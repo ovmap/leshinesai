@@ -14,6 +14,7 @@ export interface AppSettings {
   VITE_ZAI_API_KEY?: string
   VITE_MINIMAX_API_KEY?: string
   VITE_DEEPSEEK_API_KEY?: string
+  VITE_DASHSCOPE_API_KEY?: string
   VITE_GROQ_API_KEY?: string
   sttProvider?: 'openai' | 'groq' | 'transformers'
   aiProvider?:
@@ -24,6 +25,7 @@ export interface AppSettings {
     | 'zai'
     | 'minimax'
     | 'deepseek'
+    | 'dashscope'
     | 'codex'
 
   // Transformers STT settings
@@ -39,6 +41,7 @@ export interface AppSettings {
   zaiBaseUrl?: string
   minimaxBaseUrl?: string
   deepseekBaseUrl?: string
+  dashscopeBaseUrl?: string
   codexAuthConnected?: boolean
   codexAccountLabel?: string
 
@@ -103,10 +106,10 @@ export async function loadSettings(): Promise<AppSettings | null> {
     const settings = JSON.parse(jsonData) as AppSettings
     console.log('Settings loaded from:', settingsFilePath)
     return settings
-  } catch (error) {
+  } catch (error: unknown) {
     console.warn(
       'Failed to load settings or settings file not found:',
-      error.message
+      error instanceof Error ? error.message : String(error)
     )
     return null
   }
@@ -117,10 +120,10 @@ export async function deleteSettingsFile(): Promise<void> {
     await fs.access(settingsFilePath)
     await fs.unlink(settingsFilePath)
     console.log('Settings file deleted:', settingsFilePath)
-  } catch (error) {
+  } catch (error: unknown) {
     console.warn(
       'Failed to delete settings file (it may not exist):',
-      error.message
+      error instanceof Error ? error.message : String(error)
     )
   }
 }

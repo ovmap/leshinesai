@@ -129,6 +129,7 @@ function initializeOpenAIClient(): void {
 
   openaiClient = new OpenAI({
     apiKey: settings.VITE_OPENAI_API_KEY,
+    baseURL: 'https://api.302ai.cn/v1',
     dangerouslyAllowBrowser: true,
     timeout: 20 * 1000,
     maxRetries: 1,

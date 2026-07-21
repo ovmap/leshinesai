@@ -71,6 +71,9 @@
                 (currentSettings.aiProvider === 'deepseek' &&
                   currentSettings.VITE_DEEPSEEK_API_KEY &&
                   currentSettings.deepseekBaseUrl) ||
+                (currentSettings.aiProvider === 'dashscope' &&
+                  currentSettings.VITE_DASHSCOPE_API_KEY &&
+                  currentSettings.dashscopeBaseUrl) ||
                 (currentSettings.aiProvider === 'ollama' &&
                   currentSettings.ollamaBaseUrl) ||
                 (currentSettings.aiProvider === 'lm-studio' &&
@@ -312,6 +315,9 @@
                 (currentSettings.aiProvider === 'deepseek' &&
                   currentSettings.VITE_DEEPSEEK_API_KEY &&
                   currentSettings.deepseekBaseUrl) ||
+                (currentSettings.aiProvider === 'dashscope' &&
+                  currentSettings.VITE_DASHSCOPE_API_KEY &&
+                  currentSettings.dashscopeBaseUrl) ||
                 (currentSettings.aiProvider === 'ollama' &&
                   currentSettings.ollamaBaseUrl) ||
                 (currentSettings.aiProvider === 'lm-studio' &&

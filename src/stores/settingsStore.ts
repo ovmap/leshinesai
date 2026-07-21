@@ -215,6 +215,7 @@ const settingKeyToLabelMap: Record<keyof AliceSettings, string> = {
   VITE_ZAI_API_KEY: 'Z.ai API Key',
   VITE_MINIMAX_API_KEY: 'MiniMax API Key',
   VITE_DEEPSEEK_API_KEY: 'DeepSeek API Key',
+  VITE_DASHSCOPE_API_KEY: 'DashScope API Key',
   VITE_GROQ_API_KEY: 'Groq API Key (STT)',
   VITE_GOOGLE_API_KEY: 'Google API Key',
   sttProvider: 'Speech-to-Text Provider',
@@ -231,6 +232,7 @@ const settingKeyToLabelMap: Record<keyof AliceSettings, string> = {
   zaiBaseUrl: 'Z.ai Base URL',
   minimaxBaseUrl: 'MiniMax Base URL',
   deepseekBaseUrl: 'DeepSeek Base URL',
+  dashscopeBaseUrl: 'DashScope Base URL',
   codexAuthConnected: 'ChatGPT Codex authorization',
   codexAccountLabel: 'ChatGPT Codex account',
 
@@ -357,6 +359,7 @@ export const useSettingsStore = defineStore('settings', () => {
       'zai',
       'minimax',
       'deepseek',
+      'dashscope',
       'codex',
     ] as const
     if (!validAIProviders.includes(validated.aiProvider as any)) {
@@ -444,6 +447,8 @@ export const useSettingsStore = defineStore('settings', () => {
       essentialKeys.push('VITE_MINIMAX_API_KEY', 'minimaxBaseUrl')
     } else if (settings.value.aiProvider === 'deepseek') {
       essentialKeys.push('VITE_DEEPSEEK_API_KEY', 'deepseekBaseUrl')
+    } else if (settings.value.aiProvider === 'dashscope') {
+      essentialKeys.push('VITE_DASHSCOPE_API_KEY', 'dashscopeBaseUrl')
     } else if (settings.value.aiProvider === 'codex') {
       essentialKeys.push('codexAuthConnected')
     } else if (settings.value.aiProvider === 'ollama') {
@@ -511,6 +516,13 @@ export const useSettingsStore = defineStore('settings', () => {
       return (
         !!settings.value.VITE_DEEPSEEK_API_KEY?.trim() &&
         !!settings.value.deepseekBaseUrl?.trim()
+      )
+    }
+
+    if (settings.value.aiProvider === 'dashscope') {
+      return (
+        !!settings.value.VITE_DASHSCOPE_API_KEY?.trim() &&
+        !!settings.value.dashscopeBaseUrl?.trim()
       )
     }
 
@@ -767,6 +779,10 @@ export const useSettingsStore = defineStore('settings', () => {
         settings.value.assistantModel = PROVIDER_CONFIGS.deepseek.defaultModel
         settings.value.SUMMARIZATION_MODEL =
           PROVIDER_CONFIGS.deepseek.defaultModel
+      } else if (settings.value.aiProvider === 'dashscope') {
+        settings.value.assistantModel = PROVIDER_CONFIGS.dashscope.defaultModel
+        settings.value.SUMMARIZATION_MODEL =
+          PROVIDER_CONFIGS.dashscope.defaultModel
       } else if (settings.value.aiProvider === 'codex') {
         settings.value.assistantModel = PROVIDER_CONFIGS.codex.defaultModel
         settings.value.SUMMARIZATION_MODEL =
@@ -857,6 +873,7 @@ export const useSettingsStore = defineStore('settings', () => {
         VITE_ZAI_API_KEY: settings.value.VITE_ZAI_API_KEY,
         VITE_MINIMAX_API_KEY: settings.value.VITE_MINIMAX_API_KEY,
         VITE_DEEPSEEK_API_KEY: settings.value.VITE_DEEPSEEK_API_KEY,
+        VITE_DASHSCOPE_API_KEY: settings.value.VITE_DASHSCOPE_API_KEY,
         VITE_GROQ_API_KEY: settings.value.VITE_GROQ_API_KEY,
         VITE_GOOGLE_API_KEY: settings.value.VITE_GOOGLE_API_KEY,
         sttProvider: settings.value.sttProvider,
@@ -872,6 +889,7 @@ export const useSettingsStore = defineStore('settings', () => {
         zaiBaseUrl: settings.value.zaiBaseUrl,
         minimaxBaseUrl: settings.value.minimaxBaseUrl,
         deepseekBaseUrl: settings.value.deepseekBaseUrl,
+        dashscopeBaseUrl: settings.value.dashscopeBaseUrl,
         codexAuthConnected: settings.value.codexAuthConnected,
         codexAccountLabel: settings.value.codexAccountLabel,
         assistantModel: settings.value.assistantModel,
@@ -1003,6 +1021,19 @@ export const useSettingsStore = defineStore('settings', () => {
         isSaving.value = false
         return
       }
+    } else if (currentConfigForTest.aiProvider === 'dashscope') {
+      if (!currentConfigForTest.VITE_DASHSCOPE_API_KEY?.trim()) {
+        error.value = `Essential setting '${settingKeyToLabelMap.VITE_DASHSCOPE_API_KEY}' is missing.`
+        generalStore.statusMessage = 'DashScope API Key is required.'
+        isSaving.value = false
+        return
+      }
+      if (!currentConfigForTest.dashscopeBaseUrl?.trim()) {
+        error.value = `Essential setting '${settingKeyToLabelMap.dashscopeBaseUrl}' is missing.`
+        generalStore.statusMessage = 'DashScope Base URL is required.'
+        isSaving.value = false
+        return
+      }
     } else if (currentConfigForTest.aiProvider === 'codex') {
       if (!currentConfigForTest.codexAuthConnected) {
         error.value = `Essential setting '${settingKeyToLabelMap.codexAuthConnected}' is missing.`
@@ -1129,6 +1160,7 @@ export const useSettingsStore = defineStore('settings', () => {
     VITE_ZAI_API_KEY?: string
     VITE_MINIMAX_API_KEY?: string
     VITE_DEEPSEEK_API_KEY?: string
+    VITE_DASHSCOPE_API_KEY?: string
     sttProvider: 'openai' | 'groq' | 'google' | 'local'
     ttsProvider?: 'openai' | 'google' | 'local'
     embeddingProvider?: 'openai' | 'local'
@@ -1142,6 +1174,7 @@ export const useSettingsStore = defineStore('settings', () => {
     zaiBaseUrl?: string
     minimaxBaseUrl?: string
     deepseekBaseUrl?: string
+    dashscopeBaseUrl?: string
     useLocalModels?: boolean
     localSttLanguage?: string
   }) {
@@ -1153,6 +1186,8 @@ export const useSettingsStore = defineStore('settings', () => {
       onboardingData.VITE_MINIMAX_API_KEY || ''
     settings.value.VITE_DEEPSEEK_API_KEY =
       onboardingData.VITE_DEEPSEEK_API_KEY || ''
+    settings.value.VITE_DASHSCOPE_API_KEY =
+      onboardingData.VITE_DASHSCOPE_API_KEY || ''
     settings.value.sttProvider = onboardingData.sttProvider
     settings.value.aiProvider = onboardingData.aiProvider
     settings.value.VITE_GROQ_API_KEY = onboardingData.VITE_GROQ_API_KEY
@@ -1195,6 +1230,9 @@ export const useSettingsStore = defineStore('settings', () => {
     }
     if (onboardingData.deepseekBaseUrl) {
       settings.value.deepseekBaseUrl = onboardingData.deepseekBaseUrl
+    }
+    if (onboardingData.dashscopeBaseUrl) {
+      settings.value.dashscopeBaseUrl = onboardingData.dashscopeBaseUrl
     }
 
     settings.value.onboardingCompleted = true
