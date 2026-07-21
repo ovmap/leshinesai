@@ -22,6 +22,7 @@
             <option value="zai">Z.ai (Coding Plan)</option>
             <option value="minimax">MiniMax</option>
             <option value="deepseek">DeepSeek</option>
+            <option value="dashscope">通义千问</option>
             <option value="codex">ChatGPT Codex</option>
             <option value="ollama">Ollama (Local)</option>
             <option value="lm-studio">LM Studio (Local)</option>
@@ -228,6 +229,37 @@
           />
           <p class="text-xs text-gray-400 mt-1">
             OpenAI-compatible endpoint for DeepSeek chat completions.
+          </p>
+        </div>
+        <div v-if="currentSettings.aiProvider === 'dashscope'">
+          <label for="dashscope-key" class="block mb-1 text-sm"
+            >通义千问 API Key *</label
+          >
+          <input
+            id="dashscope-key"
+            type="password"
+            v-model="currentSettings.VITE_DASHSCOPE_API_KEY"
+            class="input focus:outline-none w-full"
+            autocomplete="new-password"
+            placeholder="sk-..."
+          />
+          <p class="text-xs text-gray-400 mt-1">
+            Required for DashScope (通义千问) chat models.
+          </p>
+        </div>
+        <div v-if="currentSettings.aiProvider === 'dashscope'">
+          <label for="dashscope-url" class="block mb-1 text-sm"
+            >通义千问 Base URL *</label
+          >
+          <input
+            id="dashscope-url"
+            type="text"
+            v-model="currentSettings.dashscopeBaseUrl"
+            class="input focus:outline-none w-full"
+            placeholder="https://dashscope.aliyuncs.com/compatible-mode/v1"
+          />
+          <p class="text-xs text-gray-400 mt-1">
+            OpenAI-compatible endpoint for DashScope chat completions.
           </p>
         </div>
         <div v-if="currentSettings.aiProvider === 'codex'">

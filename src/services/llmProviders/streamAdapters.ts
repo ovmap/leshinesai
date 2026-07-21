@@ -4,7 +4,7 @@ function isAbortError(error: any): boolean {
 
 export async function* convertLocalLLMStreamToResponsesFormat(
   stream: any,
-  provider: 'ollama' | 'lm-studio' | 'zai' | 'minimax' | 'deepseek'
+  provider: 'ollama' | 'lm-studio' | 'zai' | 'minimax' | 'deepseek' | 'dashscope'
 ) {
   let responseId = `${provider}-${Date.now()}`
   let messageItemId = `message-${Date.now()}`

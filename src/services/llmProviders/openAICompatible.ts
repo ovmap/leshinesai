@@ -10,7 +10,7 @@ import {
 } from './providerCatalog'
 
 type OpenAIClientGetter = () => OpenAI
-type OpenAICompatibleProviderKey = 'zai' | 'minimax' | 'deepseek'
+type OpenAICompatibleProviderKey = 'zai' | 'minimax' | 'deepseek' | 'dashscope'
 
 function convertResponsesInputToChatMessages(
   input: OpenAI.Responses.Request.InputItemLike[]
@@ -337,6 +337,12 @@ export async function createOpenAICompatibleResponse(
 
   if (provider === 'deepseek') {
     ;(params as any).thinking = { type: 'disabled' }
+  }
+
+  if (provider === 'dashscope') {
+    if (!settings.VITE_DASHSCOPE_API_KEY?.trim()) {
+      throw new Error('DashScope (通义千问) API Key is not configured.')
+    }
   }
 
   if (provider === 'minimax') {

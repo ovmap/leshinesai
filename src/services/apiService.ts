@@ -10,6 +10,7 @@ import {
   getZAIClient,
   getMiniMaxClient,
   getDeepSeekClient,
+  getDashScopeClient,
 } from './apiClients'
 import {
   createOpenAIResponse as createOpenAIResponseWithOpenAI,
@@ -33,6 +34,10 @@ import {
   createDeepSeekResponse,
   listDeepSeekModels,
 } from './llmProviders/deepseek'
+import {
+  createDashScopeResponse,
+  listDashScopeModels,
+} from './llmProviders/dashscope'
 import {
   createCodexResponse,
   createCodexTextResponse,
@@ -120,6 +125,8 @@ function getAIClient(): OpenAI {
       return getMiniMaxClient()
     case 'deepseek':
       return getDeepSeekClient()
+    case 'dashscope':
+      return getDashScopeClient()
     default:
       return getOpenAIClient()
   }
@@ -144,6 +151,9 @@ export const fetchOpenAIModels = async (): Promise<OpenAI.Models.Model[]> => {
   }
   if (settings.aiProvider === 'deepseek') {
     return listDeepSeekModels()
+  }
+  if (settings.aiProvider === 'dashscope') {
+    return listDashScopeModels()
   }
   if (settings.aiProvider === 'codex') {
     return listCodexModels()
@@ -207,6 +217,15 @@ export const createOpenAIResponse = async (
   }
   if (settings.aiProvider === 'deepseek') {
     return createDeepSeekResponse(
+      input,
+      previousResponseId,
+      stream,
+      customInstructions,
+      signal
+    )
+  }
+  if (settings.aiProvider === 'dashscope') {
+    return createDashScopeResponse(
       input,
       previousResponseId,
       stream,

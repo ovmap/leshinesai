@@ -7,6 +7,7 @@ import { DEFAULT_PERSONA_PROMPT } from '../prompts/defaultPersonaPrompt'
 import {
   DEEPSEEK_OPENAI_BASE_URL,
   MINIMAX_OPENAI_BASE_URL,
+  DASHSCOPE_OPENAI_BASE_URL,
   PROVIDER_CONFIGS,
   ZAI_CODING_BASE_URL,
   getProviderDisplayName,
@@ -34,6 +35,7 @@ export interface AliceSettings {
   VITE_ZAI_API_KEY: string
   VITE_MINIMAX_API_KEY: string
   VITE_DEEPSEEK_API_KEY: string
+  VITE_DASHSCOPE_API_KEY: string
   VITE_GROQ_API_KEY: string
   VITE_GOOGLE_API_KEY: string
   sttProvider: 'openai' | 'groq' | 'google' | 'local'
@@ -50,6 +52,7 @@ export interface AliceSettings {
   zaiBaseUrl: string
   minimaxBaseUrl: string
   deepseekBaseUrl: string
+  dashscopeBaseUrl: string
   codexAuthConnected: boolean
   codexAccountLabel: string
 
@@ -113,6 +116,9 @@ function hasMinimumConfigForOnboarding(config: AliceSettings): boolean {
   if (config.VITE_DEEPSEEK_API_KEY?.trim()) {
     return true
   }
+  if (config.VITE_DASHSCOPE_API_KEY?.trim()) {
+    return true
+  }
   if (config.codexAuthConnected) {
     return true
   }
@@ -133,6 +139,7 @@ const defaultSettings: AliceSettings = {
   VITE_ZAI_API_KEY: '',
   VITE_MINIMAX_API_KEY: '',
   VITE_DEEPSEEK_API_KEY: '',
+  VITE_DASHSCOPE_API_KEY: '',
   VITE_GROQ_API_KEY: '',
   VITE_GOOGLE_API_KEY: '',
   sttProvider: 'openai',
@@ -148,6 +155,7 @@ const defaultSettings: AliceSettings = {
   zaiBaseUrl: ZAI_CODING_BASE_URL,
   minimaxBaseUrl: MINIMAX_OPENAI_BASE_URL,
   deepseekBaseUrl: DEEPSEEK_OPENAI_BASE_URL,
+  dashscopeBaseUrl: DASHSCOPE_OPENAI_BASE_URL,
   codexAuthConnected: false,
   codexAccountLabel: '',
 
@@ -274,6 +282,7 @@ const ESSENTIAL_CORE_API_KEYS: (keyof AliceSettings)[] = [
   'VITE_ZAI_API_KEY',
   'VITE_MINIMAX_API_KEY',
   'VITE_DEEPSEEK_API_KEY',
+  'VITE_DASHSCOPE_API_KEY',
 ]
 
 function requiresOpenAIKey(config: AliceSettings): boolean {

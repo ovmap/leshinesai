@@ -1,3 +1,33 @@
 .input-field {
   @apply w-full p-2 bg-gray-700 border border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-colors;
 }
+
+/* Fix input text visibility - ensure dark background with light text */
+.input,
+.input input,
+textarea.textarea,
+select.select {
+  @apply bg-gray-800 text-gray-100 border-gray-600;
+}
+
+.input:focus,
+textarea.textarea:focus,
+select.select:focus {
+  @apply bg-gray-800 text-gray-100 border-blue-500;
+}
+
+/* Placeholder styling */
+.input::placeholder,
+textarea.textarea::placeholder {
+  @apply text-gray-500;
+}
+
+/* Number input arrows visibility */
+input[type="number"] {
+  @apply bg-gray-800 text-gray-100;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  @apply opacity-100;
+}

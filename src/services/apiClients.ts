@@ -5,6 +5,7 @@ import { backendApi } from './backendApi'
 import {
   DEEPSEEK_OPENAI_BASE_URL,
   MINIMAX_OPENAI_BASE_URL,
+  DASHSCOPE_OPENAI_BASE_URL,
   ZAI_CODING_BASE_URL,
 } from './llmProviders/providerCatalog'
 
@@ -16,6 +17,7 @@ let lmStudioClient: OpenAI | null = null
 let zaiClient: OpenAI | null = null
 let minimaxClient: OpenAI | null = null
 let deepseekClient: OpenAI | null = null
+let dashscopeClient: OpenAI | null = null
 
 export function getOpenAIClient(): OpenAI {
   if (!openaiClient) {
@@ -97,11 +99,32 @@ export function getDeepSeekClient(): OpenAI {
   return deepseekClient
 }
 
+export function getDashScopeClient(): OpenAI {
+  if (!dashscopeClient) {
+    initializeDashScopeClient()
+  }
+  if (!dashscopeClient) {
+    throw new Error('DashScope (通义千问) client could not be initialized')
+  }
+  return dashscopeClient
+}
+
 function initializeOpenAIClient(): void {
   const settings = useSettingsStore().config
+
   if (!settings.VITE_OPENAI_API_KEY) {
-    console.error('OpenAI API Key is not configured.')
-    throw new Error('OpenAI API Key is not configured.')
+    const needsOpenAI =
+      settings.sttProvider === 'openai' ||
+      settings.ttsProvider === 'openai' ||
+      settings.embeddingProvider === 'openai'
+
+    if (needsOpenAI) {
+      console.warn('OpenAI API Key is not configured but required for STT/TTS/Embeddings.')
+      throw new Error('OpenAI API Key is not configured.')
+    }
+
+    console.log('OpenAI API Key not set - skipping (not required for current provider)')
+    return
   }
 
   openaiClient = new OpenAI({
@@ -226,6 +249,22 @@ function initializeDeepSeekClient(): void {
   })
 }
 
+function initializeDashScopeClient(): void {
+  const settings = useSettingsStore().config
+  if (!settings.VITE_DASHSCOPE_API_KEY) {
+    console.error('DashScope (通义千问) API Key is not configured.')
+    throw new Error('DashScope (通义千问) API Key is not configured.')
+  }
+
+  dashscopeClient = new OpenAI({
+    apiKey: settings.VITE_DASHSCOPE_API_KEY,
+    baseURL: settings.dashscopeBaseUrl || DASHSCOPE_OPENAI_BASE_URL,
+    dangerouslyAllowBrowser: true,
+    timeout: 20 * 1000,
+    maxRetries: 1,
+  })
+}
+
 export function reinitializeClients(): void {
   console.log('Reinitializing API clients with updated settings...')
 
@@ -291,6 +330,14 @@ export function reinitializeClients(): void {
   } catch (error) {
     console.error('Failed to reinitialize DeepSeek client:', error)
     deepseekClient = null
+  }
+
+  try {
+    initializeDashScopeClient()
+    console.log('DashScope (通义千问) client reinitialized successfully')
+  } catch (error) {
+    console.error('Failed to reinitialize DashScope client:', error)
+    dashscopeClient = null
   }
 }
 

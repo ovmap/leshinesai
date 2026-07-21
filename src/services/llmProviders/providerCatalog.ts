@@ -7,6 +7,7 @@ export type AIProviderKey =
   | 'minimax'
   | 'deepseek'
   | 'codex'
+  | 'dashscope'
 
 export type ChatCompletionsProviderKey = Exclude<AIProviderKey, 'openai' | 'codex'>
 
@@ -37,6 +38,12 @@ export const MINIMAX_TEXT_MODELS: ProviderModelDefinition[] = [
 export const DEEPSEEK_TEXT_MODELS: ProviderModelDefinition[] = [
   { id: 'deepseek-v4-flash', displayName: 'DeepSeek V4 Flash' },
   { id: 'deepseek-v4-pro', displayName: 'DeepSeek V4 Pro' },
+]
+
+export const DASHSCOPE_TEXT_MODELS: ProviderModelDefinition[] = [
+  { id: 'qwen3.7-plus', displayName: 'Qwen 3.7 Plus' },
+  { id: 'qwen3.6-plus', displayName: 'Qwen 3.6 Plus' },
+  { id: 'glm-5', displayName: 'GLM-5' },
 ]
 
 export const CODEX_TEXT_MODELS: ProviderModelDefinition[] = [
@@ -91,11 +98,17 @@ export const PROVIDER_CONFIGS: Record<AIProviderKey, ProviderConfig> = {
     defaultModel: 'gpt-5.4',
     nativeWebSearch: false,
   },
+  dashscope: {
+    displayName: '通义千问',
+    defaultModel: 'qwen3.7-plus',
+    nativeWebSearch: false,
+  },
 }
 
 export const ZAI_CODING_BASE_URL = 'https://api.z.ai/api/coding/paas/v4'
 export const MINIMAX_OPENAI_BASE_URL = 'https://api.minimax.io/v1'
 export const DEEPSEEK_OPENAI_BASE_URL = 'https://api.deepseek.com'
+export const DASHSCOPE_OPENAI_BASE_URL = 'https://llm-mbjyaswuzgod1hqv.cn-beijing.maas.aliyuncs.com/compatible-mode/v1'
 
 export const CHAT_COMPLETIONS_PROVIDERS: ChatCompletionsProviderKey[] = [
   'openrouter',
@@ -104,6 +117,7 @@ export const CHAT_COMPLETIONS_PROVIDERS: ChatCompletionsProviderKey[] = [
   'zai',
   'minimax',
   'deepseek',
+  'dashscope',
 ]
 
 export function getProviderDisplayName(provider: string): string {
@@ -121,6 +135,9 @@ export function getStaticModelsForProvider(
   }
   if (provider === 'deepseek') {
     return DEEPSEEK_TEXT_MODELS
+  }
+  if (provider === 'dashscope') {
+    return DASHSCOPE_TEXT_MODELS
   }
   if (provider === 'codex') {
     return CODEX_TEXT_MODELS
