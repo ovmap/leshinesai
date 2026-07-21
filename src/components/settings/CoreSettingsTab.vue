@@ -494,10 +494,11 @@
           >
             <option value="openai">OpenAI (Cloud)</option>
             <option value="google">Google (Cloud)</option>
+            <option value="dashscope">通义千问 (Cloud)</option>
             <option value="local">Local (Piper)</option>
           </select>
           <p class="text-xs text-gray-400 mt-1">
-            Choose between cloud-based OpenAI TTS or local Piper TTS.
+            Choose between cloud-based TTS or local Piper TTS.
           </p>
         </div>
         <div v-if="currentSettings.ttsProvider === 'openai'">
@@ -539,6 +540,28 @@
             <option value="en-US-Wavenet-C">Wavenet C (Fem)</option>
             <option value="en-US-Wavenet-F">Wavenet F (Fem)</option>
           </select>
+        </div>
+        <div v-if="currentSettings.ttsProvider === 'dashscope'">
+          <label for="dashscope-tts-voice" class="block mb-1 text-sm"
+            >通义千问 TTS Voice</label
+          >
+          <select
+            id="dashscope-tts-voice"
+            v-model="currentSettings.dashscopeTtsVoice"
+            class="select select-bordered w-full focus:select-primary"
+            @change="
+              e => $emit('update:setting', 'dashscopeTtsVoice', getTargetValue(e))
+            "
+          >
+            <option value="Cherry">Cherry (女)</option>
+            <option value="Serena">Serena (女)</option>
+            <option value="Ethan">Ethan (男)</option>
+            <option value="Chelsie">Chelsie (女)</option>
+            <option value="Maia">Maia (女)</option>
+          </select>
+          <p class="text-xs text-gray-400 mt-1">
+            Using qwen3-tts-flash model.
+          </p>
         </div>
         <div v-if="currentSettings.ttsProvider === 'local'">
           <label for="local-tts-voice" class="block mb-1 text-sm"
@@ -680,12 +703,11 @@
             class="select select-bordered w-full focus:select-primary"
           >
             <option value="openai">OpenAI (Cloud)</option>
+            <option value="dashscope">通义千问 (Cloud)</option>
             <option value="local">Local (all-MiniLM-L6-v2)</option>
           </select>
           <p class="text-xs text-gray-400 mt-1">
-            Choose between cloud-based OpenAI embeddings or local
-            all-MiniLM-L6-v2 embeddings. Your existing data is preserved when
-            switching.
+            Choose between cloud-based embeddings or local all-MiniLM-L6-v2 embeddings. Your existing data is preserved when switching.
           </p>
         </div>
       </div>

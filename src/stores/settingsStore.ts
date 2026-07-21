@@ -69,11 +69,12 @@ export interface AliceSettings {
   SUMMARIZATION_MESSAGE_COUNT: number
   SUMMARIZATION_MODEL: string
   SUMMARIZATION_SYSTEM_PROMPT: string
-  ttsProvider: 'openai' | 'google' | 'local'
+  ttsProvider: 'openai' | 'google' | 'local' | 'dashscope'
   ttsVoice: 'alloy' | 'echo' | 'fable' | 'nova' | 'onyx' | 'shimmer'
   googleTtsVoice: string
   localTtsVoice: string
-  embeddingProvider: 'openai' | 'local'
+  dashscopeTtsVoice: string
+  embeddingProvider: 'openai' | 'local' | 'dashscope'
   ragEnabled: boolean
   ragPaths: string[]
   ragTopK: number
@@ -182,6 +183,7 @@ const defaultSettings: AliceSettings = {
   ttsVoice: 'nova',
   googleTtsVoice: 'en-US-Journey-F',
   localTtsVoice: 'en_US-amy-medium',
+  dashscopeTtsVoice: 'Cherry',
   embeddingProvider: 'openai',
   ragEnabled: false,
   ragPaths: [],
@@ -251,6 +253,7 @@ const settingKeyToLabelMap: Record<keyof AliceSettings, string> = {
   ttsProvider: 'Text-to-Speech Provider',
   ttsVoice: 'OpenAI TTS Voice',
   googleTtsVoice: 'Google TTS Voice',
+  dashscopeTtsVoice: 'DashScope TTS Voice',
   localTtsVoice: 'Local TTS Voice',
   embeddingProvider: 'Embedding Provider',
   ragEnabled: 'Local Documents (RAG) Enabled',
@@ -909,6 +912,7 @@ export const useSettingsStore = defineStore('settings', () => {
         ttsProvider: settings.value.ttsProvider,
         ttsVoice: settings.value.ttsVoice,
         googleTtsVoice: settings.value.googleTtsVoice,
+        dashscopeTtsVoice: settings.value.dashscopeTtsVoice,
         localTtsVoice: settings.value.localTtsVoice,
         embeddingProvider: settings.value.embeddingProvider,
         ragEnabled: settings.value.ragEnabled,
@@ -1162,8 +1166,8 @@ export const useSettingsStore = defineStore('settings', () => {
     VITE_DEEPSEEK_API_KEY?: string
     VITE_DASHSCOPE_API_KEY?: string
     sttProvider: 'openai' | 'groq' | 'google' | 'local'
-    ttsProvider?: 'openai' | 'google' | 'local'
-    embeddingProvider?: 'openai' | 'local'
+    ttsProvider?: 'openai' | 'google' | 'local' | 'dashscope'
+    embeddingProvider?: 'openai' | 'local' | 'dashscope'
     aiProvider: AIProviderKey
     assistantModel?: string
     summarizationModel?: string

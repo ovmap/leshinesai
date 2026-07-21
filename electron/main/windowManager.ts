@@ -65,6 +65,7 @@ export async function createMainWindow(): Promise<BrowserWindow> {
       preload: getPreloadPath(),
       offscreen: false,
       backgroundThrottling: false,
+      webSecurity: false,
     },
   })
 
@@ -115,6 +116,7 @@ export async function createOverlayWindow(): Promise<BrowserWindow> {
       preload: getPreloadPath(),
       offscreen: false,
       backgroundThrottling: false,
+      webSecurity: false,
     },
   })
 
@@ -223,6 +225,7 @@ export async function createSettingsWindow(): Promise<BrowserWindow> {
       preload: getPreloadPath(),
       offscreen: false,
       backgroundThrottling: false,
+      webSecurity: false,
     },
   })
 

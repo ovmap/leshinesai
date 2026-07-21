@@ -318,6 +318,13 @@ export const ttsStream = async (
       console.error('Google TTS failed, falling back to OpenAI:', error)
       return fallbackToOpenAITTS(cleanedText, signal)
     }
+  } else if (settings.ttsProvider === 'dashscope') {
+    try {
+      return await dashScopeTTS(cleanedText, signal)
+    } catch (error) {
+      console.error('DashScope TTS failed, falling back to OpenAI:', error)
+      return fallbackToOpenAITTS(cleanedText, signal)
+    }
   } else {
     return fallbackToOpenAITTS(cleanedText, signal)
   }
@@ -375,6 +382,70 @@ const googleTTS = async (
   }
   const blob = new Blob([bytes.buffer], { type: 'audio/mp3' })
   return new Response(blob)
+}
+
+const dashScopeTTS = async (
+  text: string,
+  signal: AbortSignal
+): Promise<Response> => {
+  const settings = useSettingsStore().config
+  const apiKey = settings.VITE_DASHSCOPE_API_KEY
+
+  if (!apiKey) {
+    throw new Error('DashScope API Key is not configured')
+  }
+
+  const voice = settings.dashscopeTtsVoice || 'Cherry'
+
+  const response = await fetch(
+    'https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation',
+    {
+      method: 'POST',
+      signal,
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'qwen3-tts-flash',
+        input: {
+          text: text,
+          voice: voice,
+          language_type: 'Chinese',
+        },
+      }),
+    }
+  )
+
+  if (!response.ok) {
+    const errorText = await response.text()
+    throw new Error(
+      `DashScope TTS Error: ${response.status} - ${errorText}`
+    )
+  }
+
+  const data = await response.json()
+  
+  // Get audio URL from response
+  const audioUrl = data.output?.audio?.url
+  if (!audioUrl) {
+    throw new Error('DashScope TTS: No audio URL in response')
+  }
+
+  // Fetch actual audio from OSS URL
+  const audioResponse = await fetch(audioUrl, { signal })
+  if (!audioResponse.ok) {
+    throw new Error(`DashScope TTS: Failed to download audio from OSS`)
+  }
+
+  const audioBlob = await audioResponse.blob()
+  return new Response(audioBlob, {
+    status: 200,
+    statusText: 'OK',
+    headers: {
+      'Content-Type': 'audio/mp3',
+    },
+  })
 }
 
 // Helper function for OpenAI TTS (extracted from original function)
@@ -619,6 +690,16 @@ export const createEmbedding = async (textInput: any): Promise<number[]> => {
 
   if (!textToEmbed.trim()) return []
 
+  // DashScope embedding provider
+  if (settings.embeddingProvider === 'dashscope') {
+    try {
+      return await fallbackToDashScopeEmbedding(textToEmbed)
+    } catch (error) {
+      console.error('DashScope embedding failed:', error)
+      return []
+    }
+  }
+
   const hasOpenAIKey = !!settings.VITE_OPENAI_API_KEY?.trim()
   const shouldPreferLocal =
     settings.embeddingProvider === 'local' ||
@@ -691,6 +772,44 @@ const fallbackToOpenAIEmbedding = async (
     encoding_format: 'float',
   })
   return response.data[0]?.embedding || []
+}
+
+const fallbackToDashScopeEmbedding = async (
+  textToEmbed: string
+): Promise<number[]> => {
+  const settings = useSettingsStore().config
+  const apiKey = settings.VITE_DASHSCOPE_API_KEY
+
+  if (!apiKey) {
+    throw new Error('DashScope API Key is not configured')
+  }
+
+  const response = await fetch(
+    'https://dashscope.aliyuncs.com/compatible-mode/v1/embeddings',
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'text-embedding-v4',
+        input: textToEmbed,
+        dimensions: 1536,
+        encoding_format: 'float',
+      }),
+    }
+  )
+
+  if (!response.ok) {
+    const errorText = await response.text()
+    throw new Error(
+      `DashScope Embedding Error: ${response.status} - ${errorText}`
+    )
+  }
+
+  const data = await response.json()
+  return data.data?.[0]?.embedding || []
 }
 
 export const indexMessageForThoughts = async (
