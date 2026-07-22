@@ -435,17 +435,18 @@ app.whenReady().then(async () => {
   await createOverlayWindow()
   checkForUpdates()
 
-  try {
-    console.log('[Main App Ready] Starting Go AI backend...')
-    const backendStarted = await backendManager.start()
-    if (backendStarted) {
-      console.log('[Main App Ready] Go AI backend started successfully')
-    } else {
-      console.error('[Main App Ready] Failed to start Go AI backend')
-    }
-  } catch (error) {
-    console.error('[Main App Ready] Error starting Go AI backend:', error)
-  }
+  // Go backend disabled - using cloud processing only go后端，先不用，后续用的话把注释取消
+  // try {
+  //   console.log('[Main App Ready] Starting Go AI backend...')
+  //   const backendStarted = await backendManager.start()
+  //   if (backendStarted) {
+  //     console.log('[Main App Ready] Go AI backend started successfully')
+  //   } else {
+  //     console.error('[Main App Ready] Failed to start Go AI backend')
+  //   }
+  // } catch (error) {
+  //   console.error('[Main App Ready] Error starting Go AI backend:', error)
+  // }
 
   if (initialSettings && isBrowserContextToolEnabled(initialSettings)) {
     console.log(
@@ -479,7 +480,8 @@ app.on('before-quit', async event => {
 
   try {
     await Promise.race([
-      Promise.all([ensureThoughtStoreSave(), backendManager.stop()]),
+      // Promise.all([ensureThoughtStoreSave(), backendManager.stop()]), // Go backend disabled 本地go后端，先注释，后续用的话把下面一行删除，这行取消注释
+      ensureThoughtStoreSave(),
       new Promise((_, reject) =>
         setTimeout(() => reject(new Error('Cleanup timeout')), 4000)
       ),
