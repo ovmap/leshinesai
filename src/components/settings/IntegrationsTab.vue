@@ -188,24 +188,24 @@
         <div
           v-if="currentSettings.assistantTools.includes('perform_web_search')"
         >
-          <label for="tavily-key" class="block mb-1 text-sm"
-            >Tavily API Key (Web Search)</label
+          <label for="metaso-key" class="block mb-1 text-sm"
+            >Metaso API Key (Web Search)</label
           >
           <input
-            id="tavily-key"
+            id="metaso-key"
             type="password"
-            v-model="currentSettings.VITE_TAVILY_API_KEY"
+            v-model="currentSettings.VITE_METASO_API_KEY"
             class="input focus:outline-none w-full"
             autocomplete="new-password"
-            placeholder="tvly-..."
+            placeholder="mk-..."
           />
           <p class="text-xs text-gray-400 mt-1">
             Required for web search functionality. Get your API key from
             <a
-              href="https://tavily.com"
+              href="https://metaso.cn"
               target="_blank"
               class="link link-primary"
-              >Tavily</a
+              >Metaso (秘塔)</a
             >.
           </p>
         </div>

@@ -546,15 +546,15 @@ async function browser_context(
 }
 
 /**
- * Performs a web search using the Tavily API.
+ * Performs a web search using the Metaso (秘塔) API.
  */
 async function perform_web_search(
   args: WebSearchArgs,
   settings?: any
 ): Promise<FunctionResult> {
-  const TAVILY_API_KEY = settings?.VITE_TAVILY_API_KEY
-  if (!TAVILY_API_KEY) {
-    return { success: false, error: 'Tavily API key is not configured.' }
+  const METASO_API_KEY = settings?.VITE_METASO_API_KEY
+  if (!METASO_API_KEY) {
+    return { success: false, error: 'Metaso API key is not configured.' }
   }
   if (!args.query) {
     return { success: false, error: 'Search query is missing.' }
@@ -563,32 +563,41 @@ async function perform_web_search(
   console.log(`Performing web search for: ${args.query}`)
   try {
     const response = await axios.post(
-      'https://api.tavily.com/search',
+      'https://metaso.cn/api/v1/search',
       {
-        api_key: TAVILY_API_KEY,
-        query: args.query,
-        search_depth: 'basic',
-        include_answer: true,
-        max_results: 5,
+        q: args.query,
+        scope: 'webpage',
+        includeSummary: false,
+        size: 10,
+        includeRawContent: false,
+        conciseSnippet: false,
       },
-      { timeout: 10000 }
+      {
+        headers: {
+          Authorization: `Bearer ${METASO_API_KEY}`,
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        timeout: 10000,
+      }
     )
 
-    const answer = response.data.answer
-    const results = response.data.results?.map((res: any) => ({
-      title: res.title,
-      url: res.url,
-      snippet: res.content,
+    // Metaso returns results in 'webpages' field
+    const results = response.data?.webpages?.map((res: any) => ({
+      title: res.title || 'No Title',
+      url: res.url || '',
+      snippet: res.snippet || res.content || res.description || '',
     }))
 
-    const responseData = answer
-      ? { answer: answer, sources: results }
-      : { results: results || 'No results found.' }
+    const responseData = {
+      results: results || 'No results found.',
+      query: args.query,
+    }
 
     console.log('Web search successful.')
     return { success: true, data: responseData }
   } catch (error: any) {
-    console.error('Tavily API error:', error.response?.data || error.message)
+    console.error('Metaso API error:', error.response?.data || error.message)
     return {
       success: false,
       error: `Failed to perform web search: ${error.response?.data?.error || error.message}`,

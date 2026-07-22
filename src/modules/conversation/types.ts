@@ -102,7 +102,7 @@ export interface ToolCallHandlerDependencies {
     functionName: string
     content: string
   }): void
-  executeFunction(functionName: string, args: object): Promise<string>
+  executeFunction(functionName: string, args: object, settings?: any): Promise<string>
   buildApiInput(
     isNewChainAfterTool: boolean
   ): Promise<OpenAI.Responses.Request.InputItemLike[]>

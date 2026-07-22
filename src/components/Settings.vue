@@ -294,7 +294,7 @@ const availableModelsForSelect = computed(() => {
 const toolDependencies: Record<string, string[]> = {
   search_torrents: ['VITE_JACKETT_API_KEY', 'VITE_JACKETT_URL'],
   add_torrent_to_qb: ['VITE_QB_URL', 'VITE_QB_USERNAME', 'VITE_QB_PASSWORD'],
-  perform_web_search: ['VITE_TAVILY_API_KEY'],
+  perform_web_search: ['VITE_METASO_API_KEY'],
   get_calendar_events: ['GOOGLE_AUTH'],
   create_calendar_event: ['GOOGLE_AUTH'],
   update_calendar_event: ['GOOGLE_AUTH'],

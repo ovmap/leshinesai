@@ -77,7 +77,7 @@ export interface AppSettings {
   VITE_QB_USERNAME?: string
   VITE_QB_PASSWORD?: string
 
-  VITE_TAVILY_API_KEY?: string
+  VITE_METASO_API_KEY?: string
 
   VITE_SEARXNG_URL?: string
   VITE_SEARXNG_API_KEY?: string

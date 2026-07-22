@@ -90,7 +90,7 @@ export interface AliceSettings {
   VITE_QB_USERNAME: string
   VITE_QB_PASSWORD: string
 
-  VITE_TAVILY_API_KEY: string
+  VITE_METASO_API_KEY: string
 
   VITE_SEARXNG_URL: string
   VITE_SEARXNG_API_KEY: string
@@ -200,7 +200,7 @@ const defaultSettings: AliceSettings = {
   VITE_QB_USERNAME: '',
   VITE_QB_PASSWORD: '',
 
-  VITE_TAVILY_API_KEY: '',
+  VITE_METASO_API_KEY: '',
 
   VITE_SEARXNG_URL: '',
   VITE_SEARXNG_API_KEY: '',
@@ -270,7 +270,7 @@ const settingKeyToLabelMap: Record<keyof AliceSettings, string> = {
   VITE_QB_USERNAME: 'qBittorrent Username',
   VITE_QB_PASSWORD: 'qBittorrent Password',
 
-  VITE_TAVILY_API_KEY: 'Tavily API Key (Web Search)',
+  VITE_METASO_API_KEY: 'Metaso API Key (Web Search)',
 
   VITE_SEARXNG_URL: 'SearXNG Instance URL',
   VITE_SEARXNG_API_KEY: 'SearXNG API Key (optional)',
@@ -927,7 +927,7 @@ export const useSettingsStore = defineStore('settings', () => {
         VITE_QB_URL: settings.value.VITE_QB_URL,
         VITE_QB_USERNAME: settings.value.VITE_QB_USERNAME,
         VITE_QB_PASSWORD: settings.value.VITE_QB_PASSWORD,
-        VITE_TAVILY_API_KEY: settings.value.VITE_TAVILY_API_KEY,
+        VITE_METASO_API_KEY: settings.value.VITE_METASO_API_KEY,
         VITE_SEARXNG_URL: settings.value.VITE_SEARXNG_URL,
         VITE_SEARXNG_API_KEY: settings.value.VITE_SEARXNG_API_KEY,
         websocketPort: settings.value.websocketPort,

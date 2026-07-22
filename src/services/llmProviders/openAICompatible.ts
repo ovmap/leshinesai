@@ -342,7 +342,9 @@ export async function createOpenAICompatibleResponse(
   if (provider === 'dashscope') {
     if (!settings.VITE_DASHSCOPE_API_KEY?.trim()) {
       throw new Error('DashScope (通义千问) API Key is not configured.')
-    }
+    };
+    // 关闭通义千问的混合思考模式
+    (params as any).enable_thinking = false
   }
 
   if (provider === 'minimax') {
