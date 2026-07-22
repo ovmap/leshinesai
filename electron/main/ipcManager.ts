@@ -83,6 +83,8 @@ import {
   createSettingsWindow,
   closeSettingsWindow,
   setOverlayOpacity,
+  createDashboardWindow,
+  closeDashboard,
 } from './windowManager'
 import {
   registerMicrophoneToggleHotkey,
@@ -585,6 +587,27 @@ export function registerIPCHandlers(): void {
       return { success: true }
     } catch (error: any) {
       console.error('[IPC settings-window:close] Error:', error)
+      return { success: false, error: error.message }
+    }
+  })
+
+  // Dashboard window management
+  ipcMain.handle('dashboard:open', async (event, params) => {
+    try {
+      const window = await createDashboardWindow(params || {})
+      return { success: true, windowId: window.id }
+    } catch (error: any) {
+      console.error('[IPC dashboard:open] Error:', error)
+      return { success: false, error: error.message }
+    }
+  })
+
+  ipcMain.handle('dashboard:close', () => {
+    try {
+      const result = closeDashboard()
+      return { success: result }
+    } catch (error: any) {
+      console.error('[IPC dashboard:close] Error:', error)
       return { success: false, error: error.message }
     }
   })

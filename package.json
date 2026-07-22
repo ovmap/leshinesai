@@ -59,14 +59,18 @@
     "vue-tsc": "^2.0.6"
   },
   "dependencies": {
+    "@ant-design/icons-vue": "^7.0.1",
     "@electron/node-gyp": "^10.2.0-electron.2",
     "@ricky0123/vad-web": "^0.0.24",
     "@tailwindcss/vite": "^4.3.2",
     "@types/node-cron": "^3.0.11",
+    "ant-design-vue": "^4.2.6",
     "better-sqlite3": "^9.6.0",
     "bufferutil": "^4.1.0",
     "cheerio": "^1.0.0-rc.12",
+    "dayjs": "^1.11.21",
     "dompurify": "^3.3.0",
+    "echarts": "^6.1.0",
     "electron-log": "^5.4.3",
     "electron-updater": "^6.6.2",
     "googleapis": "^166.0.0",

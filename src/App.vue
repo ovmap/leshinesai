@@ -1,8 +1,9 @@
 <template>
-  <template v-if="showOnboarding || showSettings || showOverlay">
+  <template v-if="showOnboarding || showSettings || showOverlay || showDashboard">
     <Overlay v-if="showOverlay" />
     <OnboardingWizard v-if="showOnboarding" />
     <SettingsWindow v-if="showSettings" />
+    <DashboardView v-if="showDashboard" />
   </template>
   <Main v-else />
   <CommandApprovalDialog
@@ -52,6 +53,7 @@ import Main from './components/Main.vue'
 import Overlay from './components/Overlay.vue'
 import OnboardingWizard from './components/wizard/OnboardingWizard.vue'
 import SettingsWindow from './components/SettingsWindow.vue'
+import DashboardView from './components/DashboardView.vue'
 import CommandApprovalDialog from './components/CommandApprovalDialog.vue'
 import { useSettingsStore } from './stores/settingsStore'
 import { useGeneralStore } from './stores/generalStore'
@@ -71,11 +73,15 @@ const showSettings = computed(() => {
   return route.hash === '#settings'
 })
 
+const showDashboard = computed(() => {
+  return route.hash === '#dashboard'
+})
+
 const showOnboarding = computed(() => {
   if (!settingsStore.initialLoadAttempted) {
     return false
   }
-  return route.hash !== '#settings' && route.hash !== '#overlay' && !settingsStore.settings.onboardingCompleted
+  return route.hash !== '#settings' && route.hash !== '#overlay' && route.hash !== '#dashboard' && !settingsStore.settings.onboardingCompleted
 })
 
 const updateAvailable = ref(false)

@@ -37,6 +37,7 @@ function getIndexHtmlPath(): string {
 let win: BrowserWindow | null = null
 let overlayWindow: BrowserWindow | null = null
 let settingsWindow: BrowserWindow | null = null
+let dashboardWindow: BrowserWindow | null = null
 
 export function getMainWindow(): BrowserWindow | null {
   return win
@@ -259,10 +260,82 @@ export function closeSettingsWindow(): void {
   }
 }
 
+export function getDashboardWindow(): BrowserWindow | null {
+  return dashboardWindow
+}
+
+export async function createDashboardWindow(params: {
+  modules?: string[]
+  filters?: object
+}): Promise<BrowserWindow> {
+  // 如果已存在，先显示并聚焦
+  if (dashboardWindow && !dashboardWindow.isDestroyed()) {
+    dashboardWindow.show()
+    dashboardWindow.focus()
+    // 发送更新参数
+    dashboardWindow.webContents.send('dashboard:update', params)
+    return dashboardWindow
+  }
+
+  const { width, height } = screen.getPrimaryDisplay().workAreaSize
+
+  dashboardWindow = new BrowserWindow({
+    title: 'Alice Dashboard',
+    icon: path.join(getVitePublic(), 'app_logo.png'),
+    width: Math.floor(width * 0.9),
+    height: Math.floor(height * 0.9),
+    minWidth: 800,
+    minHeight: 600,
+    frame: true,
+    transparent: false,
+    alwaysOnTop: false,
+    resizable: true,
+    backgroundColor: '#0f172a',
+    show: false,
+    webPreferences: {
+      preload: getPreloadPath(),
+      offscreen: false,
+      backgroundThrottling: false,
+      webSecurity: false,
+    },
+  })
+
+  const arg = 'dashboard'
+  if (VITE_DEV_SERVER_URL) {
+    await dashboardWindow.loadURL(`${VITE_DEV_SERVER_URL}#${arg}`)
+  } else {
+    await dashboardWindow.loadFile(getIndexHtmlPath(), { hash: arg })
+  }
+
+  // 传递初始参数
+  dashboardWindow.webContents.on('did-finish-load', () => {
+    dashboardWindow?.webContents.send('dashboard:init', params)
+  })
+
+  dashboardWindow.show()
+  dashboardWindow.focus()
+
+  dashboardWindow.on('closed', () => {
+    dashboardWindow = null
+    win?.webContents.send('dashboard-closed')
+  })
+
+  return dashboardWindow
+}
+
+export function closeDashboard(): boolean {
+  if (dashboardWindow && !dashboardWindow.isDestroyed()) {
+    dashboardWindow.close()
+    return true
+  }
+  return false
+}
+
 export function cleanupWindows(): void {
   win = null
   overlayWindow = null
   settingsWindow = null
+  dashboardWindow = null
 }
 
 export function registerCustomProtocol(

@@ -1031,3 +1031,122 @@ export async function get_dashboard_action(): Promise<FunctionResult> {
 4. **交互流畅**：独立窗口，可调整大小、位置，始终置顶
 
 下一步可以先实现最小可用 demo（工具调用 → 弹出窗口 → 显示模拟数据），验证整体流程后再逐步完善。
+
+数据源
+'TRANSPORT_DASHBOARD_URL',
+'https://transport-service-dashboard-tst.t-sy-in.earth.xcloud.lenovo.com'
+'TRANSPORT_AI_URL',
+'https://transport-service-ai-tst.t-sy-in.earth.xcloud.lenovo.com'
+
+请求案例：
+C:\Users\huangrui19>curl "https://transport-service-dashboard-tst.t-sy-in.earth.xcloud.lenovo.com/kanban/v1/volume/queryVolume" ^
+More?   --header "Accept: */*" ^
+More?   --header "Connection: keep-alive" ^
+More?   --header "Content-Type: application/json" ^
+More?   --header "User-Agent: PostmanRuntime-ApipostRuntime/1.1.0" ^
+More?   --data-raw "{\"fromWarehouse\":[],\"toProvince\":[],\"toRdc\":[],\"startDate\":\"2024-04-01 00:00:00\",\"endDate\":\"2026-07-22 23:59:59\",\"timeType\":\"FICAL_YEAR\",\"agg\":\"VOLUME\",\"customer\":[],\"bizType\":[],\"transType\":[],\"cityLevel\":[],\"dataSource\":[\"TMS\",\"LESTMS\",\"BTCP\",\"SEC\"],\"productType\":[]}"
+{"code":200,"msg":"成功","data":[{"timeDimension":"FY2024","totalValue":917531.397399997185,"totalYoy":null,"totalMom":"-11.09%","items":[{"timeDimension":"FY2024","value":"548934.0736999994","dataSource":"TMS"},{"timeDimension":"FY2024","value":"62003.630499999985","dataSource":"LESTMS"},{"timeDimension":"FY2024","value":"306593.6931999978","dataSource":"SEC"}]},{"timeDimension":"FY2025","totalValue":1129287.89689999825,"totalYoy":null,"totalMom":"23.08%","items":[{"timeDimension":"FY2025","value":"348448.35869999905","dataSource":"SEC"},{"timeDimension":"FY2025","value":"242478.4575999999","dataSource":"LESTMS"},{"timeDimension":"FY2025","value":"538361.0805999993","dataSource":"TMS"}]},{"timeDimension":"FY2026","totalValue":101126046.93240000717,"totalYoy":null,"totalMom":"8854.85%","items":[{"timeDimension":"FY2026","value":"100807508.82609999","dataSource":"LESTMS"},{"timeDimension":"FY2026","value":"122684.32290000017","dataSource":"TMS"},{"timeDimension":"FY202
+
+C:\Users\huangrui19\OneDrive - Lenovo\桌面\Program\Nodejs\alice>curl --request POST --url https://transport-service-dashboard-tst.t-sy-in.earth.xcloud.lenovo.com/kanban/v1/sign/queryNotSignItemByPage --header "Accept: */*" --header "Connection: keep-alive" --header "Content-Type: application/json" --header "User-Agent: PostmanRuntime-ApipostRuntime/1.1.0" --data "{\"modeType\": \"区配\", \"fromWarehouse\": [], \"toRdc\": [\"沈阳\"], \"pageSize\": 2}" 
+{"code":200,"total":23,"data":[{"dataSource":"TMS","fromWarehouse":"天津宁河CDC","carrierName":"中外运","deliveryName":"恒路","transNo":"TJNHCKYD20260720T08807","invoiceNo":"TJNHCKFHD20260720T10188","expressNo":null,"transportationType":"公路运输","modeType":"区配","toWarehouse":"沈阳","toProvince":"辽宁","toCity":"沈阳市","toCounty":"大东区","deliveryParty":"京东电器辽宁分部沈阳超体卖场库","channel":null,"deliverTime":"2026-07-20 20:25:11","arrivalRdcTime":"2026-07-22 14:30:00","planArrivalTime":"2026-07-22 23:00:00","goodsNum":18,"volume":0.27648,"orderStatus":"正常","predictArrivalCustomerTime":"2026-07-22 23:00:00","channelName":null,"transType":"公路运输"},{"dataSource":"TMS","fromWarehouse":"天津宁河CDC","carrierName":"中外运","deliveryName":"恒路","transNo":"TJNHCKYD20260720T01104","invoiceNo":"TJNHCKFHD20260720T01637","expressNo":null,"transportationType":"公路运输","modeType":"区配","toWarehouse":"沈阳","toProvince":"辽宁","toCity":"沈阳市","toCounty":"浑南区","deliveryParty":"辽宁京邦达供应链科技有限公司","channel":null,"deliverTime":"2026-07-20 13:06:54","arrivalRdcTime":"2026-07-22 14:30:00","planArrivalTime":"2026-07-22 23:00:00","goodsNum":1,"volume":0.01536,"orderStatus":"正常","predictArrivalCustomerTime":"2026-07-22 23:00:00","channelName":null,"transType":"公路 运输"}],"msg":"success"}
+
+
+
+
+## 方案设计：Alice 动态物流看板系统
+
+### 核心思路
+
+```
+用户对话 → Alice AI 判断需要展示数据 → 调用 show_dashboard 工具
+→ Electron 打开全屏看板窗口 → 动态渲染指定模块 → 直连 Transport API 获取数据
+```
+
+### 整体架构
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Alice 主窗口（对话）                       │
+│  "帮我看看今天的货量情况"                                     │
+└──────────────────────┬──────────────────────────────────────┘
+                       │ LLM 返回 tool_call
+                       │ show_dashboard({ modules: [...] })
+                       ▼
+┌─────────────────────────────────────────────────────────────┐
+│              Electron 主进程                                  │
+│  windowManager.createDashboardWindow()                       │
+│  → 全屏、无边框、alwaysOnTop                                 │
+└──────────────────────┬──────────────────────────────────────┘
+                       │
+                       ▼
+┌─────────────────────────────────────────────────────────────┐
+│              Dashboard 全屏窗口                               │
+│                                                              │
+│  ┌──────────────────────────────────────────────────────┐   │
+│  │  DashboardView.vue（全屏容器）                         │   │
+│  │                                                        │   │
+│  │  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐    │   │
+│  │  │ Module 1    │ │ Module 2    │ │ Module 3    │    │   │
+│  │  │ cargoVolume │ │ cargoMap    │ │ onTime      │    │   │
+│  │  │ (网格布局)   │ │ (网格布局)   │ │ (网格布局)   │    │   │
+│  │  └─────────────┘ └─────────────┘ └─────────────┘    │   │
+│  │                                                        │   │
+│  │  ┌─────────────────────────────────────────────┐      │   │
+│  │  │ Module 4: transportationLogisticsScores     │      │   │
+│  │  └─────────────────────────────────────────────┘      │   │
+│  └──────────────────────────────────────────────────────┘   │
+│                                                              │
+│  数据层：transportClient → 直连 Transport API（无网关）       │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 关键设计点
+
+**1. 模块注册表** - 从 refer 移植图表组件，建立名称映射：
+
+```typescript
+// src/modules/dashboard/moduleRegistry.ts
+const MODULE_REGISTRY = {
+  cargoVolume: { component: CargoVolume, category: 'cargo', label: '货量总览' },
+  cargoMap: { component: CargoMap, category: 'map', label: '货物地图' },
+  onTime: { component: OnTime, category: 'kpi', label: '准时交付率' },
+  capacityPool: { component: CapacityPool, category: 'resource', label: '运力池' },
+  // ... 更多模块
+}
+```
+
+**2. AI 工具定义** - 让 AI 指定要渲染哪些模块：
+
+```json
+{
+  "name": "show_dashboard",
+  "parameters": {
+    "modules": [
+      { "name": "cargoVolume", "grid": { "x": 1, "y": 1, "w": 12, "h": 6 } },
+      { "name": "cargoMap", "grid": { "x": 13, "y": 1, "w": 12, "h": 6 } }
+    ],
+    "filters": { "dateRange": "today", "warehouse": "SH" }
+  }
+}
+```
+
+**3. 数据源直连** - 在 Alice 的 `.env` 中配置：
+
+```
+VITE_TRANSPORT_DASHBOARD_URL=https://transport-service-dashboard-tst.t-sy-in.earth.xcloud.lenovo.com
+VITE_TRANSPORT_AI_URL=https://transport-service-ai-tst.t-sy-in.earth.xcloud.lenovo.com
+```
+
+**4. 移植策略** - refer 的图表组件依赖 Ant Design Vue + ECharts，需要：
+- 在 Alice 中安装 `ant-design-vue` 和 `echarts`
+- 移植 `refer/src/components/RenderComponent/chartRender/LS/` 下的组件
+- 移植 `refer/src/api/fullscreen.ts` 中的 API 调用（改为直连）
+- 移植 `refer/src/store/` 中的 filter store
+
+---
+
+你觉得这个方向对吗？有几个问题想确认：
+
+1. **移植范围**：refer 里有 40+ 个图表组件，你想全部移植还是先选几个核心的？
+2. **窗口样式**：全屏无边框（像贾维斯那样）还是保留标题栏可以关闭/拖拽？
+3. **交互方式**：看板打开后用户能操作（筛选、切换），还是纯展示？

@@ -2,6 +2,8 @@ import './assets/styles.css'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
+import Antd from 'ant-design-vue'
+import 'ant-design-vue/dist/reset.css'
 import router from './router/main.ts'
 import { initializeClients } from './services/apiClients'
 import { registerCodexToolBridge } from './services/llmProviders/codexToolBridge'
@@ -12,6 +14,7 @@ const app = createApp(App)
 
 app.use(createPinia())
 app.use(router)
+app.use(Antd)
 registerCodexToolBridge()
 
 async function mountApp(): Promise<void> {

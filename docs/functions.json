@@ -519,5 +519,43 @@
       "required": ["query"],
       "additionalProperties": false
     }
+  },
+  {
+    "type": "function",
+    "name": "show_dashboard",
+    "description": "展示物流数据看板。当需要向用户展示物流相关的数据统计、货量信息、应签未签明细等信息时调用此工具。会打开一个独立的看板窗口显示相关数据。",
+    "strict": false,
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "modules": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["cargoTrend", "signingInformation"]
+          },
+          "description": "要显示的模块列表。可选值：cargoTrend（货量趋势）、signingInformation（签收信息）。如果不指定，默认显示所有模块。"
+        },
+        "filters": {
+          "type": "object",
+          "description": "数据过滤条件",
+          "properties": {
+            "dateRange": {
+              "type": "string",
+              "description": "日期范围，如 'today', 'this_week', 'this_month'"
+            },
+            "warehouse": {
+              "type": "string",
+              "description": "始发仓筛选"
+            },
+            "rdc": {
+              "type": "string",
+              "description": "目的 RDC 筛选"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    }
   }
 ]

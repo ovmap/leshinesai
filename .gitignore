@@ -56,3 +56,5 @@ user-customization/*
 user-customization/custom-tool-scripts/*
 !user-customization/custom-tool-scripts/sample_upload_tool.js
 GEMINI.md
+
+/refer/
