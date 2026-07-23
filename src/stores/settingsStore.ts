@@ -38,7 +38,7 @@ export interface AliceSettings {
   VITE_DASHSCOPE_API_KEY: string
   VITE_GROQ_API_KEY: string
   VITE_GOOGLE_API_KEY: string
-  sttProvider: 'openai' | 'groq' | 'google' | 'local'
+  sttProvider: 'openai' | 'groq' | 'google' | 'local' | 'dashscope'
   aiProvider: AIProviderKey
 
   // Local Go Backend STT settings
@@ -351,7 +351,7 @@ export const useSettingsStore = defineStore('settings', () => {
       console.log('✅ Settings migration completed successfully')
     }
 
-    const validSTTProviders = ['openai', 'groq', 'google', 'local'] as const
+    const validSTTProviders = ['openai', 'groq', 'google', 'dashscope', 'local'] as const
     if (!validSTTProviders.includes(validated.sttProvider as any)) {
       validated.sttProvider = 'openai'
     }

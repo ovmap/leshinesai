@@ -140,6 +140,8 @@ export function useAudioProcessing() {
             )
             eventBus.emit('cancel-llm-stream')
             generalStore.stopPlaybackAndClearQueue()
+            // Transition state so finalizeAfterStream doesn't get stuck
+            setAudioState('PROCESSING_AUDIO')
           }
           isSpeechDetected.value = true
           console.log('[VAD Callback] Speech started.')
@@ -148,14 +150,19 @@ export function useAudioProcessing() {
           console.log(
             `[VAD Callback] Speech ended. Audio length: ${audio?.length}. Current state: ${audioState.value}`
           )
-          if (audioState.value === 'LISTENING' && isSpeechDetected.value) {
+          if (isSpeechDetected.value) {
+            // Process audio regardless of state (handles barge-in during SPEAKING)
+            if (audioState.value === 'SPEAKING') {
+              // After barge-in, transition to processing
+              setAudioState('PROCESSING_AUDIO')
+            }
             processAudioRecording(audio)
           } else {
             console.log(
-              '[VAD Callback] Speech ended, but not processing (state changed or no speech detected).'
+              '[VAD Callback] Speech ended, but no speech detected flag set.'
             )
-            isSpeechDetected.value = false
           }
+          isSpeechDetected.value = false
         },
       })
 
@@ -226,9 +233,20 @@ export function useAudioProcessing() {
   }
 
   const processAudioRecording = async (audio: Float32Array) => {
-    if (audioState.value !== 'LISTENING' || !audio || audio.length === 0) {
+    if (!audio || audio.length === 0) {
       console.warn(
-        '[Audio Processing] Processing aborted (invalid state or no audio).'
+        '[Audio Processing] Processing aborted (no audio data).'
+      )
+      isSpeechDetected.value = false
+      return
+    }
+    
+    // Allow processing from SPEAKING (barge-in) or LISTENING states
+    if (audioState.value === 'SPEAKING') {
+      // Already set to PROCESSING_AUDIO in onSpeechStart
+    } else if (audioState.value !== 'LISTENING') {
+      console.warn(
+        `[Audio Processing] Processing aborted (invalid state: ${audioState.value}).`
       )
       isSpeechDetected.value = false
       return

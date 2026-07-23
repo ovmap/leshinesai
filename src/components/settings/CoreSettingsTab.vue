@@ -43,6 +43,7 @@
             <option value="openai">OpenAI (gpt-4o-transcribe)</option>
             <option value="groq">Groq (whisper-large-v3)</option>
             <option value="google">Google (Cloud)</option>
+            <option value="dashscope">通义千问 (qwen3-asr-flash)</option>
             <option value="local">Local (Go Backend)</option>
           </select>
         </div>

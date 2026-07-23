@@ -1030,6 +1030,8 @@ export const useConversationStore = defineStore('conversation', () => {
         api.transcribeWithGroq(audio),
       transcribeWithGoogle: (audio: ArrayBuffer) =>
         api.transcribeWithGoogle(audio),
+      transcribeWithDashScope: (audio: ArrayBuffer) =>
+        api.transcribeWithDashScope(audio),
       transcribeWithBackend: (audio: ArrayBuffer) =>
         api.transcribeWithBackend(audio),
       logInfo: (...args: any[]) => console.log(...args),

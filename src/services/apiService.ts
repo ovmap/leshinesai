@@ -397,25 +397,40 @@ const dashScopeTTS = async (
 
   const voice = settings.dashscopeTtsVoice || 'Cherry'
 
-  const response = await fetch(
-    'https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation',
-    {
-      method: 'POST',
-      signal,
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'qwen3-tts-flash',
-        input: {
-          text: text,
-          voice: voice,
-          language_type: 'Chinese',
+  // Check if already aborted
+  if (signal.aborted) {
+    throw new DOMException('The user aborted a request.', 'AbortError')
+  }
+
+  let response: Response
+
+  try {
+    response = await fetch(
+      'https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation',
+      {
+        method: 'POST',
+        signal,
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
         },
-      }),
+        body: JSON.stringify({
+          model: 'qwen3-tts-flash',
+          input: {
+            text: text,
+            voice: voice,
+            language_type: 'Chinese',
+          },
+        }),
+      }
+    )
+  } catch (error: any) {
+    // Re-throw AbortError without wrapping it
+    if (error.name === 'AbortError') {
+      throw error
     }
-  )
+    throw new Error(`DashScope TTS Network Error: ${error.message}`)
+  }
 
   if (!response.ok) {
     const errorText = await response.text()
@@ -433,7 +448,16 @@ const dashScopeTTS = async (
   }
 
   // Fetch actual audio from OSS URL
-  const audioResponse = await fetch(audioUrl, { signal })
+  let audioResponse: Response
+  try {
+    audioResponse = await fetch(audioUrl, { signal })
+  } catch (error: any) {
+    if (error.name === 'AbortError') {
+      throw error
+    }
+    throw new Error(`DashScope TTS: Failed to download audio from OSS`)
+  }
+
   if (!audioResponse.ok) {
     throw new Error(`DashScope TTS: Failed to download audio from OSS`)
   }
@@ -644,6 +668,72 @@ export const transcribeWithOpenAI = async (
     response_format: 'json',
   })
   return transcription?.text || ''
+}
+
+export const transcribeWithDashScope = async (
+  audioBuffer: ArrayBuffer
+): Promise<string> => {
+  const settings = useSettingsStore().config
+  const apiKey = settings.VITE_DASHSCOPE_API_KEY
+
+  if (!apiKey) {
+    throw new Error('DashScope API Key is not configured')
+  }
+
+  // Convert ArrayBuffer to Base64 data URI
+  const blob = new Blob([audioBuffer], { type: 'audio/wav' })
+  const base64Audio = await new Promise<string>((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onloadend = () => {
+      const result = reader.result as string
+      resolve(result.split(',')[1])
+    }
+    reader.onerror = reject
+    reader.readAsDataURL(blob)
+  })
+
+  const language = settings.localSttLanguage || 'auto'
+
+  const response = await fetch(
+    'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions',
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'qwen3-asr-flash',
+        messages: [
+          {
+            role: 'user',
+            content: [
+              {
+                type: 'input_audio',
+                input_audio: {
+                  data: `data:audio/wav;base64,${base64Audio}`,
+                },
+              },
+            ],
+          },
+        ],
+        asr_options: {
+          language: language === 'auto' ? undefined : language,
+          enable_itn: false,
+        },
+      }),
+    }
+  )
+
+  if (!response.ok) {
+    const errorText = await response.text()
+    throw new Error(
+      `DashScope STT Error: ${response.status} - ${errorText}`
+    )
+  }
+
+  const data = await response.json()
+  return data.choices?.[0]?.message?.content || ''
 }
 
 function extractTextForEmbedding(textInput: any): string {
