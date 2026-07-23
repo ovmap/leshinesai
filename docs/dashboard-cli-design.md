@@ -303,19 +303,162 @@ AI 读取数据: dashboard data signingInformation
 
 ### 4.2 数据流（双向）
 
+**核心设计：dashboardDataStore 是 UI 的实时镜像**
+
+`dashboardDataStore` 不只是缓存数据，而是**实时镜像当前 UI 的完整状态**——包括显示什么模块、筛选条件是什么、数据内容是什么。AI 随时能"看到"用户当前看到的界面。
+
+```
+AI 操作链：
+  切换模块 → Store 同步更新 → AI 调 data 确认切换结果 ✓
+  设置筛选 → Store 同步更新 → AI 调 data 确认筛选生效 ✓
+  触发操作 → Store 同步更新 → AI 调 data 确认操作结果 ✓
+```
+
 **AI → UI（控制流）：**
 ```
 AI tool_call → functionCaller → dashboardCLI → IPC:dashboard:control
 → 主进程转发 → dashboardControlStore 更新 → UI watch 响应
+→ UI 执行操作 → 操作完成后更新 dashboardDataStore（实时镜像）
 ```
 
 **UI → AI（数据流）：**
 ```
-UI 组件获取数据 → 存入 dashboardDataStore → AI 调用 data 命令
-→ IPC:dashboard:get-data → 主进程转发 → 读取 dataStore → 返回 Markdown
+UI 组件获取数据 / 状态变化 → 实时同步到 dashboardDataStore
+→ AI 调用 data 命令 → IPC:dashboard:get-data
+→ 主进程转发 → 读取 dataStore（当前 UI 完整快照）→ 返回 Markdown
 ```
 
-### 4.3 关键文件
+**dashboardDataStore 存储内容（UI 完整状态）：**
+```typescript
+{
+  // 当前显示的模块
+  activeModules: ['cargoTrend', 'signingInformation'],
+  
+  // 当前布局
+  currentLayout: 'grid',
+  
+  // 各模块的筛选条件（与 UI 筛选器同步）
+  filters: {
+    cargoTrend: { timeType: 'FICAL_YEAR', dataSource: [...], metric: 'VOLUME' },
+    signingInformation: { fromWarehouse: '天津宁河CDC', toRdc: '沈阳', modeType: '区配' }
+  },
+  
+  // 各模块的数据（与 UI 图表/表格同步）
+  moduleData: {
+    cargoTrend: { chartData: [...], summary: {...} },
+    signingInformation: { signed: 1234, unsigned: 567, detailList: [...] }
+  },
+  
+  // UI 状态（弹窗、选中等）
+  uiState: {
+    signingInformation: { modalOpen: false, currentPage: 1 }
+  },
+  
+  // 时间戳
+  lastUpdated: 1234567890
+}
+```
+
+这样 AI 调用 `data` 命令时，拿到的就是**用户当前看到的完全一致的状态**，形成真正的视觉闭环。
+
+### 4.3 数据格式设计
+
+**核心原则：同一数据，一体两面**
+
+- **UI 看**：ECharts 图表、Ant Table 表格、地图等视觉组件
+- **AI 看**：Markdown 表格、数字摘要等结构化文本
+- **数据源**：dashboardDataStore 存储原始 JSON，UI 和 AI 共用
+
+#### 4.3.1 Store 内部结构
+
+每个模块定义自己的数据契约：
+
+```typescript
+interface ModuleDataSchema {
+  // 原始数据（UI 和 AI 共用）
+  raw: any
+  
+  // 摘要格式化（给 AI 快速看）
+  summary: () => string   // 返回 Markdown
+  
+  // 明细格式化（给 AI 深度看）
+  detail: () => string    // 返回 Markdown
+}
+```
+
+#### 4.3.2 示例：签收信息模块
+
+```typescript
+{
+  raw: {
+    signed: 1234,
+    unsigned: 567,
+    detailList: [
+      { fromWarehouse: '天津宁河CDC', transNo: 'TJNHCKYD...', toProvince: '辽宁', ... }
+    ],
+    filters: { fromWarehouse: '', toRdc: '沈阳' }
+  },
+  
+  summary: () => `## 签收信息
+- 已签收: 1,234 单
+- 待签收: 567 单
+- 签收率: 68.6%`,
+  
+  detail: () => `## 未签收明细 (共 23 条)
+| 始发仓 | 运输单号 | 承运商 | 目的省 | 目的市 | 配送模式 | 件数 | 体积 | 发货时间 |
+|--------|----------|--------|--------|--------|----------|------|------|----------|
+| 天津宁河CDC | TJNHCKYD20260720T08807 | 中外运 | 辽宁 | 沈阳市 | 区配 | 18 | 0.276 | 07-20 20:25 |
+| 天津宁河CDC | TJNHCKYD20260720T01104 | 中外运 | 辽宁 | 沈阳市 | 区配 | 1 | 0.015 | 07-20 13:06 |`
+}
+```
+
+#### 4.3.3 示例：货量趋势模块
+
+```typescript
+{
+  raw: {
+    timeSeries: [
+      { 
+        timeDimension: '2024', 
+        items: [
+          { dataSource: 'TMS', value: '548934' },
+          { dataSource: 'LESTMS', value: '62004' }
+        ],
+        totalYoy: null,
+        totalMom: '-11.09%'
+      }
+    ],
+    filters: { timeType: 'CALENDAR_YEAR', metric: 'VOLUME', dataSource: ['TMS', 'LESTMS'] }
+  },
+  
+  summary: () => `## 货量趋势
+- 时间维度: 自然年
+- 指标: 订单数量
+- 数据源: TMS, LESTMS
+- 时间范围: 2024-01-01 ~ 2026-07-22
+
+| 时间段 | TMS | LESTMS | 合计 | 环比 |
+|--------|-----|--------|------|------|
+| 2024 | 548,934 | 62,004 | 917,531 | -11.09% |
+| 2025 | 538,361 | 242,478 | 1,129,288 | +23.08% |
+| 2026 | 122,684 | 100,807,509 | 101,126,047 | +8854.85% |`,
+  
+  detail: () => `更详细的时间序列数据，包含每个数据源的完整信息...`
+}
+```
+
+#### 4.3.4 数据对应关系
+
+| UI 组件 | AI 读取格式 | 数据源 |
+|---------|------------|--------|
+| ECharts 堆叠柱状图 | Markdown 表格 | `raw.timeSeries` |
+| ECharts 环形图 | 数字摘要 | `raw.signed / unsigned` |
+| Ant Table 表格 | Markdown 表格 | `raw.detailList` |
+| 地图（未来） | 地区分布表 | `raw.regionData` |
+
+**一句话总结：Store 存原始 JSON，每个模块自己负责把它翻译成 AI 能理解的 Markdown。**
+
+### 4.4 关键文件
 
 | 文件 | 职责 |
 |------|------|

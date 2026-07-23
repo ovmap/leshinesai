@@ -21,15 +21,25 @@
 
     <!-- 模块渲染区 -->
     <div class="dashboard-content">
-      <ModulesRender :modules="currentModules" :filters="currentFilters" :key="refreshKey" />
+      <ModulesRender
+        :modules="displayModules"
+        :filters="controlStore.moduleFilters"
+        :layout="controlStore.currentLayout"
+        :key="refreshKey"
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import ModulesRender from './dashboard/ModulesRender.vue'
 import type { ModuleConfig } from './dashboard/ModulesRender.vue'
+import { useDashboardControlStore } from '../stores/dashboardControlStore'
+import { useDashboardDataStore } from '../stores/dashboardDataStore'
+
+const controlStore = useDashboardControlStore()
+const dataStore = useDashboardDataStore()
 
 // 默认模块配置
 const defaultModules: ModuleConfig[] = [
@@ -37,15 +47,32 @@ const defaultModules: ModuleConfig[] = [
   { name: 'signingInformation', span: 12, title: '签收信息' },
 ]
 
-const currentModules = ref<ModuleConfig[]>(defaultModules)
-const currentFilters = ref<any>({})
-const refreshKey = ref(0)
-
-// 模块名称到中文标题的映射（AI 传参用）
+// 模块名称到中文标题的映射
 const moduleTitleMap: Record<string, string> = {
   cargoTrend: '货量趋势',
   signingInformation: '签收信息',
 }
+
+const refreshKey = ref(0)
+
+// 根据控制 Store 的 activeModules 和 layout 计算显示模块
+const displayModules = computed<ModuleConfig[]>(() => {
+  const active = controlStore.activeModules
+  const layout = controlStore.currentLayout
+
+  if (layout === 'single' && active.length > 0) {
+    // 单模块模式：第一个模块占满 24 列
+    return [{ name: active[0], span: 24, title: moduleTitleMap[active[0]] || active[0] }]
+  }
+
+  // 网格模式：根据模块数量分配 span
+  const span = active.length <= 1 ? 24 : active.length <= 2 ? 12 : Math.floor(24 / active.length)
+  return active.map(name => ({
+    name,
+    span,
+    title: moduleTitleMap[name] || name,
+  }))
+})
 
 function refresh() {
   refreshKey.value++
@@ -55,45 +82,88 @@ function close() {
   window.close()
 }
 
-// 接收主进程参数
+// 接收主进程参数（初始化）
 onMounted(() => {
   const handleParams = (params: any) => {
     if (params?.modules && Array.isArray(params.modules)) {
-      // AI 传入的 modules 可能是字符串数组或对象数组
-      currentModules.value = params.modules.map((m: any) => {
-        if (typeof m === 'string') {
-          return { name: m, span: 12, title: moduleTitleMap[m] || m }
-        }
-        return {
-          name: m.name || m,
-          span: m.span || 12,
-          title: m.title || moduleTitleMap[m.name] || m.name,
-        }
-      })
+      controlStore.setModules(params.modules.map((m: any) =>
+        typeof m === 'string' ? m : m.name || m
+      ))
+    }
+    if (params?.layout) {
+      controlStore.setLayout(params.layout)
     }
     if (params?.filters) {
-      currentFilters.value = params.filters
+      // 初始筛选应用到所有模块
+      controlStore.applyFilters(undefined, params.filters)
     }
   }
 
+  // dashboard:init — 初始参数
   window.ipcRenderer?.on('dashboard:init', (_event: any, params: any) => {
     handleParams(params)
   })
 
+  // dashboard:update — 更新参数
   window.ipcRenderer?.on('dashboard:update', (_event: any, params: any) => {
     handleParams(params)
     refresh()
   })
 
+  // dashboard:command — CLI 命令分发
+  window.ipcRenderer?.on('dashboard:command', (_event: any, command: any) => {
+    handleCommand(command)
+  })
+
+  // dashboard:request-data — 数据请求响应
+  window.ipcRenderer?.on('dashboard:request-data', (_event: any, params: any) => {
+    const { requestId, module, format, scope } = params
+    const data = dataStore.getFormattedData(module, format || 'markdown', scope || 'summary')
+    // 直接发送给主进程（主进程 ipcMain.once 直接捕获，无需通过主窗口转发）
+    window.ipcRenderer?.send(`dashboard:data-response-${requestId}`, data)
+  })
+
   // 开发环境直接加载默认模块
   if (!window.ipcRenderer) {
-    currentModules.value = defaultModules
+    controlStore.setModules(['cargoTrend', 'signingInformation'])
   }
 })
+
+// 处理 CLI 命令
+function handleCommand(command: any) {
+  const { command: cmd, args } = command
+
+  switch (cmd) {
+    case 'show':
+      if (args?.modules) controlStore.setModules(args.modules)
+      if (args?.layout) controlStore.setLayout(args.layout)
+      break
+
+    case 'filter':
+      controlStore.applyFilters(args?.module, args?.filters || {})
+      break
+
+    case 'action':
+      if (args?.module && args?.action) {
+        controlStore.addAction(args.module, args.action, args.params || {})
+      }
+      break
+
+    case 'reset':
+      controlStore.resetFilters(args?.module)
+      break
+
+    case 'layout':
+      if (args?.layout) controlStore.setLayout(args.layout)
+      break
+  }
+}
 
 onUnmounted(() => {
   window.ipcRenderer?.removeAllListeners('dashboard:init')
   window.ipcRenderer?.removeAllListeners('dashboard:update')
+  window.ipcRenderer?.removeAllListeners('dashboard:command')
+  window.ipcRenderer?.removeAllListeners('dashboard:request-data')
 })
 </script>
 

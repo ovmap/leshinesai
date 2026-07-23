@@ -3,11 +3,18 @@ import { computed, onMounted, onUnmounted, ref, nextTick, watch } from 'vue'
 import * as echarts from 'echarts'
 import { message } from 'ant-design-vue'
 import { querySign, queryNotSignItemByPage, exportNotSignItem, queryFromWarehouse, queryToProvince, queryToRdc } from '../../../services/transportApi'
+import { useDashboardControlStore } from '../../../stores/dashboardControlStore'
+import { useDashboardDataStore } from '../../../stores/dashboardDataStore'
 
+const controlStore = useDashboardControlStore()
+const dataStore = useDashboardDataStore()
+
+// 接收模块专属筛选（来自 ModulesRender 传递的控制 Store 筛选）
 const props = defineProps<{
-  fromWarehouse?: string[]
-  toProvince?: string[]
-  toRdc?: string[]
+  fromWarehouse?: string
+  toProvince?: string
+  toRdc?: string
+  modeType?: string
 }>()
 
 // 图表相关
@@ -114,13 +121,37 @@ const fetchSigningData = async () => {
       signingData.value[0].value = result.data.hasSigned || 0
       signingData.value[1].value = result.data.notSigned || 0
     }
+    // 同步到数据 Store（UI 实时镜像）
+    syncToDataStore()
   } catch (error) {
     console.error('获取签收数据失败:', error)
     signingData.value[0].value = 0
     signingData.value[1].value = 0
+    syncToDataStore()
   } finally {
     loading.value = false
   }
+}
+
+// 同步数据到 Store（只赋值 raw 数据，格式化由 dataStore 处理）
+const syncToDataStore = () => {
+  dataStore.updateModuleData('signingInformation', {
+    signed: signingData.value[0].value,
+    unsigned: signingData.value[1].value,
+    detailList: modalData.value,
+    detailTotal: total.value,
+    filters: {
+      fromWarehouse: modalSelectedWarehouse.value,
+      toProvince: modalSelectedProvince.value,
+      toRdc: modalSelectedRdc.value,
+      modeType: modalSelectedModeType.value,
+    },
+  })
+  dataStore.updateUIState('signingInformation', {
+    modalOpen: modalVisible.value,
+    currentPage: currentPage.value,
+    pageSize: pageSize.value,
+  })
 }
 
 // 环形图配置
@@ -213,10 +244,13 @@ const fetchModalData = async (page: number = currentPage.value) => {
       modalData.value = []
       total.value = 0
     }
+    // 同步到数据 Store
+    syncToDataStore()
   } catch (error) {
     console.error('获取未签收明细失败:', error)
     modalData.value = []
     total.value = 0
+    syncToDataStore()
   } finally {
     modalLoading.value = false
   }
@@ -354,6 +388,75 @@ watch(
   },
   { deep: true }
 )
+
+// 监听 props 变化（来自控制 Store 的筛选）
+watch(
+  () => props,
+  (newProps) => {
+    let changed = false
+    if (newProps.fromWarehouse !== undefined && newProps.fromWarehouse !== modalSelectedWarehouse.value) {
+      modalSelectedWarehouse.value = newProps.fromWarehouse || ''
+      changed = true
+    }
+    if (newProps.toProvince !== undefined && newProps.toProvince !== modalSelectedProvince.value) {
+      modalSelectedProvince.value = newProps.toProvince || ''
+      changed = true
+    }
+    if (newProps.toRdc !== undefined && newProps.toRdc !== modalSelectedRdc.value) {
+      modalSelectedRdc.value = newProps.toRdc || ''
+      changed = true
+    }
+    if (newProps.modeType !== undefined && newProps.modeType !== modalSelectedModeType.value) {
+      modalSelectedModeType.value = newProps.modeType || ''
+      changed = true
+    }
+    if (changed) {
+      // 筛选变化时，如果有弹窗打开则重新获取数据
+      if (modalVisible.value) {
+        fetchModalData(1)
+      }
+      syncToDataStore()
+    }
+  },
+  { deep: true }
+)
+
+// 监听控制 Store 的操作队列
+watch(
+  () => controlStore.pendingActions,
+  (actions) => {
+    actions.forEach(action => {
+      if (action.module !== 'signingInformation') return
+      switch (action.action) {
+        case 'openDetail':
+          modalVisible.value = true
+          fetchModalData()
+          break
+        case 'closeDetail':
+          modalVisible.value = false
+          break
+        case 'export':
+          handleExport()
+          break
+        case 'resetFilters':
+          handleReset()
+          break
+      }
+      // 消费操作
+      controlStore.consumeAction(action.id)
+    })
+  },
+  { deep: true }
+)
+
+// 监听弹窗状态变化，同步 UI 状态
+watch(modalVisible, () => {
+  dataStore.updateUIState('signingInformation', {
+    modalOpen: modalVisible.value,
+    currentPage: currentPage.value,
+    pageSize: pageSize.value,
+  })
+})
 
 // 窗口大小变化
 const handleResize = () => {

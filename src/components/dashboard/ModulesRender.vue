@@ -15,17 +15,19 @@ export interface ModuleConfig {
 
 const props = defineProps<{
   modules: ModuleConfig[]
-  filters?: {
-    fromWarehouse?: string[]
-    toProvince?: string[]
-    toRdc?: string[]
-  }
+  filters?: Record<string, Record<string, any>>
+  layout?: 'single' | 'grid' | 'cards'
 }>()
+
+// 获取模块专属的筛选条件
+function getModuleFilters(moduleName: string): Record<string, any> {
+  return props.filters?.[moduleName] || {}
+}
 </script>
 
 <template>
   <div class="modules-render">
-    <div class="modules-grid">
+    <div class="modules-grid" :class="{ 'single-layout': layout === 'single' }">
       <div
         v-for="mod in modules"
         :key="mod.name"
@@ -40,7 +42,7 @@ const props = defineProps<{
             <component
               v-if="moduleComponents[mod.name]"
               :is="moduleComponents[mod.name]"
-              v-bind="filters || {}"
+              v-bind="getModuleFilters(mod.name)"
             />
             <div v-else class="unknown-module">
               未知模块: {{ mod.name }}

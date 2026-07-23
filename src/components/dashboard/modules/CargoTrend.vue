@@ -11,11 +11,21 @@ import {
   queryProductTypeList,
   queryDataSourceList,
 } from '../../../services/transportApi'
+import { useDashboardControlStore } from '../../../stores/dashboardControlStore'
+import { useDashboardDataStore } from '../../../stores/dashboardDataStore'
 
+const controlStore = useDashboardControlStore()
+const dataStore = useDashboardDataStore()
+
+// 接收模块专属筛选（来自 ModulesRender 传递的控制 Store 筛选）
 const props = defineProps<{
-  fromWarehouse?: string[]
-  toProvince?: string[]
-  toRdc?: string[]
+  fromWarehouse?: string
+  toProvince?: string
+  toRdc?: string
+  timeType?: string
+  dateRange?: string
+  dataSource?: string[]
+  metric?: string
 }>()
 
 const chartRef = ref<HTMLDivElement | null>(null)
@@ -548,14 +558,95 @@ const updateChartData = (apiData: any[]) => {
   myChart.setOption(option, true)
 }
 
+// 缓存最近一次 API 响应数据（供数据 Store 使用）
+const lastApiResponse = ref<any[]>([])
+
+// 同步数据到 Store
+const syncToDataStore = () => {
+  dataStore.updateModuleData(
+    'cargoTrend',
+    {
+      timeSeries: lastApiResponse.value,
+      filters: {
+        timeType: selectedYear.value,
+        metric: selectedMetric.value,
+        dataSource: selectedDataSource.value,
+        dateRange: selectedDateTimeRange.value
+          ? `${selectedDateTimeRange.value[0]?.format('YYYY-MM-DD')} ~ ${selectedDateTimeRange.value[1]?.format('YYYY-MM-DD')}`
+          : '未设置',
+        fromWarehouse: props.fromWarehouse || '',
+        toProvince: props.toProvince || '',
+        toRdc: props.toRdc || '',
+      },
+    },
+    syncToDataStore_summary,
+    syncToDataStore_summary
+  )
+}
+
+// summary 格式化函数（供 detail 复用）
+const syncToDataStore_summary = () => {
+  const apiData = lastApiResponse.value
+  const timeType = selectedYear.value
+  const metric = selectedMetric.value
+  const dataSourceList = selectedDataSource.value
+  const dateRange = selectedDateTimeRange.value
+
+  const metricName = metricOptions.value.find(m => m.code === metric)?.name || metric
+  const timeTypeName = yearOptions.value.find(y => y.code === timeType)?.name || timeType
+  const dateRangeStr = dateRange
+    ? `${dateRange[0]?.format('YYYY-MM-DD')} ~ ${dateRange[1]?.format('YYYY-MM-DD')}`
+    : '未设置'
+
+  let md = `## 货量趋势\n\n`
+  md += `- **时间维度**: ${timeTypeName}\n`
+  md += `- **指标**: ${metricName}\n`
+  md += `- **数据源**: ${dataSourceList.map((code: string) => dataSourceOptions.value.find(d => d.code === code)?.name || code).join(', ') || '全部'}\n`
+  md += `- **时间范围**: ${dateRangeStr}\n\n`
+
+  if (apiData.length === 0) {
+    md += '_暂无数据_\n'
+    return md
+  }
+
+  const allSources = new Set<string>()
+  apiData.forEach(item => {
+    if (item.items) {
+      item.items.forEach((i: any) => allSources.add(i.dataSource))
+    }
+  })
+  const sourceNames = Array.from(allSources).map(code => {
+    return dataSourceOptions.value.find(d => d.code === code)?.name || code
+  })
+
+  md += `| 时间段 | ${sourceNames.join(' | ')} | 合计 | 同比 | 环比 |\n`
+  md += `|--------|${sourceNames.map(() => '------').join('|')}|------|------|------|\n`
+
+  apiData.forEach((timeItem: any) => {
+    const values = sourceNames.map((_, idx) => {
+      const code = Array.from(allSources)[idx]
+      const item = timeItem.items?.find((i: any) => i.dataSource === code)
+      const val = parseFloat(item?.value) || 0
+      return val >= 1000 ? Math.round(val / 1000) + 'k' : val.toFixed(0)
+    })
+    const total = timeItem.totalValue
+    const totalStr = total >= 1000 ? Math.round(total / 1000) + 'k' : total?.toFixed(0) || '0'
+    const yoy = timeItem.totalYoy || '-'
+    const mom = timeItem.totalMom || '-'
+    md += `| ${timeItem.timeDimension} | ${values.join(' | ')} | ${totalStr} | ${yoy} | ${mom} |\n`
+  })
+
+  return md
+}
+
 // 调用 queryVolume 接口
 const callQueryVolume = async () => {
   try {
     const { startDate, endDate } = formatDateRange(selectedDateTimeRange.value)
     const params = {
-      fromWarehouse: props.fromWarehouse || [],
-      toProvince: props.toProvince || [],
-      toRdc: props.toRdc || [],
+      fromWarehouse: props.fromWarehouse ? [props.fromWarehouse] : [],
+      toProvince: props.toProvince ? [props.toProvince] : [],
+      toRdc: props.toRdc ? [props.toRdc] : [],
       startDate,
       endDate,
       timeType: selectedYear.value,
@@ -573,7 +664,10 @@ const callQueryVolume = async () => {
       return
     }
     if (response && response.code === 200 && response.data) {
+      lastApiResponse.value = response.data
       updateChartData(response.data)
+      // 同步到数据 Store
+      syncToDataStore()
     }
   } catch (error) {
     console.error('获取货量趋势数据失败:', error)
@@ -637,6 +731,71 @@ onUnmounted(() => {
 watch([selectedDateTimeRange, selectedYear, selectedMetric, selectedDataSource], () => {
   callQueryVolume()
 }, { deep: true })
+
+// 监听 props 变化（来自控制 Store 的筛选）
+watch(
+  () => props,
+  (newProps) => {
+    let changed = false
+    if (newProps.timeType && newProps.timeType !== selectedYear.value) {
+      selectedYear.value = newProps.timeType
+      const defaultRange = getDefaultDateRange(newProps.timeType)
+      selectedDateTimeRange.value = defaultRange
+      changed = true
+    }
+    if (newProps.metric && newProps.metric !== selectedMetric.value) {
+      selectedMetric.value = newProps.metric
+      changed = true
+    }
+    if (newProps.dataSource && Array.isArray(newProps.dataSource) && newProps.dataSource.length > 0) {
+      selectedDataSource.value = newProps.dataSource
+      changed = true
+    }
+    if (newProps.dateRange && typeof newProps.dateRange === 'string') {
+      const parts = newProps.dateRange.split('~').map(s => s.trim())
+      if (parts.length === 2) {
+        const start = dayjs(parts[0])
+        const end = dayjs(parts[1])
+        if (start.isValid() && end.isValid()) {
+          selectedDateTimeRange.value = [start, end]
+          changed = true
+        }
+      }
+    }
+    // fromWarehouse/toProvince/toRdc 变化时重新请求
+    if (changed || newProps.fromWarehouse || newProps.toProvince || newProps.toRdc) {
+      callQueryVolume()
+    }
+  },
+  { deep: true }
+)
+
+// 监听控制 Store 的操作队列
+watch(
+  () => controlStore.pendingActions,
+  (actions) => {
+    actions.forEach(action => {
+      if (action.module !== 'cargoTrend') return
+      switch (action.action) {
+        case 'refresh':
+          callQueryVolume()
+          break
+        case 'changeTimeType':
+          if (action.params?.timeType) {
+            selectedYear.value = action.params.timeType
+          }
+          break
+        case 'changeMetric':
+          if (action.params?.metric) {
+            selectedMetric.value = action.params.metric
+          }
+          break
+      }
+      controlStore.consumeAction(action.id)
+    })
+  },
+  { deep: true }
+)
 </script>
 
 <template>

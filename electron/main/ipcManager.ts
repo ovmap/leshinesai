@@ -85,6 +85,7 @@ import {
   setOverlayOpacity,
   createDashboardWindow,
   closeDashboard,
+  getDashboardWindow,
 } from './windowManager'
 import {
   registerMicrophoneToggleHotkey,
@@ -608,6 +609,52 @@ export function registerIPCHandlers(): void {
       return { success: result }
     } catch (error: any) {
       console.error('[IPC dashboard:close] Error:', error)
+      return { success: false, error: error.message }
+    }
+  })
+
+  // Dashboard CLI: 转发控制命令到看板窗口
+  ipcMain.handle('dashboard:control', (event, command) => {
+    try {
+      const dashboardWin = getDashboardWindow()
+      if (dashboardWin && !dashboardWin.isDestroyed()) {
+        dashboardWin.webContents.send('dashboard:command', command)
+        return { success: true }
+      }
+      return { success: false, error: '看板窗口未打开' }
+    } catch (error: any) {
+      console.error('[IPC dashboard:control] Error:', error)
+      return { success: false, error: error.message }
+    }
+  })
+
+  // Dashboard CLI: 从看板窗口获取数据
+  ipcMain.handle('dashboard:get-data', async (event, params) => {
+    try {
+      const dashboardWin = getDashboardWindow()
+      if (!dashboardWin || dashboardWin.isDestroyed()) {
+        return { success: false, error: '看板窗口未打开' }
+      }
+
+      const requestId = `data-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+
+      return new Promise((resolve) => {
+        const timeout = setTimeout(() => {
+          ipcMain.removeAllListeners(`dashboard:data-response-${requestId}`)
+          resolve({ success: false, error: '获取数据超时' })
+        }, 5000)
+
+        // 直接监听看板窗口发来的数据（看板窗口用 send，不走 invoke 转发）
+        ipcMain.once(`dashboard:data-response-${requestId}`, (_, data) => {
+          clearTimeout(timeout)
+          resolve({ success: true, data })
+        })
+
+        // 向看板窗口请求数据
+        dashboardWin.webContents.send('dashboard:request-data', { ...params, requestId })
+      })
+    } catch (error: any) {
+      console.error('[IPC dashboard:get-data] Error:', error)
       return { success: false, error: error.message }
     }
   })

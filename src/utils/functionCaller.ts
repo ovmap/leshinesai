@@ -1,6 +1,7 @@
 import { createDualEmbeddings, createEmbedding } from '../services/apiService'
 import { useCustomToolsStore } from '../stores/customToolsStore'
 import { manage_clipboard } from './functions/clipboard'
+import { executeDashboardCommand } from './dashboardCLI'
 import {
   open_path,
   list_directory,
@@ -779,6 +780,27 @@ async function show_dashboard(
   }
 }
 
+/**
+ * Dashboard CLI: 控制物流数据看板的统一命令接口
+ */
+async function dashboard_command(
+  args: { command: string; args?: Record<string, any> } = { command: '' }
+): Promise<FunctionResult> {
+  try {
+    const result = await executeDashboardCommand(args)
+    return {
+      success: true,
+      data: { message: result },
+    }
+  } catch (error: any) {
+    console.error('Error in dashboard_command:', error)
+    return {
+      success: false,
+      error: `命令执行失败: ${error.message}`,
+    }
+  }
+}
+
 const functionRegistry: {
   [key: string]: (args: any, settings?: any) => Promise<FunctionResult>
 } = {
@@ -805,6 +827,7 @@ const functionRegistry: {
   perform_web_search: perform_web_search,
   searxng_web_search: searxng_web_search,
   show_dashboard: show_dashboard,
+  dashboard_command: dashboard_command,
 }
 
 const functionSchemas = {
@@ -833,6 +856,7 @@ const functionSchemas = {
   perform_web_search: { required: ['query'] },
   searxng_web_search: { required: ['query'] },
   show_dashboard: { required: [] },
+  dashboard_command: { required: ['command'] },
 }
 
 /**

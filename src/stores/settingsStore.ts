@@ -173,6 +173,7 @@ const defaultSettings: AliceSettings = {
     'delete_memory',
     'recall_memories',
     'show_dashboard',
+    'dashboard_command',
   ],
   assistantAvatar: 'alice',
   mcpServersConfig: '[]',
