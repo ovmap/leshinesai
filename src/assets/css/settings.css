@@ -28,6 +28,83 @@ input[type="number"] {
 }
 
 input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
+input[type="number"]::-webkit-inner-spin-button {
   @apply opacity-100;
+}
+
+/* Select dropdown options - ensure dark background */
+select.select option {
+  @apply bg-gray-800 text-gray-100;
+}
+
+/* Tabs box styling for dark mode */
+.tabs-box {
+  @apply bg-gray-800/50;
+}
+
+.tabs-box .tab {
+  @apply text-gray-300 hover:text-white hover:bg-gray-700/50;
+}
+
+.tabs-box .tab-active {
+  @apply bg-gray-700 text-white;
+}
+
+/* Table styling for dark mode */
+.table {
+  @apply bg-gray-800/50 text-gray-200;
+}
+
+.table th {
+  @apply bg-gray-700/50 text-gray-200 border-b border-gray-600;
+}
+
+.table td {
+  @apply border-b border-gray-700;
+}
+
+.table-zebra tbody tr:nth-child(even) {
+  @apply bg-gray-800/30;
+}
+
+/* Modal styling for dark mode */
+.modal-box {
+  @apply bg-gray-800 text-gray-100;
+}
+
+.modal-box input,
+.modal-box textarea,
+.modal-box select {
+  @apply bg-gray-700 text-gray-100 border-gray-600;
+}
+
+/* Fieldset legend styling */
+.fieldset-legend {
+  @apply text-gray-200 font-semibold;
+}
+
+/* Alert styling improvements */
+.alert {
+  @apply text-gray-100;
+}
+
+/* Badge text visibility */
+.badge {
+  @apply text-gray-100;
+}
+
+/* Toggle switch label text */
+.toggle + span {
+  @apply text-gray-200;
+}
+
+/* Kbd styling */
+.kbd {
+  @apply bg-gray-700 text-gray-100 border-gray-600;
+}
+
+/* Loading text */
+.loading + span,
+span + .loading {
+  @apply text-gray-200;
 }

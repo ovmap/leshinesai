@@ -5,7 +5,7 @@
     </h3>
 
     <fieldset
-      class="fieldset bg-gray-900/90 border-red-500/50 rounded-box w-full border p-4"
+      class="fieldset bg-gray-900 border-red-500/50 rounded-box w-full border p-4"
     >
       <legend class="fieldset-legend">Approved Commands</legend>
       <div class="p-2 space-y-4">
@@ -36,7 +36,7 @@
                     class="btn btn-error btn-xs"
                     title="Remove command"
                   >
-                    âœ—
+                    âœ?
                   </button>
                 </td>
               </tr>

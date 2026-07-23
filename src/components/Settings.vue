@@ -1,5 +1,5 @@
 <template>
-  <div class="settings-panel p-4 h-full overflow-y-auto text-white">
+  <div data-theme="dark" class="settings-panel p-4 h-full overflow-y-auto text-white">
     <div
       v-if="settingsStore.isLoading && !settingsStore.initialLoadAttempted"
       class="text-center p-4"

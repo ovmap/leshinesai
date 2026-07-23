@@ -4,7 +4,7 @@
       User Customization
     </h3>
     <fieldset
-      class="fieldset bg-gray-900/90 border-blue-500/50 rounded-box w-full border p-4"
+      class="fieldset bg-gray-900 border-blue-500/50 rounded-box w-full border p-4"
     >
       <legend class="fieldset-legend">Assistant Avatar</legend>
       <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
@@ -75,7 +75,7 @@
           <label
             v-for="avatar in customAvatarsStore.allAvatars"
             :key="avatar.id"
-            class="p-3 rounded-lg border cursor-pointer transition-all bg-gray-900/70"
+            class="p-3 rounded-lg border cursor-pointer transition-all bg-gray-900"
             :class="{
               'border-blue-400 ring-2 ring-blue-400':
                 selectedAvatarId === avatar.id,
@@ -116,7 +116,7 @@
     </fieldset>
 
     <fieldset
-      class="fieldset bg-gray-900/90 border-green-500/50 rounded-box w-full border p-4"
+      class="fieldset bg-gray-900 border-green-500/50 rounded-box w-full border p-4"
     >
       <legend class="fieldset-legend">Custom Tools</legend>
       <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
@@ -214,7 +214,7 @@
         <article
           v-for="tool in store.tools"
           :key="tool.id"
-          class="border border-gray-800 rounded-lg p-4 bg-gray-900/70"
+          class="border border-gray-800 rounded-lg p-4 bg-gray-900"
         >
           <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
             <div>
@@ -281,7 +281,7 @@
 
     <section class="border border-gray-800 rounded-lg mt-4">
       <header
-        class="flex items-center justify-between p-4 cursor-pointer bg-gray-900/70"
+        class="flex items-center justify-between p-4 cursor-pointer bg-gray-900"
         @click="showAdvanced = !showAdvanced"
       >
         <div>

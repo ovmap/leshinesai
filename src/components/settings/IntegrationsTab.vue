@@ -5,7 +5,7 @@
     </h3>
 
     <fieldset
-      class="fieldset bg-gray-900/90 border-purple-500/50 rounded-box w-full border p-4"
+      class="fieldset bg-gray-900 border-purple-500/50 rounded-box w-full border p-4"
     >
       <legend class="fieldset-legend">Google Services Integration</legend>
       <div class="p-2 space-y-4">
@@ -84,7 +84,7 @@
     </fieldset>
 
     <fieldset
-      class="fieldset bg-gray-900/90 border-cyan-500/50 rounded-box w-full border p-4"
+      class="fieldset bg-gray-900 border-cyan-500/50 rounded-box w-full border p-4"
     >
       <legend class="fieldset-legend">Remote MCP Servers</legend>
       <div class="p-2 space-y-4">
@@ -114,7 +114,7 @@
     </fieldset>
 
     <fieldset
-      class="fieldset bg-gray-900/90 border-gray-600/50 rounded-box w-full border p-4"
+      class="fieldset bg-gray-900 border-gray-600/50 rounded-box w-full border p-4"
     >
       <legend class="fieldset-legend">
         Optional Tool APIs

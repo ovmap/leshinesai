@@ -2,7 +2,7 @@
   <div class="space-y-6">
     <h3 class="text-xl font-semibold mb-4 text-yellow-400">Global Hotkeys</h3>
     <fieldset
-      class="fieldset bg-gray-900/90 border-yellow-500/50 rounded-box w-full border p-4"
+      class="fieldset bg-gray-900 border-yellow-500/50 rounded-box w-full border p-4"
     >
       <legend class="fieldset-legend">Keyboard Shortcuts</legend>
       <div class="p-2 space-y-4">
