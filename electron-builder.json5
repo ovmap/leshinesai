@@ -45,11 +45,11 @@
   win: {
     target: [
       {
-        target: 'nsis',
+        target: 'portable',
         arch: ['x64'],
       },
     ],
-    artifactName: 'Alice-AI-App-Windows-${version}-Setup.${ext}',
+    artifactName: 'Alice-AI-App-Windows-${version}-Portable.${ext}',
   },
   nsis: {
     oneClick: true,

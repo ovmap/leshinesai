@@ -241,9 +241,9 @@ export function useAudioProcessing() {
       return
     }
     
-    // Allow processing from SPEAKING (barge-in) or LISTENING states
-    if (audioState.value === 'SPEAKING') {
-      // Already set to PROCESSING_AUDIO in onSpeechStart
+    // Allow processing from SPEAKING (barge-in), LISTENING, or PROCESSING_AUDIO (barge-in already set state)
+    if (audioState.value === 'SPEAKING' || audioState.value === 'PROCESSING_AUDIO') {
+      // State is already valid for processing
     } else if (audioState.value !== 'LISTENING') {
       console.warn(
         `[Audio Processing] Processing aborted (invalid state: ${audioState.value}).`
