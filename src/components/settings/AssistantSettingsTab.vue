@@ -182,12 +182,12 @@
             ></label>
             <input
               id="assistant-temperature"
-              type="range"
+              type="number"
               min="0"
               max="2"
               step="0.1"
               v-model.number="currentSettings.assistantTemperature"
-              class="range range-primary"
+              class="input input-bordered w-full focus:input-primary"
             />
           </div>
           <div>
@@ -204,12 +204,12 @@
             ></label>
             <input
               id="assistant-top-p"
-              type="range"
+              type="number"
               min="0"
               max="1"
               step="0.1"
               v-model.number="currentSettings.assistantTopP"
-              class="range range-success"
+              class="input input-bordered w-full focus:input-primary"
             />
           </div>
         </div>
