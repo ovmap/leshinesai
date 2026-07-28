@@ -579,64 +579,7 @@ const syncToDataStore = () => {
         toRdc: props.toRdc || '',
       },
     },
-    syncToDataStore_summary,
-    syncToDataStore_summary
   )
-}
-
-// summary 格式化函数（供 detail 复用）
-const syncToDataStore_summary = () => {
-  const apiData = lastApiResponse.value
-  const timeType = selectedYear.value
-  const metric = selectedMetric.value
-  const dataSourceList = selectedDataSource.value
-  const dateRange = selectedDateTimeRange.value
-
-  const metricName = metricOptions.value.find(m => m.code === metric)?.name || metric
-  const timeTypeName = yearOptions.value.find(y => y.code === timeType)?.name || timeType
-  const dateRangeStr = dateRange
-    ? `${dateRange[0]?.format('YYYY-MM-DD')} ~ ${dateRange[1]?.format('YYYY-MM-DD')}`
-    : '未设置'
-
-  let md = `## 货量趋势\n\n`
-  md += `- **时间维度**: ${timeTypeName}\n`
-  md += `- **指标**: ${metricName}\n`
-  md += `- **数据源**: ${dataSourceList.map((code: string) => dataSourceOptions.value.find(d => d.code === code)?.name || code).join(', ') || '全部'}\n`
-  md += `- **时间范围**: ${dateRangeStr}\n\n`
-
-  if (apiData.length === 0) {
-    md += '_暂无数据_\n'
-    return md
-  }
-
-  const allSources = new Set<string>()
-  apiData.forEach(item => {
-    if (item.items) {
-      item.items.forEach((i: any) => allSources.add(i.dataSource))
-    }
-  })
-  const sourceNames = Array.from(allSources).map(code => {
-    return dataSourceOptions.value.find(d => d.code === code)?.name || code
-  })
-
-  md += `| 时间段 | ${sourceNames.join(' | ')} | 合计 | 同比 | 环比 |\n`
-  md += `|--------|${sourceNames.map(() => '------').join('|')}|------|------|------|\n`
-
-  apiData.forEach((timeItem: any) => {
-    const values = sourceNames.map((_, idx) => {
-      const code = Array.from(allSources)[idx]
-      const item = timeItem.items?.find((i: any) => i.dataSource === code)
-      const val = parseFloat(item?.value) || 0
-      return val >= 1000 ? Math.round(val / 1000) + 'k' : val.toFixed(0)
-    })
-    const total = timeItem.totalValue
-    const totalStr = total >= 1000 ? Math.round(total / 1000) + 'k' : total?.toFixed(0) || '0'
-    const yoy = timeItem.totalYoy || '-'
-    const mom = timeItem.totalMom || '-'
-    md += `| ${timeItem.timeDimension} | ${values.join(' | ')} | ${totalStr} | ${yoy} | ${mom} |\n`
-  })
-
-  return md
 }
 
 // 调用 queryVolume 接口
@@ -914,10 +857,11 @@ watch(
   display: flex;
   align-items: center;
   gap: 16px;
-  border-bottom: 1px solid rgba(74, 158, 255, 0.2);
+  border-bottom: 1px solid rgba(74, 158, 255, 0.25);
   position: relative;
   z-index: 50;
   padding: 0 12px;
+  background: linear-gradient(180deg, rgba(10, 20, 40, 0.6) 0%, rgba(15, 30, 55, 0.4) 100%);
 }
 
 .dropdown-group {
@@ -936,7 +880,8 @@ watch(
   justify-content: space-between;
   gap: 4px;
   padding: 4px 8px;
-  background: #081f40;
+  background: url('/dashboard/dlbg.png') center/cover no-repeat,
+              rgba(8, 31, 64, 0.9);
   border: 1px solid #2873cc;
   border-radius: 4px;
   color: rgba(255, 255, 255, 0.7);
@@ -950,6 +895,7 @@ watch(
 
 .dropdown-item:hover {
   color: white;
+  border-color: rgba(74, 158, 255, 0.7);
 }
 
 .dropdown-icon {
@@ -976,10 +922,11 @@ watch(
   top: 100%;
   left: 0;
   right: 0;
-  background: #081f40;
+  background: url('/dashboard/dlbg.png') center/cover no-repeat,
+              #081f40;
   border: 1px solid #2873cc;
   border-radius: 4px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
   z-index: 50;
   margin-top: 4px;
   min-width: 100px;
@@ -1041,7 +988,8 @@ watch(
 }
 
 .time-picker :deep(.ant-picker) {
-  background: #081f40 !important;
+  background: url('/dashboard/dlbg.png') center/cover no-repeat,
+              #081f40 !important;
   border: 1px solid #2873cc !important;
   color: rgba(255, 255, 255, 0.7) !important;
   font-size: 12px !important;

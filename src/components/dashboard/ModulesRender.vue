@@ -35,6 +35,12 @@ function getModuleFilters(moduleName: string): Record<string, any> {
         :style="{ gridColumn: `span ${mod.span || 12}` }"
       >
         <div class="module-card">
+          <!-- 四角装饰 -->
+          <div class="corner top-left"></div>
+          <div class="corner top-right"></div>
+          <div class="corner bottom-left"></div>
+          <div class="corner bottom-right"></div>
+
           <div class="module-header" v-if="mod.title">
             <h3>{{ mod.title }}</h3>
           </div>
@@ -77,18 +83,37 @@ function getModuleFilters(moduleName: string): Record<string, any> {
   width: 100%;
   height: 100%;
   min-height: 280px;
-  background: rgba(15, 23, 42, 0.6);
-  border: 1px solid rgba(74, 158, 255, 0.25);
+  background: url('/dashboard/itemBg.png') center/cover no-repeat,
+              linear-gradient(135deg, rgba(8, 31, 64, 0.9), rgba(15, 23, 42, 0.95));
+  border: 1px solid rgba(74, 158, 255, 0.35);
   border-radius: 8px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  position: relative;
+  box-shadow: 0 0 16px rgba(74, 158, 255, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
+
+/* 四角装饰 */
+.corner {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-color: rgba(74, 158, 255, 0.7);
+  border-style: solid;
+  z-index: 2;
+  pointer-events: none;
+}
+.corner.top-left { top: 6px; left: 6px; border-width: 2px 0 0 2px; }
+.corner.top-right { top: 6px; right: 6px; border-width: 2px 2px 0 0; }
+.corner.bottom-left { bottom: 6px; left: 6px; border-width: 0 0 2px 2px; }
+.corner.bottom-right { bottom: 6px; right: 6px; border-width: 0 2px 2px 0; }
 
 .module-header {
   padding: 12px 16px;
-  background: rgba(30, 41, 59, 0.8);
-  border-bottom: 1px solid rgba(74, 158, 255, 0.15);
+  background: linear-gradient(180deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.7) 100%);
+  border-bottom: 1px solid rgba(74, 158, 255, 0.2);
+  position: relative;
 }
 
 .module-header h3 {
@@ -96,6 +121,7 @@ function getModuleFilters(moduleName: string): Record<string, any> {
   font-size: 14px;
   font-weight: 600;
   color: #e2e8f0;
+  letter-spacing: 1px;
 }
 
 .module-body {

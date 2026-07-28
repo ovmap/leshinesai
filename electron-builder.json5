@@ -7,36 +7,8 @@
   directories: {
     output: 'release/${version}',
   },
-  publish: [
-    {
-      provider: 'github',
-      owner: 'pmbstyle',
-      repo: 'Alice',
-      releaseType: 'release',
-    },
-  ],
   files: ['dist', 'dist-electron'],
-  extraResources: [
-    {
-      from: './app-config.json',
-      to: 'app-config.json',
-    },
-    {
-      from: 'resources/backend',
-      to: 'backend',
-      filter: ['**/*'],
-    },
-    {
-      from: 'backend/lib',
-      to: 'backend/lib',
-      filter: ['**/*'],
-    },
-    {
-      from: 'backend/models',
-      to: 'backend/models',
-      filter: ['**/*'],
-    },
-  ],
+  extraResources: [],
   mac: {
     target: ['dmg'],
     icon: 'public/app_logo.png',
@@ -50,6 +22,7 @@
       },
     ],
     artifactName: 'Alice-AI-App-Windows-${version}-Portable.${ext}',
+    signAndEditExecutable: false,
   },
   nsis: {
     oneClick: true,

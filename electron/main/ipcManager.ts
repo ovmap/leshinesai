@@ -613,6 +613,22 @@ export function registerIPCHandlers(): void {
     }
   })
 
+  // Dashboard: 切换全屏
+  ipcMain.handle('dashboard:toggle-fullscreen', async () => {
+    try {
+      const dashboardWin = getDashboardWindow()
+      if (!dashboardWin || dashboardWin.isDestroyed()) {
+        return { success: false, error: '看板窗口未打开' }
+      }
+      const isFullScreen = dashboardWin.isFullScreen()
+      dashboardWin.setFullScreen(!isFullScreen)
+      return { success: true, isFullscreen: !isFullScreen }
+    } catch (error: any) {
+      console.error('[IPC dashboard:toggle-fullscreen] Error:', error)
+      return { success: false, error: error.message }
+    }
+  })
+
   // Dashboard CLI: 转发控制命令到看板窗口
   ipcMain.handle('dashboard:control', (event, command) => {
     try {

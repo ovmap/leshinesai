@@ -286,10 +286,11 @@ export async function createDashboardWindow(params: {
     height: Math.floor(height * 0.9),
     minWidth: 800,
     minHeight: 600,
-    frame: true,
+    frame: false,
     transparent: false,
     alwaysOnTop: false,
     resizable: true,
+    fullscreenable: true,
     backgroundColor: '#0f172a',
     show: false,
     webPreferences: {
@@ -310,6 +311,14 @@ export async function createDashboardWindow(params: {
   // 传递初始参数
   dashboardWindow.webContents.on('did-finish-load', () => {
     dashboardWindow?.webContents.send('dashboard:init', params)
+  })
+
+  // 监听全屏状态变化
+  dashboardWindow.on('enter-full-screen', () => {
+    dashboardWindow?.webContents.send('dashboard:fullscreen-change', true)
+  })
+  dashboardWindow.on('leave-full-screen', () => {
+    dashboardWindow?.webContents.send('dashboard:fullscreen-change', false)
   })
 
   dashboardWindow.show()

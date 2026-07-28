@@ -22,6 +22,7 @@
   "scripts": {
     "dev": "vite",
     "build": "npm run build:go && vite build && npx electron-builder",
+    "build:win": "vite build && npx electron-builder",
     "build:web": "vite build",
     "build:go": "node scripts/build-go.js",
     "build:go:win": "cd backend && set GOOS=windows&& set GOARCH=amd64&& go build -ldflags=\"-s -w\" -o ../resources/backend/alice-backend.exe",

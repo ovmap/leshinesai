@@ -1,16 +1,29 @@
 <template>
   <div class="dashboard-container">
+    <!-- 背景层 -->
+    <div class="dashboard-bg"></div>
+
     <!-- 头部 -->
     <div class="dashboard-header">
-      <h1 class="dashboard-title">物流看板</h1>
+      <div class="header-bg-decoration"></div>
+      <h1 class="dashboard-title">联晟智达鲲鹏运输智能体</h1>
       <div class="dashboard-actions">
-        <button @click="refresh" class="action-btn">
+        <button @click="refresh" class="action-btn" title="刷新">
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
           </svg>
           刷新
         </button>
-        <button @click="close" class="action-btn">
+        <button @click="toggleFullscreen" class="action-btn" title="全屏">
+          <svg v-if="!isFullscreen" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+          </svg>
+          <svg v-else class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 9V4.5M9 9H4.5M9 9L3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5l5.25 5.25" />
+          </svg>
+          {{ isFullscreen ? '退出全屏' : '全屏' }}
+        </button>
+        <button @click="close" class="action-btn" title="关闭">
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
@@ -54,6 +67,7 @@ const moduleTitleMap: Record<string, string> = {
 }
 
 const refreshKey = ref(0)
+const isFullscreen = ref(false)
 
 // 根据控制 Store 的 activeModules 和 layout 计算显示模块
 const displayModules = computed<ModuleConfig[]>(() => {
@@ -78,12 +92,54 @@ function refresh() {
   refreshKey.value++
 }
 
+function toggleFullscreen() {
+  if (window.ipcRenderer) {
+    // Electron 环境：使用窗口全屏
+    window.ipcRenderer.invoke('dashboard:toggle-fullscreen').then((result: any) => {
+      if (result.success) {
+        isFullscreen.value = result.isFullscreen
+      } else {
+        console.error('全屏失败:', result.error)
+      }
+    }).catch((err: any) => {
+      console.error('全屏失败:', err)
+    })
+  } else {
+    // 浏览器环境：使用浏览器全屏 API
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().then(() => {
+        isFullscreen.value = true
+      }).catch(err => {
+        console.error('全屏失败:', err)
+      })
+    } else {
+      document.exitFullscreen().then(() => {
+        isFullscreen.value = false
+      }).catch(err => {
+        console.error('退出全屏失败:', err)
+      })
+    }
+  }
+}
+
 function close() {
   window.close()
 }
 
 // 接收主进程参数（初始化）
+const handleFullscreenChange = () => {
+  isFullscreen.value = !!document.fullscreenElement
+}
+
 onMounted(() => {
+  // 监听全屏状态变化（浏览器环境）
+  document.addEventListener('fullscreenchange', handleFullscreenChange)
+
+  // 监听全屏状态变化（Electron 环境）
+  window.ipcRenderer?.on('dashboard:fullscreen-change', (_event: any, isFullScreen: boolean) => {
+    isFullscreen.value = isFullScreen
+  })
+
   const handleParams = (params: any) => {
     if (params?.modules && Array.isArray(params.modules)) {
       controlStore.setModules(params.modules.map((m: any) =>
@@ -160,6 +216,8 @@ function handleCommand(command: any) {
 }
 
 onUnmounted(() => {
+  document.removeEventListener('fullscreenchange', handleFullscreenChange)
+  window.ipcRenderer?.removeAllListeners('dashboard:fullscreen-change')
   window.ipcRenderer?.removeAllListeners('dashboard:init')
   window.ipcRenderer?.removeAllListeners('dashboard:update')
   window.ipcRenderer?.removeAllListeners('dashboard:command')
@@ -171,51 +229,89 @@ onUnmounted(() => {
 .dashboard-container {
   width: 100vw;
   height: 100vh;
-  background: #0f172a;
   color: #e2e8f0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  position: relative;
+}
+
+/* 世界地图背景 */
+.dashboard-bg {
+  position: absolute;
+  inset: 0;
+  background: url('/dashboard/bigbg.png') center/cover no-repeat;
+  z-index: 0;
 }
 
 .dashboard-header {
+  position: relative;
+  z-index: 10;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
-  padding: 12px 20px;
-  background: #1e293b;
-  border-bottom: 1px solid #334155;
+  padding: 12px 24px;
+  background: url('/dashboard/header-bg.png') center/cover no-repeat;
+  -webkit-app-region: drag;
   flex-shrink: 0;
+  overflow: hidden;
+}
+
+.header-bg-decoration {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 50%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
+    linear-gradient(90deg, transparent 0%, rgba(59, 130, 246, 0.05) 50%, transparent 100%);
+  pointer-events: none;
 }
 
 .dashboard-title {
-  font-size: 18px;
-  font-weight: 600;
-  color: #3b82f6;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+  font-size: 20px;
+  font-weight: 700;
+  color: #60a5fa;
   margin: 0;
+  text-shadow: 0 0 12px rgba(96, 165, 250, 0.4);
+  letter-spacing: 2px;
 }
 
 .dashboard-actions {
+  position: relative;
+  z-index: 1;
   display: flex;
   gap: 8px;
+  -webkit-app-region: no-drag;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.dashboard-header:hover .dashboard-actions {
+  opacity: 1;
 }
 
 .action-btn {
   display: flex;
   align-items: center;
   gap: 4px;
-  padding: 6px 12px;
-  background: #334155;
-  border: none;
-  border-radius: 6px;
-  color: #e2e8f0;
+  padding: 6px 14px;
+  background: rgba(8, 31, 64, 0.8);
+  border: 1px solid rgba(74, 158, 255, 0.4);
+  border-radius: 4px;
+  color: rgba(255, 255, 255, 0.8);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
   font-size: 13px;
 }
 
 .action-btn:hover {
-  background: #475569;
+  background: rgba(59, 130, 246, 0.2);
+  border-color: rgba(74, 158, 255, 0.7);
+  color: #fff;
 }
 
 .action-btn .icon {
@@ -224,6 +320,8 @@ onUnmounted(() => {
 }
 
 .dashboard-content {
+  position: relative;
+  z-index: 1;
   flex: 1;
   overflow: hidden;
 }
