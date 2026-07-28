@@ -1167,7 +1167,7 @@ export const useSettingsStore = defineStore('settings', () => {
     VITE_MINIMAX_API_KEY?: string
     VITE_DEEPSEEK_API_KEY?: string
     VITE_DASHSCOPE_API_KEY?: string
-    sttProvider: 'openai' | 'groq' | 'google' | 'local'
+    sttProvider: 'openai' | 'groq' | 'google' | 'local' | 'dashscope'
     ttsProvider?: 'openai' | 'google' | 'local' | 'dashscope'
     embeddingProvider?: 'openai' | 'local' | 'dashscope'
     aiProvider: AIProviderKey
@@ -1194,7 +1194,19 @@ export const useSettingsStore = defineStore('settings', () => {
       onboardingData.VITE_DEEPSEEK_API_KEY || ''
     settings.value.VITE_DASHSCOPE_API_KEY =
       onboardingData.VITE_DASHSCOPE_API_KEY || ''
-    settings.value.sttProvider = onboardingData.sttProvider
+
+    // For dashscope AI provider without OpenAI key, default STT to dashscope
+    const hasOpenAIKey = Boolean(onboardingData.VITE_OPENAI_API_KEY?.trim())
+    if (
+      onboardingData.aiProvider === 'dashscope' &&
+      !hasOpenAIKey &&
+      onboardingData.sttProvider === 'openai'
+    ) {
+      settings.value.sttProvider = 'dashscope'
+    } else {
+      settings.value.sttProvider = onboardingData.sttProvider
+    }
+
     settings.value.aiProvider = onboardingData.aiProvider
     settings.value.VITE_GROQ_API_KEY = onboardingData.VITE_GROQ_API_KEY
     settings.value.VITE_GOOGLE_API_KEY = onboardingData.VITE_GOOGLE_API_KEY
@@ -1216,10 +1228,16 @@ export const useSettingsStore = defineStore('settings', () => {
       settings.value.ttsProvider = 'local'
       settings.value.embeddingProvider = 'local'
     } else {
-      // Respect the user's choice from the wizard if available, otherwise default to openai
-      settings.value.ttsProvider = onboardingData.ttsProvider || 'openai'
+      // For dashscope AI provider without OpenAI key, use dashscope for TTS/Embeddings
+      const defaultProvider =
+        onboardingData.aiProvider === 'dashscope' && !hasOpenAIKey
+          ? 'dashscope'
+          : 'openai'
+
+      // Respect the user's choice from the wizard if available, otherwise use default
+      settings.value.ttsProvider = onboardingData.ttsProvider || defaultProvider
       settings.value.embeddingProvider =
-        onboardingData.embeddingProvider || 'openai'
+        onboardingData.embeddingProvider || defaultProvider
     }
 
     if (onboardingData.ollamaBaseUrl) {

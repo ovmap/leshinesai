@@ -24,6 +24,7 @@
         <option value="zai">Z.ai (GLM Coding Plan)</option>
         <option value="minimax">MiniMax (OpenAI-compatible)</option>
         <option value="deepseek">DeepSeek (OpenAI-compatible)</option>
+        <option value="dashscope">通义千问 (DashScope)</option>
         <option value="codex">ChatGPT Codex (subscription)</option>
         <option value="ollama">Ollama (Local LLMs)</option>
         <option value="lm-studio">LM Studio (Local LLMs)</option>

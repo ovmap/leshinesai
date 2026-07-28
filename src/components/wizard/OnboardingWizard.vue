@@ -134,9 +134,9 @@ const formData = reactive({
   aiProvider: 'openai' as AIProviderKey,
   assistantModel: openaiDefaults.assistantModel as string,
   summarizationModel: openaiDefaults.summarizationModel as string,
-  sttProvider: 'openai' as 'openai' | 'groq' | 'google' | 'local',
-  ttsProvider: 'openai' as 'openai' | 'google' | 'local',
-  embeddingProvider: 'openai' as 'openai' | 'local',
+  sttProvider: 'openai' as 'openai' | 'groq' | 'google' | 'dashscope' | 'local',
+  ttsProvider: 'openai' as 'openai' | 'google' | 'dashscope' | 'local',
+  embeddingProvider: 'openai' as 'openai' | 'dashscope' | 'local',
   VITE_GROQ_API_KEY: '',
   VITE_GOOGLE_API_KEY: '',
   ollamaBaseUrl: 'http://localhost:11434',
@@ -196,6 +196,7 @@ const canContinue = computed(() => {
       if (formData.useLocalModels) return true
 
       // Check OpenAI Key requirement for non-OpenAI providers (for voice features)
+      // Note: dashscope supports TTS/STT/Embeddings natively, so no OpenAI key required
       if (
         (formData.aiProvider === 'ollama' ||
           formData.aiProvider === 'lm-studio' ||
@@ -203,7 +204,6 @@ const canContinue = computed(() => {
           formData.aiProvider === 'zai' ||
           formData.aiProvider === 'minimax' ||
           formData.aiProvider === 'deepseek' ||
-          formData.aiProvider === 'dashscope' ||
           formData.aiProvider === 'codex') &&
         !formData.VITE_OPENAI_API_KEY.trim()
       ) {

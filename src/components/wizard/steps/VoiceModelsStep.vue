@@ -148,7 +148,7 @@
     <div v-else>
       <!-- Cloud Models Configuration -->
       <div class="space-y-4">
-        <!-- OpenAI Key requirement for non-OpenAI providers -->
+        <!-- OpenAI Key requirement for non-OpenAI providers (dashscope supports TTS/STT/Embeddings natively) -->
         <div
           v-if="
             (formData.aiProvider === 'ollama' ||
@@ -156,8 +156,7 @@
               formData.aiProvider === 'openrouter' ||
               formData.aiProvider === 'zai' ||
               formData.aiProvider === 'minimax' ||
-              formData.aiProvider === 'deepseek' ||
-              formData.aiProvider === 'dashscope') &&
+              formData.aiProvider === 'deepseek') &&
             !formData.VITE_OPENAI_API_KEY?.trim()
           "
           class="alert alert-warning text-sm"
@@ -201,7 +200,7 @@
           >
         </div>
 
-        <!-- OpenAI API Key for non-OpenAI providers -->
+        <!-- OpenAI API Key for non-OpenAI providers (not needed for dashscope) -->
         <div
           v-if="
             formData.aiProvider === 'ollama' ||
@@ -209,8 +208,7 @@
             formData.aiProvider === 'openrouter' ||
             formData.aiProvider === 'zai' ||
             formData.aiProvider === 'minimax' ||
-            formData.aiProvider === 'deepseek' ||
-            formData.aiProvider === 'dashscope'
+            formData.aiProvider === 'deepseek'
           "
           class="form-control"
         >
@@ -245,6 +243,7 @@
             <option value="openai">OpenAI (Good quality, integrated)</option>
             <option value="groq">Groq (Faster, requires separate key)</option>
             <option value="google">Google (Cloud)</option>
+            <option value="dashscope">通义千问 (DashScope)</option>
           </select>
         </div>
 
@@ -320,15 +319,15 @@
           <div class="text-sm space-y-1">
             <div class="flex justify-between">
               <span class="text-base-content/60">Speech-to-Text:</span>
-              <span class="capitalize">{{ formData.sttProvider }}</span>
+              <span>{{ providerLabel(formData.sttProvider) }}</span>
             </div>
             <div class="flex justify-between">
               <span class="text-base-content/60">Text-to-Speech:</span>
-              <span>{{ providerLabel(formData.ttsProvider) }}</span>
+              <span>{{ providerLabel(effectiveTtsProvider) }}</span>
             </div>
             <div class="flex justify-between">
               <span class="text-base-content/60">Embeddings:</span>
-              <span>{{ providerLabel(formData.embeddingProvider) }}</span>
+              <span>{{ providerLabel(effectiveEmbeddingProvider) }}</span>
             </div>
           </div>
         </div>
@@ -338,7 +337,9 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{
+import { computed } from 'vue'
+
+const props = defineProps<{
   formData: any
 }>()
 
@@ -346,9 +347,36 @@ defineEmits<{
   'toggle-local': [useLocal: boolean]
 }>()
 
+// Compute effective TTS/Embedding providers based on form state
+const effectiveTtsProvider = computed(() => {
+  if (props.formData.useLocalModels) return 'local'
+  // If dashscope AI provider without OpenAI key, use dashscope
+  if (
+    props.formData.aiProvider === 'dashscope' &&
+    !props.formData.VITE_OPENAI_API_KEY?.trim()
+  ) {
+    return 'dashscope'
+  }
+  return props.formData.ttsProvider || 'openai'
+})
+
+const effectiveEmbeddingProvider = computed(() => {
+  if (props.formData.useLocalModels) return 'local'
+  // If dashscope AI provider without OpenAI key, use dashscope
+  if (
+    props.formData.aiProvider === 'dashscope' &&
+    !props.formData.VITE_OPENAI_API_KEY?.trim()
+  ) {
+    return 'dashscope'
+  }
+  return props.formData.embeddingProvider || 'openai'
+})
+
 const providerLabel = (provider: string) => {
   const labels: Record<string, string> = {
     google: 'Google',
+    groq: 'Groq',
+    dashscope: '通义千问',
     local: 'Local',
     openai: 'OpenAI',
   }

@@ -88,11 +88,11 @@
           </div>
           <div class="flex justify-between gap-3">
             <span class="text-base-content/60">TTS:</span>
-            <span>{{ providerLabel(formData.ttsProvider) }}</span>
+            <span>{{ providerLabel(effectiveTtsProvider) }}</span>
           </div>
           <div class="flex justify-between gap-3">
             <span class="text-base-content/60">Embeddings:</span>
-            <span>{{ providerLabel(formData.embeddingProvider) }}</span>
+            <span>{{ providerLabel(effectiveEmbeddingProvider) }}</span>
           </div>
         </div>
 
@@ -142,7 +142,9 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{
+import { computed } from 'vue'
+
+const props = defineProps<{
   formData: any
   isFinishing: boolean
 }>()
@@ -150,6 +152,31 @@ defineProps<{
 defineEmits<{
   finish: []
 }>()
+
+// Compute effective TTS/Embedding providers based on form state
+const effectiveTtsProvider = computed(() => {
+  if (props.formData.useLocalModels) return 'local'
+  // If dashscope AI provider without OpenAI key, use dashscope
+  if (
+    props.formData.aiProvider === 'dashscope' &&
+    !props.formData.VITE_OPENAI_API_KEY?.trim()
+  ) {
+    return 'dashscope'
+  }
+  return props.formData.ttsProvider || 'openai'
+})
+
+const effectiveEmbeddingProvider = computed(() => {
+  if (props.formData.useLocalModels) return 'local'
+  // If dashscope AI provider without OpenAI key, use dashscope
+  if (
+    props.formData.aiProvider === 'dashscope' &&
+    !props.formData.VITE_OPENAI_API_KEY?.trim()
+  ) {
+    return 'dashscope'
+  }
+  return props.formData.embeddingProvider || 'openai'
+})
 
 const providerLabel = (provider: string) => {
   const labels: Record<string, string> = {
@@ -159,6 +186,7 @@ const providerLabel = (provider: string) => {
     local: 'Local',
     minimax: 'MiniMax',
     deepseek: 'DeepSeek',
+    dashscope: '通义千问',
     ollama: 'Ollama',
     openai: 'OpenAI',
     openrouter: 'OpenRouter',
