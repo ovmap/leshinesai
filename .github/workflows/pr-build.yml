@@ -117,9 +117,9 @@ jobs:
         working-directory: backend
         run: |
           if [[ "${{ matrix.os }}" == "windows-2022" ]]; then
-            go build -ldflags="-s -w" -o ../resources/backend/alice-backend.exe
+            go build -ldflags="-s -w" -o ../resources/backend/leshine-backend.exe
           else
-            go build -ldflags="-s -w" -o ../resources/backend/alice-backend
+            go build -ldflags="-s -w" -o ../resources/backend/leshine-backend
           fi
         shell: bash
 

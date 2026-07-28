@@ -6,10 +6,10 @@ import (
 	"log"
 	"sync"
 
-	"alice-backend/internal/config"
-	"alice-backend/internal/minilm"
-	"alice-backend/internal/piper"
-	"alice-backend/internal/whisper"
+	"leshine-backend/internal/config"
+	"leshine-backend/internal/minilm"
+	"leshine-backend/internal/piper"
+	"leshine-backend/internal/whisper"
 )
 
 // Manager coordinates all AI services

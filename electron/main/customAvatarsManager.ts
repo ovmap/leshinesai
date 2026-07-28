@@ -14,7 +14,7 @@ const REQUIRED_FILES: Array<{ key: 'speaking' | 'thinking' | 'standby'; file: st
   { key: 'thinking', file: 'thinking.mp4' },
   { key: 'standby', file: 'standby.mp4' },
 ]
-const AVATAR_PROTOCOL = 'alice-avatar://'
+const AVATAR_PROTOCOL = 'leshine-avatar://'
 
 function getCustomizationRoot(): string {
   if (app.isPackaged) {

@@ -231,9 +231,9 @@ const fallbackToDashScopeEmbedding = async (
 
 | 文件 | 作用 |
 |------|------|
-| [apiClients.ts](file:///e:/Program/nodejs/Alice/src/services/apiClients.ts) | OpenAI 客户端初始化和配置 |
-| [apiService.ts](file:///e:/Program/nodejs/Alice/src/services/apiService.ts) | TTS/STT/Embeddings 服务实现 |
-| [backendService.ts](file:///e:/Program/nodejs/Alice/src/modules/conversation/backendService.ts) | STT 提供商路由逻辑 |
-| [backendApi.ts](file:///e:/Program/nodejs/Alice/src/services/backendApi.ts) | 本地后端 API 调用 (STT/TTS/Embeddings) |
-| [settingsStore.ts](file:///e:/Program/nodejs/Alice/src/stores/settingsStore.ts) | 配置管理和验证 |
-| [CoreSettingsTab.vue](file:///e:/Program/nodejs/Alice/src/components/settings/CoreSettingsTab.vue) | 设置 UI 界面 |
+| [apiClients.ts](file:///e:/Program/nodejs/Leshine/src/services/apiClients.ts) | OpenAI 客户端初始化和配置 |
+| [apiService.ts](file:///e:/Program/nodejs/Leshine/src/services/apiService.ts) | TTS/STT/Embeddings 服务实现 |
+| [backendService.ts](file:///e:/Program/nodejs/Leshine/src/modules/conversation/backendService.ts) | STT 提供商路由逻辑 |
+| [backendApi.ts](file:///e:/Program/nodejs/Leshine/src/services/backendApi.ts) | 本地后端 API 调用 (STT/TTS/Embeddings) |
+| [settingsStore.ts](file:///e:/Program/nodejs/Leshine/src/stores/settingsStore.ts) | 配置管理和验证 |
+| [CoreSettingsTab.vue](file:///e:/Program/nodejs/Leshine/src/components/settings/CoreSettingsTab.vue) | 设置 UI 界面 |

@@ -167,8 +167,8 @@ class CodexAppServerClient extends EventEmitter {
 
     await this.request('initialize', {
       clientInfo: {
-        name: 'alice_electron',
-        title: 'Alice',
+        name: 'leshine_electron',
+        title: 'Leshine',
         version: app.getVersion(),
       },
       capabilities: {
@@ -686,17 +686,17 @@ class CodexAppServerManager {
     const stream = this.findStreamForDynamicToolCall(client, call)
     if (!stream) {
       return failedDynamicToolResponse(
-        `No active Alice Codex turn found for tool call ${call.callId}.`
+        `No active Leshine Codex turn found for tool call ${call.callId}.`
       )
     }
 
     if (!stream.dynamicTools.has(call.tool)) {
-      return failedDynamicToolResponse(`Unknown Alice tool: ${call.tool}`)
+      return failedDynamicToolResponse(`Unknown Leshine tool: ${call.tool}`)
     }
 
     if (stream.sender.isDestroyed()) {
       return failedDynamicToolResponse(
-        `Cannot execute Alice tool ${call.tool}: renderer is unavailable.`
+        `Cannot execute Leshine tool ${call.tool}: renderer is unavailable.`
       )
     }
 
@@ -706,7 +706,7 @@ class CodexAppServerManager {
         this.pendingToolExecutions.delete(requestId)
         resolve(
           failedDynamicToolResponse(
-            `Alice tool ${call.tool} timed out after ${CODEX_TOOL_TIMEOUT_MS}ms.`
+            `Leshine tool ${call.tool} timed out after ${CODEX_TOOL_TIMEOUT_MS}ms.`
           )
         )
       }, CODEX_TOOL_TIMEOUT_MS)
@@ -791,7 +791,7 @@ class CodexAppServerManager {
         sandbox: 'read-only',
         developerInstructions: params.instructions || null,
         personality: 'none',
-        serviceName: 'alice_electron',
+        serviceName: 'leshine_electron',
         ephemeral: true,
         environments: [],
         config: params.config || undefined,
@@ -968,7 +968,7 @@ function normalizeToolExecutionResult(
   if (contentItems.length === 0) {
     contentItems.push({
       type: 'inputText',
-      text: result.error || 'Alice tool returned no output.',
+      text: result.error || 'Leshine tool returned no output.',
     })
   }
 
@@ -997,7 +997,7 @@ function truncateDynamicToolText(text: string): string {
     return text
   }
 
-  const notice = `\n...(Alice truncated tool result: original ${text.length} chars, showing ${CODEX_TOOL_RESULT_MAX_CHARS}.)`
+  const notice = `\n...(Leshine truncated tool result: original ${text.length} chars, showing ${CODEX_TOOL_RESULT_MAX_CHARS}.)`
   return `${text.slice(
     0,
     Math.max(0, CODEX_TOOL_RESULT_MAX_CHARS - notice.length)

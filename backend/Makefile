@@ -4,15 +4,15 @@
 build: build-windows build-linux build-macos
 
 build-windows:
-	GOOS=windows GOARCH=amd64 go build -o bin/alice-backend-windows-amd64.exe ./main.go
+	GOOS=windows GOARCH=amd64 go build -o bin/leshine-backend-windows-amd64.exe ./main.go
 
 build-linux:
-	GOOS=linux GOARCH=amd64 go build -o bin/alice-backend-linux-amd64 ./main.go
-	GOOS=linux GOARCH=arm64 go build -o bin/alice-backend-linux-arm64 ./main.go
+	GOOS=linux GOARCH=amd64 go build -o bin/leshine-backend-linux-amd64 ./main.go
+	GOOS=linux GOARCH=arm64 go build -o bin/leshine-backend-linux-arm64 ./main.go
 
 build-macos:
-	GOOS=darwin GOARCH=amd64 go build -o bin/alice-backend-macos-amd64 ./main.go
-	GOOS=darwin GOARCH=arm64 go build -o bin/alice-backend-macos-arm64 ./main.go
+	GOOS=darwin GOARCH=amd64 go build -o bin/leshine-backend-macos-amd64 ./main.go
+	GOOS=darwin GOARCH=arm64 go build -o bin/leshine-backend-macos-arm64 ./main.go
 
 # Development
 run:

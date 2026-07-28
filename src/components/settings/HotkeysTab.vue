@@ -130,16 +130,16 @@
 </template>
 
 <script setup lang="ts">
-import type { AliceSettings } from '../../stores/settingsStore'
+import type { LeshineSettings } from '../../stores/settingsStore'
 
 defineProps<{
-  currentSettings: AliceSettings
-  isRecordingHotkeyFor: keyof AliceSettings | null
+  currentSettings: LeshineSettings
+  isRecordingHotkeyFor: keyof LeshineSettings | null
 }>()
 
 defineEmits<{
-  'start-recording-hotkey': [settingKey: keyof AliceSettings]
-  'clear-hotkey': [settingKey: keyof AliceSettings]
+  'start-recording-hotkey': [settingKey: keyof LeshineSettings]
+  'clear-hotkey': [settingKey: keyof LeshineSettings]
 }>()
 
 function formatAccelerator(accelerator: string | undefined): string {

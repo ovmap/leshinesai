@@ -62,8 +62,8 @@ declare global {
         }
       }>
     }
-    customToolsAPI?: AliceCustomToolsAPI
-    customAvatarsAPI?: AliceCustomAvatarsAPI
+    customToolsAPI?: LeshineCustomToolsAPI
+    customAvatarsAPI?: LeshineCustomAvatarsAPI
   }
 }
 
@@ -72,7 +72,7 @@ declare global {
   broad IPC bridge. Once the bridge is narrowed, these can replace the `any`
   globals above.
 */
-interface AliceCustomToolsAPI {
+interface LeshineCustomToolsAPI {
   list: () => Promise<{
     success: boolean
     data?: CustomToolsSnapshot
@@ -114,7 +114,7 @@ interface AliceCustomToolsAPI {
   }>
 }
 
-interface AliceCustomAvatarsAPI {
+interface LeshineCustomAvatarsAPI {
   list: () => Promise<{
     success: boolean
     data?: CustomAvatarsSnapshot

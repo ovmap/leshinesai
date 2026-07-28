@@ -53,7 +53,7 @@ export function getSettingsWindow(): BrowserWindow | null {
 
 export async function createMainWindow(): Promise<BrowserWindow> {
   win = new BrowserWindow({
-    title: 'Alice',
+    title: 'Leshine',
     icon: path.join(getVitePublic(), 'app_logo.png'),
     transparent: true,
     frame: false,
@@ -83,7 +83,7 @@ export async function createMainWindow(): Promise<BrowserWindow> {
   win.webContents.on('did-finish-load', () => {
     win?.webContents.send(
       'main-process-message',
-      `Alice ready at ${new Date().toLocaleString()}`
+      `Leshine ready at ${new Date().toLocaleString()}`
     )
   })
 
@@ -209,7 +209,7 @@ export async function createSettingsWindow(): Promise<BrowserWindow> {
   }
 
   settingsWindow = new BrowserWindow({
-    title: 'Alice Settings',
+    title: 'Leshine Settings',
     icon: path.join(getVitePublic(), 'app_logo.png'),
     width: 900,
     height: 700,
@@ -280,7 +280,7 @@ export async function createDashboardWindow(params: {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize
 
   dashboardWindow = new BrowserWindow({
-    title: 'Alice Dashboard',
+    title: 'Leshine Dashboard',
     icon: path.join(getVitePublic(), 'app_logo.png'),
     width: Math.floor(width * 0.9),
     height: Math.floor(height * 0.9),
@@ -351,8 +351,8 @@ export function registerCustomProtocol(
   generatedImagesPath: string,
   customAvatarsPath?: string
 ): void {
-  protocol.registerFileProtocol('alice-image', (request, callback) => {
-    const url = request.url.substring('alice-image://'.length)
+  protocol.registerFileProtocol('leshine-image', (request, callback) => {
+    const url = request.url.substring('leshine-image://'.length)
     const decodedUrlPath = decodeURIComponent(url)
     const filePath = path.normalize(
       path.join(generatedImagesPath, decodedUrlPath)
@@ -369,8 +369,8 @@ export function registerCustomProtocol(
   })
 
   if (customAvatarsPath) {
-    protocol.registerFileProtocol('alice-avatar', (request, callback) => {
-      const url = request.url.substring('alice-avatar://'.length)
+    protocol.registerFileProtocol('leshine-avatar', (request, callback) => {
+      const url = request.url.substring('leshine-avatar://'.length)
       const decodedUrlPath = decodeURIComponent(url)
       const filePath = path.normalize(
         path.join(customAvatarsPath, decodedUrlPath)

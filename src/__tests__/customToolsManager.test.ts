@@ -13,7 +13,7 @@ import { mkdtempSync, rmSync, mkdirSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import os from 'node:os'
 
-const testRoot = mkdtempSync(path.join(os.tmpdir(), 'alice-custom-tools-'))
+const testRoot = mkdtempSync(path.join(os.tmpdir(), 'leshine-custom-tools-'))
 const userDataDir = path.join(testRoot, 'user-data')
 mkdirSync(userDataDir, { recursive: true })
 let cwdSpy: any = null

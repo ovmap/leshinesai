@@ -252,7 +252,7 @@ export class BackendManager {
       // Development mode - look for compiled Go binary in resources/backend/
       const devPath = path.join(
         __dirname,
-        '../../resources/backend/alice-backend'
+        '../../resources/backend/leshine-backend'
       )
       const devPathWin = devPath + '.exe'
 
@@ -273,9 +273,9 @@ export class BackendManager {
 
       let backendPath: string
       if (process.platform === 'win32') {
-        backendPath = path.join(backendDir, 'alice-backend.exe')
+        backendPath = path.join(backendDir, 'leshine-backend.exe')
       } else {
-        backendPath = path.join(backendDir, 'alice-backend')
+        backendPath = path.join(backendDir, 'leshine-backend')
       }
 
       if (fs.existsSync(backendPath)) {

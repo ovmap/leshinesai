@@ -7,8 +7,8 @@ import (
 	"net/url"
 	"time"
 
-	"alice-backend/internal/api"
-	"alice-backend/internal/config"
+	"leshine-backend/internal/api"
+	"leshine-backend/internal/config"
 
 	"github.com/gorilla/mux"
 )

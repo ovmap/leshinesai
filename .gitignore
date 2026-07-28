@@ -37,7 +37,7 @@ CLAUDE.md
 /python/api/__pycache__
 /python/utils/__pycache__
 /resources/python/_internal
-resources/python/alice-ai-backend.exe
+resources/python/leshine-ai-backend.exe
 /python/__pycache__
 /resources
 /backend/bin
@@ -46,7 +46,7 @@ resources/python/alice-ai-backend.exe
 /bin
 /models
 AGENTS.md
-backend/alice-backend
+backend/leshine-backend
 
 # User customization sandbox (allow sample fixtures)
 user-customization/*

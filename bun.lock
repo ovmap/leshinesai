@@ -2,7 +2,7 @@
   "lockfileVersion": 1,
   "workspaces": {
     "": {
-      "name": "alice-ai-app",
+      "name": "leshine-ai-app",
       "dependencies": {
         "@ricky0123/vad-web": "^0.0.24",
         "@tailwindcss/vite": "^4.1.4",

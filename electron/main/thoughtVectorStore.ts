@@ -11,10 +11,10 @@ type SQLiteDatabase = any
 const OPENAI_VECTOR_DIMENSION = 1536 // OpenAI embedding dimension
 const LOCAL_VECTOR_DIMENSION = 384 // all-MiniLM-L6-v2 embedding dimension (Go backend)
 const MAX_ELEMENTS_HNSW = 10000
-const HNSW_OPENAI_INDEX_FILE_NAME = 'alice-thoughts-hnsw-openai.index'
-const HNSW_LOCAL_INDEX_FILE_NAME = 'alice-thoughts-hnsw-local.index'
-const DB_FILE_NAME = 'alice-thoughts.sqlite'
-const OLD_MEMORIES_JSON_FILE = 'alice-memories.json'
+const HNSW_OPENAI_INDEX_FILE_NAME = 'leshine-thoughts-hnsw-openai.index'
+const HNSW_LOCAL_INDEX_FILE_NAME = 'leshine-thoughts-hnsw-local.index'
+const DB_FILE_NAME = 'leshine-thoughts.sqlite'
+const OLD_MEMORIES_JSON_FILE = 'leshine-memories.json'
 
 const hnswOpenAIIndexFilePath = path.join(
   app.getPath('userData'),

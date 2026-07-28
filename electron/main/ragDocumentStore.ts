@@ -16,9 +16,9 @@ type SQLiteDatabase = any
 
 const LOCAL_VECTOR_DIMENSION = 384
 const MAX_ELEMENTS_HNSW = 200000
-const RAG_DB_FILE_NAME = 'alice-rag.sqlite'
-const RAG_HNSW_INDEX_FILE_NAME = 'alice-rag-hnsw-local.index'
-const RAG_HNSW_META_FILE_NAME = 'alice-rag-hnsw-local.meta.json'
+const RAG_DB_FILE_NAME = 'leshine-rag.sqlite'
+const RAG_HNSW_INDEX_FILE_NAME = 'leshine-rag-hnsw-local.index'
+const RAG_HNSW_META_FILE_NAME = 'leshine-rag-hnsw-local.meta.json'
 const SUPPORTED_EXTENSIONS = new Set([
   '.txt',
   '.md',

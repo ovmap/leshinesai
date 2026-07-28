@@ -12,11 +12,11 @@ const baseSnapshot = (): CustomAvatarsSnapshot => ({
       folderName: 'Galaxy',
       source: 'custom',
       stateVideos: {
-        speaking: 'alice-avatar://Galaxy/speaking.mp4',
-        thinking: 'alice-avatar://Galaxy/thinking.mp4',
-        standby: 'alice-avatar://Galaxy/standby.mp4',
+        speaking: 'leshine-avatar://Galaxy/speaking.mp4',
+        thinking: 'leshine-avatar://Galaxy/thinking.mp4',
+        standby: 'leshine-avatar://Galaxy/standby.mp4',
       },
-      previewVideo: 'alice-avatar://Galaxy/standby.mp4',
+      previewVideo: 'leshine-avatar://Galaxy/standby.mp4',
     },
   ],
   customizationRoot: '/tmp/user-customization/custom-avatars',
@@ -53,7 +53,7 @@ describe('useCustomAvatarsStore', () => {
     expect(api.list).toHaveBeenCalledTimes(1)
     expect(store.customAvatars).toHaveLength(1)
     expect(store.allAvatars).toHaveLength(2)
-    expect(store.activeAvatarId).toBe('alice')
+    expect(store.activeAvatarId).toBe('leshine')
   })
 
   it('tracks selected avatar from settings store', async () => {
@@ -82,11 +82,11 @@ describe('useCustomAvatarsStore', () => {
       folderName: 'Neon',
       source: 'custom',
       stateVideos: {
-        speaking: 'alice-avatar://Neon/speaking.mp4',
-        thinking: 'alice-avatar://Neon/thinking.mp4',
-        standby: 'alice-avatar://Neon/standby.mp4',
+        speaking: 'leshine-avatar://Neon/speaking.mp4',
+        thinking: 'leshine-avatar://Neon/thinking.mp4',
+        standby: 'leshine-avatar://Neon/standby.mp4',
       },
-      previewVideo: 'alice-avatar://Neon/standby.mp4',
+      previewVideo: 'leshine-avatar://Neon/standby.mp4',
     })
     api.refresh.mockResolvedValue({ success: true, data: updatedSnapshot })
 

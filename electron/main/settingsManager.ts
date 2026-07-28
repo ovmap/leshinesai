@@ -2,7 +2,7 @@ import { app } from 'electron'
 import path from 'node:path'
 import fs from 'node:fs/promises'
 
-const SETTINGS_FILE_NAME = 'alice-settings.json'
+const SETTINGS_FILE_NAME = 'leshine-settings.json'
 const settingsFilePath = path.join(app.getPath('userData'), SETTINGS_FILE_NAME)
 
 export interface AppSettings {

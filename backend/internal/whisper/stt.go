@@ -15,7 +15,7 @@ import (
 	"time"
 	"archive/zip"
 
-	"alice-backend/internal/embedded"
+	"leshine-backend/internal/embedded"
 )
 
 
@@ -415,7 +415,7 @@ func (s *STTService) downloadWhisperBinary(ctx context.Context) error {
 	case "windows":
 		if runtime.GOARCH == "amd64" || runtime.GOARCH == "x86_64" {
 			downloadURLs = []string{
-				"https://aliceai.ca/app_assets/whisper/whisper-windows.zip",
+				"https://leshineai.ca/app_assets/whisper/whisper-windows.zip",
 			}
 			fileName = "whisper-windows.zip"
 		} else {
@@ -424,19 +424,19 @@ func (s *STTService) downloadWhisperBinary(ctx context.Context) error {
 	case "darwin":
 		if runtime.GOARCH == "arm64" {
 			downloadURLs = []string{
-				"https://aliceai.ca/app_assets/whisper/whisper-macos-arm64.zip",
+				"https://leshineai.ca/app_assets/whisper/whisper-macos-arm64.zip",
 			}
 			fileName = "whisper-macos-arm64.zip"
 		} else {
 			downloadURLs = []string{
-				"https://aliceai.ca/app_assets/whisper/whisper-macos-x64.zip",
+				"https://leshineai.ca/app_assets/whisper/whisper-macos-x64.zip",
 			}
 			fileName = "whisper-macos-x64.zip"
 		}
 	case "linux":
 		if runtime.GOARCH == "amd64" || runtime.GOARCH == "x86_64" {
 			downloadURLs = []string{
-				"https://aliceai.ca/app_assets/whisper/whisper-linux-x64.zip",
+				"https://leshineai.ca/app_assets/whisper/whisper-linux-x64.zip",
 			}
 			fileName = "whisper-linux-x64.zip"
 		} else {
@@ -668,7 +668,7 @@ func (s *STTService) downloadFileWithHeaders(url, filepath string) error {
 	if err != nil {
 		return fmt.Errorf("failed to create request: %w", err)
 	}
-	req.Header.Set("User-Agent", "AliceElectron/1.0 (compatible; file downloader)")
+	req.Header.Set("User-Agent", "LeshineElectron/1.0 (compatible; file downloader)")
 	req.Header.Set("Accept", "application/octet-stream, */*")
 
 	resp, err := client.Do(req)

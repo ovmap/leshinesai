@@ -18,7 +18,7 @@ import (
 	"sync"
 	"time"
 
-	"alice-backend/internal/embedded"
+	"leshine-backend/internal/embedded"
 )
 
 // TTSService provides text-to-speech functionality using Piper
@@ -707,7 +707,7 @@ func (s *TTSService) downloadPiperBinary() error {
 	case "darwin":
 		if runtime.GOARCH == "arm64" {
 			downloadURLs = []string{
-				"https://raw.githubusercontent.com/pmbstyle/Alice/main/assets/binaries/piper-macos-arm64",
+				"https://raw.githubusercontent.com/pmbstyle/Leshine/main/assets/binaries/piper-macos-arm64",
 				"https://github.com/rhasspy/piper/releases/download/2023.11.14-2/piper_macos_aarch64.tar.gz",
 			}
 			fileName = "piper-macos-arm64"
@@ -791,7 +791,7 @@ func (s *TTSService) downloadFile(url, destPath string) error {
 	if err != nil {
 		return fmt.Errorf("failed to create request: %w", err)
 	}
-	req.Header.Set("User-Agent", "AliceElectron/1.0 (compatible; file downloader)")
+	req.Header.Set("User-Agent", "LeshineElectron/1.0 (compatible; file downloader)")
 	req.Header.Set("Accept", "application/octet-stream, */*")
 	req.Header.Set("Accept-Encoding", "identity")
 	req.Header.Set("Connection", "keep-alive")

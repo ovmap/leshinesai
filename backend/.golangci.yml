@@ -25,7 +25,7 @@ linters-settings:
   lll:
     line-length: 140
   goimports:
-    local-prefixes: alice-backend
+    local-prefixes: leshine-backend
   gocritic:
     enabled-tags:
       - diagnostic

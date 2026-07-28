@@ -1,4 +1,4 @@
-If you downloaded Alice setup files from git releases, you can see some OS warnings when running the setup.
+If you downloaded Leshine setup files from git releases, you can see some OS warnings when running the setup.
 
 There is nothing to be afraid of; the reason for these warnings is the missing paid code signing certification that Apple and Microsoft want from developers.
 
@@ -10,11 +10,11 @@ If you see Windows standard warning that the app publisher is unknown, click 'Mo
 
 ## 🍎 MacOS, run an unsigned app
 
-Run in your terminal `xattr -cr "/Applications/Alice AI App.app"`
+Run in your terminal `xattr -cr "/Applications/Leshine AI App.app"`
 
 # AI Provider Setup
 
-Alice supports OpenAI, OpenRouter, DeepSeek, MiniMax, Z.ai, and local LLM inference.
+Leshine supports OpenAI, OpenRouter, DeepSeek, MiniMax, Z.ai, and local LLM inference.
 
 ## OpenAI (Default)
 
@@ -55,6 +55,6 @@ Alice supports OpenAI, OpenRouter, DeepSeek, MiniMax, Z.ai, and local LLM infere
 
 # Google services connection (optional)
 
-- In settings, click 'Connect to Google Services', authorize your Google account to connect to Alice
+- In settings, click 'Connect to Google Services', authorize your Google account to connect to Leshine
 
-Continue with [tools](https://github.com/pmbstyle/Alice/blob/main/docs/toolsInstructions.md) setup if not done during previous steps (optional).
+Continue with [tools](https://github.com/pmbstyle/Leshine/blob/main/docs/toolsInstructions.md) setup if not done during previous steps (optional).

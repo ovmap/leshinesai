@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"alice-backend/internal/config"
-	"alice-backend/internal/models"
+	"leshine-backend/internal/config"
+	"leshine-backend/internal/models"
 )
 
 // Handler provides HTTP handlers for all API endpoints

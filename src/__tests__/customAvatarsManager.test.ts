@@ -12,7 +12,7 @@ import fs from 'node:fs/promises'
 import { mkdtempSync, rmSync, mkdirSync } from 'node:fs'
 import os from 'node:os'
 
-const testRoot = mkdtempSync(path.join(os.tmpdir(), 'alice-custom-avatars-'))
+const testRoot = mkdtempSync(path.join(os.tmpdir(), 'leshine-custom-avatars-'))
 const userDataDir = path.join(testRoot, 'user-data')
 mkdirSync(userDataDir, { recursive: true })
 let cwdSpy: any = null
@@ -60,17 +60,17 @@ describe('customAvatarsManager', () => {
   })
 
   it('includes only folders with all required videos', async () => {
-    await fs.mkdir(path.join(avatarsRoot, 'GalaxyAlice'), { recursive: true })
+    await fs.mkdir(path.join(avatarsRoot, 'GalaxyLeshine'), { recursive: true })
     await fs.writeFile(
-      path.join(avatarsRoot, 'GalaxyAlice', 'speaking.mp4'),
+      path.join(avatarsRoot, 'GalaxyLeshine', 'speaking.mp4'),
       'speaking'
     )
     await fs.writeFile(
-      path.join(avatarsRoot, 'GalaxyAlice', 'thinking.mp4'),
+      path.join(avatarsRoot, 'GalaxyLeshine', 'thinking.mp4'),
       'thinking'
     )
     await fs.writeFile(
-      path.join(avatarsRoot, 'GalaxyAlice', 'standby.mp4'),
+      path.join(avatarsRoot, 'GalaxyLeshine', 'standby.mp4'),
       'standby'
     )
 
@@ -83,12 +83,12 @@ describe('customAvatarsManager', () => {
     const snapshot = await loadCustomAvatarsFromDisk()
     expect(snapshot.avatars).toHaveLength(1)
     const avatar = snapshot.avatars[0]
-    expect(avatar.name).toBe('GalaxyAlice')
-    expect(avatar.id).toBe('custom:GalaxyAlice')
-    expect(avatar.stateVideos.speaking.startsWith('alice-avatar://')).toBe(true)
+    expect(avatar.name).toBe('GalaxyLeshine')
+    expect(avatar.id).toBe('custom:GalaxyLeshine')
+    expect(avatar.stateVideos.speaking.startsWith('leshine-avatar://')).toBe(true)
     const decodedPath = decodeURIComponent(
-      avatar.stateVideos.thinking.replace('alice-avatar://', '')
+      avatar.stateVideos.thinking.replace('leshine-avatar://', '')
     )
-    expect(decodedPath.endsWith('GalaxyAlice/thinking.mp4')).toBe(true)
+    expect(decodedPath.endsWith('GalaxyLeshine/thinking.mp4')).toBe(true)
   })
 })

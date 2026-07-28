@@ -106,7 +106,7 @@
             v-model="currentSettings.assistantSystemPrompt"
             rows="8"
             class="textarea textarea-bordered w-full focus:textarea-primary h-48"
-            placeholder="Describe Alice's voice, tone, and personality..."
+            placeholder="Describe Leshine's voice, tone, and personality..."
           ></textarea>
         </div>
 
@@ -488,7 +488,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
-import type { AliceSettings } from '../../stores/settingsStore'
+import type { LeshineSettings } from '../../stores/settingsStore'
 import { useSettingsStore } from '../../stores/settingsStore'
 import { useCustomToolsStore } from '../../stores/customToolsStore'
 import { infoIcon } from '../../utils/assetsImport'
@@ -500,7 +500,7 @@ interface Tool {
 }
 
 const props = defineProps<{
-  currentSettings: AliceSettings
+  currentSettings: LeshineSettings
   availableModels: Array<{ id: string }>
   availableTools: Tool[]
   isRefreshingModels: boolean

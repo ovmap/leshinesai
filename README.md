@@ -1,16 +1,16 @@
-# Alice
+# Leshine
 
-<img src="https://img.shields.io/github/license/pmbstyle/alice"> <img src="https://img.shields.io/github/v/release/pmbstyle/alice"> <img src="https://img.shields.io/github/downloads/pmbstyle/Alice/total">
+<img src="https://img.shields.io/github/license/pmbstyle/leshine"> <img src="https://img.shields.io/github/v/release/pmbstyle/leshine"> <img src="https://img.shields.io/github/downloads/pmbstyle/Leshine/total">
 
-Say "Hi" to Alice 👋, your open-source AI companion designed to live on your desktop.
+Say "Hi" to Leshine 👋, your open-source AI companion designed to live on your desktop.
 
-Alice brings together voice interaction, intelligent context awareness, powerful tooling, and a friendly personality to assist you with everything from daily tasks to deeper creative work.
-Alice is more than a chatbot; she’s built to feel present, responsive, emotionally engaging, and deeply useful.
+Leshine brings together voice interaction, intelligent context awareness, powerful tooling, and a friendly personality to assist you with everything from daily tasks to deeper creative work.
+Leshine is more than a chatbot; she’s built to feel present, responsive, emotionally engaging, and deeply useful.
 
 ## Quick showcase
 <p align="center">
   <a href="https://www.youtube.com/watch?v=fDYUjh6UXqk">
-    <img width="817" height="504" alt="AliceVideo" src="https://github.com/user-attachments/assets/9e0ffee2-198a-43a0-9f9a-a003d221e31d" />
+    <img width="817" height="504" alt="LeshineVideo" src="https://github.com/user-attachments/assets/9e0ffee2-198a-43a0-9f9a-a003d221e31d" />
   </a>
 </p>
 
@@ -18,9 +18,9 @@ Alice is more than a chatbot; she’s built to feel present, responsive, emotion
 
 ### 💻 Local and Cloud use
 
-Alice is designed to work with Cloud(OpenAI / Codex subscription, OpenRouter, Z.ai, Minimax, Deepseek) and Local LLMs (Ollama/LM Studio).
+Leshine is designed to work with Cloud(OpenAI / Codex subscription, OpenRouter, Z.ai, Minimax, Deepseek) and Local LLMs (Ollama/LM Studio).
 Has built-in speech-to-text, text-to-speech, and embedding services.
-While the OpenAI cloud API is preferred and provides the best user experience, Alice can also operate **fully locally** (experimental).
+While the OpenAI cloud API is preferred and provides the best user experience, Leshine can also operate **fully locally** (experimental).
 
 ### 🗣️ Voice Interaction
 
@@ -44,7 +44,7 @@ While the OpenAI cloud API is preferred and provides the best user experience, A
 
 ### 🪄 Computer Use Tools
 
-Alice can interact with your local system with user-approved permissions:
+Leshine can interact with your local system with user-approved permissions:
 
 * 📂 File system browsing (e.g., listing folders)
 * 💻 Shell command execution (`ls`, `mv`, `mkdir`, etc)
@@ -69,12 +69,12 @@ Alice can interact with your local system with user-approved permissions:
 
 ### 💬 Wake Word Support  
 With the local STT model, you can set a **wake-up word** (like "Hey, Siri").  
-- Alice will always listen, but only process requests when the wake word is spoken.  
+- Leshine will always listen, but only process requests when the wake word is spoken.  
 - Default mode is **auto language detection**, but you can also select a specific language in settings. 
 
-### 💻 Dedicated Chrome [Extension](https://github.com/pmbstyle/alice-chrome-extension)
+### 💻 Dedicated Chrome [Extension](https://github.com/pmbstyle/leshine-chrome-extension)
 
-* Ask Alice about your active Chrome tab
+* Ask Leshine about your active Chrome tab
 * Context menu for selected text on a web page
   - Fact check this
   - Summarize this
@@ -94,7 +94,7 @@ Fully customizable settings interface:
 
 ### 🔨 Custom Tools
 
-Alice supports [custom tools](https://github.com/pmbstyle/Alice/blob/main/docs/custom-tools.md) that are defined in JSON and backed by local scripts.
+Leshine supports [custom tools](https://github.com/pmbstyle/Leshine/blob/main/docs/custom-tools.md) that are defined in JSON and backed by local scripts.
 
 1. Open *Settings → Customization → Custom tools*
 2. Upload or drop your script (writes to `custom-tool-scripts/`)
@@ -103,7 +103,7 @@ Alice supports [custom tools](https://github.com/pmbstyle/Alice/blob/main/docs/c
 
 ### 🎭 Custom Avatars
 
-Swap Alice's appearance with [your own](https://github.com/pmbstyle/Alice/blob/main/docs/custom-avatars.md) video loops:
+Swap Leshine's appearance with [your own](https://github.com/pmbstyle/Leshine/blob/main/docs/custom-avatars.md) video loops:
 
 1. Create a folder under `user-customization/custom-avatars/<AvatarName>/`.
 2. Drop `speaking.mp4`, `thinking.mp4`, and `standby.mp4` into that folder (all required).
@@ -111,18 +111,18 @@ Swap Alice's appearance with [your own](https://github.com/pmbstyle/Alice/blob/m
 
 ## 🚀 Download
 
-👉 **[Download the latest release](https://github.com/pmbstyle/Alice/releases/latest)**
+👉 **[Download the latest release](https://github.com/pmbstyle/Leshine/releases/latest)**
 
 <!-- STABLE_DOWNLOADS -->
 | Platform | Download |
 |----------|----------|
-| **Windows** | [Alice-AI-App-Windows-1.4.4-Setup.exe](https://github.com/pmbstyle/Alice/releases/download/v1.4.4/Alice-AI-App-Windows-1.4.4-Setup.exe) |
-| **macOS** | [Alice-AI-App-Mac-1.4.4-Installer.dmg](https://github.com/pmbstyle/Alice/releases/download/v1.4.4/Alice-AI-App-Mac-1.4.4-Installer.dmg) |
-| **Linux** | [Alice-AI-App-Linux-1.4.4.AppImage](https://github.com/pmbstyle/Alice/releases/download/v1.4.4/Alice-AI-App-Linux-1.4.4.AppImage) |
-| **ArchLinux**(community build) | [AUR Package](https://aur.archlinux.org/packages/alice-ai-app-bin) |
+| **Windows** | [Leshine-AI-App-Windows-1.4.4-Setup.exe](https://github.com/pmbstyle/Leshine/releases/download/v1.4.4/Leshine-AI-App-Windows-1.4.4-Setup.exe) |
+| **macOS** | [Leshine-AI-App-Mac-1.4.4-Installer.dmg](https://github.com/pmbstyle/Leshine/releases/download/v1.4.4/Leshine-AI-App-Mac-1.4.4-Installer.dmg) |
+| **Linux** | [Leshine-AI-App-Linux-1.4.4.AppImage](https://github.com/pmbstyle/Leshine/releases/download/v1.4.4/Leshine-AI-App-Linux-1.4.4.AppImage) |
+| **ArchLinux**(community build) | [AUR Package](https://aur.archlinux.org/packages/leshine-ai-app-bin) |
 <!-- STABLE_DOWNLOADS_END -->
 
-Follow the [Setup Instructions](https://github.com/pmbstyle/Alice/blob/main/docs/setupInstructions.md) to configure your API keys and environment.
+Follow the [Setup Instructions](https://github.com/pmbstyle/Leshine/blob/main/docs/setupInstructions.md) to configure your API keys and environment.
 
 
 
@@ -151,7 +151,7 @@ Other tools:
 
 ```bash
 # 1. Clone the repo
-$ git clone https://github.com/pmbstyle/Alice.git
+$ git clone https://github.com/pmbstyle/Leshine.git
 
 # 2. Install dependencies
 $ npm install
@@ -159,7 +159,7 @@ $ npm install
 # 3. Set up your .env file (see .env.example for reference)
 ```
 
-Follow [setup instructions](https://github.com/pmbstyle/Alice/blob/main/docs/setupInstructions.md) to obtain required API credentials.
+Follow [setup instructions](https://github.com/pmbstyle/Leshine/blob/main/docs/setupInstructions.md) to obtain required API credentials.
 
 ```bash
 # 4. Compile backend
@@ -190,7 +190,7 @@ Install the output from the `release/` directory.
 
 ## 🤝 Contributing
 
-Ideas, bug reports, feature requests - all welcome! Open an issue or PR, or drop by to share your thoughts. Your input helps shape Alice into something wonderful 💚
+Ideas, bug reports, feature requests - all welcome! Open an issue or PR, or drop by to share your thoughts. Your input helps shape Leshine into something wonderful 💚
 
 ## A full app overview with tutorials
 <p align="center">

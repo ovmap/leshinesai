@@ -1,4 +1,4 @@
-module alice-backend
+module leshine-backend
 
 go 1.23.0
 

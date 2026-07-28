@@ -119,7 +119,7 @@
       <legend class="fieldset-legend">
         Optional Tool APIs
         <a
-          href="https://github.com/pmbstyle/Alice/blob/main/docs/toolsInstructions.md"
+          href="https://github.com/pmbstyle/Leshine/blob/main/docs/toolsInstructions.md"
           target="_blank"
           class="ml-2"
         >
@@ -257,7 +257,7 @@
 </template>
 
 <script setup lang="ts">
-import type { AliceSettings } from '../../stores/settingsStore'
+import type { LeshineSettings } from '../../stores/settingsStore'
 import { newTabIcon } from '../../utils/assetsImport'
 
 interface GoogleAuthStatus {
@@ -269,7 +269,7 @@ interface GoogleAuthStatus {
 }
 
 defineProps<{
-  currentSettings: AliceSettings
+  currentSettings: LeshineSettings
   googleAuthStatus: GoogleAuthStatus
 }>()
 

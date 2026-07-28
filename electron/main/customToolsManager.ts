@@ -71,7 +71,7 @@ async function ensureCustomizationPackage(customizationRoot: string) {
   } catch {
     await fs.writeFile(
       packageJsonPath,
-      JSON.stringify({ name: 'alice-custom-tools', type: 'module' }, null, 2),
+      JSON.stringify({ name: 'leshine-custom-tools', type: 'module' }, null, 2),
       'utf-8'
     )
   }
@@ -90,7 +90,7 @@ async function bootstrapDemoTool(filePath: string) {
   return {
     success: true,
     data: {
-      message: \`Hello \${subject}! Alice demo tool at your service.\`,
+      message: \`Hello \${subject}! Leshine demo tool at your service.\`,
       providedName: subject,
       timestamp: new Date().toISOString(),
       contextInfo: {

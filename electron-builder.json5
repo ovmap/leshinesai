@@ -1,9 +1,9 @@
 // @see https://www.electron.build/configuration/configuration
 {
   $schema: 'https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json',
-  appId: 'aliceaiapp',
+  appId: 'leshineaiapp',
   asar: true,
-  productName: 'Alice AI App',
+  productName: 'Leshine AI App',
   directories: {
     output: 'release/${version}',
   },
@@ -12,7 +12,7 @@
   mac: {
     target: ['dmg'],
     icon: 'public/app_logo.png',
-    artifactName: 'Alice-AI-App-Mac-${version}-Installer.${ext}',
+    artifactName: 'Leshine-AI-App-Mac-${version}-Installer.${ext}',
   },
   win: {
     target: [
@@ -21,7 +21,7 @@
         arch: ['x64'],
       },
     ],
-    artifactName: 'Alice-AI-App-Windows-${version}-Portable.${ext}',
+    artifactName: 'Leshine-AI-App-Windows-${version}-Portable.${ext}',
     signAndEditExecutable: false,
   },
   nsis: {
@@ -35,6 +35,6 @@
     target: ['AppImage'],
     category: 'Utility',
     icon: 'public/app_logo.png',
-    artifactName: 'Alice-AI-App-Linux-${version}.${ext}',
+    artifactName: 'Leshine-AI-App-Linux-${version}.${ext}',
   },
 }

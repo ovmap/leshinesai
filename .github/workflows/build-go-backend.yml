@@ -21,19 +21,19 @@ jobs:
           - os: windows-latest
             goos: windows
             goarch: amd64
-            output: alice-backend.exe
+            output: leshine-backend.exe
           - os: macos-latest
             goos: darwin
             goarch: amd64
-            output: alice-backend
+            output: leshine-backend
           - os: macos-14
             goos: darwin
             goarch: arm64
-            output: alice-backend
+            output: leshine-backend
           - os: ubuntu-latest
             goos: linux
             goarch: amd64
-            output: alice-backend
+            output: leshine-backend
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -97,7 +97,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: alice-backend-${{ matrix.goos }}-${{ matrix.goarch }}
+          name: leshine-backend-${{ matrix.goos }}-${{ matrix.goarch }}
           path: backend/${{ matrix.output }}
           retention-days: 30
 
@@ -112,14 +112,14 @@ jobs:
       - name: Download Linux binary
         uses: actions/download-artifact@v4
         with:
-          name: alice-backend-linux-amd64
+          name: leshine-backend-linux-amd64
           path: backend/
 
       - name: Start backend server
         working-directory: backend
         run: |
-          chmod +x alice-backend
-          echo "Starting alice-backend..."
+          chmod +x leshine-backend
+          echo "Starting leshine-backend..."
 
           # Create log files
           touch backend.log backend.error.log
@@ -128,7 +128,7 @@ jobs:
           # Disable model features since models aren't available in CI
           echo "Starting backend with features disabled (CI environment)"
           echo "Configuration: ENABLE_STT=false ENABLE_TTS=false ENABLE_EMBEDDINGS=false PORT=8765"
-          nohup env ENABLE_STT=false ENABLE_TTS=false ENABLE_EMBEDDINGS=false PORT=8765 ./alice-backend > backend.log 2> backend.error.log &
+          nohup env ENABLE_STT=false ENABLE_TTS=false ENABLE_EMBEDDINGS=false PORT=8765 ./leshine-backend > backend.log 2> backend.error.log &
           BACKEND_PID=$!
           echo "BACKEND_PID=$BACKEND_PID" >> $GITHUB_ENV
           echo "Started backend with PID: $BACKEND_PID"
@@ -163,7 +163,7 @@ jobs:
             echo "=== STDERR ==="
             cat backend.error.log || echo "No stderr log"
             echo "=== Process status ==="
-            ps aux | grep alice-backend || echo "No alice-backend processes"
+            ps aux | grep leshine-backend || echo "No leshine-backend processes"
             echo "=== Network status ==="
             netstat -tlnp | grep 8765 || echo "Port 8765 not bound"
             exit 1
@@ -213,4 +213,4 @@ jobs:
           if [ ! -z "$BACKEND_PID" ]; then
             kill $BACKEND_PID || true
           fi
-          pkill -f alice-backend || true
+          pkill -f leshine-backend || true

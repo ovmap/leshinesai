@@ -8,10 +8,10 @@ import (
 	"syscall"
 	"time"
 
-	"alice-backend/internal/api"
-	"alice-backend/internal/config"
-	"alice-backend/internal/models"
-	"alice-backend/internal/server"
+	"leshine-backend/internal/api"
+	"leshine-backend/internal/config"
+	"leshine-backend/internal/models"
+	"leshine-backend/internal/server"
 )
 
 func main() {

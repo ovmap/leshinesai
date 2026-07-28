@@ -1,8 +1,8 @@
 import { ref, onUnmounted } from 'vue'
-import type { AliceSettings } from '../stores/settingsStore'
+import type { LeshineSettings } from '../stores/settingsStore'
 
 export function useHotkeyRecording() {
-  const isRecordingHotkeyFor = ref<keyof AliceSettings | null>(null)
+  const isRecordingHotkeyFor = ref<keyof LeshineSettings | null>(null)
   const activeRecordingKeys = ref<Set<string>>(new Set())
 
   const modifierKeys = [
@@ -89,7 +89,7 @@ export function useHotkeyRecording() {
 
       const newHotkey = acceleratorParts.join('+')
       if (isRecordingHotkeyFor.value) {
-        currentSettings[isRecordingHotkeyFor.value as keyof AliceSettings] =
+        currentSettings[isRecordingHotkeyFor.value as keyof LeshineSettings] =
           newHotkey
       }
       stopRecordingHotkey()
@@ -99,7 +99,7 @@ export function useHotkeyRecording() {
   let currentKeyHandler: ((event: KeyboardEvent) => void) | null = null
 
   const startRecordingHotkey = (
-    settingKey: keyof AliceSettings,
+    settingKey: keyof LeshineSettings,
     currentSettings: any
   ) => {
     isRecordingHotkeyFor.value = settingKey
@@ -124,7 +124,7 @@ export function useHotkeyRecording() {
   }
 
   const clearHotkey = (
-    settingKey: keyof AliceSettings,
+    settingKey: keyof LeshineSettings,
     currentSettings: any
   ) => {
     if (isRecordingHotkeyFor.value === settingKey) {

@@ -1,10 +1,10 @@
-# Alice 物流看板集成方案
+# Leshine 物流看板集成方案
 
 ## 一、方案概述
 
 ### 1.1 目标
 
-将 Alice AI 助手改造为**物流智能助手**，实现类似"贾维斯"的效果：
+将 Leshine AI 助手改造为**物流智能助手**，实现类似"贾维斯"的效果：
 - AI 根据对话上下文**自主判断**何时需要展示物流数据
 - 通过**原生 Vue 组件**渲染物流看板（运单、车辆、仓库等）
 - 看板以**半透明悬浮窗口**形式弹出，支持用户交互
@@ -1047,18 +1047,18 @@ More?   --header "User-Agent: PostmanRuntime-ApipostRuntime/1.1.0" ^
 More?   --data-raw "{\"fromWarehouse\":[],\"toProvince\":[],\"toRdc\":[],\"startDate\":\"2024-04-01 00:00:00\",\"endDate\":\"2026-07-22 23:59:59\",\"timeType\":\"FICAL_YEAR\",\"agg\":\"VOLUME\",\"customer\":[],\"bizType\":[],\"transType\":[],\"cityLevel\":[],\"dataSource\":[\"TMS\",\"LESTMS\",\"BTCP\",\"SEC\"],\"productType\":[]}"
 {"code":200,"msg":"成功","data":[{"timeDimension":"FY2024","totalValue":917531.397399997185,"totalYoy":null,"totalMom":"-11.09%","items":[{"timeDimension":"FY2024","value":"548934.0736999994","dataSource":"TMS"},{"timeDimension":"FY2024","value":"62003.630499999985","dataSource":"LESTMS"},{"timeDimension":"FY2024","value":"306593.6931999978","dataSource":"SEC"}]},{"timeDimension":"FY2025","totalValue":1129287.89689999825,"totalYoy":null,"totalMom":"23.08%","items":[{"timeDimension":"FY2025","value":"348448.35869999905","dataSource":"SEC"},{"timeDimension":"FY2025","value":"242478.4575999999","dataSource":"LESTMS"},{"timeDimension":"FY2025","value":"538361.0805999993","dataSource":"TMS"}]},{"timeDimension":"FY2026","totalValue":101126046.93240000717,"totalYoy":null,"totalMom":"8854.85%","items":[{"timeDimension":"FY2026","value":"100807508.82609999","dataSource":"LESTMS"},{"timeDimension":"FY2026","value":"122684.32290000017","dataSource":"TMS"},{"timeDimension":"FY202
 
-C:\Users\huangrui19\OneDrive - Lenovo\桌面\Program\Nodejs\alice>curl --request POST --url https://transport-service-dashboard-tst.t-sy-in.earth.xcloud.lenovo.com/kanban/v1/sign/queryNotSignItemByPage --header "Accept: */*" --header "Connection: keep-alive" --header "Content-Type: application/json" --header "User-Agent: PostmanRuntime-ApipostRuntime/1.1.0" --data "{\"modeType\": \"区配\", \"fromWarehouse\": [], \"toRdc\": [\"沈阳\"], \"pageSize\": 2}" 
+C:\Users\huangrui19\OneDrive - Lenovo\桌面\Program\Nodejs\leshine>curl --request POST --url https://transport-service-dashboard-tst.t-sy-in.earth.xcloud.lenovo.com/kanban/v1/sign/queryNotSignItemByPage --header "Accept: */*" --header "Connection: keep-alive" --header "Content-Type: application/json" --header "User-Agent: PostmanRuntime-ApipostRuntime/1.1.0" --data "{\"modeType\": \"区配\", \"fromWarehouse\": [], \"toRdc\": [\"沈阳\"], \"pageSize\": 2}" 
 {"code":200,"total":23,"data":[{"dataSource":"TMS","fromWarehouse":"天津宁河CDC","carrierName":"中外运","deliveryName":"恒路","transNo":"TJNHCKYD20260720T08807","invoiceNo":"TJNHCKFHD20260720T10188","expressNo":null,"transportationType":"公路运输","modeType":"区配","toWarehouse":"沈阳","toProvince":"辽宁","toCity":"沈阳市","toCounty":"大东区","deliveryParty":"京东电器辽宁分部沈阳超体卖场库","channel":null,"deliverTime":"2026-07-20 20:25:11","arrivalRdcTime":"2026-07-22 14:30:00","planArrivalTime":"2026-07-22 23:00:00","goodsNum":18,"volume":0.27648,"orderStatus":"正常","predictArrivalCustomerTime":"2026-07-22 23:00:00","channelName":null,"transType":"公路运输"},{"dataSource":"TMS","fromWarehouse":"天津宁河CDC","carrierName":"中外运","deliveryName":"恒路","transNo":"TJNHCKYD20260720T01104","invoiceNo":"TJNHCKFHD20260720T01637","expressNo":null,"transportationType":"公路运输","modeType":"区配","toWarehouse":"沈阳","toProvince":"辽宁","toCity":"沈阳市","toCounty":"浑南区","deliveryParty":"辽宁京邦达供应链科技有限公司","channel":null,"deliverTime":"2026-07-20 13:06:54","arrivalRdcTime":"2026-07-22 14:30:00","planArrivalTime":"2026-07-22 23:00:00","goodsNum":1,"volume":0.01536,"orderStatus":"正常","predictArrivalCustomerTime":"2026-07-22 23:00:00","channelName":null,"transType":"公路 运输"}],"msg":"success"}
 
 
 
 
-## 方案设计：Alice 动态物流看板系统
+## 方案设计：Leshine 动态物流看板系统
 
 ### 核心思路
 
 ```
-用户对话 → Alice AI 判断需要展示数据 → 调用 show_dashboard 工具
+用户对话 → Leshine AI 判断需要展示数据 → 调用 show_dashboard 工具
 → Electron 打开全屏看板窗口 → 动态渲染指定模块 → 直连 Transport API 获取数据
 ```
 
@@ -1066,7 +1066,7 @@ C:\Users\huangrui19\OneDrive - Lenovo\桌面\Program\Nodejs\alice>curl --request
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    Alice 主窗口（对话）                       │
+│                    Leshine 主窗口（对话）                       │
 │  "帮我看看今天的货量情况"                                     │
 └──────────────────────┬──────────────────────────────────────┘
                        │ LLM 返回 tool_call
@@ -1130,7 +1130,7 @@ const MODULE_REGISTRY = {
 }
 ```
 
-**3. 数据源直连** - 在 Alice 的 `.env` 中配置：
+**3. 数据源直连** - 在 Leshine 的 `.env` 中配置：
 
 ```
 VITE_TRANSPORT_DASHBOARD_URL=https://transport-service-dashboard-tst.t-sy-in.earth.xcloud.lenovo.com
@@ -1138,7 +1138,7 @@ VITE_TRANSPORT_AI_URL=https://transport-service-ai-tst.t-sy-in.earth.xcloud.leno
 ```
 
 **4. 移植策略** - refer 的图表组件依赖 Ant Design Vue + ECharts，需要：
-- 在 Alice 中安装 `ant-design-vue` 和 `echarts`
+- 在 Leshine 中安装 `ant-design-vue` 和 `echarts`
 - 移植 `refer/src/components/RenderComponent/chartRender/LS/` 下的组件
 - 移植 `refer/src/api/fullscreen.ts` 中的 API 调用（改为直连）
 - 移植 `refer/src/store/` 中的 filter store

@@ -1,20 +1,20 @@
 # Custom Tools
 
-Alice supports custom tools that are defined in JSON and backed by local scripts. This document explains where those files live, the JSON format, and the runtime expectations for uploaded scripts.
+Leshine supports custom tools that are defined in JSON and backed by local scripts. This document explains where those files live, the JSON format, and the runtime expectations for uploaded scripts.
 
 ## Storage locations
 
 | Mode | Base folder |
 | --- | --- |
 | Development (`npm run dev`) | `<repo>/user-customization/` |
-| Packaged / production | `<userData>/user-customization/` (e.g., `%AppData%/Alice AI App/user-customization/`) |
+| Packaged / production | `<userData>/user-customization/` (e.g., `%AppData%/Leshine AI App/user-customization/`) |
 
 Inside that folder the app maintains:
 
 - `custom-tools.json` – array of custom tool definitions
 - `custom-tool-scripts/` – scripts uploaded through the settings UI
 
-> ℹ️ On first run Alice seeds this folder with a disabled `demo_greet_user` tool.
+> ℹ️ On first run Leshine seeds this folder with a disabled `demo_greet_user` tool.
 > Enable it from **Settings → Customization** to verify the plumbing before writing your own scripts.
 
 You can drop JSON/scripts manually and then press **Refresh** in *Settings → Customization* to re-validate the set.

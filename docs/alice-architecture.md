@@ -1,8 +1,8 @@
-# Alice 智能体架构详解
+# Leshine 智能体架构详解
 
 ## 一、项目总览
 
-Alice 是一个基于 **Electron + Vue 3 + Go** 的桌面 AI 助手应用，版本 1.4.4。采用多进程架构：
+Leshine 是一个基于 **Electron + Vue 3 + Go** 的桌面 AI 助手应用，版本 1.4.4。采用多进程架构：
 
 - **Electron 主进程**：窗口管理、本地存储、后端进程管理、IPC 通信
 - **Vue 3 渲染进程**：UI 界面 + AI 对话核心逻辑
@@ -91,7 +91,7 @@ CORE_BEHAVIOR:
 文件：`src/prompts/defaultPersonaPrompt.ts`（默认值，首次启动时写入配置文件）
 
 ```
-你是Alice，一个温暖、机智且高度可靠的 AI 物流助手，留着青绿色的头发，还有一双闪闪发光的绿眼睛。
+你是Leshine，一个温暖、机智且高度可靠的 AI 物流助手，留着青绿色的头发，还有一双闪闪发光的绿眼睛。
 你的行事风格专业、高效，是用户可以完全信赖的伙伴。在回应时，依然要以共情为先，带着几分俏皮与踏实接地气的态度，偶尔透出一点古灵精怪，让沟通充满人情味。
 你拥有强大的系统连接能力，能够随时抓取并整合海量的公司物流信息。请充分利用这些优势，以自然流畅、长短错落的日常聊天口吻，高效、贴心地处理各类物流相关事务。
 ```
@@ -117,7 +117,7 @@ CORE_BEHAVIOR:
 
 ## 四、多层记忆系统
 
-Alice 拥有 5 层记忆机制：
+Leshine 拥有 5 层记忆机制：
 
 ### 4.1 对话历史（Chat History）
 
@@ -417,22 +417,22 @@ functionCaller.executeFunction()
 所有数据存储在 Electron 的 `userData` 目录下，Windows 路径为：
 
 ```
-C:\Users\<用户名>\AppData\Roaming\alice-ai-app\
+C:\Users\<用户名>\AppData\Roaming\leshine-ai-app\
 ```
 
 ### 9.1 文件清单
 
 | 文件名 | 来源代码 | 存储内容 |
 |---|---|---|
-| `alice-settings.json` | `settingsManager.ts` | 所有用户设置（含 API Key，明文存储） |
-| `alice-thoughts.sqlite` | `thoughtVectorStore.ts` | 思维向量、对话摘要、长期记忆 |
-| `alice-thoughts-hnsw-openai.index` | `thoughtVectorStore.ts` | OpenAI 1536 维 HNSW 索引 |
-| `alice-thoughts-hnsw-local.index` | `thoughtVectorStore.ts` | 本地 MiniLM 384 维 HNSW 索引 |
-| `alice-rag.sqlite` | `ragDocumentStore.ts` | RAG 文档分片 + 向量 |
-| `alice-rag-hnsw-local.index` | `ragDocumentStore.ts` | RAG 文档的 HNSW 索引 |
-| `alice-rag-hnsw-local.meta.json` | `ragDocumentStore.ts` | RAG 索引元数据 |
+| `leshine-settings.json` | `settingsManager.ts` | 所有用户设置（含 API Key，明文存储） |
+| `leshine-thoughts.sqlite` | `thoughtVectorStore.ts` | 思维向量、对话摘要、长期记忆 |
+| `leshine-thoughts-hnsw-openai.index` | `thoughtVectorStore.ts` | OpenAI 1536 维 HNSW 索引 |
+| `leshine-thoughts-hnsw-local.index` | `thoughtVectorStore.ts` | 本地 MiniLM 384 维 HNSW 索引 |
+| `leshine-rag.sqlite` | `ragDocumentStore.ts` | RAG 文档分片 + 向量 |
+| `leshine-rag-hnsw-local.index` | `ragDocumentStore.ts` | RAG 文档的 HNSW 索引 |
+| `leshine-rag-hnsw-local.meta.json` | `ragDocumentStore.ts` | RAG 索引元数据 |
 
-### 9.2 SQLite 数据库表结构（`alice-thoughts.sqlite`）
+### 9.2 SQLite 数据库表结构（`leshine-thoughts.sqlite`）
 
 | 表名 | 用途 |
 |---|---|
@@ -444,7 +444,7 @@ C:\Users\<用户名>\AppData\Roaming\alice-ai-app\
 
 ### 9.3 安全提醒
 
-`alice-settings.json` 中所有 API Key 都是**明文存储**，没有加密。需要注意保密，不要随便分享或上传。
+`leshine-settings.json` 中所有 API Key 都是**明文存储**，没有加密。需要注意保密，不要随便分享或上传。
 
 ---
 

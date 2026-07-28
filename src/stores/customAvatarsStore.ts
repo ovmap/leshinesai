@@ -13,9 +13,9 @@ interface OperationResult<T> {
 }
 
 const builtInAvatar: CustomAvatar = {
-  id: 'alice',
-  name: 'Alice',
-  folderName: 'Alice',
+  id: 'leshine',
+  name: 'Leshine',
+  folderName: 'Leshine',
   source: 'builtin',
   stateVideos: {
     speaking: videoSpeaking,

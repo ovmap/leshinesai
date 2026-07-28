@@ -181,10 +181,10 @@
         class="text-xs text-gray-400 mt-4 flex justify-center items-center gap-1"
       >
         <span
-          >Alice
+          >Leshine
           <a
             :href="
-              'https://github.com/pmbstyle/Alice/releases/tag/v' + appVersion
+              'https://github.com/pmbstyle/Leshine/releases/tag/v' + appVersion
             "
             target="_blank"
             class="link link-hover"
@@ -209,7 +209,7 @@
 <script setup lang="ts">
 import { ref, watch, onMounted, computed } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useSettingsStore, type AliceSettings } from '../stores/settingsStore'
+import { useSettingsStore, type LeshineSettings } from '../stores/settingsStore'
 import { useConversationStore } from '../stores/conversationStore'
 import { heartIcon } from '../utils/assetsImport'
 import { PREDEFINED_OPENAI_TOOLS } from '../utils/assistantTools'
@@ -233,7 +233,7 @@ const settingsStore = useSettingsStore()
 const conversationStore = useConversationStore()
 const { settings } = storeToRefs(settingsStore)
 
-const currentSettings = ref<AliceSettings>({
+const currentSettings = ref<LeshineSettings>({
   ...settings.value,
 })
 const activeTab = ref<
@@ -341,18 +341,18 @@ function getToolInfo(name: string): {
   }
 
   const descriptionMap: Record<string, string> = {
-    get_current_datetime: 'Allows Alice to get the current date and time',
+    get_current_datetime: 'Allows Leshine to get the current date and time',
     open_path:
-      "Allows Alice to open apps, URLs, files, and folders on the user's computer",
-    manage_clipboard: "Alice can read and write to the user's clipboard",
-    save_memory: 'Alice can store memories (long term memory)',
-    delete_memory: 'Alice can delete memories (long term memory)',
-    recall_memories: 'Alice can recall memories (long term memory)',
+      "Allows Leshine to open apps, URLs, files, and folders on the user's computer",
+    manage_clipboard: "Leshine can read and write to the user's clipboard",
+    save_memory: 'Leshine can store memories (long term memory)',
+    delete_memory: 'Leshine can delete memories (long term memory)',
+    recall_memories: 'Leshine can recall memories (long term memory)',
     list_directory:
-      "Alice can list the files and folders on the user's computer",
-    execute_command: "Alice can execute shell commands on the user's computer",
-    schedule_task: 'Alice can schedule tasks to run on a recurring basis',
-    manage_scheduled_tasks: 'Alice can manage scheduled tasks',
+      "Leshine can list the files and folders on the user's computer",
+    execute_command: "Leshine can execute shell commands on the user's computer",
+    schedule_task: 'Leshine can schedule tasks to run on a recurring basis',
+    manage_scheduled_tasks: 'Leshine can manage scheduled tasks',
     get_calendar_events: 'Google Calendar integration to get calendar events',
     create_calendar_event:
       'Google Calendar integration to create calendar events',
@@ -364,11 +364,11 @@ function getToolInfo(name: string): {
     search_emails: 'Google Gmail integration to search emails',
     get_email_content: 'Google Gmail integration to get email content',
     search_torrents:
-      'Alice can search for torrents on the internet (requires Jackett)',
+      'Leshine can search for torrents on the internet (requires Jackett)',
     add_torrent_to_qb:
-      'Alice can add a torrent to qBittorrent (requires qBittorrent)',
+      'Leshine can add a torrent to qBittorrent (requires qBittorrent)',
     browser_context:
-      'Alice can get information about the current webpage in users browser (requires browser extension)',
+      'Leshine can get information about the current webpage in users browser (requires browser extension)',
     perform_web_search: 'For models that lack web search capabilities (Tavily)',
     searxng_web_search:
       'For models that lack web search capabilities (SearXNG)',
@@ -386,16 +386,16 @@ const resetSystemPrompt = () => {
   currentSettings.value.assistantSystemPrompt = DEFAULT_ASSISTANT_PERSONA_PROMPT
 }
 
-const startRecordingHotkey = (settingKey: keyof AliceSettings) => {
+const startRecordingHotkey = (settingKey: keyof LeshineSettings) => {
   startRecordingHotkeyComposable(settingKey, currentSettings.value)
 }
 
-const clearHotkey = (settingKey: keyof AliceSettings) => {
+const clearHotkey = (settingKey: keyof LeshineSettings) => {
   clearHotkeyComposable(settingKey, currentSettings.value)
 }
 
 const updateCurrentSetting = (
-  key: keyof AliceSettings,
+  key: keyof LeshineSettings,
   value: string | boolean | number | string[]
 ) => {
   ;(currentSettings.value as any)[key] = value
@@ -410,7 +410,7 @@ function isToolConfigured(toolName: string): boolean {
     if (depKey === 'GOOGLE_AUTH') {
       return googleAuthStatus.isAuthenticated
     }
-    const value = currentLocalSettings[depKey as keyof AliceSettings]
+    const value = currentLocalSettings[depKey as keyof LeshineSettings]
     if (typeof value === 'string') {
       return !!value.trim()
     }
@@ -445,12 +445,12 @@ watch(
   newValues => {
     for (const key in newValues) {
       if (
-        settingsStore.settings[key as keyof AliceSettings] !==
-        newValues[key as keyof AliceSettings]
+        settingsStore.settings[key as keyof LeshineSettings] !==
+        newValues[key as keyof LeshineSettings]
       ) {
-        const value = newValues[key as keyof AliceSettings]
+        const value = newValues[key as keyof LeshineSettings]
         if (value !== undefined) {
-          settingsStore.updateSetting(key as keyof AliceSettings, value)
+          settingsStore.updateSetting(key as keyof LeshineSettings, value)
         }
       }
     }

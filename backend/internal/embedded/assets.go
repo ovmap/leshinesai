@@ -84,20 +84,20 @@ func GetProductionBaseDirectory() string {
 		homeDir, err := os.UserHomeDir()
 		if err != nil {
 			log.Printf("Warning: Could not get user home directory, using temp: %v", err)
-			userDataDir := filepath.Join(os.TempDir(), "alice-ai-app")
+			userDataDir := filepath.Join(os.TempDir(), "leshine-ai-app")
 			log.Printf("Detected AppImage environment, using temp directory as base: %s", userDataDir)
 			return userDataDir
 		}
-		userDataDir := filepath.Join(homeDir, ".local", "share", "alice-ai-app")
+		userDataDir := filepath.Join(homeDir, ".local", "share", "leshine-ai-app")
 		log.Printf("Detected AppImage environment, using user data directory as base: %s", userDataDir)
 		return userDataDir
 	}
 
 	// Check if we're in an Electron app bundle structure
 	// In production Electron apps, the backend executable is in:
-	// - Windows: resources/backend/alice-backend.exe
-	// - macOS: Resources/backend/alice-backend  
-	// - Linux: resources/backend/alice-backend
+	// - Windows: resources/backend/leshine-backend.exe
+	// - macOS: Resources/backend/leshine-backend  
+	// - Linux: resources/backend/leshine-backend
 	
 	// Check for Electron resources structure
 	parentDir := filepath.Dir(exeDir)
@@ -110,11 +110,11 @@ func GetProductionBaseDirectory() string {
 			homeDir, err := os.UserHomeDir()
 			if err != nil {
 				log.Printf("Warning: Could not get user home directory, using temp: %v", err)
-				userDataDir := filepath.Join(os.TempDir(), "alice-ai-app")
+				userDataDir := filepath.Join(os.TempDir(), "leshine-ai-app")
 				log.Printf("Electron directory not writable, using temp directory as base: %s", userDataDir)
 				return userDataDir
 			}
-			userDataDir := filepath.Join(homeDir, ".local", "share", "alice-ai-app")
+			userDataDir := filepath.Join(homeDir, ".local", "share", "leshine-ai-app")
 			log.Printf("Electron directory not writable, using user data directory as base: %s", userDataDir)
 			return userDataDir
 		} else {

@@ -51,7 +51,7 @@ import { setupDependencies } from '../../scripts/setup-dependencies.js'
 
 // Global state for hot reload persistence
 declare global {
-  var aliceAppState:
+  var leshineAppState:
     | {
         managersInitialized: boolean
         appInitialized: boolean
@@ -67,8 +67,8 @@ const GENERATED_IMAGES_FULL_PATH = path.join(USER_DATA_PATH, 'generated_images')
 let isHandlingQuit = false
 let wss: any | null = null
 // Use global variables to persist across hot reloads
-if (!global.aliceAppState) {
-  global.aliceAppState = {
+if (!global.leshineAppState) {
+  global.leshineAppState = {
     managersInitialized: false,
     appInitialized: false,
     initTimestamp: Date.now(),
@@ -76,16 +76,16 @@ if (!global.aliceAppState) {
   }
 }
 
-let managersInitialized = global.aliceAppState.managersInitialized
-let appInitialized = global.aliceAppState.appInitialized
-const initId = global.aliceAppState.initId
+let managersInitialized = global.leshineAppState.managersInitialized
+let appInitialized = global.leshineAppState.appInitialized
+const initId = global.leshineAppState.initId
 
 // Prevent clustering in development
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true'
 process.env.NODE_OPTIONS = '--max-old-space-size=4096'
 
 const currentTime = Date.now()
-const timeSinceLastInit = currentTime - global.aliceAppState.initTimestamp
+const timeSinceLastInit = currentTime - global.leshineAppState.initTimestamp
 
 console.log(
   `[Main Index ${initId}] Starting Electron main process... PID: ${process.pid}, Time since last init: ${timeSinceLastInit}ms`
@@ -137,13 +137,13 @@ process.on('unhandledRejection', (reason, promise) => {
 })
 
 function initializeManagers(): void {
-  if (global.aliceAppState!.managersInitialized) {
+  if (global.leshineAppState!.managersInitialized) {
     console.log(
       `[Main Index ${initId}] Managers already initialized, skipping...`
     )
     return
   }
-  global.aliceAppState!.managersInitialized = true
+  global.leshineAppState!.managersInitialized = true
 
   console.log(`[Main Index ${initId}] Initializing managers...`)
   DesktopManager.getInstance()
@@ -360,13 +360,13 @@ app.on('ready', () => {
 app.whenReady().then(async () => {
   console.log(
     `[Main Index ${initId}] whenReady called, appInitialized:`,
-    global.aliceAppState!.appInitialized
+    global.leshineAppState!.appInitialized
   )
-  if (global.aliceAppState!.appInitialized) {
+  if (global.leshineAppState!.appInitialized) {
     console.log(`[Main Index ${initId}] App already initialized, skipping...`)
     return
   }
-  global.aliceAppState!.appInitialized = true
+  global.leshineAppState!.appInitialized = true
 
   console.log(`[Main Index ${initId}] Starting app initialization...`)
 

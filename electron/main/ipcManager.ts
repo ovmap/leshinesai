@@ -928,7 +928,7 @@ export function registerIPCHandlers(): void {
       await mkdir(GENERATED_IMAGES_FULL_PATH, { recursive: true })
 
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
-      const fileName = `alice_generated_${timestamp}.png`
+      const fileName = `leshine_generated_${timestamp}.png`
       const absoluteFilePath = path.join(GENERATED_IMAGES_FULL_PATH, fileName)
 
       await writeFile(absoluteFilePath, Buffer.from(base64Data, 'base64'))

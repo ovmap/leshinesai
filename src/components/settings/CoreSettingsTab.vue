@@ -460,7 +460,7 @@
                 e =>
                   $emit('update:setting', 'localSttWakeWord', getTargetValue(e))
               "
-              placeholder="alice"
+              placeholder="leshine"
             />
             <p class="text-xs text-gray-400 mt-1">
               The word that will activate voice recording. Use simple, common
@@ -822,7 +822,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
-import type { AliceSettings } from '../../stores/settingsStore'
+import type { LeshineSettings } from '../../stores/settingsStore'
 import { backendApi, type Voice } from '../../services/backendApi'
 import { useCodexAuth } from '../../composables/useCodexAuth'
 
@@ -832,12 +832,12 @@ interface ServiceStatus {
 }
 
 const props = defineProps<{
-  currentSettings: AliceSettings
+  currentSettings: LeshineSettings
 }>()
 
 const emit = defineEmits<{
   'update:setting': [
-    key: keyof AliceSettings,
+    key: keyof LeshineSettings,
     value: string | boolean | number | string[],
   ]
 }>()

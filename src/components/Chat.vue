@@ -147,7 +147,7 @@ const getDisplayableMessageContent = (message: ChatMessage): string => {
         part.path &&
         part.absolutePathForOpening
       ) {
-        const imageSrcForDisplay = `alice-image://${part.path}`
+        const imageSrcForDisplay = `leshine-image://${part.path}`
         const imageClass = part.isPartial
           ? 'partial-image-preview'
           : 'final-image'
@@ -160,7 +160,7 @@ const getDisplayableMessageContent = (message: ChatMessage): string => {
             <img 
               src="${imageSrcForDisplay}" 
               alt="${titleText}" 
-              class="max-w-xs md:max-w-sm rounded-lg cursor-pointer shadow-lg generated-alice-image" 
+              class="max-w-xs md:max-w-sm rounded-lg cursor-pointer shadow-lg generated-leshine-image" 
               data-absolute-path="${part.absolutePathForOpening}"
               title="${titleText}"
             />
@@ -216,7 +216,7 @@ const handleChatClick = (event: MouseEvent) => {
   // Handle generated image clicks
   if (
     targetElement.tagName === 'IMG' &&
-    targetElement.classList.contains('generated-alice-image')
+    targetElement.classList.contains('generated-leshine-image')
   ) {
     const absoluteImagePath = targetElement.getAttribute('data-absolute-path')
     if (absoluteImagePath) {

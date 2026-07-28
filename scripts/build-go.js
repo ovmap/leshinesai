@@ -19,15 +19,15 @@ const FFMPEG_URLS = {
     'https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz',
 }
 
-// Whisper.cpp download URLs for different platforms (using aliceai.ca hosting for reliability)
+// Whisper.cpp download URLs for different platforms (using leshineai.ca hosting for reliability)
 const WHISPER_URLS = {
-  win32: 'https://aliceai.ca/app_assets/whisper/whisper-windows.zip',
+  win32: 'https://leshineai.ca/app_assets/whisper/whisper-windows.zip',
   darwin: {
-    x64: 'https://aliceai.ca/app_assets/whisper/whisper-macos-x64.zip',
-    arm64: 'https://aliceai.ca/app_assets/whisper/whisper-macos-arm64.zip',
+    x64: 'https://leshineai.ca/app_assets/whisper/whisper-macos-x64.zip',
+    arm64: 'https://leshineai.ca/app_assets/whisper/whisper-macos-arm64.zip',
   },
   linux: {
-    x64: 'https://aliceai.ca/app_assets/whisper/whisper-linux-x64.zip',
+    x64: 'https://leshineai.ca/app_assets/whisper/whisper-linux-x64.zip',
   },
 }
 
@@ -36,7 +36,7 @@ const PIPER_URLS = {
   win32: 'https://github.com/rhasspy/piper/releases/download/2023.11.14-2/piper_windows_amd64.zip',
   darwin: {
     x64: 'https://github.com/rhasspy/piper/releases/download/2023.11.14-2/piper_macos_x64.tar.gz',
-    arm64: 'https://raw.githubusercontent.com/pmbstyle/Alice/main/assets/binaries/piper-macos-arm64',
+    arm64: 'https://raw.githubusercontent.com/pmbstyle/Leshine/main/assets/binaries/piper-macos-arm64',
   },
   linux: {
     x64: 'https://github.com/rhasspy/piper/releases/download/2023.11.14-2/piper_linux_x86_64.tar.gz',
@@ -1098,7 +1098,7 @@ async function buildGoBackend() {
   }
 
   // Determine output filename
-  const outputName = isWindows ? 'alice-backend.exe' : 'alice-backend'
+  const outputName = isWindows ? 'leshine-backend.exe' : 'leshine-backend'
   const outputPath = path.join('..', 'resources', 'backend', outputName)
 
   // Build command

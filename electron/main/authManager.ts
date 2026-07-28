@@ -109,7 +109,7 @@ function startAuthServer(): Promise<void> {
             await googleAuthManager.getTokensFromCode(code)
             res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' })
             res.end(
-              '<h1>Authentication Successful!</h1><p>You can close this browser window/tab now and return to Alice.</p>'
+              '<h1>Authentication Successful!</h1><p>You can close this browser window/tab now and return to Leshine.</p>'
             )
             closeAuthWindowAndNotify(
               true,

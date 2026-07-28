@@ -29,7 +29,7 @@ The summary should help provide context for future interactions, allowing the co
 **Keep the summary to 2-4 sentences and definitely no more than 150 words.**
 Do not add any conversational fluff, commentary, or an introductory/concluding sentence like "Here is the summary:". Just provide the factual summary of the conversation transcript.`
 
-export interface AliceSettings {
+export interface LeshineSettings {
   VITE_OPENAI_API_KEY: string
   VITE_OPENROUTER_API_KEY: string
   VITE_ZAI_API_KEY: string
@@ -101,7 +101,7 @@ export interface AliceSettings {
   onboardingCompleted: boolean
 }
 
-function hasMinimumConfigForOnboarding(config: AliceSettings): boolean {
+function hasMinimumConfigForOnboarding(config: LeshineSettings): boolean {
   if (config.VITE_OPENAI_API_KEY?.trim()) {
     return true
   }
@@ -134,7 +134,7 @@ function hasMinimumConfigForOnboarding(config: AliceSettings): boolean {
   return false
 }
 
-const defaultSettings: AliceSettings = {
+const defaultSettings: LeshineSettings = {
   VITE_OPENAI_API_KEY: '',
   VITE_OPENROUTER_API_KEY: '',
   VITE_ZAI_API_KEY: '',
@@ -149,7 +149,7 @@ const defaultSettings: AliceSettings = {
   localSttModel: 'whisper-base',
   localSttLanguage: 'auto',
   localSttEnabled: false,
-  localSttWakeWord: 'alice',
+  localSttWakeWord: 'leshine',
 
   ollamaBaseUrl: 'http://localhost:11434',
   lmStudioBaseUrl: 'http://localhost:1234',
@@ -175,7 +175,7 @@ const defaultSettings: AliceSettings = {
     'show_dashboard',
     'dashboard_command',
   ],
-  assistantAvatar: 'alice',
+  assistantAvatar: 'leshine',
   mcpServersConfig: '[]',
   MAX_HISTORY_MESSAGES_FOR_API: 10,
   SUMMARIZATION_MESSAGE_COUNT: 20,
@@ -213,7 +213,7 @@ const defaultSettings: AliceSettings = {
   onboardingCompleted: false,
 }
 
-const settingKeyToLabelMap: Record<keyof AliceSettings, string> = {
+const settingKeyToLabelMap: Record<keyof LeshineSettings, string> = {
   VITE_OPENAI_API_KEY: 'OpenAI API Key',
   VITE_OPENROUTER_API_KEY: 'OpenRouter API Key',
   VITE_ZAI_API_KEY: 'Z.ai API Key',
@@ -283,7 +283,7 @@ const settingKeyToLabelMap: Record<keyof AliceSettings, string> = {
   onboardingCompleted: 'Onboarding Completed',
 }
 
-const ESSENTIAL_CORE_API_KEYS: (keyof AliceSettings)[] = [
+const ESSENTIAL_CORE_API_KEYS: (keyof LeshineSettings)[] = [
   'VITE_OPENAI_API_KEY',
   'VITE_OPENROUTER_API_KEY',
   'VITE_ZAI_API_KEY',
@@ -292,7 +292,7 @@ const ESSENTIAL_CORE_API_KEYS: (keyof AliceSettings)[] = [
   'VITE_DASHSCOPE_API_KEY',
 ]
 
-function requiresOpenAIKey(config: AliceSettings): boolean {
+function requiresOpenAIKey(config: LeshineSettings): boolean {
   return (
     config.aiProvider === 'openai' ||
     config.sttProvider === 'openai' ||
@@ -302,7 +302,7 @@ function requiresOpenAIKey(config: AliceSettings): boolean {
 }
 
 export const useSettingsStore = defineStore('settings', () => {
-  const settings = ref<AliceSettings>({ ...defaultSettings })
+  const settings = ref<LeshineSettings>({ ...defaultSettings })
   const isLoading = ref(false)
   const isSaving = ref(false)
   const error = ref<string | null>(null)
@@ -312,8 +312,8 @@ export const useSettingsStore = defineStore('settings', () => {
   const sessionApprovedCommands = ref<string[]>([])
 
   const validateAndFixSettings = (
-    loadedSettings: Partial<AliceSettings>
-  ): { settings: AliceSettings; migrated: boolean } => {
+    loadedSettings: Partial<LeshineSettings>
+  ): { settings: LeshineSettings; migrated: boolean } => {
     const validated = { ...defaultSettings, ...loadedSettings }
     let migrated = false
 
@@ -436,7 +436,7 @@ export const useSettingsStore = defineStore('settings', () => {
 
   const areEssentialSettingsProvided = computed(() => {
     if (!isProduction.value) return true
-    const essentialKeys: (keyof AliceSettings)[] = [
+    const essentialKeys: (keyof LeshineSettings)[] = [
       'assistantModel',
       'SUMMARIZATION_MODEL',
     ]
@@ -546,7 +546,7 @@ export const useSettingsStore = defineStore('settings', () => {
     return true
   })
 
-  const config = computed<Readonly<AliceSettings>>(() => {
+  const config = computed<Readonly<LeshineSettings>>(() => {
     if (isProduction.value) {
       return settings.value
     }
@@ -611,7 +611,7 @@ export const useSettingsStore = defineStore('settings', () => {
         const loaded = await window.settingsAPI.loadSettings()
         if (loaded) {
           const result = validateAndFixSettings(
-            loaded as Partial<AliceSettings>
+            loaded as Partial<LeshineSettings>
           )
           settings.value = result.settings
           await ensureOnboardingStateConsistency()
@@ -638,13 +638,13 @@ export const useSettingsStore = defineStore('settings', () => {
           settings.value = result.settings
         }
       } else {
-        let devCombinedSettings: AliceSettings = { ...defaultSettings }
+        let devCombinedSettings: LeshineSettings = { ...defaultSettings }
         if (window.settingsAPI) {
           const loadedDevSettings = await window.settingsAPI.loadSettings()
           if (loadedDevSettings) {
             devCombinedSettings = {
               ...devCombinedSettings,
-              ...(loadedDevSettings as Partial<AliceSettings>),
+              ...(loadedDevSettings as Partial<LeshineSettings>),
             }
 
             if (
@@ -656,7 +656,7 @@ export const useSettingsStore = defineStore('settings', () => {
           }
         }
         for (const key of Object.keys(defaultSettings) as Array<
-          keyof AliceSettings
+          keyof LeshineSettings
         >) {
           if (key === 'onboardingCompleted') {
             continue
@@ -701,7 +701,7 @@ export const useSettingsStore = defineStore('settings', () => {
             '[SettingsStore] Settings validation failed, using unvalidated settings:',
             error
           )
-          settings.value = devCombinedSettings as AliceSettings
+          settings.value = devCombinedSettings as LeshineSettings
         }
       }
 
@@ -747,7 +747,7 @@ export const useSettingsStore = defineStore('settings', () => {
   }
 
   function updateSetting(
-    key: keyof AliceSettings,
+    key: keyof LeshineSettings,
     value: string | boolean | number | string[]
   ) {
     if (
@@ -872,7 +872,7 @@ export const useSettingsStore = defineStore('settings', () => {
     isSaving.value = true
     error.value = null
     try {
-      const plainSettings: AliceSettings = {
+      const plainSettings: LeshineSettings = {
         VITE_OPENAI_API_KEY: settings.value.VITE_OPENAI_API_KEY,
         VITE_OPENROUTER_API_KEY: settings.value.VITE_OPENROUTER_API_KEY,
         VITE_ZAI_API_KEY: settings.value.VITE_ZAI_API_KEY,
@@ -1134,19 +1134,19 @@ export const useSettingsStore = defineStore('settings', () => {
         successMessage.value +=
           ' (Dev mode - .env might override for operation if not using UI for all settings)'
       }
-      generalStore.statusMessage = 'Re-initializing Alice with new settings...'
+      generalStore.statusMessage = 'Re-initializing Leshine with new settings...'
 
       if (conversationStore.isInitialized) {
         conversationStore.isInitialized = false
       }
       const initSuccess = await conversationStore.initialize()
       if (initSuccess) {
-        successMessage.value += ' Alice is ready.'
+        successMessage.value += ' Leshine is ready.'
         generalStore.setAudioState('IDLE')
       } else {
         const initErrorMsg = generalStore.statusMessage.includes('Error:')
           ? generalStore.statusMessage
-          : 'Failed to re-initialize Alice with new settings.'
+          : 'Failed to re-initialize Leshine with new settings.'
         error.value = (error.value ? error.value + '; ' : '') + initErrorMsg
         successMessage.value = `Settings valid, but ${initErrorMsg}`
       }

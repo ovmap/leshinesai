@@ -508,7 +508,7 @@ func downloadFile(url, dst string, timeout time.Duration) error {
 	if err != nil {
 		return err
 	}
-	req.Header.Set("User-Agent", "AliceAI/1.0")
+	req.Header.Set("User-Agent", "LeshineAI/1.0")
 	client := &http.Client{Timeout: timeout}
 	resp, err := client.Do(req)
 	if err != nil {

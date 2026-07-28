@@ -38,7 +38,7 @@
   {
     "type": "function",
     "name": "manage_clipboard",
-    "description": "Manages the system clipboard. Can read the current text content from the clipboard or write new text content to it. Useful for transferring text between Alice and other applications.",
+    "description": "Manages the system clipboard. Can read the current text content from the clipboard or write new text content to it. Useful for transferring text between Leshine and other applications.",
     "strict": false,
     "parameters": {
       "type": "object",
@@ -170,11 +170,11 @@
         "action_type": {
           "type": "string",
           "enum": ["command", "reminder"],
-          "description": "Type of action: 'command' to execute a shell command, 'reminder' for Alice to speak a message."
+          "description": "Type of action: 'command' to execute a shell command, 'reminder' for Leshine to speak a message."
         },
         "details": {
           "type": "string",
-          "description": "For 'command': the shell command to execute. For 'reminder': the message for Alice to speak."
+          "description": "For 'command': the shell command to execute. For 'reminder': the message for Leshine to speak."
         }
       },
       "required": ["name", "schedule", "action_type", "details"],

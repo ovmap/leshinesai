@@ -5,7 +5,7 @@ import path from 'path'
 import os from 'os'
 
 /**
- * Setup required dependencies for out-of-box Alice AI experience
+ * Setup required dependencies for out-of-box Leshine AI experience
  * This ensures ffmpeg is available for Whisper transcription
  */
 function setupFFmpegForUser() {
@@ -70,7 +70,7 @@ function setupFFmpegForUser() {
  * Setup all required dependencies
  */
 function setupDependencies() {
-  console.log('🔧 Setting up Alice AI dependencies...')
+  console.log('🔧 Setting up Leshine AI dependencies...')
 
   const ffmpegSuccess = setupFFmpegForUser()
 
