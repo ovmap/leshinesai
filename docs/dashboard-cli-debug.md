@@ -125,7 +125,36 @@ await window.ipcRenderer.invoke('dashboard:control', {
 })
 ```
 
-layout 可选值: `single` | `grid` | `cards`
+layout 可选值: `single` | `grid` | `cards` | `scroll`
+
+| 值 | 说明 |
+|---|---|
+| `grid` | 网格布局（默认），多模块并排，自动分配列宽 |
+| `single` | 单模块全屏聚焦，只显示第一个模块 |
+| `cards` | 卡片流，可滚动（当前走 grid 默认逻辑） |
+| `scroll` | 垂直滚动模式，每个模块独占一屏，右侧出现 QuickBar 导航栏 |
+
+#### scroll 模式调试
+
+```js
+// 切换到 scroll 布局
+await window.ipcRenderer.invoke('dashboard:control', {
+  command: 'layout',
+  args: { layout: 'scroll' }
+})
+
+// 切回 grid
+await window.ipcRenderer.invoke('dashboard:control', {
+  command: 'layout',
+  args: { layout: 'grid' }
+})
+```
+
+scroll 模式下 QuickBar 行为：
+- 默认收起，鼠标悬停展开导航列表
+- 点击导航项平滑滚动到对应模块
+- 手动滚动时自动高亮当前模块
+- 窗口 resize 后自动重新计算锚点
 
 ### close — 关闭看板
 

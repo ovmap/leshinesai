@@ -34,42 +34,93 @@
 
     <!-- 模块渲染区 -->
     <div class="dashboard-content">
+      <!-- scroll 布局：垂直堆叠，每个模块有独立的网格系统 -->
+      <div
+        v-if="controlStore.currentLayout === 'scroll'"
+        class="scroll-container"
+        ref="scrollContainerRef"
+      >
+        <div
+          v-for="mod in scrollModules"
+          :key="mod.name"
+          class="view-item"
+          :data-module="mod.name"
+        >
+          <!-- 有 scrollLayout 的模块使用网格模式 -->
+          <ModulesRender
+            v-if="mod.scrollLayout"
+            :gridConfig="mod.scrollLayout.gridConfig"
+            :components="mod.scrollLayout.components"
+            :filters="controlStore.moduleFilters"
+            :key="`${refreshKey}-grid`"
+          />
+          <!-- 没有 scrollLayout 的模块使用默认模式 -->
+          <ModulesRender
+            v-else
+            :modules="[{ name: mod.name, span: 24, title: mod.title }]"
+            :filters="controlStore.moduleFilters"
+            layout="single"
+            :key="`${refreshKey}-default`"
+          />
+        </div>
+      </div>
+
+      <!-- 其他布局：现有逻辑 -->
       <ModulesRender
+        v-else
         :modules="displayModules"
         :filters="controlStore.moduleFilters"
         :layout="controlStore.currentLayout"
         :key="refreshKey"
       />
     </div>
+
+    <!-- QuickBar 右侧导航（仅 scroll 布局时显示） -->
+    <QuickBar
+      v-if="controlStore.currentLayout === 'scroll'"
+      ref="quickBarRef"
+      :modules="scrollModules"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import ModulesRender from './dashboard/ModulesRender.vue'
+import QuickBar from './dashboard/QuickBar.vue'
 import type { ModuleConfig } from './dashboard/ModulesRender.vue'
+import { sortedModules, getModuleTitleMap } from './dashboard/moduleRegistry'
+import type { ModuleMeta } from './dashboard/moduleRegistry'
 import { useDashboardControlStore } from '../stores/dashboardControlStore'
 import { useDashboardDataStore } from '../stores/dashboardDataStore'
 
 const controlStore = useDashboardControlStore()
 const dataStore = useDashboardDataStore()
 
-// 默认模块配置
+const refreshKey = ref(0)
+const isFullscreen = ref(false)
+const quickBarRef = ref<InstanceType<typeof QuickBar> | null>(null)
+const scrollContainerRef = ref<HTMLElement | null>(null)
+
+// 从注册表获取模块标题映射
+const moduleTitleMap = getModuleTitleMap()
+
+// 默认模块配置（保留用于非 scroll 模式）
 const defaultModules: ModuleConfig[] = [
   { name: 'cargoTrend', span: 12, title: '货量趋势' },
   { name: 'signingInformation', span: 12, title: '签收信息' },
+  { name: 'cargoBanner', span: 24, title: '智能体异常预警' },
 ]
 
-// 模块名称到中文标题的映射
-const moduleTitleMap: Record<string, string> = {
-  cargoTrend: '货量趋势',
-  signingInformation: '签收信息',
-}
+// scroll 模式下的模块列表（从注册表读取，按 order 排序）
+const scrollModules = computed<ModuleMeta[]>(() => {
+  const active = controlStore.activeModules
+  return sortedModules()
+    .filter(m => active.includes(m.name))
+    .sort((a, b) => a.order - b.order)
+})
 
-const refreshKey = ref(0)
-const isFullscreen = ref(false)
-
-// 根据控制 Store 的 activeModules 和 layout 计算显示模块
+// 根据控制 Store 的 activeModules 和 layout 计算显示模块（非 scroll 模式）
 const displayModules = computed<ModuleConfig[]>(() => {
   const active = controlStore.activeModules
   const layout = controlStore.currentLayout
@@ -184,6 +235,18 @@ onMounted(() => {
     controlStore.setModules(['cargoTrend', 'signingInformation'])
   }
 })
+
+// 监听布局切换，scroll 模式下重新初始化 QuickBar 锚点
+watch(
+  () => controlStore.currentLayout,
+  (newLayout) => {
+    if (newLayout === 'scroll') {
+      nextTick(() => {
+        quickBarRef.value?.initAnchor()
+      })
+    }
+  }
+)
 
 // 处理 CLI 命令
 function handleCommand(command: any) {
@@ -325,4 +388,25 @@ onUnmounted(() => {
   flex: 1;
   overflow: hidden;
 }
+
+/* scroll 容器 */
+.scroll-container {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+
+/* 每个模块占满一屏 */
+.scroll-container .view-item {
+  width: 100%;
+  min-height: calc(100vh - 60px);
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+/* scroll 容器滚动条 */
+.scroll-container::-webkit-scrollbar { width: 6px; }
+.scroll-container::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.2); }
+.scroll-container::-webkit-scrollbar-thumb { background: rgba(74, 158, 255, 0.4); border-radius: 3px; }
 </style>

@@ -1,47 +1,166 @@
 <script setup lang="ts">
-import { defineAsyncComponent, type Component } from 'vue'
+import { ref, onMounted, onUnmounted, computed, nextTick, watch } from 'vue'
+import { getModuleComponentMap, type GridConfig, type ComponentPosition } from './moduleRegistry'
 
-// 模块注册表 - 所有可用的看板模块
-const moduleComponents: Record<string, Component> = {
-  cargoTrend: defineAsyncComponent(() => import('./modules/CargoTrend.vue')),
-  signingInformation: defineAsyncComponent(() => import('./modules/SigningInformation.vue')),
-}
+// 从统一注册表获取组件映射
+const moduleComponents = getModuleComponentMap()
 
 export interface ModuleConfig {
   name: string
   span?: number  // 1-24 网格跨度，默认 12
   title?: string
+  noBorder?: boolean  // 是否隐藏边框和标题
 }
 
 const props = defineProps<{
-  modules: ModuleConfig[]
+  modules?: ModuleConfig[]
   filters?: Record<string, Record<string, any>>
-  layout?: 'single' | 'grid' | 'cards'
+  layout?: 'single' | 'grid' | 'cards' | 'scroll'
+  // 网格模式 props（参考 refer 的 ModulesRender）
+  gridConfig?: GridConfig
+  components?: ComponentPosition[]
 }>()
 
 // 获取模块专属的筛选条件
 function getModuleFilters(moduleName: string): Record<string, any> {
   return props.filters?.[moduleName] || {}
 }
+
+// ============ 网格模式逻辑（参考 refer） ============
+
+const containerRef = ref<HTMLElement | null>(null)
+const gridWidth = ref(0)   // 每个格子的宽度 (px)
+const gridHeight = ref(0)  // 每个格子的高度 (px)
+let resizeObserver: ResizeObserver | null = null
+
+/**
+ * 计算格子尺寸 — 参考 refer 的 initSize()
+ * scroll 模式下格子为正方形，容器高度动态计算
+ */
+function initSize() {
+  if (!containerRef.value || !props.gridConfig) return
+
+  const { gridCols, gridRows, gridGap } = props.gridConfig
+  const width = containerRef.value.getBoundingClientRect().width
+
+  if (width <= 0) return
+
+  // 计算格子宽度
+  const gw = (width - gridGap * (gridCols - 1)) / gridCols
+  gridWidth.value = Math.floor(gw * 100) / 100  // paddingFixed
+
+  // scroll 模式：格子为正方形
+  gridHeight.value = gridWidth.value
+
+  // 计算容器总高度
+  const totalHeight = (gridHeight.value + gridGap) * gridRows
+  containerRef.value.style.height = `${totalHeight}px`
+}
+
+/**
+ * 网格坐标 → 像素定位 — 参考 refer 的 getGridStyle()
+ */
+function getGridStyle(item: ComponentPosition) {
+  if (!props.gridConfig) return {}
+
+  const { gridGap } = props.gridConfig
+  const top = (gridHeight.value + gridGap) * (item.y - 1)
+  const left = (gridWidth.value + gridGap) * (item.x - 1)
+  const w = item.width * gridWidth.value + gridGap * (item.width - 1)
+  const h = item.height * gridHeight.value + gridGap * (item.height - 1)
+
+  return {
+    position: 'absolute' as const,
+    top: `${top}px`,
+    left: `${left}px`,
+    width: `${w}px`,
+    height: `${h}px`,
+  }
+}
+
+/** 获取组件的 zoom 值 */
+function getComponentZoom(item: ComponentPosition): number {
+  return item.zoom ?? 1
+}
+
+// 是否使用网格模式
+const isGridMode = computed(() => !!props.gridConfig && !!props.components)
+
+onMounted(() => {
+  if (isGridMode.value) {
+    nextTick(() => {
+      initSize()
+      // 监听容器尺寸变化
+      if (containerRef.value) {
+        resizeObserver = new ResizeObserver(() => {
+          initSize()
+        })
+        resizeObserver.observe(containerRef.value)
+      }
+    })
+  }
+})
+
+onUnmounted(() => {
+  if (resizeObserver) {
+    resizeObserver.disconnect()
+    resizeObserver = null
+  }
+})
+
+// 监听 gridConfig 变化
+watch(() => props.gridConfig, () => {
+  if (isGridMode.value) {
+    nextTick(() => initSize())
+  }
+}, { deep: true })
 </script>
 
 <template>
-  <div class="modules-render">
+  <!-- 网格模式（参考 refer 的绝对定位布局） -->
+  <div
+    v-if="isGridMode"
+    ref="containerRef"
+    class="modules-render-grid"
+  >
+    <div
+      v-for="item in components"
+      :key="item.name"
+      class="modules-component"
+      :style="getGridStyle(item)"
+    >
+      <div class="component-content" :style="{ zoom: getComponentZoom(item) }">
+        <component
+          v-if="moduleComponents[item.name]"
+          :is="moduleComponents[item.name]"
+          v-bind="getModuleFilters(item.name)"
+        />
+        <div v-else class="unknown-module">
+          未知模块: {{ item.name }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CSS Grid 模式（原有逻辑） -->
+  <div v-else class="modules-render">
     <div class="modules-grid" :class="{ 'single-layout': layout === 'single' }">
       <div
-        v-for="mod in modules"
+        v-for="mod in (modules || [])"
         :key="mod.name"
         class="module-slot"
         :style="{ gridColumn: `span ${mod.span || 12}` }"
       >
-        <div class="module-card">
+        <div class="module-card" :class="{ 'no-border': mod.noBorder }">
           <!-- 四角装饰 -->
-          <div class="corner top-left"></div>
-          <div class="corner top-right"></div>
-          <div class="corner bottom-left"></div>
-          <div class="corner bottom-right"></div>
+          <template v-if="!mod.noBorder">
+            <div class="corner top-left"></div>
+            <div class="corner top-right"></div>
+            <div class="corner bottom-left"></div>
+            <div class="corner bottom-right"></div>
+          </template>
 
-          <div class="module-header" v-if="mod.title">
+          <div class="module-header" v-if="mod.title && !mod.noBorder">
             <h3>{{ mod.title }}</h3>
           </div>
           <div class="module-body">
@@ -61,6 +180,24 @@ function getModuleFilters(moduleName: string): Record<string, any> {
 </template>
 
 <style scoped>
+/* ============ 网格模式样式 ============ */
+.modules-render-grid {
+  position: relative;
+  width: 100%;
+  /* 高度由 JS 动态计算 */
+}
+
+.modules-component {
+  position: absolute;
+  overflow: hidden;
+}
+
+.component-content {
+  width: 100%;
+  height: 100%;
+}
+
+/* ============ CSS Grid 模式样式 ============ */
 .modules-render {
   width: 100%;
   height: 100%;
@@ -92,6 +229,13 @@ function getModuleFilters(moduleName: string): Record<string, any> {
   flex-direction: column;
   position: relative;
   box-shadow: 0 0 16px rgba(74, 158, 255, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.module-card.no-border {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  min-height: 0;
 }
 
 /* 四角装饰 */

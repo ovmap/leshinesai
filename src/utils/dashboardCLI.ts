@@ -5,14 +5,11 @@
  * 通过 IPC 与看板窗口通信。
  */
 
-// 可用模块列表
-const AVAILABLE_MODULES = ['cargoTrend', 'signingInformation']
+import { getModuleNames, getModuleTitleMap } from '../components/dashboard/moduleRegistry'
 
-// 模块中文名称映射
-const MODULE_NAMES: Record<string, string> = {
-  cargoTrend: '货量趋势',
-  signingInformation: '签收信息',
-}
+// 从统一注册表动态获取
+const AVAILABLE_MODULES = getModuleNames()
+const MODULE_NAMES = getModuleTitleMap()
 
 /**
  * 执行 CLI 命令，返回结果字符串给 AI
@@ -209,7 +206,7 @@ async function handleReset(args?: Record<string, any>): Promise<string> {
  */
 async function handleLayout(args?: Record<string, any>): Promise<string> {
   const layout = args?.layout || 'grid'
-  const validLayouts = ['single', 'grid', 'cards']
+  const validLayouts = ['single', 'grid', 'cards', 'scroll']
 
   if (!validLayouts.includes(layout)) {
     return `错误: 无效布局 "${layout}"。可选: ${validLayouts.join(', ')}`

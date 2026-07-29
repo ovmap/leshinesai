@@ -8,10 +8,10 @@ import { ref } from 'vue'
  */
 export const useDashboardControlStore = defineStore('dashboardControl', () => {
   // 当前活跃模块列表
-  const activeModules = ref<string[]>(['cargoTrend', 'signingInformation'])
+  const activeModules = ref<string[]>(['cargoTrend', 'signingInformation', 'cargoBanner'])
 
   // 当前布局模式
-  const currentLayout = ref<'single' | 'grid' | 'cards'>('grid')
+  const currentLayout = ref<'single' | 'grid' | 'cards' | 'scroll'>('grid')
 
   // 各模块的筛选条件
   const moduleFilters = ref<Record<string, Record<string, any>>>({})
@@ -30,7 +30,7 @@ export const useDashboardControlStore = defineStore('dashboardControl', () => {
   }
 
   // 设置布局
-  function setLayout(layout: 'single' | 'grid' | 'cards') {
+  function setLayout(layout: 'single' | 'grid' | 'cards' | 'scroll') {
     currentLayout.value = layout
   }
 

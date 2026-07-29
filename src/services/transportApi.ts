@@ -249,4 +249,72 @@ export async function queryToProvince() {
   return response.data
 }
 
+// ============ 智能体异常预警 (cargoBanner) API 接口 ============
+
+/** 查询异常预警订单统计 */
+export async function queryRiskOrderStats(data: object) {
+  const response = await transportAiClient.post('/ai/v1/riskAlert/queryRiskOrderStats', data)
+  return response.data
+}
+
+/** 分页查询异常预警订单数据 */
+export async function queryRiskOrderByPage(data: object) {
+  const response = await transportAiClient.post('/ai/v1/riskAlert/queryRiskOrderByPage', data)
+  return response.data
+}
+
+/** 导出异常预警订单数据 */
+export async function exportRiskOrder(data: object) {
+  const response = await transportAiClient.post('/ai/v1/riskAlert/exportRiskOrder', data)
+  return response.data
+}
+
+/** 查询CDD预警统计 */
+export async function queryCddAlertStats(data: object) {
+  const response = await transportAiClient.post('/ai/v1/cddAlert/queryCddAlertStats', data)
+  return response.data
+}
+
+/** 查询CDD预警详情（支持多种筛选条件） */
+export async function queryCddAlertDetails(data: object) {
+  const response = await transportAiClient.post('/ai/v1/cddAlert/queryCddAlertDetails', data)
+  return response.data
+}
+
+/** 导出CDD预警数据 */
+export async function exportCddAlertDataByFilter(data: object) {
+  const response = await transportAiClient.post('/ai/v1/cddAlert/exportCddAlertDetails', data)
+  return response.data
+}
+
+/** 查询车辆预警 */
+export async function queryAbnormalVehicleStats() {
+  const response = await transportAiClient.get('/ai/v1/vehicleAlert/queryAbnormalVehicleStats')
+  return response.data
+}
+
+/** 查询ISG延迟风险 */
+export async function queryIsgDelayRisk(data: object) {
+  const response = await transportAiClient.post('/ai/v1/isgAlert/queryIsgDelayRisk', data)
+  return response.data
+}
+
+/** 查询ISG在途异常 */
+export async function queryIsgInTransitAbnormal(data: object) {
+  const response = await transportAiClient.post('/ai/v1/isgAlert/queryIsgInTransitAbnormal', data)
+  return response.data
+}
+
+/** 查询ISG交付异常 */
+export async function queryIsgDeliveryAbnormal(data: object) {
+  const response = await transportAiClient.post('/ai/v1/isgAlert/queryIsgDeliveryAbnormal', data)
+  return response.data
+}
+
+/** 查询ISG风险预警 */
+export async function queryIsgRiskAlert() {
+  const response = await transportAiClient.get('/ai/v1/isgAlert/queryIsgRiskAlert')
+  return response.data
+}
+
 export { transportDashboardClient, transportAiClient }

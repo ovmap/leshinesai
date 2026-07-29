@@ -614,8 +614,8 @@
             },
             "layout": {
               "type": "string",
-              "enum": ["single", "grid", "cards"],
-              "description": "布局模式 (show/layout 命令)。single=单模块全屏, grid=网格, cards=卡片"
+              "enum": ["single", "grid", "cards", "scroll"],
+              "description": "布局模式 (show/layout 命令)。single=单模块全屏, grid=网格并排, cards=卡片, scroll=垂直滚动+QuickBar导航"
             }
           }
         }
