@@ -331,6 +331,7 @@ const updateChartData = (apiData: any[]) => {
   const option = {
     legend: {
       data: legendData,
+      top: 0,
       left: 'center',
       itemGap: 20,
       textStyle: { color: '#FFFFFF', fontSize: 11 },
@@ -742,7 +743,11 @@ watch(
 </script>
 
 <template>
-  <div class="cargo-trend-container">
+  <div class="cargo-trend-wrapper">
+    <div class="header-bar">
+      <h2 class="header-title">货量趋势</h2>
+    </div>
+    <div class="cargo-trend-container">
     <!-- 控制面板 -->
     <div class="control-panel">
       <div class="dropdown-group">
@@ -837,12 +842,42 @@ watch(
       <div ref="chartRef" class="chart-container"></div>
     </div>
   </div>
+  </div>
 </template>
 
 <style scoped>
-.cargo-trend-container {
+.cargo-trend-wrapper {
   width: 100%;
   height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.header-bar {
+  width: 100%;
+  height: 1.8rem;
+  flex-shrink: 0;
+  background: url('/dashboard/images/title-bg.png') center/100% 100% no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  border-bottom: 1px solid rgba(74, 158, 255, 0.2);
+}
+
+.header-title {
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin: 0;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.cargo-trend-container {
+  flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   position: relative;
@@ -851,22 +886,22 @@ watch(
 
 .control-panel {
   width: 100%;
-  height: 50px;
-  min-height: 50px;
+  height: 2rem;
+  min-height: 2rem;
   flex-shrink: 0;
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 8px;
   border-bottom: 1px solid rgba(74, 158, 255, 0.25);
   position: relative;
   z-index: 50;
-  padding: 0 12px;
+  padding: 0 8px;
   background: linear-gradient(180deg, rgba(10, 20, 40, 0.6) 0%, rgba(15, 30, 55, 0.4) 100%);
 }
 
 .dropdown-group {
   display: flex;
-  gap: 8px;
+  gap: 4px;
   flex-wrap: nowrap;
   justify-content: flex-start;
   align-items: center;
@@ -878,19 +913,19 @@ watch(
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 4px;
-  padding: 4px 8px;
+  gap: 3px;
+  padding: 2px 6px;
   background: url('/dashboard/dlbg.png') center/cover no-repeat,
               rgba(8, 31, 64, 0.9);
   border: 1px solid #2873cc;
-  border-radius: 4px;
+  border-radius: 3px;
   color: rgba(255, 255, 255, 0.7);
-  font-size: 12px;
+  font-size: 10px;
   cursor: pointer;
   transition: all 0.3s ease;
   flex: 1;
   min-width: 0;
-  max-width: 120px;
+  max-width: 100px;
 }
 
 .dropdown-item:hover {
@@ -951,14 +986,14 @@ watch(
 }
 
 .dropdown-option {
-  padding: 6px 12px;
+  padding: 4px 8px;
   color: white;
-  font-size: 12px;
+  font-size: 10px;
   cursor: pointer;
   transition: background-color 0.2s ease;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
 }
 
 .dropdown-option:hover {
@@ -980,31 +1015,32 @@ watch(
   z-index: 50;
   flex: 1;
   min-width: 0;
-  max-width: 200px;
+  max-width: 160px;
 }
 
 .time-picker {
   width: 100%;
 }
 
-.time-picker :deep(.ant-picker) {
+:global(.control-panel .time-picker-item .ant-picker) {
   background: url('/dashboard/dlbg.png') center/cover no-repeat,
               #081f40 !important;
   border: 1px solid #2873cc !important;
   color: rgba(255, 255, 255, 0.7) !important;
-  font-size: 12px !important;
-  height: 28px !important;
+  font-size: 10px !important;
+  height: 22px !important;
 }
 
-.time-picker :deep(.ant-picker-input input) {
+:global(.control-panel .time-picker-item .ant-picker-input input) {
+  color: rgba(255, 255, 255, 0.7) !important;
+  font-size: 10px !important;
+}
+
+:global(.control-panel .time-picker-item .ant-picker-separator) {
   color: rgba(255, 255, 255, 0.7) !important;
 }
 
-.time-picker :deep(.ant-picker-separator) {
-  color: rgba(255, 255, 255, 0.7) !important;
-}
-
-.time-picker :deep(.ant-picker-suffix) {
+:global(.control-panel .time-picker-item .ant-picker-suffix) {
   color: rgba(255, 255, 255, 0.7) !important;
 }
 
@@ -1014,7 +1050,7 @@ watch(
   flex-direction: column;
   min-height: 0;
   overflow: hidden;
-  padding: 12px;
+  padding: 0;
 }
 
 .chart-container {

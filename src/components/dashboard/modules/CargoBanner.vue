@@ -27,9 +27,10 @@ const loadSelectOptions = async () => {
       queryToProvince(),
       queryToRdc()
     ])
-    if (whRes?.data) warehouseOptions.value = Array.isArray(whRes.data) ? whRes.data : []
-    if (provRes?.data) provinceOptions.value = Array.isArray(provRes.data) ? provRes.data : []
-    if (rdcRes?.data) rdcOptions.value = Array.isArray(rdcRes.data) ? rdcRes.data : []
+    // 接口返回对象数组 {code, name}，提取 name 作为字符串
+    if (whRes?.data) warehouseOptions.value = Array.isArray(whRes.data) ? whRes.data.map((item: any) => item.name || item) : []
+    if (provRes?.data) provinceOptions.value = Array.isArray(provRes.data) ? provRes.data.map((item: any) => item.name || item) : []
+    if (rdcRes?.data) rdcOptions.value = Array.isArray(rdcRes.data) ? rdcRes.data.map((item: any) => item.name || item) : []
   } catch (error) {
     console.error('加载筛选选项失败:', error)
   }
@@ -308,6 +309,8 @@ const fetchCddAlertStats = async () => {
     }
 
     const result = await queryCddAlertStats(filterParams)
+    // console.log('[CDD] filterParams:', JSON.stringify(filterParams))
+    // console.log('[CDD] API result:', JSON.stringify(result))
     
     // 添加保护判断：检查 data 不为 null
     if (result && result.code === 200 && result.data !== null && result.data !== undefined) {
@@ -558,7 +561,7 @@ const fetchRiskOrderStats = async () => {
         content: Array.isArray(finalIsgContent) ? finalIsgContent : []
       },
       {
-        title: '异常预警大于7天未解决',
+        title: '超7天异常预警',
         content: Array.isArray(finalRiskContent) ? finalRiskContent : []
       }
     ]
@@ -2888,7 +2891,7 @@ onUnmounted(() => {
     <div class="content-wrapper">
       <!-- 中央视频 -->
       <div class="central-video">
-        <video ref="videoRef" src='/static/video/border.webm' autoPlay muted loop preload='auto'
+        <video ref="videoRef" src='/dashboard/video/border.webm' autoPlay muted loop preload='auto'
           class="handbook-bg"></video>
       </div>
 
@@ -2899,7 +2902,7 @@ onUnmounted(() => {
           @click="handleCardClick(index)">
           <!-- 车辆图标 -->
           <div class="car-icon-container">
-            <img src="/static/images/banner-car.png" :alt="'车辆图标'" />
+            <img src="/dashboard/images/banner-car.png" :alt="'车辆图标'" />
           </div>
 
           <!-- 连接箭头 -->
@@ -2932,7 +2935,7 @@ onUnmounted(() => {
                 </p>
               </template>
               <div v-else class="empty-content">
-                <img src="/static/images/image_empty.png" alt="暂无数据" class="empty-image" />
+                <img src="/dashboard/images/image_empty.png" alt="暂无数据" class="empty-image" />
                 <p class="empty-text">暂无数据</p>
               </div>
             </div>
@@ -3404,7 +3407,7 @@ onUnmounted(() => {
 
 .cargo-data-cards .cargo-data-card.card-position-1 .connection-arrow {
   top: -1.5rem;
-  background: url('/static/images/jiantou1.png') center/cover no-repeat;
+  background: url('/dashboard/images/jiantou1.png') center/cover no-repeat;
 }
 
 .cargo-data-cards .cargo-data-card.card-position-1 .text-card {
@@ -3427,7 +3430,7 @@ onUnmounted(() => {
 
 .cargo-data-cards .cargo-data-card.card-position-2 .connection-arrow {
   top: -1.5rem;
-  background: url('/static/images/jiantou2.png') center/cover no-repeat;
+  background: url('/dashboard/images/jiantou2.png') center/cover no-repeat;
 }
 
 /* 卡片3 - 左上 */
@@ -3439,7 +3442,7 @@ onUnmounted(() => {
 
 .cargo-data-cards .cargo-data-card.card-position-3 .connection-arrow {
   top: -1.5rem;
-  background: url('/static/images/jiantou3.png') center/cover no-repeat;
+  background: url('/dashboard/images/jiantou3.png') center/cover no-repeat;
 }
 
 .cargo-data-cards .cargo-data-card.card-position-3 .text-card {
@@ -3457,7 +3460,7 @@ onUnmounted(() => {
 
 .cargo-data-cards .cargo-data-card.card-position-4 .connection-arrow {
   top: -1.5rem;
-  background: url('/static/images/jiantou4.png') center/cover no-repeat;
+  background: url('/dashboard/images/jiantou4.png') center/cover no-repeat;
 }
 
 .cargo-data-cards .cargo-data-card.card-position-4 .text-card {
@@ -3526,7 +3529,7 @@ onUnmounted(() => {
 /* 文字卡片 */
 .cargo-data-cards .cargo-data-card .text-card {
   position: absolute;
-  background: url('/static/images/banner-bg.png');
+  background: url('/dashboard/images/banner-bg.png');
   background-size: 100% 100%;
   border-radius: 0.5rem;
   padding: 0.75rem 1rem;
@@ -4318,7 +4321,7 @@ onUnmounted(() => {
 }
 
 .card-detail-modal {
-  background: url('/static/images/table-bg-lg.png') no-repeat;
+  background: url('/dashboard/images/table-bg-lg.png') no-repeat;
   background-size: cover;
   border: 0.125rem solid #4a9eff;
   border-radius: 0.5rem;

@@ -10,8 +10,11 @@ export const useDashboardControlStore = defineStore('dashboardControl', () => {
   // 当前活跃模块列表
   const activeModules = ref<string[]>(['cargoTrend', 'signingInformation', 'cargoBanner'])
 
+  // 当前页面（对应 pageRegistry 中的 name）
+  const currentPage = ref<string>('cargoBanner')
+
   // 当前布局模式
-  const currentLayout = ref<'single' | 'grid' | 'cards' | 'scroll'>('grid')
+  const currentLayout = ref<'single' | 'grid' | 'cards' | 'scroll'>('scroll')
 
   // 各模块的筛选条件
   const moduleFilters = ref<Record<string, Record<string, any>>>({})
@@ -32,6 +35,11 @@ export const useDashboardControlStore = defineStore('dashboardControl', () => {
   // 设置布局
   function setLayout(layout: 'single' | 'grid' | 'cards' | 'scroll') {
     currentLayout.value = layout
+  }
+
+  // 设置当前页面
+  function setCurrentPage(page: string) {
+    currentPage.value = page
   }
 
   // 应用筛选（合并到现有筛选）
@@ -88,10 +96,12 @@ export const useDashboardControlStore = defineStore('dashboardControl', () => {
 
   return {
     activeModules,
+    currentPage,
     currentLayout,
     moduleFilters,
     pendingActions,
     setModules,
+    setCurrentPage,
     setLayout,
     applyFilters,
     resetFilters,

@@ -1,9 +1,12 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { ref, onMounted } from 'vue'
+import { Swiper, SwiperSlide } from 'swiper/vue'
+import 'swiper/css'
+import 'swiper/css/pagination'
+import { Pagination, Autoplay } from 'swiper/modules'
 import { queryTotalVolume } from '../../../services/transportApi'
 
 interface CarouselData {
-  id: number
   title: string
   value: string
   unit: string
@@ -15,37 +18,46 @@ interface CarouselData {
 }
 
 const props = defineProps<{
-  fromWarehouse?: string
+  fromWarehouse?: string[]
   toProvince?: string[]
   toRdc?: string[]
 }>()
 
 const carouselData = ref<CarouselData[]>([
-  { id: 1, title: '年累计货量', value: '0', unit: '', yoy: '0%', mom: '0%', currentDate: '', yoyDate: '', momDate: '' },
-  { id: 2, title: '月累计货量', value: '0', unit: '', yoy: '0%', mom: '0%', currentDate: '', yoyDate: '', momDate: '' },
-  { id: 3, title: '日货量', value: '0', unit: '', yoy: '0%', mom: '0%', currentDate: '', yoyDate: '', momDate: '' },
+  { title: '日累计货量', value: '0', unit: 'm³', yoy: '0%', mom: '0%', currentDate: '', yoyDate: '', momDate: '' },
+  { title: '月累计货量', value: '0', unit: 'm³', yoy: '0%', mom: '0%', currentDate: '', yoyDate: '', momDate: '' },
+  { title: '年累计货量', value: '0', unit: 'm³', yoy: '0%', mom: '0%', currentDate: '', yoyDate: '', momDate: '' },
 ])
 
-const currentIndex = ref(0)
-let timer: ReturnType<typeof setInterval> | null = null
+const formatNumber = (num: number): string => {
+  if (num >= 1000000000) {
+    return (num / 1000000000).toFixed(1) + 'b'
+  } else if (num >= 1000000) {
+    return (num / 1000000).toFixed(1) + 'm'
+  } else if (num >= 1000) {
+    return (num / 1000).toFixed(1) + 'k'
+  }
+  return num.toString()
+}
 
 const fetchData = async () => {
   try {
-    const wh = props.fromWarehouse || ''
+    const wh = props.fromWarehouse?.[0] || ''
     const province = props.toProvince || []
     const rdc = props.toRdc || []
 
-    const [yearData, monthData, dayData] = await Promise.all([
-      queryTotalVolume('3', wh, province, rdc),
-      queryTotalVolume('2', wh, province, rdc),
+    const [dayData, monthData, yearData] = await Promise.all([
       queryTotalVolume('1', wh, province, rdc),
+      queryTotalVolume('2', wh, province, rdc),
+      queryTotalVolume('3', wh, province, rdc),
     ])
 
     const updateCard = (index: number, data: any) => {
       if (data?.data) {
         const d = data.data
-        const valid = d.totalVolume !== null && d.totalVolume !== undefined
-        carouselData.value[index].value = valid ? Math.floor(parseFloat(d.totalVolume) || 0).toString() : '0'
+        const raw = parseFloat(d.totalVolume || '0')
+        carouselData.value[index].value = formatNumber(Math.round(raw))
+        carouselData.value[index].unit = d.unit || 'm³'
         carouselData.value[index].yoy = d.yoy || '0%'
         carouselData.value[index].mom = d.mom || '0%'
         carouselData.value[index].currentDate = d.currentDate || ''
@@ -54,253 +66,294 @@ const fetchData = async () => {
       }
     }
 
-    updateCard(0, yearData)
+    updateCard(0, dayData)
     updateCard(1, monthData)
-    updateCard(2, dayData)
+    updateCard(2, yearData)
   } catch (error) {
     console.error('获取货量数据失败:', error)
   }
 }
 
-const formatTooltip = (item: CarouselData) => {
+const getTrendArrow = (val: string): { arrow: string; color: string } => {
+  if (val.startsWith('+') || val.startsWith('↑')) {
+    return { arrow: '↑', color: '#10b981' }
+  }
+  if (val.startsWith('-') || val.startsWith('↓')) {
+    return { arrow: '↓', color: '#ef4444' }
+  }
+  return { arrow: '', color: '#94a3b8' }
+}
+
+const buildTooltipHtml = (item: CarouselData): string => {
   const lines: string[] = []
   if (item.currentDate && item.yoyDate) {
-    lines.push(`${item.currentDate} 对比 ${item.yoyDate} 同比: ${item.yoy}`)
+    const yoyTrend = getTrendArrow(item.yoy)
+    lines.push(`${item.currentDate} 对比 ${item.yoyDate} 同比: ${yoyTrend.arrow} ${item.yoy}`)
   }
   if (item.currentDate && item.momDate) {
-    lines.push(`${item.currentDate} 对比 ${item.momDate} 环比: ${item.mom}`)
+    const momTrend = getTrendArrow(item.mom)
+    lines.push(`${item.currentDate} 对比 ${item.momDate} 环比: ${momTrend.arrow} ${item.mom}`)
   }
   return lines.join('\n') || '暂无详细数据'
 }
 
-const getTrendColor = (val: string) => {
-  if (val.startsWith('+') || val.startsWith('↑')) return '#10b981'
-  if (val.startsWith('-') || val.startsWith('↓')) return '#ef4444'
-  return '#94a3b8'
-}
-
-const next = () => {
-  currentIndex.value = (currentIndex.value + 1) % carouselData.value.length
-}
-
-const prev = () => {
-  currentIndex.value = (currentIndex.value - 1 + carouselData.value.length) % carouselData.value.length
-}
-
-const startAutoPlay = () => {
-  stopAutoPlay()
-  timer = setInterval(next, 4000)
-}
-
-const stopAutoPlay = () => {
-  if (timer) {
-    clearInterval(timer)
-    timer = null
-  }
-}
-
 onMounted(() => {
   fetchData()
-  startAutoPlay()
-})
-
-onUnmounted(() => {
-  stopAutoPlay()
 })
 </script>
 
 <template>
-  <div class="cargo-volume" @mouseenter="stopAutoPlay" @mouseleave="startAutoPlay">
-    <div class="carousel-card">
-      <!-- 四角装饰 -->
-      <div class="corner top-left"></div>
-      <div class="corner top-right"></div>
-      <div class="corner bottom-left"></div>
-      <div class="corner bottom-right"></div>
-
-      <!-- 轮播内容 -->
-      <transition name="fade" mode="out-in">
-        <div class="slide" :key="currentIndex">
-          <div class="card-title">{{ carouselData[currentIndex].title }}</div>
-          <a-tooltip :title="formatTooltip(carouselData[currentIndex])" placement="bottom" color="#1e293b">
-            <div class="card-value">{{ carouselData[currentIndex].value }}</div>
-          </a-tooltip>
-          <div class="card-trends">
-            <span class="trend-item" v-if="carouselData[currentIndex].yoy">
-              同比 <span :style="{ color: getTrendColor(carouselData[currentIndex].yoy) }">{{ carouselData[currentIndex].yoy }}</span>
-            </span>
-            <span class="trend-item" v-if="carouselData[currentIndex].mom">
-              环比 <span :style="{ color: getTrendColor(carouselData[currentIndex].mom) }">{{ carouselData[currentIndex].mom }}</span>
-            </span>
+  <div class="cargo-volume-container">
+    <div class="carousel-section">
+      <div class="carousel-cards-container">
+        <div class="carousel-card-wrapper">
+          <div class="carousel-card">
+            <Swiper
+              :slides-per-view="1"
+              :loop="false"
+              :pagination="{ clickable: true, el: '.swiper-pagination' }"
+              :autoplay="{ delay: 4000, disableOnInteraction: false }"
+              :modules="[Pagination, Autoplay]"
+            >
+              <SwiperSlide v-for="(item, index) in carouselData" :key="index">
+                <div class="card-content-carouselCard">
+                  <div class="card-title">{{ item.title }}</div>
+                  <div class="card-main-content">
+                    <div class="card-value-unit">
+                      <a-tooltip :title="buildTooltipHtml(item)" placement="bottom" color="#1e293b">
+                        <span class="card-value">{{ item.value }}</span>
+                      </a-tooltip>
+                      <span class="card-unit">{{ item.unit }}</span>
+                    </div>
+                  </div>
+                </div>
+              </SwiperSlide>
+            </Swiper>
+            <div class="swiper-pagination"></div>
           </div>
         </div>
-      </transition>
-
-      <!-- 导航 -->
-      <div class="nav-arrows">
-        <button class="nav-btn" @click="prev">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="15,18 9,12 15,6"></polyline>
-          </svg>
-        </button>
-        <button class="nav-btn" @click="next">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="9,6 15,12 9,18"></polyline>
-          </svg>
-        </button>
-      </div>
-
-      <!-- 指示器 -->
-      <div class="indicators">
-        <span
-          v-for="(_, idx) in carouselData"
-          :key="idx"
-          class="dot"
-          :class="{ active: idx === currentIndex }"
-          @click="currentIndex = idx"
-        ></span>
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-.cargo-volume {
+.cargo-volume-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.carousel-section {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.carousel-cards-container {
   width: 100%;
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 16px;
+}
+
+.carousel-card-wrapper {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background-image: url('/dashboard/images/cargo-bg.png');
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  border-radius: 0.5rem;
+  box-shadow: 0 0 1.25rem rgba(74, 158, 255, 0.3);
+  overflow: hidden;
 }
 
 .carousel-card {
   width: 100%;
   height: 100%;
-  min-height: 180px;
-  background: linear-gradient(135deg, rgba(8, 31, 64, 0.9), rgba(15, 23, 42, 0.95));
-  border: 1px solid rgba(74, 158, 255, 0.4);
-  border-radius: 12px;
-  padding: 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  padding: 1rem;
   position: relative;
-  box-shadow: 0 0 20px rgba(74, 158, 255, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
-/* 四角装饰 */
-.corner {
-  position: absolute;
-  width: 12px;
-  height: 12px;
-  border-color: rgba(74, 158, 255, 0.6);
-  border-style: solid;
+.carousel-card :deep(.swiper) {
+  width: 100%;
+  height: 100%;
 }
-.corner.top-left { top: 8px; left: 8px; border-width: 2px 0 0 2px; }
-.corner.top-right { top: 8px; right: 8px; border-width: 2px 2px 0 0; }
-.corner.bottom-left { bottom: 8px; left: 8px; border-width: 0 0 2px 2px; }
-.corner.bottom-right { bottom: 8px; right: 8px; border-width: 0 2px 2px 0; }
 
-.slide {
-  text-align: center;
+.carousel-card :deep(.swiper-slide) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-content-carouselCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   width: 100%;
 }
 
 .card-title {
-  font-size: 14px;
   color: #a0c4ff;
-  margin-bottom: 12px;
+  font-size: clamp(0.35rem, 0.7vw, 0.6rem);
+  margin-bottom: 0.4rem;
   font-weight: 400;
 }
 
+.card-main-content {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+}
+
+.card-value-unit {
+  display: flex;
+  align-items: baseline;
+  gap: 0.2rem;
+}
+
 .card-value {
-  font-size: 42px;
-  font-weight: 700;
   color: #ffffff;
-  text-shadow: 0 0 12px rgba(255, 255, 255, 0.3);
+  font-weight: 700;
+  font-size: clamp(0.5rem, 1.4vw, 0.8rem);
+  text-shadow: 0 0 0.4rem rgba(255, 255, 255, 0.3);
+  cursor: pointer;
   line-height: 1.2;
-  cursor: pointer;
-  margin-bottom: 12px;
 }
 
-.card-trends {
-  display: flex;
-  gap: 24px;
-  justify-content: center;
-  font-size: 13px;
-  color: #94a3b8;
+.card-unit {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: clamp(0.35rem, 0.8vw, 0.5rem);
+  font-weight: 400;
 }
 
-.trend-item span {
-  font-weight: 600;
-}
-
-/* 导航箭头 */
-.nav-arrows {
+/* Swiper 分页圆点 */
+.swiper-pagination {
   position: absolute;
-  top: 50%;
-  left: 0;
-  right: 0;
-  transform: translateY(-50%);
-  display: flex;
-  justify-content: space-between;
-  padding: 0 4px;
-  pointer-events: none;
-}
-
-.nav-btn {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  border: 1px solid rgba(74, 158, 255, 0.3);
-  background: rgba(8, 31, 64, 0.8);
-  color: #a0c4ff;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: all;
-  transition: all 0.2s;
-}
-
-.nav-btn:hover {
-  background: rgba(74, 158, 255, 0.2);
-  border-color: rgba(74, 158, 255, 0.6);
-}
-
-/* 指示器 */
-.indicators {
-  position: absolute;
-  bottom: 12px;
+  bottom: 0.5rem;
   left: 50%;
   transform: translateX(-50%);
+  z-index: 10;
   display: flex;
-  gap: 8px;
+  gap: 0.375rem;
+  justify-content: center;
 }
 
-.dot {
-  width: 8px;
-  height: 8px;
+.swiper-pagination :deep(.swiper-pagination-bullet) {
+  width: 6px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.4);
+  opacity: 1;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.3);
-  cursor: pointer;
   transition: all 0.3s;
 }
 
-.dot.active {
+.swiper-pagination :deep(.swiper-pagination-bullet-active) {
   background: #ffffff;
   transform: scale(1.3);
 }
 
-/* 过渡动画 */
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s ease;
+/* 响应式断点 */
+@media (max-width: 900px) {
+  .card-value {
+    font-size: clamp(1.25rem, 2.5vw, 2rem);
+  }
+
+  .card-title {
+    font-size: clamp(0.7rem, 1.1vw, 0.875rem);
+  }
+
+  .carousel-card-wrapper {
+    border-radius: 0.375rem;
+  }
 }
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
+
+@media (max-width: 768px) {
+  .card-value {
+    font-size: clamp(1.125rem, 2.2vw, 1.75rem);
+  }
+
+  .carousel-card {
+    padding: 0.75rem;
+  }
+
+  .corner-decor {
+    width: 6px;
+    height: 6px;
+  }
+}
+
+@media (max-width: 600px) {
+  .card-value {
+    font-size: clamp(1rem, 2vw, 1.5rem);
+  }
+
+  .card-title {
+    font-size: 0.7rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .carousel-card {
+    padding: 0.5rem;
+  }
+
+  .swiper-pagination {
+    bottom: 0.25rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .card-value {
+    font-size: clamp(0.875rem, 1.8vw, 1.25rem);
+  }
+
+  .card-unit {
+    font-size: 0.625rem;
+  }
+
+  .corner-decor {
+    width: 5px;
+    height: 5px;
+    border-width: 1.5px;
+  }
+
+  .corner-decor.top-left { top: 4px; left: 4px; }
+  .corner-decor.top-right { top: 4px; right: 4px; }
+  .corner-decor.bottom-left { bottom: 4px; left: 4px; }
+  .corner-decor.bottom-right { bottom: 4px; right: 4px; }
+}
+
+@media (max-width: 300px) {
+  .card-value {
+    font-size: 0.75rem;
+  }
+
+  .card-title {
+    font-size: 0.6rem;
+  }
+
+  .card-unit {
+    font-size: 0.5rem;
+  }
+
+  .carousel-card {
+    padding: 0.25rem;
+  }
+
+  .corner-decor {
+    width: 4px;
+    height: 4px;
+    border-width: 1px;
+  }
 }
 </style>

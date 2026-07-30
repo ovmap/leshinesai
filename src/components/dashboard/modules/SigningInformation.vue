@@ -473,7 +473,11 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="signing-information">
+  <div class="signing-information-wrapper">
+    <div class="header-bar">
+      <h2 class="header-title">签收信息</h2>
+    </div>
+    <div class="signing-information">
     <!-- 环形图 -->
     <div class="chart-wrapper">
       <div ref="chartRef" class="chart-container"></div>
@@ -550,13 +554,43 @@ onUnmounted(() => {
         </div>
       </div>
     </Teleport>
+    </div>
   </div>
 </template>
 
 <style scoped>
-.signing-information {
+.signing-information-wrapper {
   width: 100%;
   height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.header-bar {
+  width: 100%;
+  height: 1.8rem;
+  flex-shrink: 0;
+  background: url('/dashboard/images/title-bg.png') center/100% 100% no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  border-bottom: 1px solid rgba(74, 158, 255, 0.2);
+}
+
+.header-title {
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin: 0;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.signing-information {
+  flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;

@@ -1,86 +1,17 @@
 <script setup lang="ts">
 import { ref, nextTick, onMounted, onBeforeUnmount } from 'vue'
-import type { ModuleMeta } from './moduleRegistry'
+import type { PageMeta } from './moduleRegistry'
 
 const props = defineProps<{
-  modules: ModuleMeta[]
+  pages: PageMeta[]
+  currentPage: string
 }>()
 
-const activeIndex = ref(0)
+const emit = defineEmits<{
+  (e: 'page-change', pageName: string): void
+}>()
+
 const isExpanded = ref(false)
-let isClickTo = false
-let clearClickTimer: ReturnType<typeof setTimeout> | null = null
-
-let scrollContainer: HTMLElement | null = null
-let moduleTops: number[] = []
-let moduleHeights: number[] = []
-
-/**
- * 初始化锚点 — 计算每个模块的位置
- * 参考 refer 项目的 initAnchor()
- */
-function initAnchor() {
-  scrollContainer = document.querySelector('.scroll-container')
-  if (!scrollContainer) return
-
-  const items = scrollContainer.querySelectorAll('.view-item')
-  moduleTops = []
-  moduleHeights = []
-
-  let cumTop = 0
-  items.forEach((item) => {
-    moduleTops.push(cumTop)
-    moduleHeights.push(item.clientHeight)
-    cumTop += item.clientHeight
-  })
-
-  nextTick(() => {
-    intoView(0)
-  })
-}
-
-/**
- * 点击导航项 → 滚动到对应模块
- */
-function intoView(index: number) {
-  if (!scrollContainer) return
-
-  isClickTo = true
-  activeIndex.value = index
-
-  const targetTop = moduleTops[index] || 0
-
-  scrollContainer.scrollTo({
-    top: targetTop,
-    behavior: 'smooth',
-  })
-
-  if (clearClickTimer) clearTimeout(clearClickTimer)
-  clearClickTimer = setTimeout(() => {
-    isClickTo = false
-  }, 1500)
-}
-
-/**
- * 滚动监听 → 自动高亮当前模块
- */
-function setActiveIndex() {
-  if (isClickTo || !scrollContainer) return
-
-  const scrollTop = scrollContainer.scrollTop
-  let i = 0
-
-  for (let index = 0; index < moduleTops.length; index++) {
-    const cur = moduleTops[index]
-    const nex = moduleTops[index + 1]
-    if (scrollTop >= cur && ((nex && scrollTop < nex) || !nex)) {
-      i = index
-      break
-    }
-  }
-
-  activeIndex.value = i
-}
 
 function handleMouseEnter() {
   isExpanded.value = true
@@ -90,35 +21,15 @@ function handleMouseLeave() {
   isExpanded.value = false
 }
 
-function handleResize() {
-  setTimeout(() => {
-    initAnchor()
-  }, 100)
+function handlePageClick(pageName: string) {
+  if (pageName !== props.currentPage) {
+    emit('page-change', pageName)
+  }
 }
 
-onMounted(() => {
-  nextTick(() => {
-    initAnchor()
-  })
-
-  setTimeout(() => {
-    const container = document.querySelector('.scroll-container')
-    if (container) {
-      container.addEventListener('scroll', setActiveIndex)
-    }
-  }, 0)
-
-  window.addEventListener('resize', handleResize)
-})
-
-onBeforeUnmount(() => {
-  const container = document.querySelector('.scroll-container')
-  if (container) {
-    container.removeEventListener('scroll', setActiveIndex)
-  }
-  window.removeEventListener('resize', handleResize)
-  if (clearClickTimer) clearTimeout(clearClickTimer)
-})
+function initAnchor() {
+  // 页面切换模式下无需计算锚点，保留接口兼容
+}
 
 defineExpose({ initAnchor })
 </script>
@@ -139,32 +50,27 @@ defineExpose({ initAnchor })
       </div>
     </div>
 
-    <!-- 展开状态：导航列表 -->
+    <!-- 展开状态：页面导航列表 -->
     <template v-if="isExpanded">
       <div class="navi-list">
         <div
           class="navi-item"
-          :class="{ active: index === activeIndex }"
-          @click="intoView(index)"
-          v-for="(mod, index) in modules"
-          :key="mod.name"
-          :title="mod.title"
+          :class="{ active: page.name === currentPage }"
+          @click="handlePageClick(page.name)"
+          v-for="page in pages"
+          :key="page.name"
+          :title="page.title"
         >
           <div class="navi-icon">
-            <!-- 货量趋势 -->
-            <svg v-if="mod.icon === 'trend'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M3 3v18h18" />
-              <path d="M7 16l4-8 4 4 4-8" />
-            </svg>
-            <!-- 签收信息 -->
-            <svg v-else-if="mod.icon === 'sign'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M9 12l2 2 4-4" />
-              <circle cx="12" cy="12" r="10" />
-            </svg>
-            <!-- 智能体异常预警 -->
-            <svg v-else-if="mod.icon === 'alert'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <!-- 运输智能体 -->
+            <svg v-if="page.icon === 'alert'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M12 9v4M12 17h.01" />
               <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+            </svg>
+            <!-- 地图 -->
+            <svg v-else-if="page.icon === 'map'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M1 6v16l7-4 8 4 7-4V2l-7 4-8-4-7 4z" />
+              <path d="M8 2v16M16 6v16" />
             </svg>
             <!-- 默认图标 -->
             <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -173,7 +79,7 @@ defineExpose({ initAnchor })
           </div>
           <!-- 标签名（hover 时显示在左侧） -->
           <div class="navi-label">
-            <span>{{ mod.title }}</span>
+            <span>{{ page.title }}</span>
           </div>
         </div>
       </div>

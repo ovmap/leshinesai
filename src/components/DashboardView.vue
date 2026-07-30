@@ -34,33 +34,18 @@
 
     <!-- 模块渲染区 -->
     <div class="dashboard-content">
-      <!-- scroll 布局：垂直堆叠，每个模块有独立的网格系统 -->
+      <!-- scroll 布局：按当前页面渲染，每个页面是独立的全屏视图 -->
       <div
         v-if="controlStore.currentLayout === 'scroll'"
         class="scroll-container"
         ref="scrollContainerRef"
       >
-        <div
-          v-for="mod in scrollModules"
-          :key="mod.name"
-          class="view-item"
-          :data-module="mod.name"
-        >
-          <!-- 有 scrollLayout 的模块使用网格模式 -->
+        <div v-if="currentPageData" class="view-item">
           <ModulesRender
-            v-if="mod.scrollLayout"
-            :gridConfig="mod.scrollLayout.gridConfig"
-            :components="mod.scrollLayout.components"
+            :gridConfig="currentPageData.gridConfig"
+            :components="currentPageData.components"
             :filters="controlStore.moduleFilters"
-            :key="`${refreshKey}-grid`"
-          />
-          <!-- 没有 scrollLayout 的模块使用默认模式 -->
-          <ModulesRender
-            v-else
-            :modules="[{ name: mod.name, span: 24, title: mod.title }]"
-            :filters="controlStore.moduleFilters"
-            layout="single"
-            :key="`${refreshKey}-default`"
+            :key="`${refreshKey}-page-${currentPageData.name}`"
           />
         </div>
       </div>
@@ -79,7 +64,9 @@
     <QuickBar
       v-if="controlStore.currentLayout === 'scroll'"
       ref="quickBarRef"
-      :modules="scrollModules"
+      :pages="pageRegistry"
+      :current-page="controlStore.currentPage"
+      @page-change="controlStore.setCurrentPage($event)"
     />
   </div>
 </template>
@@ -89,8 +76,8 @@ import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import ModulesRender from './dashboard/ModulesRender.vue'
 import QuickBar from './dashboard/QuickBar.vue'
 import type { ModuleConfig } from './dashboard/ModulesRender.vue'
-import { sortedModules, getModuleTitleMap } from './dashboard/moduleRegistry'
-import type { ModuleMeta } from './dashboard/moduleRegistry'
+import { getModuleTitleMap, pageRegistry, getPageByName } from './dashboard/moduleRegistry'
+import type { PageMeta } from './dashboard/moduleRegistry'
 import { useDashboardControlStore } from '../stores/dashboardControlStore'
 import { useDashboardDataStore } from '../stores/dashboardDataStore'
 
@@ -112,12 +99,9 @@ const defaultModules: ModuleConfig[] = [
   { name: 'cargoBanner', span: 24, title: '智能体异常预警' },
 ]
 
-// scroll 模式下的模块列表（从注册表读取，按 order 排序）
-const scrollModules = computed<ModuleMeta[]>(() => {
-  const active = controlStore.activeModules
-  return sortedModules()
-    .filter(m => active.includes(m.name))
-    .sort((a, b) => a.order - b.order)
+// 当前页面数据（参考 refer 项目的 zone/module 切换）
+const currentPageData = computed<PageMeta | undefined>(() => {
+  return getPageByName(controlStore.currentPage)
 })
 
 // 根据控制 Store 的 activeModules 和 layout 计算显示模块（非 scroll 模式）
@@ -245,6 +229,16 @@ watch(
         quickBarRef.value?.initAnchor()
       })
     }
+  }
+)
+
+// 监听页面切换，重新初始化 QuickBar 锚点
+watch(
+  () => controlStore.currentPage,
+  () => {
+    nextTick(() => {
+      quickBarRef.value?.initAnchor()
+    })
   }
 )
 
