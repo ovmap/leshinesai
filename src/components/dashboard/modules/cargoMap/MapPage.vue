@@ -11,7 +11,7 @@ import {
   countNotSign,
   exportAbnormalTruck,
   queryWarehouseList,
-} from '../../../services/transportApi'
+} from '../../../../services/transportApi'
 import chinaGeo from './china.json'
 
 // 类型定义

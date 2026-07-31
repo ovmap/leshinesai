@@ -113,7 +113,7 @@ export const moduleRegistry: ModuleMeta[] = [
     name: 'mapPage',
     title: '地图',
     icon: 'map',
-    component: defineAsyncComponent(() => import('./modules/MapPage.vue')),
+    component: defineAsyncComponent(() => import('./modules/cargoMap/MapPage.vue')),
     defaultSpan: 24,
     order: 15,
   },

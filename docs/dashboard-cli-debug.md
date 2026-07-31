@@ -9,10 +9,16 @@
 ### show — 显示/切换模块
 
 ```js
+// 打开看板（默认 scroll 页面模式，modules 参数忽略，按 pageRegistry 渲染）
+await window.ipcRenderer.invoke('dashboard:open', {})
+
+// 打开看板并指定 grid 布局
 await window.ipcRenderer.invoke('dashboard:open', {
   modules: ['cargoTrend', 'signingInformation'],
   layout: 'grid'
 })
+
+// 单模块全屏（仅大模块支持）
 await window.ipcRenderer.invoke('dashboard:control', {
   command: 'show',
   args: { modules: ['cargoTrend'], layout: 'single' }
@@ -121,7 +127,7 @@ await window.ipcRenderer.invoke('dashboard:control', {
 ```js
 await window.ipcRenderer.invoke('dashboard:control', {
   command: 'layout',
-  args: { layout: 'single' }
+  args: { layout: 'scroll' }
 })
 ```
 
@@ -129,32 +135,48 @@ layout 可选值: `single` | `grid` | `cards` | `scroll`
 
 | 值 | 说明 |
 |---|---|
-| `grid` | 网格布局（默认），多模块并排，自动分配列宽 |
-| `single` | 单模块全屏聚焦，只显示第一个模块 |
-| `cards` | 卡片流，可滚动（当前走 grid 默认逻辑） |
-| `scroll` | 垂直滚动模式，每个模块独占一屏，右侧出现 QuickBar 导航栏 |
+| `scroll` | 页面模式（默认），每个页面独占全屏，右侧 QuickBar 切换页面 |
+| `grid` | 网格布局，多模块并排，自动分配列宽 |
+| `cards` | 卡片流（目前同 grid，后续会做动效） |
+| `single` | 单模块全屏聚焦（仅大模块支持，见下方说明） |
 
-#### scroll 模式调试
+**single 布局支持的模块：**
+- `energyPrices` — 能源价格趋势
+- `abnormalTransportation` — 运输异常
+- `capacityPool` — 运力池
+- `urgentCustomer` — 加急&重点客户风险
+- `majorEvents` — 重大活动&极端天气影响
+- `cargoTrend` — 货量趋势
+- `signingInformation` — 签收信息
+- `reorderProgress` — 返单进展
+
+**不支持 single 的模块（小卡片/特殊组件）：**
+- `cargoBanner` — 运输智能体（视频+弹窗）
+- `mapPage` — 地图（独占整页）
+- `cargoVolume` / `onTime` / `endToEnd` / `energyPricesCard` / `unitPrice` / `dryPrice` — 4×3 小卡片
+
+### page — 切换页面（scroll 布局专用）
 
 ```js
-// 切换到 scroll 布局
+// 切换到地图页面
 await window.ipcRenderer.invoke('dashboard:control', {
-  command: 'layout',
-  args: { layout: 'scroll' }
+  command: 'page',
+  args: { page: 'mapPage' }
 })
 
-// 切回 grid
+// 切换到运输智能体页面
 await window.ipcRenderer.invoke('dashboard:control', {
-  command: 'layout',
-  args: { layout: 'grid' }
+  command: 'page',
+  args: { page: 'cargoBanner' }
 })
 ```
 
-scroll 模式下 QuickBar 行为：
-- 默认收起，鼠标悬停展开导航列表
-- 点击导航项平滑滚动到对应模块
-- 手动滚动时自动高亮当前模块
-- 窗口 resize 后自动重新计算锚点
+可用页面:
+
+| 页面名 | 标题 | 说明 |
+|--------|------|------|
+| `cargoBanner` | 运输智能体 | 包含货量卡片、趋势图、异常图表等 16 个子组件 |
+| `mapPage` | 地图 | 中国地图，含热力图、在途车辆、仓库、客户、迁徙路线 |
 
 ### close — 关闭看板
 
@@ -162,22 +184,65 @@ scroll 模式下 QuickBar 行为：
 await window.ipcRenderer.invoke('dashboard:close')
 ```
 
+### fullscreen — 切换全屏
+
+```js
+// 切换全屏（toggle）
+await window.ipcRenderer.invoke('dashboard:control', {
+  command: 'fullscreen',
+  args: { action: 'toggle' }
+})
+
+// 进入全屏
+await window.ipcRenderer.invoke('dashboard:control', {
+  command: 'fullscreen',
+  args: { action: 'enter' }
+})
+
+// 退出全屏
+await window.ipcRenderer.invoke('dashboard:control', {
+  command: 'fullscreen',
+  args: { action: 'exit' }
+})
+```
+
+action 可选值: `toggle`（默认）| `enter` | `exit`
+
 ## 可用模块
 
 | 模块名 | 中文名 | 说明 |
 |--------|--------|------|
-| `cargoTrend` | 货量趋势 | 堆叠柱状图 + 同比/环比折线 |
-| `signingInformation` | 签收信息 | 环形图 + 未签收明细弹窗 |
+| `cargoBanner` | 运输智能体 | 视频+数据卡片+弹窗 |
+| `mapPage` | 地图 | ECharts 中国地图（热力图+车辆+仓库+客户+路线） |
+| `cargoVolume` | 累计货量 | Swiper 轮播（日/月/年） |
+| `onTime` | 提货及时率 | 静态单值卡片 |
+| `endToEnd` | 准时交付率 | 静态单值卡片 |
+| `energyPricesCard` | 能源价格 | Swiper 轮播（汽/柴/航空燃油） |
+| `energyPrices` | 能源价格趋势 | ECharts 折线/柱状图 |
+| `abnormalTransportation` | 运输异常 | ECharts 矩形树图+详情弹窗 |
+| `capacityPool` | 运力池 | 自动滚动表格+详情弹窗 |
+| `urgentCustomer` | 加急&重点客户风险 | 自动滚动表格+详情弹窗 |
+| `majorEvents` | 重大活动&极端天气影响 | 自动滚动表格+详情弹窗 |
+| `unitPrice` | 干单价 | 静态单值卡片 |
+| `dryPrice` | 配单价 | 静态单值卡片 |
+| `cargoTrend` | 货量趋势 | 图表 |
+| `signingInformation` | 签收信息 | 表格+图表 |
+| `reorderProgress` | 返单进展 | 双层环形图+导出进度 |
 
 ## 筛选参数参考
 
-### cargoTrend
+### 通用筛选
 
 | 参数 | 类型 | 说明 |
 |------|------|------|
 | `fromWarehouse` | string | 始发仓 |
 | `toProvince` | string | 目的省 |
 | `toRdc` | string | 目的RDC |
+
+### cargoTrend
+
+| 参数 | 类型 | 说明 |
+|------|------|------|
 | `timeType` | string | 时间维度 (CALENDAR_YEAR/FICAL_YEAR/MONTH/WEEK/DAY...) |
 | `metric` | string | 指标 (VOLUME/WEIGHT/VOLUME_SIZE) |
 | `dataSource` | string[] | 数据源列表 |
@@ -187,7 +252,4 @@ await window.ipcRenderer.invoke('dashboard:close')
 
 | 参数 | 类型 | 说明 |
 |------|------|------|
-| `fromWarehouse` | string | 始发仓 |
-| `toProvince` | string | 目的省 |
-| `toRdc` | string | 目的RDC |
 | `modeType` | string | 配送模式 (区配/直送) |

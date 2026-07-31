@@ -7,13 +7,13 @@
 LLM 天然擅长生成结构化命令，CLI 是可组合的（像 docker/kubectl），比多个分散的工具更易扩展。
 
 ```
-用户: "帮我筛选北京始发的未签收数据"
+用户: "帮我看看地图上的在途车辆"
   ↓
-AI 生成命令: dashboard filter --fromWarehouse 北京
+AI 生成命令: dashboard page --page mapPage
   ↓
 命令执行器解析 → IPC 发送到看板窗口 → Pinia Store 更新 → UI 自动响应
   ↓
-AI 读取数据: dashboard data signingInformation
+AI 读取数据: dashboard data mapPage
   ↓
 返回 Markdown 格式数据 → AI 组织自然语言回复用户
 ```
@@ -32,6 +32,7 @@ AI 读取数据: dashboard data signingInformation
 | `dashboard action` | 触发 UI 操作 | 操作结果 |
 | `dashboard reset` | 重置所有筛选 | 确认信息 |
 | `dashboard layout` | 切换布局模式 | 确认信息 |
+| `dashboard page` | 切换页面 | 确认信息 |
 | `dashboard close` | 关闭看板窗口 | 确认信息 |
 
 ### 2.2 命令详细定义
@@ -50,13 +51,28 @@ AI 读取数据: dashboard data signingInformation
 
 - `modules`: 要显示的模块列表（可选，不传则保持当前）
 - `layout`: 布局模式（可选）
-  - `single` — 一次只显示一个模块，全屏聚焦
-  - `grid` — 网格布局，多模块并排（默认）
-  - `cards` — 卡片布局，可滚动
+  - `scroll` — 页面模式（默认），每个页面独占全屏，右侧 QuickBar 切换
+  - `single` — 一次只显示一个模块，全屏聚焦（仅大模块支持）
+  - `grid` — 网格布局，多模块并排
+  - `cards` — 卡片流（目前同 grid，后续会做动效）
 
-已注册模块：
-- `cargoTrend` — 货量趋势（堆叠柱状图 + 同比/环比折线）
-- `signingInformation` — 签收信息（环形图 + 未签收明细弹窗）
+已注册模块（16 个）：
+- `cargoBanner` — 运输智能体（视频+数据卡片+弹窗）
+- `mapPage` — 地图（ECharts 中国地图）
+- `cargoVolume` — 累计货量（Swiper 轮播）
+- `onTime` — 提货及时率（静态卡片）
+- `endToEnd` — 准时交付率（静态卡片）
+- `energyPricesCard` — 能源价格（Swiper 轮播）
+- `energyPrices` — 能源价格趋势（ECharts 折线/柱状图）
+- `abnormalTransportation` — 运输异常（ECharts 矩形树图）
+- `capacityPool` — 运力池（自动滚动表格）
+- `urgentCustomer` — 加急&重点客户风险（自动滚动表格）
+- `majorEvents` — 重大活动&极端天气影响（自动滚动表格）
+- `unitPrice` — 干单价（静态卡片）
+- `dryPrice` — 配单价（静态卡片）
+- `cargoTrend` — 货量趋势（图表）
+- `signingInformation` — 签收信息（表格+图表）
+- `reorderProgress` — 返单进展（双层环形图）
 
 #### `dashboard filter` — 设置筛选
 
@@ -157,11 +173,27 @@ AI 读取数据: dashboard data signingInformation
 {
   "command": "layout",
   "args": {
-    "type": "single",
-    "focus": "cargoTrend"
+    "layout": "scroll"
   }
 }
 ```
+
+#### `dashboard page` — 切换页面
+
+```json
+{
+  "command": "page",
+  "args": {
+    "page": "mapPage"
+  }
+}
+```
+
+- `page`: 目标页面名称
+  - `cargoBanner` — 运输智能体（默认）
+  - `mapPage` — 地图
+
+scroll 布局下，每个页面是一个独立的全屏视图，通过 QuickBar 导航切换。
 
 #### `dashboard close` — 关闭看板
 
@@ -188,7 +220,7 @@ AI 读取数据: dashboard data signingInformation
     "properties": {
       "command": {
         "type": "string",
-        "enum": ["show", "filter", "data", "action", "reset", "layout", "close"],
+        "enum": ["show", "filter", "data", "action", "reset", "layout", "page", "close"],
         "description": "要执行的命令"
       },
       "args": {
@@ -197,12 +229,17 @@ AI 读取数据: dashboard data signingInformation
         "properties": {
           "modules": {
             "type": "array",
-            "items": { "type": "string", "enum": ["cargoTrend", "signingInformation"] },
+            "items": { "type": "string" },
             "description": "模块列表 (show 命令)"
           },
           "module": {
             "type": "string",
             "description": "目标模块 (filter/data/action 命令)"
+          },
+          "page": {
+            "type": "string",
+            "enum": ["cargoBanner", "mapPage"],
+            "description": "目标页面 (page 命令)"
           },
           "filters": {
             "type": "object",
@@ -234,7 +271,7 @@ AI 读取数据: dashboard data signingInformation
           },
           "layout": {
             "type": "string",
-            "enum": ["single", "grid", "cards"],
+            "enum": ["single", "grid", "cards", "scroll"],
             "description": "布局模式 (show/layout 命令)"
           }
         }
@@ -257,20 +294,20 @@ AI 读取数据: dashboard data signingInformation
 ┌──────────────────────────────────────────────────────────────┐
 │                    Leshine 主窗口（对话）                         │
 │                                                               │
-│  用户: "帮我筛选北京始发的未签收数据"                           │
+│  用户: "帮我看看地图上的在途车辆"                               │
 │                    │                                          │
 │                    ▼                                          │
 │  LLM → tool_call: dashboard_command                          │
-│    { command: "filter", args: { fromWarehouse: "北京" } }    │
+│    { command: "page", args: { page: "mapPage" } }            │
 │                    │                                          │
 │                    ▼                                          │
 │  functionCaller.ts                                           │
 │    → executeDashboardCommand(parsedArgs)                     │
 │                    │                                          │
 │                    ▼                                          │
-│  dashboardCLI.ts (命令执行器)                                  │
+│  dashboard/index.ts (命令执行器)                               │
 │    ├─ 解析命令 + 校验参数                                     │
-│    ├─ 路由到对应 handler                                     │
+│    ├─ 路由到对应 handler (commands/*.ts)                      │
 │    └─ 返回结果给 AI                                          │
 │                    │                                          │
 └────────────────────┼──────────────────────────────────────────┘
@@ -287,16 +324,17 @@ AI 读取数据: dashboard data signingInformation
 │              Dashboard 窗口                                    │
 │                                                               │
 │  dashboardControlStore (Pinia)                                │
-│    ├─ currentFilters: 当前筛选状态                             │
+│    ├─ currentPage: 当前页面                                   │
+│    ├─ moduleFilters: 各模块筛选状态                            │
 │    ├─ activeModules: 当前活跃模块                              │
 │    ├─ currentLayout: 当前布局                                 │
-│    ├─ pendingActions: 待执行操作队列                           │
-│    └─ dataCache: 数据缓存（供 data 命令读取）                  │
+│    └─ pendingActions: 待执行操作队列                           │
 │                    │                                          │
 │                    ▼                                          │
-│  UI 组件 (watch store → 自动响应)                              │
-│    ├─ CargoTrend.vue → watch filters → 重新请求数据           │
-│    └─ SigningInformation.vue → watch filters → 重新请求数据   │
+│  DashboardView.vue                                            │
+│    ├─ 根据 currentPage 渲染对应页面                            │
+│    ├─ ModulesRender.vue → 网格布局渲染                        │
+│    └─ QuickBar.vue → 页面切换导航                             │
 │                                                               │
 └──────────────────────────────────────────────────────────────┘
 ```
@@ -305,18 +343,18 @@ AI 读取数据: dashboard data signingInformation
 
 **核心设计：dashboardDataStore 是 UI 的实时镜像**
 
-`dashboardDataStore` 不只是缓存数据，而是**实时镜像当前 UI 的完整状态**——包括显示什么模块、筛选条件是什么、数据内容是什么。AI 随时能"看到"用户当前看到的界面。
+`dashboardDataStore` 不只是缓存数据，而是**实时镜像当前 UI 的完整状态**——包括显示什么页面、筛选条件是什么、数据内容是什么。AI 随时能"看到"用户当前看到的界面。
 
 ```
 AI 操作链：
-  切换模块 → Store 同步更新 → AI 调 data 确认切换结果 ✓
+  切换页面 → Store 同步更新 → AI 调 data 确认切换结果 ✓
   设置筛选 → Store 同步更新 → AI 调 data 确认筛选生效 ✓
   触发操作 → Store 同步更新 → AI 调 data 确认操作结果 ✓
 ```
 
 **AI → UI（控制流）：**
 ```
-AI tool_call → functionCaller → dashboardCLI → IPC:dashboard:control
+AI tool_call → functionCaller → dashboard/index.ts → IPC:dashboard:control
 → 主进程转发 → dashboardControlStore 更新 → UI watch 响应
 → UI 执行操作 → 操作完成后更新 dashboardDataStore（实时镜像）
 ```
@@ -331,11 +369,11 @@ UI 组件获取数据 / 状态变化 → 实时同步到 dashboardDataStore
 **dashboardDataStore 存储内容（UI 完整状态）：**
 ```typescript
 {
-  // 当前显示的模块
-  activeModules: ['cargoTrend', 'signingInformation'],
+  // 当前显示的页面
+  currentPage: 'cargoBanner',
   
   // 当前布局
-  currentLayout: 'grid',
+  currentLayout: 'scroll',
   
   // 各模块的筛选条件（与 UI 筛选器同步）
   filters: {
@@ -346,7 +384,8 @@ UI 组件获取数据 / 状态变化 → 实时同步到 dashboardDataStore
   // 各模块的数据（与 UI 图表/表格同步）
   moduleData: {
     cargoTrend: { chartData: [...], summary: {...} },
-    signingInformation: { signed: 1234, unsigned: 567, detailList: [...] }
+    signingInformation: { signed: 1234, unsigned: 567, detailList: [...] },
+    mapPage: { heatMap: [...], trucks: [...], warehouses: [...] }
   },
   
   // UI 状态（弹窗、选中等）
@@ -412,49 +451,14 @@ interface ModuleDataSchema {
 }
 ```
 
-#### 4.3.3 示例：货量趋势模块
-
-```typescript
-{
-  raw: {
-    timeSeries: [
-      { 
-        timeDimension: '2024', 
-        items: [
-          { dataSource: 'TMS', value: '548934' },
-          { dataSource: 'LESTMS', value: '62004' }
-        ],
-        totalYoy: null,
-        totalMom: '-11.09%'
-      }
-    ],
-    filters: { timeType: 'CALENDAR_YEAR', metric: 'VOLUME', dataSource: ['TMS', 'LESTMS'] }
-  },
-  
-  summary: () => `## 货量趋势
-- 时间维度: 自然年
-- 指标: 订单数量
-- 数据源: TMS, LESTMS
-- 时间范围: 2024-01-01 ~ 2026-07-22
-
-| 时间段 | TMS | LESTMS | 合计 | 环比 |
-|--------|-----|--------|------|------|
-| 2024 | 548,934 | 62,004 | 917,531 | -11.09% |
-| 2025 | 538,361 | 242,478 | 1,129,288 | +23.08% |
-| 2026 | 122,684 | 100,807,509 | 101,126,047 | +8854.85% |`,
-  
-  detail: () => `更详细的时间序列数据，包含每个数据源的完整信息...`
-}
-```
-
-#### 4.3.4 数据对应关系
+#### 4.3.3 数据对应关系
 
 | UI 组件 | AI 读取格式 | 数据源 |
 |---------|------------|--------|
 | ECharts 堆叠柱状图 | Markdown 表格 | `raw.timeSeries` |
 | ECharts 环形图 | 数字摘要 | `raw.signed / unsigned` |
+| ECharts 中国地图 | 地区分布表 | `raw.heatMap` |
 | Ant Table 表格 | Markdown 表格 | `raw.detailList` |
-| 地图（未来） | 地区分布表 | `raw.regionData` |
 
 **一句话总结：Store 存原始 JSON，每个模块自己负责把它翻译成 AI 能理解的 Markdown。**
 
@@ -462,421 +466,97 @@ interface ModuleDataSchema {
 
 | 文件 | 职责 |
 |------|------|
-| `src/utils/dashboardCLI.ts` | 命令解析器 + 执行器（主窗口侧） |
+| `src/utils/dashboard/index.ts` | 命令注册表 + 执行入口（主窗口侧） |
+| `src/utils/dashboard/commands/*.ts` | 各命令处理函数 |
+| `src/utils/dashboard/types.ts` | 命令类型定义 |
 | `src/stores/dashboardControlStore.ts` | 看板窗口内的控制状态（看板窗口侧） |
 | `src/stores/dashboardDataStore.ts` | 看板窗口内的数据缓存（看板窗口侧） |
 | `src/utils/functionCaller.ts` | 注册 `dashboard_command` 工具 |
 | `docs/functions.json` | 工具定义 |
-| `electron/main/ipcManager.ts` | 新增 `dashboard:control` 和 `dashboard:get-data` IPC |
+| `electron/main/ipcManager.ts` | `dashboard:control` 和 `dashboard:get-data` IPC |
 | `electron/main/windowManager.ts` | 转发控制指令到看板窗口 |
 
 ---
 
-## 五、实现细节
+## 五、页面系统
 
-### 5.1 命令执行器 (`src/utils/dashboardCLI.ts`)
+### 5.1 页面注册表
+
+看板支持多页面，每个页面是一个独立的全屏视图，内部使用网格布局排列子组件。
 
 ```typescript
-// 命令路由
-export async function executeDashboardCommand(args: {
-  command: string
-  args?: Record<string, any>
-}): Promise<string> {
-  const { command, args: cmdArgs } = args
+// src/components/dashboard/moduleRegistry.ts
 
-  switch (command) {
-    case 'show':
-      return handleShow(cmdArgs)
-    case 'filter':
-      return handleFilter(cmdArgs)
-    case 'data':
-      return await handleData(cmdArgs)
-    case 'action':
-      return await handleAction(cmdArgs)
-    case 'reset':
-      return handleReset(cmdArgs)
-    case 'layout':
-      return handleLayout(cmdArgs)
-    case 'close':
-      return handleClose()
-    default:
-      return `未知命令: ${command}。可用命令: show, filter, data, action, reset, layout, close`
-  }
+interface PageMeta {
+  name: string                      // 页面标识符
+  title: string                     // 页面标题
+  icon: string                      // QuickBar 图标
+  gridConfig: GridConfig            // 网格配置 (48x27)
+  components: ComponentPosition[]   // 子组件布局
 }
 
-// show 命令处理
-async function handleShow(args?: Record<string, any>): Promise<string> {
-  const modules = args?.modules || []
-  const layout = args?.layout || 'grid'
-
-  // 如果看板窗口不存在，先创建
-  await window.ipcRenderer.invoke('dashboard:open', { modules, layout })
-
-  // 如果已存在，发送更新
-  await window.ipcRenderer.invoke('dashboard:control', {
-    command: 'show',
-    args: { modules, layout }
-  })
-
-  return `看板已更新: 显示模块 [${modules.join(', ')}], 布局: ${layout}`
-}
-
-// filter 命令处理
-async function handleFilter(args?: Record<string, any>): Promise<string> {
-  if (!args?.filters && !args?.module) {
-    return '错误: filter 命令需要 filters 参数'
-  }
-
-  await window.ipcRenderer.invoke('dashboard:control', {
-    command: 'filter',
-    args
-  })
-
-  const filterDesc = Object.entries(args.filters || {})
-    .map(([k, v]) => `${k}=${v}`)
-    .join(', ')
-
-  return `筛选条件已应用: ${filterDesc}`
-}
-
-// data 命令处理（需要读取看板窗口的数据）
-async function handleData(args?: Record<string, any>): Promise<string> {
-  const module = args?.module
-  const format = args?.format || 'markdown'
-  const scope = args?.scope || 'summary'
-
-  const result = await window.ipcRenderer.invoke('dashboard:get-data', {
-    module, format, scope
-  })
-
-  return result.data || '暂无数据'
-}
+const pageRegistry: PageMeta[] = [
+  {
+    name: 'cargoBanner',
+    title: '运输智能体',
+    gridConfig: { gridCols: 48, gridRows: 27, gridGap: 12 },
+    components: [
+      // 16 个子组件的网格位置配置
+      { name: 'cargoVolume', x: 1, y: 1, width: 4, height: 3 },
+      { name: 'cargoBanner', x: 13, y: 1, width: 24, height: 18 },
+      // ...
+    ]
+  },
+  {
+    name: 'mapPage',
+    title: '地图',
+    gridConfig: { gridCols: 48, gridRows: 27, gridGap: 12 },
+    components: [
+      { name: 'mapPage', x: 1, y: 1, width: 48, height: 27 },
+    ]
+  },
+]
 ```
 
-### 5.2 看板控制 Store (`src/stores/dashboardControlStore.ts`)
+### 5.2 页面切换流程
 
-```typescript
-import { defineStore } from 'pinia'
-import { ref, watch } from 'vue'
-
-export const useDashboardControlStore = defineStore('dashboardControl', () => {
-  // 当前筛选状态
-  const currentFilters = ref<Record<string, any>>({})
-
-  // 当前活跃模块
-  const activeModules = ref<string[]>(['cargoTrend', 'signingInformation'])
-
-  // 当前布局
-  const currentLayout = ref<'single' | 'grid' | 'cards'>('grid')
-
-  // 待执行操作队列
-  const pendingActions = ref<Array<{ module: string; action: string; params: any }>>([])
-
-  // 应用筛选（由 IPC 触发）
-  function applyFilters(module: string | undefined, filters: Record<string, any>) {
-    if (module) {
-      // 模块专属筛选
-      currentFilters.value[module] = { ...currentFilters.value[module], ...filters }
-    } else {
-      // 全局筛选，应用到所有模块
-      Object.keys(currentFilters.value).forEach(mod => {
-        currentFilters.value[mod] = { ...currentFilters.value[mod], ...filters }
-      })
-    }
-  }
-
-  // 切换模块
-  function setModules(modules: string[]) {
-    activeModules.value = modules
-  }
-
-  // 切换布局
-  function setLayout(layout: 'single' | 'grid' | 'cards') {
-    currentLayout.value = layout
-  }
-
-  // 添加操作
-  function addAction(module: string, action: string, params: any) {
-    pendingActions.value.push({ module, action, params })
-  }
-
-  // 重置
-  function reset(module?: string) {
-    if (module) {
-      currentFilters.value[module] = {}
-    } else {
-      currentFilters.value = {}
-    }
-  }
-
-  return {
-    currentFilters,
-    activeModules,
-    currentLayout,
-    pendingActions,
-    applyFilters,
-    setModules,
-    setLayout,
-    addAction,
-    reset,
-  }
-})
+```
+QuickBar 点击 / CLI page 命令
+  → dashboardControlStore.setCurrentPage(pageName)
+  → DashboardView.vue watch currentPage
+  → 重新渲染 ModulesRender (传入对应页面的 gridConfig + components)
+  → QuickBar 高亮当前页面
 ```
 
-### 5.3 数据 Store (`src/stores/dashboardDataStore.ts`)
+### 5.3 网格坐标系
 
-```typescript
-import { defineStore } from 'pinia'
-import { ref } from 'vue'
-
-export const useDashboardDataStore = defineStore('dashboardData', () => {
-  // 各模块的数据缓存
-  const moduleData = ref<Record<string, any>>({})
-
-  // 更新模块数据（由 UI 组件调用）
-  function updateModuleData(module: string, data: any) {
-    moduleData.value[module] = {
-      data,
-      timestamp: Date.now(),
-    }
-  }
-
-  // 获取格式化数据（供 data 命令使用）
-  function getFormattedData(module?: string, format = 'markdown', scope = 'summary'): string {
-    const modules = module ? [module] : Object.keys(moduleData.value)
-
-    if (format === 'markdown') {
-      return modules.map(mod => formatAsMarkdown(mod, moduleData.value[mod], scope)).join('\n\n')
-    } else if (format === 'json') {
-      const data = module ? moduleData.value[module] : moduleData.value
-      return JSON.stringify(data, null, 2)
-    }
-    return ''
-  }
-
-  // Markdown 格式化
-  function formatAsMarkdown(module: string, cached: any, scope: string): string {
-    if (!cached?.data) return `## ${module}\n暂无数据`
-
-    const data = cached.data
-    switch (module) {
-      case 'signingInformation':
-        return formatSigningData(data, scope)
-      case 'cargoTrend':
-        return formatCargoTrendData(data, scope)
-      default:
-        return `## ${module}\n${JSON.stringify(data, null, 2)}`
-    }
-  }
-
-  return { moduleData, updateModuleData, getFormattedData }
-})
-```
-
-### 5.4 UI 组件改造
-
-以 `SigningInformation.vue` 为例，需要：
-
-```typescript
-// 引入控制 Store 和数据 Store
-import { useDashboardControlStore } from '../../../stores/dashboardControlStore'
-import { useDashboardDataStore } from '../../../stores/dashboardDataStore'
-
-const controlStore = useDashboardControlStore()
-const dataStore = useDashboardDataStore()
-
-// 监听控制 Store 的筛选变化
-watch(() => controlStore.currentFilters['signingInformation'], (newFilters) => {
-  if (newFilters) {
-    // 应用筛选到本地状态
-    if (newFilters.fromWarehouse) modalSelectedWarehouse.value = newFilters.fromWarehouse
-    if (newFilters.toProvince) modalSelectedProvince.value = newFilters.toProvince
-    if (newFilters.toRdc) modalSelectedRdc.value = newFilters.toRdc
-    if (newFilters.modeType) modalSelectedModeType.value = newFilters.modeType
-    // 重新获取数据
-    fetchModalData()
-  }
-}, { deep: true })
-
-// 获取数据后同步到数据 Store
-const fetchSigningData = async () => {
-  // ... 原有逻辑 ...
-  // 同步到数据 Store
-  dataStore.updateModuleData('signingInformation', {
-    signed: signingData.value[0].value,
-    unsigned: signingData.value[1].value,
-  })
-}
-```
-
-### 5.5 IPC 通信
-
-**主进程新增处理 (`ipcManager.ts`)：**
-
-```typescript
-// 控制指令转发到看板窗口
-ipcMain.handle('dashboard:control', async (event, command) => {
-  const dashboardWin = getDashboardWindow()
-  if (dashboardWin && !dashboardWin.isDestroyed()) {
-    dashboardWin.webContents.send('dashboard:command', command)
-    return { success: true }
-  }
-  return { success: false, error: '看板窗口未打开' }
-})
-
-// 从看板窗口获取数据
-ipcMain.handle('dashboard:get-data', async (event, params) => {
-  const dashboardWin = getDashboardWindow()
-  if (!dashboardWin || dashboardWin.isDestroyed()) {
-    return { success: false, error: '看板窗口未打开' }
-  }
-
-  // 通过 IPC 请求看板窗口的数据
-  return new Promise((resolve) => {
-    const requestId = Date.now().toString()
-    // 监听看板窗口的数据响应
-    ipcMain.once(`dashboard:data-response-${requestId}`, (_, data) => {
-      resolve({ success: true, data })
-    })
-    // 向看板窗口请求数据
-    dashboardWin.webContents.send('dashboard:request-data', { ...params, requestId })
-  })
-})
-```
-
-**看板窗口接收命令 (`DashboardView.vue`)：**
-
-```typescript
-onMounted(() => {
-  // 接收控制命令
-  window.ipcRenderer.on('dashboard:command', (_, command) => {
-    const controlStore = useDashboardControlStore()
-
-    switch (command.command) {
-      case 'show':
-        controlStore.setModules(command.args.modules)
-        controlStore.setLayout(command.args.layout)
-        break
-      case 'filter':
-        controlStore.applyFilters(command.args.module, command.args.filters)
-        break
-      case 'action':
-        controlStore.addAction(command.args.module, command.args.action, command.args.params)
-        break
-      case 'reset':
-        controlStore.reset(command.args?.module)
-        break
-    }
-  })
-
-  // 响应数据请求
-  window.ipcRenderer.on('dashboard:request-data', (_, params) => {
-    const dataStore = useDashboardDataStore()
-    const formatted = dataStore.getFormattedData(params.module, params.format, params.scope)
-    window.ipcRenderer.invoke(`dashboard:data-response`, {
-      requestId: params.requestId,
-      data: formatted
-    })
-  })
-})
-```
+- 总网格：48 列 × 27 行
+- 坐标从 1 开始（不是 0）
+- `x` = 列位置，`y` = 行位置
+- 小卡片标准尺寸：`width: 4, height: 3`
 
 ---
 
-## 六、交互示例
+## 六、扩展性
 
-### 场景 1: 查看并筛选签收数据
+### 新增页面
 
-```
-用户: "帮我看看未签收的情况"
-
-AI:
-  → dashboard_command({ command: "show", args: { modules: ["signingInformation"] } })
-  → dashboard_command({ command: "data", args: { module: "signingInformation", scope: "summary" } })
-  ← "已签收: 1,234 单, 待签收: 567 单"
-
-AI 回复: "当前有 567 单待签收，已在看板展示签收信息。需要我筛选特定仓库或地区吗？"
-
-用户: "看看天津发往沈阳的"
-
-AI:
-  → dashboard_command({ command: "filter", args: { module: "signingInformation", filters: { fromWarehouse: "天津宁河CDC", toRdc: "沈阳" } } })
-  → dashboard_command({ command: "data", args: { module: "signingInformation", scope: "detail" } })
-  ← 返回筛选后的 Markdown 表格
-
-AI 回复: "天津发往沈阳的未签收有 23 单，主要分布在...（展示明细表格）"
-```
-
-### 场景 2: 切换模块查看
-
-```
-用户: "今年货量怎么样"
-
-AI:
-  → dashboard_command({ command: "show", args: { modules: ["cargoTrend"] } })
-  → dashboard_command({ command: "filter", args: { module: "cargoTrend", filters: { timeType: "FICAL_YEAR" } } })
-  → dashboard_command({ command: "data", args: { module: "cargoTrend", scope: "summary" } })
-  ← 返回货量摘要
-
-AI 回复: "今年货量趋势已展示在看板上。FY2026 总货量约 XX 万单，同比增长 XX%。"
-```
-
-### 场景 3: 组合操作
-
-```
-用户: "帮我导出沈阳RDC的区配未签收数据"
-
-AI:
-  → dashboard_command({ command: "show", args: { modules: ["signingInformation"] } })
-  → dashboard_command({ command: "filter", args: { filters: { toRdc: "沈阳", modeType: "区配" } } })
-  → dashboard_command({ command: "action", args: { module: "signingInformation", action: "export" } })
-  ← "导出成功"
-
-AI 回复: "已将沈阳RDC区配模式的未签收数据导出，文件已下载。共 23 条记录。"
-```
-
----
-
-## 七、实施步骤
-
-### Phase 1: 基础框架
-1. 创建 `dashboardControlStore.ts` 和 `dashboardDataStore.ts`
-2. 新增 `dashboard:control` 和 `dashboard:get-data` IPC 通道
-3. 创建 `dashboardCLI.ts` 命令执行器
-4. 在 `functions.json` 中注册 `dashboard_command` 工具
-5. 在 `functionCaller.ts` 中注册工具
-
-### Phase 2: UI 组件改造
-1. 修改 `CargoTrend.vue` — 接入控制 Store + 数据 Store
-2. 修改 `SigningInformation.vue` — 接入控制 Store + 数据 Store
-3. 修改 `DashboardView.vue` — 监听 IPC 命令并分发
-4. 修改 `ModulesRender.vue` — 支持动态布局切换
-
-### Phase 3: 数据格式化
-1. 实现 `formatSigningData()` — 签收数据 Markdown 格式化
-2. 实现 `formatCargoTrendData()` — 货量趋势 Markdown 格式化
-3. 实现 `dashboard:get-data` 的完整数据回传链路
-
-### Phase 4: 测试与优化
-1. 端到端测试：AI 命令 → UI 响应 → 数据回传
-2. 错误处理：看板窗口未打开时的降级策略
-3. 命令组合：多个命令连续执行的正确性
-
----
-
-## 八、扩展性
+1. 在 `moduleRegistry.ts` 的 `pageRegistry` 中添加 `PageMeta`
+2. 在 `QuickBar.vue` 中添加对应图标
+3. 在 `dashboardControlStore.ts` 的 `currentPage` 默认值中考虑
 
 ### 新增模块
-只需：
-1. 在 `ModulesRender.vue` 注册组件
-2. 在 `dashboardDataStore` 添加格式化函数
-3. 在 `functions.json` 的 enum 中添加模块名
+
+1. 在 `modules/` 目录下创建组件
+2. 在 `moduleRegistry.ts` 的 `moduleRegistry` 中注册
+3. 在对应页面的 `components` 数组中配置网格位置
+4. 在 `dashboardDataStore` 添加格式化函数
 
 ### 新增命令
-只需：
-1. 在 `dashboardCLI.ts` 添加 handler
-2. 在 `dashboardControlStore` 添加对应状态
-3. 在 `functions.json` 的 command enum 中添加
+
+1. 在 `src/utils/dashboard/commands/` 创建新文件
+2. 导出 `CommandHandler` 类型的处理函数
+3. 在 `src/utils/dashboard/index.ts` 的 `commandRegistry` 中注册
 
 ### 未来可能的命令
 - `dashboard export` — 导出数据

@@ -104,23 +104,35 @@ const currentPageData = computed<PageMeta | undefined>(() => {
   return getPageByName(controlStore.currentPage)
 })
 
+// 大模块（支持 single/grid/cards 布局）
+const LARGE_MODULES = [
+  'energyPrices', 'abnormalTransportation', 'capacityPool',
+  'urgentCustomer', 'majorEvents', 'cargoTrend',
+  'signingInformation', 'reorderProgress',
+]
+
 // 根据控制 Store 的 activeModules 和 layout 计算显示模块（非 scroll 模式）
 const displayModules = computed<ModuleConfig[]>(() => {
   const active = controlStore.activeModules
   const layout = controlStore.currentLayout
 
-  if (layout === 'single' && active.length > 0) {
-    // 单模块模式：第一个模块占满 24 列
-    return [{ name: active[0], span: 24, title: moduleTitleMap[active[0]] || active[0] }]
+  // single/grid/cards 布局只支持大模块
+  if (layout === 'single' || layout === 'grid' || layout === 'cards') {
+    const filtered = active.filter(m => LARGE_MODULES.includes(m))
+    if (filtered.length === 0) return []
+
+    if (layout === 'single') {
+      return [{ name: filtered[0], span: 24 }]
+    }
+
+    // grid/cards 最多 3 个
+    const modules = filtered.slice(0, 3)
+    const span = modules.length <= 1 ? 24 : modules.length <= 2 ? 12 : 8
+    return modules.map(name => ({ name, span }))
   }
 
-  // 网格模式：根据模块数量分配 span
-  const span = active.length <= 1 ? 24 : active.length <= 2 ? 12 : Math.floor(24 / active.length)
-  return active.map(name => ({
-    name,
-    span,
-    title: moduleTitleMap[name] || name,
-  }))
+  // 其他布局（scroll 等）不过滤
+  return active.map(name => ({ name, span: 12 }))
 })
 
 function refresh() {
@@ -268,6 +280,17 @@ function handleCommand(command: any) {
 
     case 'layout':
       if (args?.layout) controlStore.setLayout(args.layout)
+      break
+
+    case 'page':
+      if (args?.page) {
+        controlStore.setLayout('scroll')
+        controlStore.setCurrentPage(args.page)
+      }
+      break
+
+    case 'fullscreen':
+      toggleFullscreen()
       break
   }
 }

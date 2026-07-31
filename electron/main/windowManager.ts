@@ -322,6 +322,7 @@ export async function createDashboardWindow(params: {
   })
 
   dashboardWindow.show()
+  dashboardWindow.setFullScreen(true)
   dashboardWindow.focus()
 
   dashboardWindow.on('closed', () => {

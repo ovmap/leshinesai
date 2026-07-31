@@ -1,7 +1,7 @@
 import { createDualEmbeddings, createEmbedding } from '../services/apiService'
 import { useCustomToolsStore } from '../stores/customToolsStore'
 import { manage_clipboard } from './functions/clipboard'
-import { executeDashboardCommand } from './dashboardCLI'
+import { executeDashboardCommand } from './dashboard'
 import {
   open_path,
   list_directory,
