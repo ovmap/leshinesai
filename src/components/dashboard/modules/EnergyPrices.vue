@@ -2,6 +2,9 @@
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import * as echarts from 'echarts'
 import { queryEnergyPrice } from '../../../services/transportApi'
+import { useDashboardDataStore } from '../../../stores/dashboardDataStore'
+
+const dataStore = useDashboardDataStore()
 
 // Tab切换状态
 const activeTab = ref<'domestic' | 'international'>('domestic')
@@ -43,6 +46,12 @@ const loadData = async (isInternational: boolean) => {
         energyPriceData.value.domestic = result.data
       }
       updateChart()
+      // 同步到数据 Store
+      dataStore.updateModuleData('energyPrices', {
+        domestic: energyPriceData.value.domestic,
+        international: energyPriceData.value.international,
+        timeRange: getTimeRange(),
+      })
     }
   } catch (error) {
     console.error('获取能源价格数据失败:', error)

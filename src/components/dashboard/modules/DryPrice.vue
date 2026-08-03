@@ -2,6 +2,9 @@
 import { ref, onMounted } from 'vue'
 import dayjs from 'dayjs'
 import { queryDeliveryPrice } from '../../../services/transportApi'
+import { useDashboardDataStore } from '../../../stores/dashboardDataStore'
+
+const dataStore = useDashboardDataStore()
 
 const title = '配单价(m³)'
 const unit = '元'
@@ -13,6 +16,7 @@ const fetchData = async () => {
     const endDate = dayjs().subtract(1, 'month').endOf('month').format('YYYY-MM-DD') + ' 23:59:59'
     const result = await queryDeliveryPrice({ startDate, endDate })
     if (result?.code === 200 && result.data) {
+      dataStore.updateModuleData('dryPrice', result.data)
       value.value = parseFloat(result.data.deliveryPrice ?? '0').toFixed(2)
     }
   } catch (error) {

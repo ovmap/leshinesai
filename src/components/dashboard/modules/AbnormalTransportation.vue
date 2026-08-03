@@ -11,6 +11,9 @@ import {
   queryToRdc,
   queryDataSourceList,
 } from '../../../services/transportApi'
+import { useDashboardDataStore } from '../../../stores/dashboardDataStore'
+
+const dataStore = useDashboardDataStore()
 
 const props = defineProps<{
   fromWarehouse?: string[]
@@ -280,6 +283,17 @@ const fetchData = async () => {
 
     const response = await statNotSignOrder(params)
     initChart(response)
+    // 同步到数据 Store
+    dataStore.updateModuleData('abnormalTransportation', {
+      rawData: response,
+      filters: {
+        fromWarehouse: props.fromWarehouse || [],
+        toProvince: props.toProvince || [],
+        toRdc: props.toRdc || [],
+        startDate: defaultStartDate,
+        endDate: defaultEndDate,
+      },
+    })
   } catch (error) {
     console.error('获取运输异常数据失败:', error)
   }

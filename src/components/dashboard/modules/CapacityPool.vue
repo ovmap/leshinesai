@@ -7,6 +7,9 @@ import {
   queryToCityList,
   queryLogisticList,
 } from '../../../services/transportApi';
+import { useDashboardDataStore } from '../../../stores/dashboardDataStore';
+
+const dataStore = useDashboardDataStore();
 
 // 表格数据
 const tableData = ref<Array<{
@@ -303,6 +306,12 @@ const loadData = async () => {
         vehicleCount: item.truckCount || 0,
         vehicleType: item.truckType || ''
       }));
+      // 同步到数据 Store
+      dataStore.updateModuleData('capacityPool', {
+        list: tableData.value,
+        total: tableData.value.length,
+        rawData: res.data,
+      });
     }
   } catch (error) {
     console.error('加载运力池数据失败:', error);

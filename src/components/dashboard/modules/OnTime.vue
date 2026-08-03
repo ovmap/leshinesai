@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
 import { queryOnTimeRateCard } from '../../../services/transportApi'
+import { useDashboardDataStore } from '../../../stores/dashboardDataStore'
+
+const dataStore = useDashboardDataStore()
 
 const title = '提货及时率'
 const props = defineProps<{
@@ -38,6 +41,7 @@ const fetchData = async () => {
     // console.log('[OnTime] API result:', result)
 
     if (result?.code === 200 && result.data) {
+      dataStore.updateModuleData('onTime', result.data)
       // 提货及时率使用 pickupRate 字段
       const rate = result.data.pickupRate
       if (typeof rate === 'string' && rate.includes('%')) {

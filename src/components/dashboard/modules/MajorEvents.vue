@@ -6,6 +6,9 @@ import {
   exportAffectOrderItem,
   queryFromWarehouse,
 } from '../../../services/transportApi'
+import { useDashboardDataStore } from '../../../stores/dashboardDataStore'
+
+const dataStore = useDashboardDataStore()
 
 const props = defineProps<{
   fromWarehouse?: string[]
@@ -117,6 +120,17 @@ const fetchTrafficInfo = async () => {
         impact: item.desc,
         affectedOrders: item.affectOrderCount,
       }))
+      // 同步到数据 Store
+      dataStore.updateModuleData('majorEvents', {
+        list: tableData.value,
+        total: tableData.value.length,
+        rawData: response.data,
+        filters: {
+          fromWarehouse: props.fromWarehouse || [],
+          toProvince: props.toProvince || [],
+          toRdc: props.toRdc || [],
+        },
+      })
     }
   } catch (error) {
     console.error('获取重大活动数据失败:', error)

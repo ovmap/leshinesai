@@ -69,15 +69,6 @@ interface SearXNGSearchArgs {
   safesearch?: number
 }
 
-interface ShowDashboardArgs {
-  modules?: string[]
-  filters?: {
-    dateRange?: string
-    warehouse?: string
-    rdc?: string
-  }
-}
-
 async function executeCustomToolViaIPC(
   name: string,
   args: Record<string, any>
@@ -743,44 +734,6 @@ async function searxng_web_search(
 }
 
 /**
- * Shows the logistics dashboard window with specified modules and filters.
- */
-async function show_dashboard(
-  args: ShowDashboardArgs = {}
-): Promise<FunctionResult> {
-  try {
-    const params = {
-      modules: args.modules || ['cargoTrend', 'signingInformation'],
-      filters: args.filters || {},
-    }
-
-    const result = await window.ipcRenderer.invoke('dashboard:open', params)
-
-    if (result.success) {
-      return {
-        success: true,
-        data: {
-          message: '物流看板已打开',
-          modules: params.modules,
-          windowId: result.windowId,
-        },
-      }
-    } else {
-      return {
-        success: false,
-        error: result.error || '打开看板失败',
-      }
-    }
-  } catch (error: any) {
-    console.error('Error in show_dashboard:', error)
-    return {
-      success: false,
-      error: `打开看板失败: ${error.message}`,
-    }
-  }
-}
-
-/**
  * Dashboard CLI: 控制物流数据看板的统一命令接口
  */
 async function dashboard_command(
@@ -826,7 +779,6 @@ const functionRegistry: {
   browser_context: browser_context,
   perform_web_search: perform_web_search,
   searxng_web_search: searxng_web_search,
-  show_dashboard: show_dashboard,
   dashboard_command: dashboard_command,
 }
 
@@ -855,7 +807,6 @@ const functionSchemas = {
   browser_context: { required: [] },
   perform_web_search: { required: ['query'] },
   searxng_web_search: { required: ['query'] },
-  show_dashboard: { required: [] },
   dashboard_command: { required: ['command'] },
 }
 

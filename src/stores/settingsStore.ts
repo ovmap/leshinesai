@@ -172,7 +172,6 @@ const defaultSettings: LeshineSettings = {
     'save_memory',
     'delete_memory',
     'recall_memories',
-    'show_dashboard',
     'dashboard_command',
   ],
   assistantAvatar: 'leshine',

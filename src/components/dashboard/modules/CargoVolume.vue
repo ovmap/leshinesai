@@ -5,6 +5,7 @@ import 'swiper/css'
 import 'swiper/css/pagination'
 import { Pagination, Autoplay } from 'swiper/modules'
 import { queryTotalVolume } from '../../../services/transportApi'
+import { useDashboardDataStore } from '../../../stores/dashboardDataStore'
 
 interface CarouselData {
   title: string
@@ -22,6 +23,8 @@ const props = defineProps<{
   toProvince?: string[]
   toRdc?: string[]
 }>()
+
+const dataStore = useDashboardDataStore()
 
 const carouselData = ref<CarouselData[]>([
   { title: '日累计货量', value: '0', unit: 'm³', yoy: '0%', mom: '0%', currentDate: '', yoyDate: '', momDate: '' },
@@ -69,6 +72,13 @@ const fetchData = async () => {
     updateCard(0, dayData)
     updateCard(1, monthData)
     updateCard(2, yearData)
+
+    // 同步数据到 dataStore
+    dataStore.updateModuleData('cargoVolume', {
+      day: dayData?.data || null,
+      month: monthData?.data || null,
+      year: yearData?.data || null,
+    })
   } catch (error) {
     console.error('获取货量数据失败:', error)
   }

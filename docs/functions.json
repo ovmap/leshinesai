@@ -522,46 +522,8 @@
   },
   {
     "type": "function",
-    "name": "show_dashboard",
-    "description": "展示物流数据看板。当需要向用户展示物流相关的数据统计、货量信息、应签未签明细等信息时调用此工具。会打开一个独立的看板窗口显示相关数据。",
-    "strict": false,
-    "parameters": {
-      "type": "object",
-      "properties": {
-        "modules": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "enum": ["cargoTrend", "signingInformation"]
-          },
-          "description": "要显示的模块列表。可选值：cargoTrend（货量趋势）、signingInformation（签收信息）。如果不指定，默认显示所有模块。"
-        },
-        "filters": {
-          "type": "object",
-          "description": "数据过滤条件",
-          "properties": {
-            "dateRange": {
-              "type": "string",
-              "description": "日期范围，如 'today', 'this_week', 'this_month'"
-            },
-            "warehouse": {
-              "type": "string",
-              "description": "始发仓筛选"
-            },
-            "rdc": {
-              "type": "string",
-              "description": "目的 RDC 筛选"
-            }
-          }
-        }
-      },
-      "additionalProperties": false
-    }
-  },
-  {
-    "type": "function",
     "name": "dashboard_command",
-    "description": "控制运输智能体看板的 CLI 命令工具。通过不同命令控制看板显示、筛选数据、获取数据等。看板是一个独立的窗口，AI 可以通过此工具完全控制它。",
+    "description": "控制运输智能体看板的 CLI 命令工具。通过不同命令控制看板显示、筛选数据、获取数据等。看板是一个独立窗口，AI 可以通过此工具完全控制它。data 命令具有布局感知能力：scroll 布局下不指定 module 返回页面概览，指定 module 返回详细数据（大模块会提示是否聚焦）；grid/single 布局下直接返回当前模块的详细数据。如果请求的模块不在当前视图，会提示切换页面或布局。",
     "strict": false,
     "parameters": {
       "type": "object",
@@ -582,7 +544,7 @@
             },
             "module": {
               "type": "string",
-              "description": "目标模块 (filter/data/action/reset 命令)。不指定则应用到所有模块"
+              "description": "目标模块 (filter/data/action/reset 命令)。data 命令不指定 module 则返回当前页面概览（模块列表+摘要）。指定 module 则返回该模块的详细数据。如果模块不在当前页面，会提示切换页面。"
             },
             "page": {
               "type": "string",
@@ -611,7 +573,7 @@
             "scope": {
               "type": "string",
               "enum": ["summary", "detail", "full"],
-              "description": "数据范围 (data 命令)。summary=摘要, detail=明细, full=完整。默认 summary"
+              "description": "数据范围 (data 命令)。summary=摘要, detail=明细, full=完整。默认 summary。注意：grid/single 布局下 summary 会自动提升到 detail，因为已经在聚焦状态。"
             },
             "action": {
               "type": "string",

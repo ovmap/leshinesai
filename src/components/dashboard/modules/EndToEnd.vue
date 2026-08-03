@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { queryOnTimeRateCard } from '../../../services/transportApi'
+import { useDashboardDataStore } from '../../../stores/dashboardDataStore'
+
+const dataStore = useDashboardDataStore()
 
 const props = defineProps<{
   fromWarehouse?: string[]
@@ -37,6 +40,7 @@ const fetchData = async () => {
     // console.log('[EndToEnd] API result:', result)
 
     if (result?.code === 200 && result.data) {
+      dataStore.updateModuleData('endToEnd', result.data)
       // 端对端准时交付率使用 deliveryRate 字段
       const rate = result.data.deliveryRate
       if (rate !== null && rate !== undefined && rate !== '') {

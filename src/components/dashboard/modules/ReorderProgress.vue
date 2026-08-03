@@ -9,6 +9,9 @@ import {
   queryExportProgress,
   queryCustomerList,
 } from '../../../services/transportApi'
+import { useDashboardDataStore } from '../../../stores/dashboardDataStore'
+
+const dataStore = useDashboardDataStore()
 
 const props = defineProps<{
   fromWarehouse?: string[]
@@ -206,6 +209,24 @@ const fetchReturnData = async () => {
         notConfirm30dTo60d: result.data.notConfirm30dTo60d || 0,
         notConfirmOver60d: result.data.notConfirmOver60d || 0,
       }
+      // 同步到数据 Store
+      dataStore.updateModuleData('reorderProgress', {
+        confirmedCount: returnData.value.confirmed,
+        totalCount: returnData.value.confirmed + returnData.value.notConfirm,
+        confirmed: returnData.value.confirmed,
+        notConfirm: returnData.value.notConfirm,
+        notConfirmWithin30d: returnData.value.notConfirmWithin30d,
+        notConfirm30dTo60d: returnData.value.notConfirm30dTo60d,
+        notConfirmOver60d: returnData.value.notConfirmOver60d,
+        rawData: result.data,
+        filters: {
+          dateRange: `${dateRange.value[0].format('YYYY-MM-DD')} ~ ${dateRange.value[1].format('YYYY-MM-DD')}`,
+          customer: selectedCustomer.value,
+          fromWarehouse: props.fromWarehouse || [],
+          toProvince: props.toProvince || [],
+          toRdc: props.toRdc || [],
+        },
+      })
     }
   } catch (error: any) {
     const errCode = error?.response?.data?.code

@@ -2,22 +2,10 @@
  * layout 命令 — 切换布局
  */
 
-import { getModuleTitleMap } from '../../../components/dashboard/moduleRegistry'
+import { getModuleTitleMap, LARGE_MODULES } from '../../../components/dashboard/moduleRegistry'
 import type { CommandHandler } from '../types'
 
 const VALID_LAYOUTS = ['single', 'grid', 'cards', 'scroll']
-
-// 大模块（支持 single/grid/cards 布局）
-const LARGE_MODULES = [
-  'energyPrices',
-  'abnormalTransportation',
-  'capacityPool',
-  'urgentCustomer',
-  'majorEvents',
-  'cargoTrend',
-  'signingInformation',
-  'reorderProgress',
-]
 
 // grid/cards 布局最多支持的模块数
 const MAX_GRID_MODULES = 3

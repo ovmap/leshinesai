@@ -108,7 +108,7 @@ export const PROVIDER_CONFIGS: Record<AIProviderKey, ProviderConfig> = {
 export const ZAI_CODING_BASE_URL = 'https://api.z.ai/api/coding/paas/v4'
 export const MINIMAX_OPENAI_BASE_URL = 'https://api.minimax.io/v1'
 export const DEEPSEEK_OPENAI_BASE_URL = 'https://api.deepseek.com'
-export const DASHSCOPE_OPENAI_BASE_URL = 'https://llm-mbjyaswuzgod1hqv.cn-beijing.maas.aliyuncs.com/compatible-mode/v1'
+export const DASHSCOPE_OPENAI_BASE_URL = 'https://dashscope.aliyuncs.com/compatible-mode/v1'
 
 export const CHAT_COMPLETIONS_PROVIDERS: ChatCompletionsProviderKey[] = [
   'openrouter',

@@ -87,24 +87,134 @@ await window.ipcRenderer.invoke('dashboard:control', {
 })
 ```
 
-### data — 获取数据（返回 Markdown）
+### data — 获取数据（布局感知，返回 Markdown）
+
+data 命令会根据当前布局状态智能返回数据。
+
+#### 参数
+
+| 参数 | 说明 | 可选值 |
+|------|------|--------|
+| `module` | 模块名（不传则返回页面概览） | 见下方模块列表 |
+| `format` | 格式 | `markdown`（默认）, `json` |
+| `scope` | 数据范围 | `summary`（默认）, `detail`, `full` |
+
+#### 基础测试
 
 ```js
-// 获取指定模块摘要
+// 1. 获取页面概览（scroll 布局下不指定模块，返回当前页面所有模块摘要）
+await window.ipcRenderer.invoke('dashboard:get-data', {
+  format: 'markdown',
+  scope: 'summary'
+})
+
+// 2. 获取单个模块数据（布局感知）
 await window.ipcRenderer.invoke('dashboard:get-data', {
   module: 'cargoTrend',
   format: 'markdown',
   scope: 'summary'
 })
 
-// 获取全部数据
+// 3. 获取模块详细数据
 await window.ipcRenderer.invoke('dashboard:get-data', {
+  module: 'signingInformation',
   format: 'markdown',
+  scope: 'detail'
+})
+
+// 4. 获取模块完整数据
+await window.ipcRenderer.invoke('dashboard:get-data', {
+  module: 'cargoTrend',
+  format: 'markdown',
+  scope: 'full'
+})
+
+// 5. 获取 JSON 格式原始数据
+await window.ipcRenderer.invoke('dashboard:get-data', {
+  module: 'cargoTrend',
+  format: 'json',
   scope: 'full'
 })
 ```
 
-scope 可选值: `summary` | `detail` | `full`
+#### 各模块数据测试
+
+```js
+// ===== 小卡片模块 =====
+await window.ipcRenderer.invoke('dashboard:get-data', { module: 'cargoVolume' })
+await window.ipcRenderer.invoke('dashboard:get-data', { module: 'onTime' })
+await window.ipcRenderer.invoke('dashboard:get-data', { module: 'endToEnd' })
+await window.ipcRenderer.invoke('dashboard:get-data', { module: 'energyPricesCard' })
+await window.ipcRenderer.invoke('dashboard:get-data', { module: 'unitPrice' })
+await window.ipcRenderer.invoke('dashboard:get-data', { module: 'dryPrice' })
+
+// ===== 大模块 =====
+await window.ipcRenderer.invoke('dashboard:get-data', { module: 'energyPrices' })
+await window.ipcRenderer.invoke('dashboard:get-data', { module: 'abnormalTransportation' })
+await window.ipcRenderer.invoke('dashboard:get-data', { module: 'capacityPool' })
+await window.ipcRenderer.invoke('dashboard:get-data', { module: 'urgentCustomer' })
+await window.ipcRenderer.invoke('dashboard:get-data', { module: 'majorEvents' })
+await window.ipcRenderer.invoke('dashboard:get-data', { module: 'cargoTrend' })
+await window.ipcRenderer.invoke('dashboard:get-data', { module: 'signingInformation' })
+await window.ipcRenderer.invoke('dashboard:get-data', { module: 'reorderProgress' })
+
+// ===== 特殊模块 =====
+await window.ipcRenderer.invoke('dashboard:get-data', { module: 'mapPage' })
+```
+
+#### 布局感知行为测试
+
+```js
+// --- scroll 布局（默认）---
+
+// 无模块 → 返回页面概览
+await window.ipcRenderer.invoke('dashboard:get-data', {})
+
+// 模块在当前页 → 返回数据 + 大模块提示聚焦
+await window.ipcRenderer.invoke('dashboard:get-data', { module: 'cargoTrend' })
+
+// 模块不在当前页 → 提示切换页面
+await window.ipcRenderer.invoke('dashboard:get-data', { module: 'mapPage' })
+
+// --- 切换到 grid 布局 ---
+await window.ipcRenderer.invoke('dashboard:control', {
+  command: 'layout',
+  args: { layout: 'grid', modules: ['cargoTrend', 'signingInformation'] }
+})
+
+// 模块在当前 grid → 返回详细数据（scope 自动提升到 detail）
+await window.ipcRenderer.invoke('dashboard:get-data', { module: 'cargoTrend' })
+
+// 模块不在当前 grid → 提示切换
+await window.ipcRenderer.invoke('dashboard:get-data', { module: 'energyPrices' })
+
+// --- 切换到 single 布局 ---
+await window.ipcRenderer.invoke('dashboard:control', {
+  command: 'layout',
+  args: { layout: 'single', modules: ['cargoTrend'] }
+})
+
+// 模块是当前全屏 → 返回完整数据
+await window.ipcRenderer.invoke('dashboard:get-data', { module: 'cargoTrend' })
+
+// 模块不是当前全屏 → 提示切换
+await window.ipcRenderer.invoke('dashboard:get-data', { module: 'signingInformation' })
+
+// --- 切回 scroll ---
+await window.ipcRenderer.invoke('dashboard:control', {
+  command: 'layout',
+  args: { layout: 'scroll' }
+})
+```
+
+#### scope 在不同布局下的行为
+
+| 布局 | scope=summary | scope=detail | scope=full |
+|------|---------------|--------------|------------|
+| scroll（无模块） | 页面概览 | 页面概览 | 页面概览 |
+| scroll（指定模块） | 模块数据 | 模块详细数据 | 模块完整数据 |
+| grid（指定模块） | 自动提升到 detail | 详细数据 | 完整数据 |
+| single（指定模块） | 自动提升到 detail | 详细数据 | 完整数据 |
 
 ### reset — 重置筛选
 

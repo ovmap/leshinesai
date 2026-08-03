@@ -2,23 +2,11 @@
  * show 命令 — 显示/切换模块
  */
 
-import { getModuleNames, getModuleTitleMap } from '../../../components/dashboard/moduleRegistry'
+import { getModuleNames, getModuleTitleMap, LARGE_MODULES } from '../../../components/dashboard/moduleRegistry'
 import type { CommandHandler } from '../types'
 
 const AVAILABLE_MODULES = getModuleNames()
 const MODULE_NAMES = getModuleTitleMap()
-
-// 大模块（支持 single/grid/cards 布局）
-const LARGE_MODULES = [
-  'energyPrices',
-  'abnormalTransportation',
-  'capacityPool',
-  'urgentCustomer',
-  'majorEvents',
-  'cargoTrend',
-  'signingInformation',
-  'reorderProgress',
-]
 
 // grid/cards 布局最多支持的模块数
 const MAX_GRID_MODULES = 3

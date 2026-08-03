@@ -276,3 +276,67 @@ export function getPageByName(name: string): PageMeta | undefined {
 export function getPages(): PageMeta[] {
   return [...pageRegistry]
 }
+
+// ========== 模块分类 ==========
+
+/** 大模块（支持 single/grid 布局） */
+export const LARGE_MODULES = [
+  'energyPrices',
+  'abnormalTransportation',
+  'capacityPool',
+  'urgentCustomer',
+  'majorEvents',
+  'cargoTrend',
+  'signingInformation',
+  'reorderProgress',
+]
+
+/** 小卡片模块（仅 scroll 页面内展示） */
+export const SMALL_MODULES = [
+  'cargoVolume',
+  'onTime',
+  'endToEnd',
+  'energyPricesCard',
+  'unitPrice',
+  'dryPrice',
+]
+
+/** 特殊模块（页面容器/独占整页） */
+export const SPECIAL_MODULES = [
+  'cargoBanner',
+  'mapPage',
+]
+
+/** 判断模块是否为大模块（支持 single/grid） */
+export function isLargeModule(module: string): boolean {
+  return LARGE_MODULES.includes(module)
+}
+
+/** 判断模块是否为小卡片 */
+export function isSmallModule(module: string): boolean {
+  return SMALL_MODULES.includes(module)
+}
+
+/** 获取指定页面内的所有模块名 */
+export function getPageModuleNames(pageName: string): string[] {
+  const page = getPageByName(pageName)
+  if (!page) return []
+  return page.components.map(c => c.name)
+}
+
+/** 获取指定页面内的所有模块元信息（含 title） */
+export function getPageModuleMetaList(pageName: string): { name: string; title: string }[] {
+  const names = getPageModuleNames(pageName)
+  const titleMap = getModuleTitleMap()
+  return names.map(name => ({ name, title: titleMap[name] || name }))
+}
+
+/** 查找模块所在页面（返回页面 name，找不到返回 null） */
+export function findModulePage(module: string): string | null {
+  for (const page of pageRegistry) {
+    if (page.components.some(c => c.name === module)) {
+      return page.name
+    }
+  }
+  return null
+}

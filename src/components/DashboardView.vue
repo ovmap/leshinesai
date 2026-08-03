@@ -76,7 +76,7 @@ import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import ModulesRender from './dashboard/ModulesRender.vue'
 import QuickBar from './dashboard/QuickBar.vue'
 import type { ModuleConfig } from './dashboard/ModulesRender.vue'
-import { getModuleTitleMap, pageRegistry, getPageByName } from './dashboard/moduleRegistry'
+import { getModuleTitleMap, pageRegistry, getPageByName, LARGE_MODULES } from './dashboard/moduleRegistry'
 import type { PageMeta } from './dashboard/moduleRegistry'
 import { useDashboardControlStore } from '../stores/dashboardControlStore'
 import { useDashboardDataStore } from '../stores/dashboardDataStore'
@@ -103,13 +103,6 @@ const defaultModules: ModuleConfig[] = [
 const currentPageData = computed<PageMeta | undefined>(() => {
   return getPageByName(controlStore.currentPage)
 })
-
-// 大模块（支持 single/grid/cards 布局）
-const LARGE_MODULES = [
-  'energyPrices', 'abnormalTransportation', 'capacityPool',
-  'urgentCustomer', 'majorEvents', 'cargoTrend',
-  'signingInformation', 'reorderProgress',
-]
 
 // 根据控制 Store 的 activeModules 和 layout 计算显示模块（非 scroll 模式）
 const displayModules = computed<ModuleConfig[]>(() => {
@@ -218,10 +211,10 @@ onMounted(() => {
     handleCommand(command)
   })
 
-  // dashboard:request-data — 数据请求响应
+  // dashboard:request-data — 数据请求响应（使用布局感知的 getSmartData）
   window.ipcRenderer?.on('dashboard:request-data', (_event: any, params: any) => {
     const { requestId, module, format, scope } = params
-    const data = dataStore.getFormattedData(module, format || 'markdown', scope || 'summary')
+    const data = dataStore.getSmartData(module, format || 'markdown', scope || 'summary')
     // 直接发送给主进程（主进程 ipcMain.once 直接捕获，无需通过主窗口转发）
     window.ipcRenderer?.send(`dashboard:data-response-${requestId}`, data)
   })

@@ -5,6 +5,9 @@ import 'swiper/css'
 import 'swiper/css/pagination'
 import { Pagination, Autoplay } from 'swiper/modules'
 import { queryEnergyPrice } from '../../../services/transportApi'
+import { useDashboardDataStore } from '../../../stores/dashboardDataStore'
+
+const dataStore = useDashboardDataStore()
 
 interface EnergyPriceData {
   id: number
@@ -57,6 +60,7 @@ const fetchEnergyPrice = async () => {
     const result = await queryEnergyPrice({ startDate, endDate, international: false })
     console.log('[EnergyPrices] API result:', result)
     if (result?.code === 200 && result.data) {
+      dataStore.updateModuleData('energyPricesCard', result.data)
       const data = result.data
       energyPriceData.value = [
         {

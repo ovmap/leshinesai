@@ -8,6 +8,9 @@ import {
   exportUrgentOrdersItem,
   queryFromWarehouse,
 } from '../../../services/transportApi'
+import { useDashboardDataStore } from '../../../stores/dashboardDataStore'
+
+const dataStore = useDashboardDataStore()
 
 const props = defineProps<{
   fromWarehouse?: string[]
@@ -430,6 +433,17 @@ const loadData = async () => {
       } else if (result.data.records && Array.isArray(result.data.records)) {
         tableData.value = result.data.records
       }
+      // 同步到数据 Store
+      dataStore.updateModuleData('urgentCustomer', {
+        list: tableData.value,
+        total: tableData.value.length,
+        rawData: result.data,
+        filters: {
+          fromWarehouse: props.fromWarehouse || [],
+          toProvince: props.toProvince || [],
+          toRdc: props.toRdc || [],
+        },
+      })
     }
   } catch (error) {
     console.error('获取加急客户风险数据失败:', error)
