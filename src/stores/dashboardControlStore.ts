@@ -51,8 +51,8 @@ export const useDashboardControlStore = defineStore('dashboardControl', () => {
         ...filters,
       }
     } else {
-      // 全局筛选，应用到所有已注册模块
-      Object.keys(moduleFilters.value).forEach(mod => {
+      // 全局筛选，应用到所有活跃模块（确保每个模块都有条目）
+      activeModules.value.forEach(mod => {
         moduleFilters.value[mod] = {
           ...moduleFilters.value[mod],
           ...filters,

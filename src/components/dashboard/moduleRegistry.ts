@@ -34,6 +34,21 @@ export interface PageMeta {
 }
 
 /**
+ * 模块动作定义
+ */
+export interface ModuleAction {
+  name: string           // 动作名称
+  description: string    // 动作描述
+  params?: {             // 参数定义
+    [key: string]: {
+      type: string       // 参数类型
+      description: string // 参数描述
+      required?: boolean  // 是否必填
+    }
+  }
+}
+
+/**
  * 模块元数据接口
  * 参考 refer 项目的 pageModules 数据结构
  */
@@ -44,6 +59,7 @@ export interface ModuleMeta {
   component: Component  // 异步组件
   defaultSpan?: number  // 默认网格跨度（1-24），scroll 模式下忽略
   order: number         // 排序序号
+  actions?: ModuleAction[] // 模块支持的指令列表
 }
 
 /**
@@ -231,6 +247,48 @@ export const moduleRegistry: ModuleMeta[] = [
     component: defineAsyncComponent(() => import('./modules/SigningInformation.vue')),
     defaultSpan: 12,
     order: 9,
+    actions: [
+      {
+        name: 'openDetail',
+        description: '打开未签收明细弹窗',
+      },
+      {
+        name: 'closeDetail',
+        description: '关闭弹窗',
+      },
+      {
+        name: 'setFilters',
+        description: '设置筛选条件（所有参数可选，只传需要设置的字段）',
+        params: {
+          fromWarehouse: { type: 'string', description: '始发仓' },
+          toProvince: { type: 'string', description: '目的省' },
+          toRdc: { type: 'string', description: '目的RDC' },
+          modeType: { type: 'string', description: '配送模式（区配/直送）' },
+        },
+      },
+      {
+        name: 'setPage',
+        description: '设置表格页码',
+        params: {
+          page: { type: 'number', description: '页码', required: true },
+        },
+      },
+      {
+        name: 'setPageSize',
+        description: '设置每页显示条数',
+        params: {
+          size: { type: 'number', description: '每页条数', required: true },
+        },
+      },
+      {
+        name: 'resetFilters',
+        description: '重置所有筛选条件',
+      },
+      {
+        name: 'export',
+        description: '导出数据',
+      },
+    ],
   },
   {
     name: 'reorderProgress',

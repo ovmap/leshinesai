@@ -11,11 +11,14 @@ const dataStore = useDashboardDataStore()
 
 // 接收模块专属筛选（来自 ModulesRender 传递的控制 Store 筛选）
 const props = defineProps<{
-  fromWarehouse?: string
-  toProvince?: string
-  toRdc?: string
+  fromWarehouse?: string[]
+  toProvince?: string[]
+  toRdc?: string[]
   modeType?: string
 }>()
+
+// 判断是否是 single 布局
+const isSingleLayout = computed(() => controlStore.currentLayout === 'single')
 
 // 图表相关
 const chartRef = ref<HTMLDivElement | null>(null)
@@ -44,6 +47,11 @@ const modalSelectedWarehouse = ref<string>('')
 const modalSelectedProvince = ref<string>('')
 const modalSelectedRdc = ref<string>('')
 const modalSelectedModeType = ref<string>('')
+
+// 用于跟踪全局筛选数组变化（多选检测）
+const lastWarehouseStr = ref<string>('')
+const lastProvinceStr = ref<string>('')
+const lastRdcStr = ref<string>('')
 
 // 下拉框状态
 const modalIsWarehouseOpen = ref(false)
@@ -112,11 +120,22 @@ const tableColumns = [
   { title: '体积', dataIndex: 'volume', key: 'volume', width: 60 },
 ]
 
-// 获取签收数据
+// 获取签收数据（使用全局筛选条件）
 const fetchSigningData = async () => {
   try {
     loading.value = true
-    const result = await querySign({})
+    // 构建筛选参数（props 已经是数组）
+    const filterParams: Record<string, string[]> = {}
+    if (props.fromWarehouse && Array.isArray(props.fromWarehouse) && props.fromWarehouse.length > 0) {
+      filterParams.fromWarehouse = props.fromWarehouse
+    }
+    if (props.toProvince && Array.isArray(props.toProvince) && props.toProvince.length > 0) {
+      filterParams.toProvince = props.toProvince
+    }
+    if (props.toRdc && Array.isArray(props.toRdc) && props.toRdc.length > 0) {
+      filterParams.toRdc = props.toRdc
+    }
+    const result = await querySign(filterParams)
     if (result?.data) {
       signingData.value[0].value = result.data.hasSigned || 0
       signingData.value[1].value = result.data.notSigned || 0
@@ -217,9 +236,10 @@ const donutOptions = computed(() => ({
 const handleChartClick = (params: any) => {
   if (params?.name === '今日待签收') {
     modalVisible.value = true
-    modalSelectedWarehouse.value = ''
-    modalSelectedProvince.value = ''
-    modalSelectedRdc.value = ''
+    // 继承全局筛选值（参考 refer 逻辑）
+    modalSelectedWarehouse.value = props.fromWarehouse?.[0] || ''
+    modalSelectedProvince.value = props.toProvince?.[0] || ''
+    modalSelectedRdc.value = props.toRdc?.[0] || ''
     modalSelectedModeType.value = ''
     fetchModalData()
   }
@@ -344,9 +364,21 @@ const closeAllDropdowns = () => {
 onMounted(async () => {
   // 加载筛选选项
   await loadFilterOptions()
-  
+
+  // single 布局下，继承全局筛选值
+  if (isSingleLayout.value) {
+    modalSelectedWarehouse.value = props.fromWarehouse?.[0] || ''
+    modalSelectedProvince.value = props.toProvince?.[0] || ''
+    modalSelectedRdc.value = props.toRdc?.[0] || ''
+  }
+
   // 先获取数据
   await fetchSigningData()
+
+  // single 布局下自动请求表格数据
+  if (isSingleLayout.value) {
+    await fetchModalData()
+  }
   
   await nextTick()
   if (chartRef.value) {
@@ -367,23 +399,8 @@ watch(
   signingData,
   (newData) => {
     if (myChart) {
-      myChart.setOption(
-        {
-          series: [
-            {
-              data: newData
-                .map((item) => ({
-                  value: item.value,
-                  itemStyle: { color: item.color },
-                  name: item.name,
-                  labelLine: { lineStyle: { color: item.color } },
-                }))
-                .filter((item) => item.value > 0),
-            },
-          ],
-        },
-        true
-      )
+      // 使用完整的 donutOptions 更新，确保 series type 正确
+      myChart.setOption(donutOptions.value, true)
     }
   },
   { deep: true }
@@ -394,28 +411,59 @@ watch(
   () => props,
   (newProps) => {
     let changed = false
-    if (newProps.fromWarehouse !== undefined && newProps.fromWarehouse !== modalSelectedWarehouse.value) {
-      modalSelectedWarehouse.value = newProps.fromWarehouse || ''
+    // 比较数组内容（多选时需要比较整个数组）
+    const newWarehouseArr = newProps.fromWarehouse || []
+    const newProvinceArr = newProps.toProvince || []
+    const newRdcArr = newProps.toRdc || []
+
+    // 将数组转为字符串比较（简单方式）
+    const newWarehouseStr = newWarehouseArr.join(',')
+    const newProvinceStr = newProvinceArr.join(',')
+    const newRdcStr = newRdcArr.join(',')
+
+    // 弹窗内的筛选值（单选）
+    const currentWarehouseStr = modalSelectedWarehouse.value
+    const currentProvinceStr = modalSelectedProvince.value
+    const currentRdcStr = modalSelectedRdc.value
+
+    // 如果全局筛选变化，更新弹窗内的筛选值（取第一个）
+    if (newWarehouseArr[0] !== modalSelectedWarehouse.value) {
+      modalSelectedWarehouse.value = newWarehouseArr[0] || ''
       changed = true
     }
-    if (newProps.toProvince !== undefined && newProps.toProvince !== modalSelectedProvince.value) {
-      modalSelectedProvince.value = newProps.toProvince || ''
+    if (newProvinceArr[0] !== modalSelectedProvince.value) {
+      modalSelectedProvince.value = newProvinceArr[0] || ''
       changed = true
     }
-    if (newProps.toRdc !== undefined && newProps.toRdc !== modalSelectedRdc.value) {
-      modalSelectedRdc.value = newProps.toRdc || ''
+    if (newRdcArr[0] !== modalSelectedRdc.value) {
+      modalSelectedRdc.value = newRdcArr[0] || ''
       changed = true
     }
     if (newProps.modeType !== undefined && newProps.modeType !== modalSelectedModeType.value) {
       modalSelectedModeType.value = newProps.modeType || ''
       changed = true
     }
+
+    // 如果全局筛选数组本身变化了（多选），也要刷新
+    // 通过比较字符串判断数组是否变化
+    if (
+      newWarehouseStr !== (lastWarehouseStr.value || '') ||
+      newProvinceStr !== (lastProvinceStr.value || '') ||
+      newRdcStr !== (lastRdcStr.value || '')
+    ) {
+      changed = true
+      lastWarehouseStr.value = newWarehouseStr
+      lastProvinceStr.value = newProvinceStr
+      lastRdcStr.value = newRdcStr
+    }
+
     if (changed) {
-      // 筛选变化时，如果有弹窗打开则重新获取数据
+      // 全局筛选变化时，刷新环形图数据
+      fetchSigningData()
+      // 如果弹窗打开，也刷新弹窗表格数据
       if (modalVisible.value) {
         fetchModalData(1)
       }
-      syncToDataStore()
     }
   },
   { deep: true }
@@ -441,6 +489,38 @@ watch(
         case 'resetFilters':
           handleReset()
           break
+        // 专属指令：设置筛选条件
+        case 'setFilters':
+          if (action.params?.fromWarehouse !== undefined) {
+            modalSelectedWarehouse.value = action.params.fromWarehouse
+          }
+          if (action.params?.toProvince !== undefined) {
+            modalSelectedProvince.value = action.params.toProvince
+          }
+          if (action.params?.toRdc !== undefined) {
+            modalSelectedRdc.value = action.params.toRdc
+          }
+          if (action.params?.modeType !== undefined) {
+            modalSelectedModeType.value = action.params.modeType
+          }
+          currentPage.value = 1
+          fetchModalData(1)
+          break
+        // 专属指令：设置页码
+        case 'setPage':
+          if (action.params?.page !== undefined) {
+            currentPage.value = action.params.page
+            fetchModalData(action.params.page)
+          }
+          break
+        // 专属指令：设置每页条数
+        case 'setPageSize':
+          if (action.params?.size !== undefined) {
+            pageSize.value = action.params.size
+            currentPage.value = 1
+            fetchModalData(1)
+          }
+          break
       }
       // 消费操作
       controlStore.consumeAction(action.id)
@@ -456,6 +536,13 @@ watch(modalVisible, () => {
     currentPage: currentPage.value,
     pageSize: pageSize.value,
   })
+})
+
+// 监听布局变化，切换到 single 时自动请求表格数据
+watch(isSingleLayout, (isSingle) => {
+  if (isSingle && modalData.value.length === 0) {
+    fetchModalData()
+  }
 })
 
 // 窗口大小变化
@@ -478,65 +565,57 @@ onUnmounted(() => {
       <h2 class="header-title">签收信息</h2>
     </div>
     <div class="signing-information">
-    <!-- 环形图 -->
-    <div class="chart-wrapper">
-      <div ref="chartRef" class="chart-container"></div>
-    </div>
-
-    <!-- 未签收明细弹窗 -->
-    <Teleport to="body">
-      <div v-if="modalVisible" class="modal-overlay" @click.self="handleModalClose">
-        <div class="modal-container">
-          <!-- 弹窗头部 -->
-          <div class="modal-header">
-            <h3 class="modal-title">未签收明细</h3>
-            <button class="close-btn" @click="handleModalClose">×</button>
+      <!-- single 布局：左右分栏 -->
+      <template v-if="isSingleLayout">
+        <div class="single-layout">
+          <!-- 左侧：环形图 -->
+          <div class="single-chart">
+            <div ref="chartRef" class="chart-container"></div>
           </div>
-
-          <!-- 筛选区域 -->
-          <div class="modal-filters">
-            <div class="filter-group">
-              <select v-model="modalSelectedWarehouse" class="filter-select filter-select-sm">
-                <option value="">始发仓</option>
-                <option v-for="opt in warehouseOptions" :key="opt.code" :value="opt.code">{{ opt.name }}</option>
-              </select>
-              <select v-model="modalSelectedProvince" class="filter-select">
-                <option value="">目的省</option>
-                <option v-for="opt in provinceOptions" :key="opt.code" :value="opt.code">{{ opt.name }}</option>
-              </select>
-              <select v-model="modalSelectedRdc" class="filter-select filter-select-sm">
-                <option value="">目的RDC</option>
-                <option v-for="opt in rdcOptions" :key="opt.code" :value="opt.code">{{ opt.name }}</option>
-              </select>
-              <select v-model="modalSelectedModeType" class="filter-select">
-                <option value="">配送模式</option>
-                <option v-for="opt in modeTypeOptions" :key="opt.code" :value="opt.code">{{ opt.name }}</option>
-              </select>
+          <!-- 右侧：表格（原弹窗内容） -->
+          <div class="single-table">
+            <!-- 筛选区域 -->
+            <div class="inline-filters">
+              <div class="filter-group">
+                <select v-model="modalSelectedWarehouse" class="filter-select filter-select-sm">
+                  <option value="">始发仓</option>
+                  <option v-for="opt in warehouseOptions" :key="opt.code" :value="opt.code">{{ opt.name }}</option>
+                </select>
+                <select v-model="modalSelectedProvince" class="filter-select">
+                  <option value="">目的省</option>
+                  <option v-for="opt in provinceOptions" :key="opt.code" :value="opt.code">{{ opt.name }}</option>
+                </select>
+                <select v-model="modalSelectedRdc" class="filter-select filter-select-sm">
+                  <option value="">目的RDC</option>
+                  <option v-for="opt in rdcOptions" :key="opt.code" :value="opt.code">{{ opt.name }}</option>
+                </select>
+                <select v-model="modalSelectedModeType" class="filter-select">
+                  <option value="">配送模式</option>
+                  <option v-for="opt in modeTypeOptions" :key="opt.code" :value="opt.code">{{ opt.name }}</option>
+                </select>
+              </div>
+              <div class="filter-buttons">
+                <a-button size="small" @click="handleSearch">搜索</a-button>
+                <a-button size="small" @click="handleReset">重置</a-button>
+                <a-button size="small" type="primary" :loading="exportLoading" @click="handleExport">导出</a-button>
+              </div>
             </div>
-            <div class="filter-buttons">
-              <a-button size="small" @click="handleSearch">搜索</a-button>
-              <a-button size="small" @click="handleReset">重置</a-button>
-              <a-button size="small" type="primary" :loading="exportLoading" @click="handleExport">导出</a-button>
-            </div>
-          </div>
-
-          <!-- 表格区域 -->
-          <div class="modal-table-wrapper">
-            <div class="modal-table">
+            <!-- 表格 -->
+            <div class="table-wrapper">
               <a-spin :spinning="modalLoading">
                 <a-table
                   :columns="tableColumns"
                   :data-source="modalData"
                   :pagination="false"
                   size="small"
-                  :scroll="{ x: 'max-content', y: 500 }"
+                  :scroll="{ x: 'max-content', y: 'calc(100% - 60px)' }"
                   @change="handleTableChange"
                   class="custom-table"
                 >
                 </a-table>
               </a-spin>
             </div>
-            <div class="modal-pagination">
+            <div class="pagination">
               <a-pagination
                 :current="currentPage"
                 :page-size="pageSize"
@@ -552,8 +631,87 @@ onUnmounted(() => {
             </div>
           </div>
         </div>
-      </div>
-    </Teleport>
+      </template>
+
+      <!-- 其他布局：环形图 + 弹窗 -->
+      <template v-else>
+        <!-- 环形图 -->
+        <div class="chart-wrapper">
+          <div ref="chartRef" class="chart-container"></div>
+        </div>
+
+        <!-- 未签收明细弹窗 -->
+        <Teleport to="body">
+          <div v-if="modalVisible" class="modal-overlay" @click.self="handleModalClose">
+            <div class="modal-container">
+              <!-- 弹窗头部 -->
+              <div class="modal-header">
+                <h3 class="modal-title">未签收明细</h3>
+                <button class="close-btn" @click="handleModalClose">×</button>
+              </div>
+
+              <!-- 筛选区域 -->
+              <div class="modal-filters">
+                <div class="filter-group">
+                  <select v-model="modalSelectedWarehouse" class="filter-select filter-select-sm">
+                    <option value="">始发仓</option>
+                    <option v-for="opt in warehouseOptions" :key="opt.code" :value="opt.code">{{ opt.name }}</option>
+                  </select>
+                  <select v-model="modalSelectedProvince" class="filter-select">
+                    <option value="">目的省</option>
+                    <option v-for="opt in provinceOptions" :key="opt.code" :value="opt.code">{{ opt.name }}</option>
+                  </select>
+                  <select v-model="modalSelectedRdc" class="filter-select filter-select-sm">
+                    <option value="">目的RDC</option>
+                    <option v-for="opt in rdcOptions" :key="opt.code" :value="opt.code">{{ opt.name }}</option>
+                  </select>
+                  <select v-model="modalSelectedModeType" class="filter-select">
+                    <option value="">配送模式</option>
+                    <option v-for="opt in modeTypeOptions" :key="opt.code" :value="opt.code">{{ opt.name }}</option>
+                  </select>
+                </div>
+                <div class="filter-buttons">
+                  <a-button size="small" @click="handleSearch">搜索</a-button>
+                  <a-button size="small" @click="handleReset">重置</a-button>
+                  <a-button size="small" type="primary" :loading="exportLoading" @click="handleExport">导出</a-button>
+                </div>
+              </div>
+
+              <!-- 表格区域 -->
+              <div class="modal-table-wrapper">
+                <div class="modal-table">
+                  <a-spin :spinning="modalLoading">
+                    <a-table
+                      :columns="tableColumns"
+                      :data-source="modalData"
+                      :pagination="false"
+                      size="small"
+                      :scroll="{ x: 'max-content', y: 500 }"
+                      @change="handleTableChange"
+                      class="custom-table"
+                    >
+                    </a-table>
+                  </a-spin>
+                </div>
+                <div class="modal-pagination">
+                  <a-pagination
+                    :current="currentPage"
+                    :page-size="pageSize"
+                    :total="total"
+                    show-size-changer
+                    show-quick-jumper
+                    :show-total="(total: number) => `共 ${total} 条`"
+                    :page-size-options="['10', '20', '50', '100']"
+                    @change="handlePageChange"
+                    @showSizeChange="handlePageSizeChange"
+                    size="small"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </Teleport>
+      </template>
     </div>
   </div>
 </template>
@@ -916,5 +1074,61 @@ onUnmounted(() => {
 
 :deep(.ant-spin-container) {
   min-height: 200px !important;
+}
+
+/* single 布局样式 */
+.single-layout {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.single-chart {
+  flex: 0 0 35%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.single-table {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(74, 158, 255, 0.3);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.inline-filters {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: linear-gradient(180deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.9) 100%);
+  border-bottom: 1px solid rgba(74, 158, 255, 0.15);
+  flex-shrink: 0;
+}
+
+.table-wrapper {
+  flex: 1;
+  overflow: auto;
+  min-height: 0;
+  padding: 0 16px;
+}
+
+.pagination {
+  padding: 12px 16px;
+  display: flex;
+  justify-content: center;
+  flex-shrink: 0;
+  border-top: 1px solid rgba(74, 158, 255, 0.15);
+}
+
+.pagination :deep(.ant-pagination) {
+  margin: 0 !important;
 }
 </style>

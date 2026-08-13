@@ -426,6 +426,7 @@ const loadData = async () => {
     const result = await queryUrgentOrdersByPage(params)
 
     if (result && result.code === 200 && result.data) {
+      console.log('[UrgentCustomer] API result:', { total: result.total, dataLength: Array.isArray(result.data) ? result.data.length : 'not array', dataKeys: Object.keys(result.data) })
       if (Array.isArray(result.data)) {
         tableData.value = result.data
       } else if (result.data.list && Array.isArray(result.data.list)) {
@@ -433,10 +434,11 @@ const loadData = async () => {
       } else if (result.data.records && Array.isArray(result.data.records)) {
         tableData.value = result.data.records
       }
+      console.log('[UrgentCustomer] tableData.length:', tableData.value.length, 'result.total:', result.total)
       // 同步到数据 Store
       dataStore.updateModuleData('urgentCustomer', {
         list: tableData.value,
-        total: tableData.value.length,
+        total: result.total || tableData.value.length,
         rawData: result.data,
         filters: {
           fromWarehouse: props.fromWarehouse || [],
@@ -444,6 +446,7 @@ const loadData = async () => {
           toRdc: props.toRdc || [],
         },
       })
+      console.log('[UrgentCustomer] Store updated, total:', result.total || tableData.value.length)
     }
   } catch (error) {
     console.error('获取加急客户风险数据失败:', error)

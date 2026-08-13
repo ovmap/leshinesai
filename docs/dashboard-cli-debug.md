@@ -64,9 +64,11 @@ await window.ipcRenderer.invoke('dashboard:control', {
 
 // 重置筛选
 await window.ipcRenderer.invoke('dashboard:control', {
-  command: 'action',
+  co
+  mmand: 'action',
   args: { module: 'signingInformation', action: 'resetFilters' }
 })
+
 
 // 刷新数据
 await window.ipcRenderer.invoke('dashboard:control', {

@@ -6,6 +6,10 @@
     <!-- 头部 -->
     <div class="dashboard-header">
       <div class="header-bg-decoration"></div>
+      <!-- 全局筛选栏 -->
+      <div class="header-filter-container">
+        <GlobalFilterBar />
+      </div>
       <h1 class="dashboard-title">联晟智达鲲鹏运输智能体</h1>
       <div class="dashboard-actions">
         <button @click="refresh" class="action-btn" title="刷新">
@@ -75,6 +79,7 @@
 import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import ModulesRender from './dashboard/ModulesRender.vue'
 import QuickBar from './dashboard/QuickBar.vue'
+import GlobalFilterBar from './dashboard/GlobalFilterBar.vue'
 import type { ModuleConfig } from './dashboard/ModulesRender.vue'
 import { getModuleTitleMap, pageRegistry, getPageByName, LARGE_MODULES } from './dashboard/moduleRegistry'
 import type { PageMeta } from './dashboard/moduleRegistry'
@@ -323,11 +328,11 @@ onUnmounted(() => {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  padding: 12px 24px;
+  padding: 4px 24px 12px;
   background: url('/dashboard/header-bg.png') center/cover no-repeat;
   -webkit-app-region: drag;
   flex-shrink: 0;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .header-bg-decoration {
@@ -351,6 +356,14 @@ onUnmounted(() => {
   margin: 0;
   text-shadow: 0 0 12px rgba(96, 165, 250, 0.4);
   letter-spacing: 2px;
+}
+
+.header-filter-container {
+  position: absolute;
+  left: 24px;
+  z-index: 100;
+  -webkit-app-region: no-drag;
+  overflow: visible;
 }
 
 .dashboard-actions {

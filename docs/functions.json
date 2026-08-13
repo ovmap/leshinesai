@@ -523,7 +523,7 @@
   {
     "type": "function",
     "name": "dashboard_command",
-    "description": "控制运输智能体看板的 CLI 命令工具。通过不同命令控制看板显示、筛选数据、获取数据等。看板是一个独立窗口，AI 可以通过此工具完全控制它。data 命令具有布局感知能力：scroll 布局下不指定 module 返回页面概览，指定 module 返回详细数据（大模块会提示是否聚焦）；grid/single 布局下直接返回当前模块的详细数据。如果请求的模块不在当前视图，会提示切换页面或布局。",
+    "description": "控制运输智能体看板的 CLI 命令工具。通过不同命令控制看板显示、筛选数据、获取数据等。看板是一个独立窗口，AI 可以通过此工具完全控制它。data 命令具有布局感知能力：scroll 布局下不指定 module 返回页面概览，指定 module 返回详细数据（大模块会提示是否聚焦）；single 布局下直接返回当前模块的详细数据。如果请求的模块不在当前视图，会提示切换页面或布局。",
     "strict": false,
     "parameters": {
       "type": "object",
@@ -573,16 +573,46 @@
             "scope": {
               "type": "string",
               "enum": ["summary", "detail", "full"],
-              "description": "数据范围 (data 命令)。summary=摘要, detail=明细, full=完整。默认 summary。注意：grid/single 布局下 summary 会自动提升到 detail，因为已经在聚焦状态。"
+              "description": "数据范围 (data 命令)。summary=摘要, detail=明细, full=完整。默认 summary。注意：single 布局下 summary 会自动提升到 detail，因为已经在聚焦状态。"
             },
             "action": {
               "type": "string",
-              "description": "操作名称 (action 命令)。如 openDetail, export, refresh"
+              "description": "操作名称 (action 命令)。使用 'list' 或 'help' 可查询模块的可用指令列表。常见操作：openDetail(打开弹窗), closeDetail(关闭弹窗), setFilters(设置筛选), setPage(翻页), setPageSize(设置每页条数), resetFilters(重置筛选), export(导出)"
+            },
+            "params": {
+              "type": "object",
+              "description": "操作参数 (action 命令)。不同操作需要不同参数，使用 action='list' 查询具体模块的可用指令和参数要求",
+              "properties": {
+                "page": {
+                  "type": "integer",
+                  "description": "页码 (setPage 操作)"
+                },
+                "size": {
+                  "type": "integer",
+                  "description": "每页条数 (setPageSize 操作)"
+                },
+                "fromWarehouse": {
+                  "type": "string",
+                  "description": "始发仓 (setFilters 操作)"
+                },
+                "toProvince": {
+                  "type": "string",
+                  "description": "目的省 (setFilters 操作)"
+                },
+                "toRdc": {
+                  "type": "string",
+                  "description": "目的RDC (setFilters 操作)"
+                },
+                "modeType": {
+                  "type": "string",
+                  "description": "配送模式：区配/直送 (setFilters 操作)"
+                }
+              }
             },
             "layout": {
               "type": "string",
-              "enum": ["scroll", "single", "grid"],
-              "description": "布局模式 (show/layout 命令)。scroll=智能体布局（默认）, single=单模块全屏, grid=网格并排(最多3个大模块)"
+              "enum": ["scroll", "single"],
+              "description": "布局模式 (show/layout 命令)。scroll=智能体布局（默认）, single=单模块全屏"
             }
           }
         }
