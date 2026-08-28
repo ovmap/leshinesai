@@ -577,7 +577,7 @@
             },
             "action": {
               "type": "string",
-              "description": "操作名称 (action 命令)。使用 'list' 或 'help' 可查询模块的可用指令列表。常见操作：openDetail(打开弹窗), closeDetail(关闭弹窗), setFilters(设置筛选), setPage(翻页), setPageSize(设置每页条数), resetFilters(重置筛选), export(导出)"
+              "description": "操作名称 (action 命令)。**使用流程：先传 'list' 查询目标模块的可用指令列表及参数要求，再根据返回结果执行具体操作。** 不同模块的指令不同，必须先查询再执行。"
             },
             "params": {
               "type": "object",

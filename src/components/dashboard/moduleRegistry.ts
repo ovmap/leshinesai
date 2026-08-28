@@ -69,7 +69,7 @@ export interface ModuleMeta {
 export const pageRegistry: PageMeta[] = [
   {
     name: 'cargoBanner',
-    title: '运输智能体',
+    title: '智能体中心',
     icon: 'alert',
     gridConfig: { gridCols: 48, gridRows: 27, gridGap: 12 },
     components: [
@@ -119,11 +119,24 @@ export const pageRegistry: PageMeta[] = [
 export const moduleRegistry: ModuleMeta[] = [
   {
     name: 'cargoBanner',
-    title: '运输智能体',
+    title: '智能体中心',
     icon: 'alert',
     component: defineAsyncComponent(() => import('./modules/CargoBanner.vue')),
     defaultSpan: 24,
     order: 0,
+    actions: [
+      {
+        name: 'openCardDetail',
+        description: '放大查看指定卡片的详情弹窗（该模块不支持 single 全屏，只能通过此指令放大卡片）',
+        params: {
+          cardIndex: { type: 'number', description: '卡片索引（0=CDD达成率预警, 1=ISG电子标签预警, 2=超七天异常预警, 3=车辆安全监控）', required: true },
+        },
+      },
+      {
+        name: 'closeCardDetail',
+        description: '关闭卡片详情弹窗',
+      },
+    ],
   },
   {
     name: 'mapPage',

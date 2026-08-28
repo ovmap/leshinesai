@@ -565,6 +565,11 @@ const fetchRiskOrderStats = async () => {
         content: Array.isArray(finalRiskContent) ? finalRiskContent : []
       }
     ]
+
+    // 推送数据到 Store，供智能体使用
+    dataStore.updateModuleData('cargoBanner', {
+      cards: dataCards.value
+    })
   } catch (error) {
     console.error('fetchRiskOrderStats error:', error)
     // 即使整体失败，也确保卡片数组存在，避免页面崩溃，4个卡片
@@ -854,6 +859,35 @@ const handleCardDetailModalClose = () => {
   selectedCardIndex.value = -1
   selectedCardData.value = null
 }
+
+// 监听控制 Store 的操作队列（支持智能体指令打开/关闭卡片详情）
+watch(
+  () => controlStore.pendingActions,
+  (actions) => {
+    actions.forEach(action => {
+      if (action.module !== 'cargoBanner') return
+      switch (action.action) {
+        case 'openCardDetail': {
+          const idx = action.params?.cardIndex
+          if (typeof idx === 'number' && idx >= 0 && idx < dataCards.value.length) {
+            const card = dataCards.value[idx]
+            // 无数据的卡片不打开弹窗
+            const hasData = Array.isArray(card?.content) && card.content.length > 0
+            if (hasData) {
+              handleCardExpand(idx)
+            }
+          }
+          break
+        }
+        case 'closeCardDetail':
+          handleCardDetailModalClose()
+          break
+      }
+      controlStore.consumeAction(action.id)
+    })
+  },
+  { deep: true }
+)
 
 // 关闭CDD搜索下拉框
 const closeCddSearchDropdowns = () => {

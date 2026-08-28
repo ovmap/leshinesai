@@ -12,15 +12,17 @@ export function formatUrgentCustomer(data: any, scope: string): string {
     return md
   }
 
-  // 汇总
-  const urgentCount = list.filter((item: any) => item.hasRisk).length
-  const riskCount = list.filter((item: any) => item.riskType).length
+  // 过滤掉无风险订单（"在途无风险"、"异常无风险"）
+  const NO_RISK_TYPES = ['在途无风险', '异常无风险']
+  const isRisky = (item: any) => !NO_RISK_TYPES.includes(item.riskType)
+  const riskyList = list.filter(isRisky)
 
-  const totalCount = data?.total || list.length
-  console.log('[formatter:urgentCustomer] list.length:', list.length, 'data.total:', data?.total, 'totalCount:', totalCount)
-  md += `- **总订单数**: ${totalCount} 条\n`
-  md += `- **加急订单**: ${urgentCount} 条\n`
-  md += `- **有风险订单**: ${riskCount} 条\n`
+  // 汇总
+  const riskCount = riskyList.length
+
+  const noRiskCount = list.length - riskyList.length
+  console.log('[formatter:urgentCustomer] list.length:', list.length, 'riskyCount:', riskCount, 'noRiskCount:', noRiskCount)
+  md += `- **有风险订单**: ${riskCount} 条  \n- **无风险订单**: ${noRiskCount} 条`
 
   // summary 只输出汇总
   if (scope === 'summary') {
@@ -32,12 +34,14 @@ export function formatUrgentCustomer(data: any, scope: string): string {
     '1': '公路', '2': '航空', '3': '铁路', '4': '快递',
   }
 
-  // detail/full 输出明细
-  md += `\n### 订单明细\n\n`
+  // detail/full 输出明细：有风险的排前面，无风险的排后面
+  const sortedList = [...riskyList, ...list.filter((item: any) => !isRisky(item))]
+
+  md += `\n### 订单明细（有风险 ${riskCount} 条）\n\n`
   md += `| 发货单号 | 运输方式 | 在途位置 | 目的省市 | 预计到达 | 风险类型 |\n`
   md += `|----------|----------|----------|----------|----------|----------|\n`
 
-  const items = scope === 'full' ? list : list.slice(0, 20)
+  const items = scope === 'full' ? sortedList : sortedList.slice(0, 20)
   items.forEach((item: any) => {
     const invoiceNo = item.invoiceNo || '-'
     const transType = transTypeMap[String(item.transType)] || item.transType || '-'

@@ -255,8 +255,12 @@ export const useDashboardDataStore = defineStore('dashboardData', () => {
       }
       case 'mapPage':
         return `${title}: 地图页面`
-      case 'cargoBanner':
-        return `${title}: 智能体`
+      case 'cargoBanner': {
+        const cards = data.cards || []
+        if (cards.length === 0) return `${title}: 暂无数据`
+        const summary = cards.map((c: any, i: number) => `${i}:${c.title || '未知'}(${c.content?.length || 0}条)`).join(', ')
+        return `${title}: [${summary}]`
+      }
       default:
         return `${title}: 已加载`
     }

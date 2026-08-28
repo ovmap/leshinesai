@@ -19,6 +19,7 @@ import { formatMajorEvents } from './majorEvents'
 import { formatReorderProgress } from './reorderProgress'
 import { formatCargoTrend } from './cargoTrend'
 import { formatSigningInformation } from './signingInformation'
+import { formatCargoBanner } from './cargoBanner'
 
 /**
  * 模块格式化函数注册表
@@ -40,6 +41,7 @@ export const formatters: Record<string, (data: any, scope: string) => string> = 
   reorderProgress: formatReorderProgress,
   cargoTrend: formatCargoTrend,
   signingInformation: formatSigningInformation,
+  cargoBanner: formatCargoBanner,
 }
 
 /**
