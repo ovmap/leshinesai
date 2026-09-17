@@ -317,6 +317,10 @@ import { Pagination, Autoplay } from 'swiper/modules'
 | PFP KPI-城配排名 | CityLogisticsRank.vue | 动态月份列表格+详情弹窗+双导出 | queryDeliveryKpiRank, queryDeliveryKpiRankDetail, queryDeliveryLogisticPunishInfo, exportDeliveryLogisticKpiRank, exportDeliveryLogisticKpiRankScoreDetail, exportDeliveryLogisticKpiRankPunishDetail |
 | TCL华星物流商KPI评分 | TclWarehousingScores.vue | 多层级表格+筛选+双导出 | queryHuaxingKpiSummary, exportHuaxingLogisticKpiScoreSummary, exportHuaxingLogisticKpiScoreDetail |
 | 运输仓储多业务KPI评分 | TransStorageKpiScore.vue | 表格+筛选+导出 | queryTransStorageKpiScore, exportTransStorageKpiScore, queryAssessmentUnit |
+| 运输DOA KPI评分 | TransportationDoaScores.vue | 多层级表格+筛选+双导出 | queryDoaKpiSummary, queryTransTypeList, exportDoaLogisticKpiScoreSummary, exportDoaLogisticKpiScoreDetail |
+| ToC物流商KPI评分 | TocWarehousingScores.vue | 多层级表格+筛选+双导出 | queryToCKpiSummary, exportTocLogisticKpiScoreSummary, exportTocLogisticKpiScoreDetail |
+| 运输开放业务KPI评分 | TransportationOpenScores.vue | 多层级表格+筛选+导出 | queryOpenBusinessKpiSummary, exportOpenBusinessLogisticKpiScoreSummary |
+| 运输快递KPI评分 | TransportationExpressScores.vue | 多层级表格+筛选+双导出 | queryExpressKpiSummary, exportExpressLogisticKpiScoreSummary, exportExpressLogisticKpiScoreDetail |
 
 ---
 
@@ -526,6 +530,99 @@ import { Pagination, Autoplay } from 'swiper/modules'
    - 替换 API 导入路径
    - 考核单元下拉从API获取（queryAssessmentUnit，bizType=9）
    - 业务分类下拉硬编码（仓储/运输）
+   - SCSS → 纯 CSS scoped
+   - 添加 header-bar 组件内标题
+
+---
+
+### 2026-09-17 迁移 transportationOpenScores 模块
+
+**源文件**: `refer/src/components/RenderComponent/chartRender/LS/transportationOpenScores/index.vue`
+
+**目标文件**: `src/components/dashboard/modules/TransportationOpenScores.vue`
+
+**页面位置**: `pfpKpiExpress` (PFP KPI-运输快递业务) 页面，位置 x=1, y=1, 尺寸 48x13
+
+**迁移内容**:
+1. **API 接口** (transportApi.ts):
+   - `queryOpenBusinessKpiSummary` - 查询开放业务KPI评分汇总数据
+   - `exportOpenBusinessLogisticKpiScoreSummary` - 导出开放业务物流商KPI评分汇总
+
+2. **组件功能**:
+   - 月份范围选择器（默认前2个月）
+   - 物流商多选下拉框（支持搜索）
+   - 客户多选下拉框（支持搜索）
+   - 显示详情开关（切换简略/详细表格视图）
+   - 导出汇总按钮
+   - 表格支持横向滚动，自适应高度
+
+3. **表格列**:
+   - 基础列：年月、物流商、客户
+   - 详情模式额外列：总成绩 + 4个KPI指标的详细数据（达标数量/总数量/比率/得分）
+     - 准时交货率 (kpiType: 38)
+     - 送货准确率 (kpiType: 37)
+     - 货物破损率 (kpiType: 39)
+     - 返单及时率 (kpiType: 40)
+   - 简略模式列：4个KPI指标比率（带趋势箭头和颜色标识）
+   - 详情模式额外列：得分汇总、扣分项、扣分说明、加分项、加分说明
+
+4. **KPI 类型映射** (bizType='8'):
+   - kpiType 38: 开放业务准时交货率
+   - kpiType 37: 开放业务送货准确率
+   - kpiType 39: 开放业务货物破损率
+   - kpiType 40: 开放业务返单及时率
+
+5. **适配要点**:
+   - 替换 API 导入路径
+   - 使用 selectOptionsStore 的 `getLogisticsByBizType('8')` 和 `getWarehouseByBizType('8')`
+   - SCSS → 纯 CSS scoped
+   - 添加 header-bar 组件内标题
+
+---
+
+### 2026-09-17 迁移 transportationExpressScores 模块
+
+**源文件**: `refer/src/components/RenderComponent/chartRender/LS/transportationExpressScores/index.vue`
+
+**目标文件**: `src/components/dashboard/modules/TransportationExpressScores.vue`
+
+**页面位置**: `pfpKpiExpress` (PFP KPI-运输快递业务) 页面，位置 x=1, y=14, 尺寸 48x14
+
+**迁移内容**:
+1. **API 接口** (transportApi.ts):
+   - `queryExpressKpiSummary` - 查询快递KPI评分汇总数据
+   - `exportExpressLogisticKpiScoreSummary` - 导出快递物流商KPI评分汇总
+   - `exportExpressLogisticKpiScoreDetail` - 导出快递物流商KPI评分明细
+
+2. **组件功能**:
+   - 月份范围选择器（默认前2个月）
+   - 物流商多选下拉框（支持搜索）
+   - 仓库多选下拉框（支持搜索）
+   - 显示详情开关（切换简略/详细表格视图）
+   - 导出汇总/导出明细按钮
+   - 表格支持横向滚动，自适应高度
+
+3. **表格列**:
+   - 基础列：年月、物流商、仓库
+   - 详情模式额外列：总成绩 + 5个KPI指标的详细数据（达标数量/总数量/比率/得分）
+     - 正向订单准时交货率 (kpiType: 23)
+     - 正向发货及时率 (kpiType: 24)
+     - 破损率 (kpiType: 25)
+     - 遗失率 (kpiType: 26)
+     - 客户满意度 (kpiType: 27)
+   - 简略模式列：5个KPI指标比率（带趋势箭头和颜色标识）
+   - 详情模式额外列：得分汇总、扣分项、扣分说明、加分项、加分说明
+
+4. **KPI 类型映射** (bizType='5'):
+   - kpiType 23: 快递正向订单准时交货率
+   - kpiType 24: 快递正向发货及时率
+   - kpiType 25: 快递破损率
+   - kpiType 26: 快递遗失率
+   - kpiType 27: 快递客户满意度
+
+5. **适配要点**:
+   - 替换 API 导入路径
+   - 使用 selectOptionsStore 的 `getLogisticsByBizType('5')` 和 `getWarehouseByBizType('5')`
    - SCSS → 纯 CSS scoped
    - 添加 header-bar 组件内标题
 

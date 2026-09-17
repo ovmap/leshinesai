@@ -180,14 +180,20 @@ export const pageRegistry: PageMeta[] = [
     title: 'PFP KPI-ToC',
     icon: 'icon-daili',
     gridConfig: { gridCols: 48, gridRows: 27, gridGap: 12 },
-    components: []
+    components: [
+      { name: 'transportationDoaScores', x: 1, y: 1, width: 48, height: 13, zoom: 1 },
+      { name: 'tocWarehousingScores', x: 1, y: 14, width: 48, height: 14, zoom: 1 },
+    ]
   },
   {
     name: 'pfpKpiExpress',
     title: 'PFP KPI-运输快递业务',
     icon: 'icon-lianwangzhongxin',
     gridConfig: { gridCols: 48, gridRows: 27, gridGap: 12 },
-    components: []
+    components: [
+      { name: 'transportationOpenScores', x: 1, y: 1, width: 48, height: 13, zoom: 1 },
+      { name: 'transportationExpressScores', x: 1, y: 14, width: 48, height: 14, zoom: 1 },
+    ]
   },
 ]
 
@@ -319,6 +325,38 @@ export const moduleRegistry: ModuleMeta[] = [
     component: defineAsyncComponent(() => import('./modules/TransStorageKpiScore.vue')),
     defaultSpan: 24,
     order: 27,
+  },
+  {
+    name: 'transportationDoaScores',
+    title: '运输DOA KPI评分',
+    icon: 'delivery',
+    component: defineAsyncComponent(() => import('./modules/TransportationDoaScores.vue')),
+    defaultSpan: 24,
+    order: 28,
+  },
+  {
+    name: 'tocWarehousingScores',
+    title: 'ToC物流商KPI评分',
+    icon: 'delivery',
+    component: defineAsyncComponent(() => import('./modules/TocWarehousingScores.vue')),
+    defaultSpan: 24,
+    order: 29,
+  },
+  {
+    name: 'transportationOpenScores',
+    title: '运输开放业务KPI评分',
+    icon: 'delivery',
+    component: defineAsyncComponent(() => import('./modules/TransportationOpenScores.vue')),
+    defaultSpan: 24,
+    order: 30,
+  },
+  {
+    name: 'transportationExpressScores',
+    title: '运输快递KPI评分',
+    icon: 'delivery',
+    component: defineAsyncComponent(() => import('./modules/TransportationExpressScores.vue')),
+    defaultSpan: 24,
+    order: 31,
   },
   // ====== 左侧卡片 ======
   {

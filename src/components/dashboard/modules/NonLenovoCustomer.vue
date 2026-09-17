@@ -1232,8 +1232,6 @@ onUnmounted(() => {
   z-index: 1;
   display: flex;
   flex-direction: column;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(74, 158, 255, 0.3) rgba(0, 0, 0, 0.1);
 }
 
 .table-section :deep(.ant-spin-container) {
@@ -1398,21 +1396,27 @@ onUnmounted(() => {
   font-style: italic;
 }
 
-.table-section::-webkit-scrollbar {
-  width: 4px;
+.table-section :deep(.ant-table-body) {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(74, 158, 255, 0.3) rgba(0, 0, 0, 0.1);
 }
 
-.table-section::-webkit-scrollbar-track {
+.table-section :deep(.ant-table-body::-webkit-scrollbar) {
+  width: 4px;
+  height: 4px;
+}
+
+.table-section :deep(.ant-table-body::-webkit-scrollbar-track) {
   background: rgba(0, 0, 0, 0.1);
   border-radius: 2px;
 }
 
-.table-section::-webkit-scrollbar-thumb {
+.table-section :deep(.ant-table-body::-webkit-scrollbar-thumb) {
   background: rgba(74, 158, 255, 0.3);
   border-radius: 2px;
 }
 
-.table-section::-webkit-scrollbar-thumb:hover {
+.table-section :deep(.ant-table-body::-webkit-scrollbar-thumb:hover) {
   background: rgba(74, 158, 255, 0.5);
 }
 </style>

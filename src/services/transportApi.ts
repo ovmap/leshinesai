@@ -819,4 +819,78 @@ export async function queryAssessmentUnit() {
   return response.data
 }
 
+// ============ 运输DOA KPI评分（TransportationDoaScores） API 接口 ============
+
+/** 查询DOA KPI评分汇总数据 */
+export async function queryDoaKpiSummary(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/logisticKpi/queryDoaKpiSummary', data)
+  return response.data
+}
+
+/** 导出DOA物流商KPI评分汇总 */
+export async function exportDoaLogisticKpiScoreSummary(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/logisticKpi/exportDoaLogisticKpiScoreSummary', data)
+  return response.data
+}
+
+/** 导出DOA物流商KPI评分明细 */
+export async function exportDoaLogisticKpiScoreDetail(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/logisticKpi/exportDoaLogisticKpiScoreDetail', data)
+  return response.data
+}
+
+// ============ ToC物流商KPI评分（TocWarehousingScores） API 接口 ============
+
+/** 查询ToC物流商KPI评分汇总数据 */
+export async function queryToCKpiSummary(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/logisticKpi/queryToCKpiSummary', data)
+  return response.data
+}
+
+/** 导出ToC物流商KPI评分汇总 */
+export async function exportTocLogisticKpiScoreSummary(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/logisticKpi/exportTocLogisticKpiScoreSummary', data)
+  return response.data
+}
+
+/** 导出ToC物流商KPI评分明细 */
+export async function exportTocLogisticKpiScoreDetail(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/logisticKpi/exportTocLogisticKpiScoreDetail', data)
+  return response.data
+}
+
+// ============ 运输开放业务KPI评分（TransportationOpenScores） API 接口 ============
+
+/** 查询开放业务KPI评分汇总数据 */
+export async function queryOpenBusinessKpiSummary(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/logisticKpi/queryOpenBusinessKpiSummary', data)
+  return response.data
+}
+
+/** 导出开放业务物流商KPI评分汇总 */
+export async function exportOpenBusinessLogisticKpiScoreSummary(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/logisticKpi/exportOpenBusinessLogisticKpiScoreSummary', data)
+  return response.data
+}
+
+// ============ 运输快递KPI评分（TransportationExpressScores） API 接口 ============
+
+/** 查询快递KPI评分汇总数据 */
+export async function queryExpressKpiSummary(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/logisticKpi/queryExpressKpiSummary', data)
+  return response.data
+}
+
+/** 导出快递物流商KPI评分汇总 */
+export async function exportExpressLogisticKpiScoreSummary(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/logisticKpi/exportExpressLogisticKpiScoreSummary', data)
+  return response.data
+}
+
+/** 导出快递物流商KPI评分明细 */
+export async function exportExpressLogisticKpiScoreDetail(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/logisticKpi/exportExpressLogisticKpiScoreDetail', data)
+  return response.data
+}
+
 export { transportDashboardClient, transportAiClient }
