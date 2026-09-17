@@ -62,20 +62,7 @@ defineExpose({ initAnchor })
           :title="page.title"
         >
           <div class="navi-icon">
-            <!-- 运输智能体 -->
-            <svg v-if="page.icon === 'alert'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 9v4M12 17h.01" />
-              <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
-            </svg>
-            <!-- 地图 -->
-            <svg v-else-if="page.icon === 'map'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M1 6v16l7-4 8 4 7-4V2l-7 4-8-4-7 4z" />
-              <path d="M8 2v16M16 6v16" />
-            </svg>
-            <!-- 默认图标 -->
-            <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="3" width="18" height="18" rx="2" />
-            </svg>
+            <i class="iconfont" :class="page.icon"></i>
           </div>
           <!-- 标签名（hover 时显示在左侧） -->
           <div class="navi-label">
@@ -178,7 +165,14 @@ defineExpose({ initAnchor })
 .navi-icon {
   width: 20px;
   height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: rgba(255, 255, 255, 0.75);
+}
+
+.navi-icon .iconfont {
+  font-size: 18px;
 }
 
 .navi-item.active .navi-icon {

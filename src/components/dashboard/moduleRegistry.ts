@@ -70,7 +70,7 @@ export const pageRegistry: PageMeta[] = [
   {
     name: 'cargoBanner',
     title: '智能体中心',
-    icon: 'alert',
+    icon: 'icon-yujing',
     gridConfig: { gridCols: 48, gridRows: 27, gridGap: 12 },
     components: [
       // 左侧 3 个卡片（各占 4×3 格子，横向排列）
@@ -104,11 +104,35 @@ export const pageRegistry: PageMeta[] = [
   {
     name: 'mapPage',
     title: '地图',
-    icon: 'map',
+    icon: 'icon-shuzihuadaping',
     gridConfig: { gridCols: 48, gridRows: 27, gridGap: 12 },
     components: [
       // 预留：后续在这里添加地图相关组件
       { name: 'mapPage', x: 1, y: 1, width: 48, height: 27, zoom: 1 },
+    ]
+  },
+  {
+    name: 'onTimeDelivery',
+    title: '准时交付率',
+    icon: 'icon-tubiao-zhexiantu',
+    gridConfig: { gridCols: 48, gridRows: 27, gridGap: 12 },
+    components: [
+      // 仓储物流准时交付率模块（占 48x13）
+      { name: 'warehousingLogistics', x: 1, y: 1, width: 48, height: 13, zoom: 1 },
+      // 准时交付率-时间维度模块（占 48x14，两个模块合计占满 48x27）
+      { name: 'timeDimension', x: 1, y: 14, width: 48, height: 14, zoom: 1 },
+    ]
+  },
+  {
+    name: 'onTimeDeliveryCustomer',
+    title: '准时交付率-客户',
+    icon: 'icon-wushuju',
+    gridConfig: { gridCols: 48, gridRows: 27, gridGap: 12 },
+    components: [
+      // 准时交付率-客户模块（占 48x13）
+      { name: 'lenovoCustomer', x: 1, y: 1, width: 48, height: 13, zoom: 1 },
+      // 端到端准时交付率-非联想客户模块（占 48x14，两个模块合计占满 48x27）
+      { name: 'nonLenovoCustomer', x: 1, y: 14, width: 48, height: 14, zoom: 1 },
     ]
   },
 ]
@@ -145,6 +169,38 @@ export const moduleRegistry: ModuleMeta[] = [
     component: defineAsyncComponent(() => import('./modules/cargoMap/MapPage.vue')),
     defaultSpan: 24,
     order: 15,
+  },
+  {
+    name: 'warehousingLogistics',
+    title: '仓储物流准时交付率',
+    icon: 'delivery',
+    component: defineAsyncComponent(() => import('./modules/WarehousingLogistics.vue')),
+    defaultSpan: 24,
+    order: 16,
+  },
+  {
+    name: 'timeDimension',
+    title: '准时交付率-时间维度',
+    icon: 'delivery',
+    component: defineAsyncComponent(() => import('./modules/TimeDimension.vue')),
+    defaultSpan: 24,
+    order: 17,
+  },
+  {
+    name: 'lenovoCustomer',
+    title: '准时交付率-客户',
+    icon: 'delivery',
+    component: defineAsyncComponent(() => import('./modules/LenovoCustomer.vue')),
+    defaultSpan: 24,
+    order: 18,
+  },
+  {
+    name: 'nonLenovoCustomer',
+    title: '端到端准时交付率-非联想客户',
+    icon: 'delivery',
+    component: defineAsyncComponent(() => import('./modules/NonLenovoCustomer.vue')),
+    defaultSpan: 24,
+    order: 19,
   },
   // ====== 左侧卡片 ======
   {

@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { queryFromWarehouse, queryToProvince, queryToRdc } from '../services/transportApi'
+import { queryFromWarehouse, queryToProvince, queryToRdc, queryDataSourceList, queryDeliveryList, queryCustomerList } from '../services/transportApi'
 
 /**
  * 下拉选项 Store
@@ -13,6 +13,12 @@ export const useSelectOptionsStore = defineStore('selectOptions', () => {
   const provinceOptions = ref<string[]>([])
   // 目的RDC选项
   const rdcOptions = ref<string[]>([])
+  // 数据源选项
+  const dataSourceOptions = ref<{ code: string; name: string }[]>([])
+  // 物流商选项
+  const deliveryProviderOptions = ref<{ code: string; name: string }[]>([])
+  // 客户选项
+  const customerOptions = ref<{ code: string; name: string }[]>([])
 
   // 加载状态
   const loading = ref(false)
@@ -71,6 +77,64 @@ export const useSelectOptionsStore = defineStore('selectOptions', () => {
   }
 
   /**
+   * 格式化选项数据（从 {code, name} 对象数组）
+   */
+  const formatOptions = (data: any[]): { code: string; name: string }[] => {
+    return data
+      .map((item: any) => {
+        const code = item?.code != null ? String(item.code) : ''
+        const name = item?.name != null ? String(item.name) : ''
+        return { code, name }
+      })
+      .filter((option) => option.code && option.name && option.code !== '[object Object]' && option.name !== '[object Object]')
+  }
+
+  /**
+   * 获取数据源选项
+   */
+  async function fetchDataSourceOptions() {
+    try {
+      const res = await queryDataSourceList()
+      if (res && res.code === 200 && Array.isArray(res.data)) {
+        dataSourceOptions.value = formatOptions(res.data)
+      }
+    } catch (err) {
+      console.error('获取数据源选项失败:', err)
+      dataSourceOptions.value = []
+    }
+  }
+
+  /**
+   * 获取物流商选项
+   */
+  async function fetchDeliveryProviderOptions() {
+    try {
+      const res = await queryDeliveryList()
+      if (res && res.code === 200 && Array.isArray(res.data)) {
+        deliveryProviderOptions.value = formatOptions(res.data)
+      }
+    } catch (err) {
+      console.error('获取物流商选项失败:', err)
+      deliveryProviderOptions.value = []
+    }
+  }
+
+  /**
+   * 获取客户选项
+   */
+  async function fetchCustomerOptions() {
+    try {
+      const res = await queryCustomerList()
+      if (res && res.code === 200 && Array.isArray(res.data)) {
+        customerOptions.value = formatOptions(res.data)
+      }
+    } catch (err) {
+      console.error('获取客户选项失败:', err)
+      customerOptions.value = []
+    }
+  }
+
+  /**
    * 并行加载所有选项
    */
   async function fetchAllOptions() {
@@ -84,6 +148,9 @@ export const useSelectOptionsStore = defineStore('selectOptions', () => {
         fetchFromWarehouseOptions(),
         fetchProvinceOptions(),
         fetchRdcOptions(),
+        fetchDataSourceOptions(),
+        fetchDeliveryProviderOptions(),
+        fetchCustomerOptions(),
       ])
       isDataLoaded.value = true
     } catch (err) {
@@ -124,6 +191,9 @@ export const useSelectOptionsStore = defineStore('selectOptions', () => {
     fromWarehouseOptions.value = []
     provinceOptions.value = []
     rdcOptions.value = []
+    dataSourceOptions.value = []
+    deliveryProviderOptions.value = []
+    customerOptions.value = []
     isDataLoaded.value = false
     loading.value = false
   }
@@ -132,11 +202,17 @@ export const useSelectOptionsStore = defineStore('selectOptions', () => {
     fromWarehouseOptions,
     provinceOptions,
     rdcOptions,
+    dataSourceOptions,
+    deliveryProviderOptions,
+    customerOptions,
     loading,
     isDataLoaded,
     fetchFromWarehouseOptions,
     fetchProvinceOptions,
     fetchRdcOptions,
+    fetchDataSourceOptions,
+    fetchDeliveryProviderOptions,
+    fetchCustomerOptions,
     fetchAllOptions,
     ensureDataLoaded,
     resetData,

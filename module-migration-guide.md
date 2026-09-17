@@ -184,26 +184,23 @@ refer 中标题分两种情况：
 },
 ```
 
-### Step 5: 配置 scrollLayout 网格位置
+### Step 5: 配置页面网格位置
 
-在 cargoBanner 的 `scrollLayout.components` 数组中添加位置配置：
+在 `pageRegistry` 中找到对应页面（或新建页面），在其 `components` 数组中添加位置配置：
+
+
+**新建页面示例：**
+
+如果模块需要独立页面，在 `pageRegistry` 中添加新页面：
 
 ```typescript
-scrollLayout: {
+{
+  name: 'newPageName',           // 页面唯一标识
+  title: '页面标题',              // 中文标题
+  icon: 'iconKey',                // QuickBar 图标 key（如 'map', 'delivery', 'alert'）
   gridConfig: { gridCols: 48, gridRows: 27, gridGap: 12 },
   components: [
-    // 左侧卡片
-    { name: 'cargoVolume',  x: 1,  y: 1, width: 4, height: 3, zoom: 1 },
-    { name: 'onTime',       x: 5,  y: 1, width: 4, height: 3, zoom: 1 },
-    { name: 'endToEnd',     x: 9,  y: 1, width: 4, height: 3, zoom: 1 },
-    // 中央：运输智能体
-    { name: 'cargoBanner',  x: 13, y: 1, width: 24, height: 18, zoom: 1 },
-    // 右侧卡片
-    { name: 'energyPrices', x: 37, y: 1, width: 4, height: 3, zoom: 1 },
-    { name: 'unitPrice',    x: 41, y: 1, width: 4, height: 3, zoom: 1 },
-    { name: 'dryPrice',     x: 45, y: 1, width: 4, height: 3, zoom: 1 },
-    // 新增模块加在这里 ↓
-    { name: 'moduleName',   x: ?,  y: ?, width: ?, height: ?, zoom: 1 },
+    { name: 'moduleName', x: 1, y: 1, width: 48, height: 27, zoom: 1 },
   ]
 }
 ```
@@ -308,6 +305,10 @@ import { Pagination, Autoplay } from 'swiper/modules'
 | 货量趋势 | CargoTrend.vue | 图表 | queryVolume |
 | 签收信息 | SigningInformation.vue | 表格+图表 | querySign |
 | 返单进展 | ReorderProgress.vue | 双层环形图+导出进度 | queryTransConfirmStat, exportTransNotConfirm |
+| 仓储物流准时交付率 | WarehousingLogistics.vue | 多层级表格+筛选 | queryOnTimeDeliveryRate, exportOnTimeDeliveryRate |
+| 准时交付率-时间维度 | TimeDimension.vue | 动态时间维度表格+筛选 | queryOnTimeRateTime, exportOnTimeRateTime |
+| 准时交付率-客户 | LenovoCustomer.vue | 原因分析表格+筛选 | queryEndToEndDeliveryRateReason, queryProductGroupList, queryBtcpIndicateList |
+| 端到端准时交付率-非联想客户 | NonLenovoCustomer.vue | 多层级表格+筛选+导出 | queryEndToEndDeliveryRateCust, exportEndToEndDeliveryRateCust |
 
 ---
 

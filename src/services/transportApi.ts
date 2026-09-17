@@ -525,4 +525,78 @@ export async function queryExportProgress(key: string) {
   return response.data
 }
 
+// ============ 准时交付率（仓储物流） API 接口 ============
+
+/** 查询准时交付率数据 */
+export async function queryOnTimeDeliveryRate(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/onTimeRate/queryOnTimeDeliveryRate', data)
+  return response.data
+}
+
+/** 导出准时交付率明细 */
+export async function exportOnTimeDeliveryRateItem(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/onTimeRate/exportOnTimeDeliveryRateItem', data)
+  return response.data
+}
+
+/** 导出准时交付率表格 */
+export async function exportOnTimeDeliveryRate(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/onTimeRate/exportOnTimeDeliveryRate', data)
+  return response.data
+}
+
+/** 查询配送商列表（物流商） */
+export async function queryDeliveryList() {
+  const response = await transportDashboardClient.get('/kanban/v1/select/queryDeliveryList')
+  return response.data
+}
+
+// ============ 准时交付率（时间维度） API 接口 ============
+
+/** 查询时间维度准时交付率数据 */
+export async function queryOnTimeRateTime(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/onTimeRateTime/queryOnTimeRateTime', data)
+  return response.data
+}
+
+/** 导出时间维度准时交付率数据 */
+export async function exportOnTimeRateTime(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/onTimeRateTime/exportOnTimeRateTime', data)
+  return response.data
+}
+
+// ============ 准时交付率-客户（LenovoCustomer） API 接口 ============
+
+/** 查询端到端交付率原因分析数据 */
+export async function queryEndToEndDeliveryRateReason(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/onTimeRate/queryEndToEndDeliveryRateReason', data)
+  return response.data
+}
+
+/** 查询产品类型分组列表 */
+export async function queryProductGroupList() {
+  const response = await transportDashboardClient.get('/kanban/v1/select/queryProductGroupList')
+  return response.data
+}
+
+/** 查询 BTCP 指标列表（业务类型） */
+export async function queryBtcpIndicateList() {
+  const response = await transportDashboardClient.get('/kanban/v1/select/queryBtcpIndicateList')
+  return response.data
+}
+
+// ============ 准时交付率-非联想客户（NonLenovoCustomer） API 接口 ============
+
+/** 查询端到端交付率（非联想客户）数据 */
+export async function queryEndToEndDeliveryRateCust(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/onTimeRate/queryEndToEndDeliveryRateCust', data)
+  return response.data
+}
+
+/** 导出端到端交付率（非联想客户）数据 */
+export async function exportEndToEndDeliveryRateCust(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/onTimeRate/exportEndToEndDeliveryRateCust', data)
+  return response.data
+}
+
 export { transportDashboardClient, transportAiClient }
