@@ -599,4 +599,224 @@ export async function exportEndToEndDeliveryRateCust(data: object) {
   return response.data
 }
 
+// ============ PFP KPI-仓库（TobWarehousingCard） API 接口 ============
+
+/** 查询 ToB 物流商 KPI 评分汇总数据 */
+export async function queryToBKpiSummary(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/logisticKpi/queryToBKpiSummary', data)
+  return response.data
+}
+
+/** 导出 ToB 物流商 KPI 评分汇总数据 */
+export async function exportToBLogisticKpiScoreSummary(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/logisticKpi/exportToBLogisticKpiScoreSummary', data)
+  return response.data
+}
+
+/** 导出 ToB 物流商 KPI 评分明细数据 */
+export async function exportToBLogisticKpiScoreDetail(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/logisticKpi/exportToBLogisticKpiScoreDetail', data)
+  return response.data
+}
+
+/** 根据业务类型查询物流商列表 */
+export async function queryLogistics(bizType: string) {
+  const response = await transportDashboardClient.get(`/kanban/v1/select/queryLogistics?bizType=${bizType}`)
+  return response.data
+}
+
+/** 根据业务类型查询 CDC 仓库列表 */
+export async function queryCdcWarehouses(bizType: string) {
+  const response = await transportDashboardClient.get(`/kanban/v1/select/queryCdcWarehouses?bizType=${bizType}`)
+  return response.data
+}
+
+// ============ PFP KPI-仓库排名（TobWarehousingRank） API 接口 ============
+
+/** 查询 ToB 物流商 KPI 排名数据 */
+export async function queryToBKpiRank(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/logisticKpi/queryToBKpiRank', data)
+  return response.data
+}
+
+/** 查询 ToB 物流商 KPI 排名得分详情 */
+export async function queryToBKpiRankDetail(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/logisticKpi/queryToBKpiRankDetail', data)
+  return response.data
+}
+
+/** 查询 ToB 物流商奖惩信息 */
+export async function queryToBLogisticPunishInfo(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/logisticKpi/queryToBLogisticPunishInfo', data)
+  return response.data
+}
+
+/** 导出 ToB 物流商 KPI 排名数据 */
+export async function exportToBLogisticKpiRank(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/logisticKpi/exportToBLogisticKpiRank', data)
+  return response.data
+}
+
+/** 导出 ToB 物流商 KPI 排名得分详情 */
+export async function exportToBLogisticKpiRankScoreDetail(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/logisticKpi/exportToBLogisticKpiRankScoreDetail', data)
+  return response.data
+}
+
+/** 导出 ToB 物流商 KPI 排名奖惩详情 */
+export async function exportToBLogisticKpiRankPunishDetail(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/logisticKpi/exportToBLogisticKpiRankPunishDetail', data)
+  return response.data
+}
+
+// ============ PFP KPI-运输（TransportationLogisticsScores） API 接口 ============
+
+/** 导出运输物流商 KPI 评分汇总 */
+export async function exportTransLogisticKpiScoreSummary(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/logisticKpi/exportTransLogisticKpiScoreSummary', data)
+  return response.data
+}
+
+/** 导出运输物流商 KPI 评分明细 */
+export async function exportTransLogisticKpiScoreDetail(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/logisticKpi/exportTransLogisticKpiScoreDetail', data)
+  return response.data
+}
+
+// ============ PFP KPI-运输排名（TransportationLogisticsRank） API 接口 ============
+
+/** 查询运输物流商 KPI 排名数据 */
+export async function queryTransKpiRank(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/logisticKpi/queryTransKpiRank', data)
+  return response.data
+}
+
+/** 查询运输物流商 KPI 排名得分详情 */
+export async function queryTransKpiRankDetail(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/logisticKpi/queryTransKpiRankDetail', data)
+  return response.data
+}
+
+/** 查询运输物流商奖惩信息 */
+export async function queryTransLogisticPunishInfo(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/logisticKpi/queryTransLogisticPunishInfo', data)
+  return response.data
+}
+
+/** 导出运输物流商 KPI 排名数据 */
+export async function exportTransLogisticKpiRank(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/logisticKpi/exportTransLogisticKpiRank', data)
+  return response.data
+}
+
+/** 导出运输物流商 KPI 排名得分详情 */
+export async function exportTransLogisticKpiRankScoreDetail(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/logisticKpi/exportTransLogisticKpiRankScoreDetail', data)
+  return response.data
+}
+
+/** 导出运输物流商 KPI 排名奖惩详情 */
+export async function exportTransLogisticKpiRankPunishDetail(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/logisticKpi/exportTransLogisticKpiRankPunishDetail', data)
+  return response.data
+}
+
+// ============ PFP KPI-城配（CityLogisticsScores） API 接口 ============
+
+/** 查询城配物流商 KPI 评分汇总数据 */
+export async function queryDeliveryKpiSummary(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/logisticKpi/queryDeliveryKpiSummary', data)
+  return response.data
+}
+
+/** 导出城配物流商 KPI 评分汇总数据 */
+export async function exportDeliveryLogisticKpiScoreSummary(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/logisticKpi/exportDeliveryLogisticKpiScoreSummary', data)
+  return response.data
+}
+
+/** 导出城配物流商 KPI 评分明细数据 */
+export async function exportDeliveryLogisticKpiScoreDetail(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/logisticKpi/exportDeliveryLogisticKpiScoreDetail', data)
+  return response.data
+}
+
+// ============ PFP KPI-城配排名（CityLogisticsRank） API 接口 ============
+
+/** 查询城配物流商 KPI 排名数据 */
+export async function queryDeliveryKpiRank(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/logisticKpi/queryDeliveryKpiRank', data)
+  return response.data
+}
+
+/** 查询城配物流商 KPI 排名得分详情 */
+export async function queryDeliveryKpiRankDetail(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/logisticKpi/queryDeliveryKpiRankDetail', data)
+  return response.data
+}
+
+/** 查询城配物流商奖惩信息 */
+export async function queryDeliveryLogisticPunishInfo(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/logisticKpi/queryDeliveryLogisticPunishInfo', data)
+  return response.data
+}
+
+/** 导出城配物流商 KPI 排名数据 */
+export async function exportDeliveryLogisticKpiRank(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/logisticKpi/exportDeliveryLogisticKpiRank', data)
+  return response.data
+}
+
+/** 导出城配物流商 KPI 排名得分详情 */
+export async function exportDeliveryLogisticKpiRankScoreDetail(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/logisticKpi/exportDeliveryLogisticKpiRankScoreDetail', data)
+  return response.data
+}
+
+/** 导出城配物流商 KPI 排名奖惩详情 */
+export async function exportDeliveryLogisticKpiRankPunishDetail(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/logisticKpi/exportDeliveryLogisticKpiRankPunishDetail', data)
+  return response.data
+}
+
+// ============ TCL华星物流商KPI评分（TclWarehousingScores） API 接口 ============
+
+/** 查询TCL华星物流商 KPI 评分汇总数据 */
+export async function queryHuaxingKpiSummary(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/logisticKpi/queryHuaxingKpiSummary', data)
+  return response.data
+}
+
+/** 导出TCL华星物流商 KPI 评分汇总 */
+export async function exportHuaxingLogisticKpiScoreSummary(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/logisticKpi/exportHuaxingLogisticKpiScoreSummary', data)
+  return response.data
+}
+
+/** 导出TCL华星物流商 KPI 评分明细 */
+export async function exportHuaxingLogisticKpiScoreDetail(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/logisticKpi/exportHuaxingLogisticKpiScoreDetail', data)
+  return response.data
+}
+
+// ============ 运输仓储多业务KPI评分（TransStorageKpiScore） API 接口 ============
+
+/** 查询运输仓储多业务 KPI 评分数据 */
+export async function queryTransStorageKpiScore(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/logisticKpi/queryTransStorageKpiScore', data)
+  return response.data
+}
+
+/** 导出运输仓储多业务 KPI 评分数据 */
+export async function exportTransStorageKpiScore(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/logisticKpi/exportTransStorageKpiScore', data)
+  return response.data
+}
+
+/** 查询考核单元下拉选项（bizType=9） */
+export async function queryAssessmentUnit() {
+  const response = await transportDashboardClient.get('/kanban/v1/select/queryAssessmentUnit', { params: { bizType: 9 } })
+  return response.data
+}
+
 export { transportDashboardClient, transportAiClient }

@@ -135,6 +135,60 @@ export const pageRegistry: PageMeta[] = [
       { name: 'nonLenovoCustomer', x: 1, y: 14, width: 48, height: 14, zoom: 1 },
     ]
   },
+  {
+    name: 'pfpKpiWarehouse',
+    title: 'PFP KPI-仓库',
+    icon: 'icon-shuzihuayingxiao',
+    gridConfig: { gridCols: 48, gridRows: 27, gridGap: 12 },
+    components: [
+      { name: 'tobWarehousingCard', x: 1, y: 1, width: 48, height: 13, zoom: 1 },
+      { name: 'tobWarehousingRank', x: 1, y: 14, width: 48, height: 14, zoom: 1 },
+    ]
+  },
+  {
+    name: 'pfpKpiTransport',
+    title: 'PFP KPI-运输',
+    icon: 'icon-falv',
+    gridConfig: { gridCols: 48, gridRows: 27, gridGap: 12 },
+    components: [
+      { name: 'transportationLogisticsScores', x: 1, y: 1, width: 48, height: 13, zoom: 1 },
+      { name: 'transportationLogisticsRank', x: 1, y: 14, width: 48, height: 14, zoom: 1 },
+    ]
+  },
+  {
+    name: 'pfpKpiCityDelivery',
+    title: 'PFP KPI-城配',
+    icon: 'icon-bumendongtai',
+    gridConfig: { gridCols: 48, gridRows: 27, gridGap: 12 },
+    components: [
+      { name: 'cityLogisticsScores', x: 1, y: 1, width: 48, height: 13, zoom: 1 },
+      { name: 'cityLogisticsRank', x: 1, y: 14, width: 48, height: 14, zoom: 1 },
+    ]
+  },
+  {
+    name: 'pfpKpiCustomer',
+    title: 'PFP KPI-客户',
+    icon: 'icon-guke',
+    gridConfig: { gridCols: 48, gridRows: 27, gridGap: 12 },
+    components: [
+      { name: 'tclWarehousingScores', x: 1, y: 1, width: 48, height: 13, zoom: 1 },
+      { name: 'transStorageKpiScore', x: 1, y: 14, width: 48, height: 14, zoom: 1 },
+    ]
+  },
+  {
+    name: 'pfpKpiToC',
+    title: 'PFP KPI-ToC',
+    icon: 'icon-daili',
+    gridConfig: { gridCols: 48, gridRows: 27, gridGap: 12 },
+    components: []
+  },
+  {
+    name: 'pfpKpiExpress',
+    title: 'PFP KPI-运输快递业务',
+    icon: 'icon-lianwangzhongxin',
+    gridConfig: { gridCols: 48, gridRows: 27, gridGap: 12 },
+    components: []
+  },
 ]
 
 /**
@@ -201,6 +255,70 @@ export const moduleRegistry: ModuleMeta[] = [
     component: defineAsyncComponent(() => import('./modules/NonLenovoCustomer.vue')),
     defaultSpan: 24,
     order: 19,
+  },
+  {
+    name: 'tobWarehousingCard',
+    title: 'PFP KPI-仓库',
+    icon: 'delivery',
+    component: defineAsyncComponent(() => import('./modules/TobWarehousingCard.vue')),
+    defaultSpan: 24,
+    order: 20,
+  },
+  {
+    name: 'tobWarehousingRank',
+    title: 'PFP KPI-仓库排名',
+    icon: 'delivery',
+    component: defineAsyncComponent(() => import('./modules/TobWarehousingRank.vue')),
+    defaultSpan: 24,
+    order: 21,
+  },
+  {
+    name: 'transportationLogisticsScores',
+    title: 'PFP KPI-运输',
+    icon: 'delivery',
+    component: defineAsyncComponent(() => import('./modules/TransportationLogisticsScores.vue')),
+    defaultSpan: 24,
+    order: 22,
+  },
+  {
+    name: 'transportationLogisticsRank',
+    title: 'PFP KPI-运输排名',
+    icon: 'delivery',
+    component: defineAsyncComponent(() => import('./modules/TransportationLogisticsRank.vue')),
+    defaultSpan: 24,
+    order: 23,
+  },
+  {
+    name: 'cityLogisticsScores',
+    title: 'PFP KPI-城配',
+    icon: 'delivery',
+    component: defineAsyncComponent(() => import('./modules/CityLogisticsScores.vue')),
+    defaultSpan: 24,
+    order: 24,
+  },
+  {
+    name: 'cityLogisticsRank',
+    title: 'PFP KPI-城配排名',
+    icon: 'delivery',
+    component: defineAsyncComponent(() => import('./modules/CityLogisticsRank.vue')),
+    defaultSpan: 24,
+    order: 25,
+  },
+  {
+    name: 'tclWarehousingScores',
+    title: 'TCL华星物流商KPI评分',
+    icon: 'delivery',
+    component: defineAsyncComponent(() => import('./modules/TclWarehousingScores.vue')),
+    defaultSpan: 24,
+    order: 26,
+  },
+  {
+    name: 'transStorageKpiScore',
+    title: '运输仓储多业务KPI评分',
+    icon: 'delivery',
+    component: defineAsyncComponent(() => import('./modules/TransStorageKpiScore.vue')),
+    defaultSpan: 24,
+    order: 27,
   },
   // ====== 左侧卡片 ======
   {

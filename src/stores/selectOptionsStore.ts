@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { queryFromWarehouse, queryToProvince, queryToRdc, queryDataSourceList, queryDeliveryList, queryCustomerList } from '../services/transportApi'
+import { queryFromWarehouse, queryToProvince, queryToRdc, queryDataSourceList, queryDeliveryList, queryCustomerList, queryLogistics, queryCdcWarehouses } from '../services/transportApi'
 
 /**
  * 下拉选项 Store
@@ -19,6 +19,12 @@ export const useSelectOptionsStore = defineStore('selectOptions', () => {
   const deliveryProviderOptions = ref<{ code: string; name: string }[]>([])
   // 客户选项
   const customerOptions = ref<{ code: string; name: string }[]>([])
+  
+  // 按业务类型存储物流商选项（Map<bizType, options>）
+  const logisticsOptionsByBizType = ref<Map<string, { code: string; name: string }[]>>(new Map())
+  
+  // 按业务类型存储 CDC 仓库选项（Map<bizType, options>）
+  const warehouseOptionsByBizType = ref<Map<string, { code: string; name: string }[]>>(new Map())
 
   // 加载状态
   const loading = ref(false)
@@ -135,6 +141,52 @@ export const useSelectOptionsStore = defineStore('selectOptions', () => {
   }
 
   /**
+   * 根据业务类型获取物流商选项
+   */
+  async function fetchLogisticsByBizType(bizType: string = '1') {
+    try {
+      const res = await queryLogistics(bizType)
+      if (res && res.code === 200 && Array.isArray(res.data)) {
+        const options = formatOptions(res.data)
+        logisticsOptionsByBizType.value.set(bizType, options)
+      }
+    } catch (err) {
+      console.error(`获取物流商选项失败(bizType=${bizType}):`, err)
+      logisticsOptionsByBizType.value.set(bizType, [])
+    }
+  }
+
+  /**
+   * 根据业务类型获取 CDC 仓库选项
+   */
+  async function fetchWarehouseByBizType(bizType: string = '1') {
+    try {
+      const res = await queryCdcWarehouses(bizType)
+      if (res && res.code === 200 && Array.isArray(res.data)) {
+        const options = formatOptions(res.data)
+        warehouseOptionsByBizType.value.set(bizType, options)
+      }
+    } catch (err) {
+      console.error(`获取 CDC 仓库选项失败(bizType=${bizType}):`, err)
+      warehouseOptionsByBizType.value.set(bizType, [])
+    }
+  }
+
+  /**
+   * 获取指定业务类型的物流商选项
+   */
+  function getLogisticsByBizType(bizType: string = '1'): { code: string; name: string }[] {
+    return logisticsOptionsByBizType.value.get(bizType) || []
+  }
+
+  /**
+   * 获取指定业务类型的 CDC 仓库选项
+   */
+  function getWarehouseByBizType(bizType: string = '1'): { code: string; name: string }[] {
+    return warehouseOptionsByBizType.value.get(bizType) || []
+  }
+
+  /**
    * 并行加载所有选项
    */
   async function fetchAllOptions() {
@@ -205,6 +257,8 @@ export const useSelectOptionsStore = defineStore('selectOptions', () => {
     dataSourceOptions,
     deliveryProviderOptions,
     customerOptions,
+    logisticsOptionsByBizType,
+    warehouseOptionsByBizType,
     loading,
     isDataLoaded,
     fetchFromWarehouseOptions,
@@ -213,6 +267,10 @@ export const useSelectOptionsStore = defineStore('selectOptions', () => {
     fetchDataSourceOptions,
     fetchDeliveryProviderOptions,
     fetchCustomerOptions,
+    fetchLogisticsByBizType,
+    fetchWarehouseByBizType,
+    getLogisticsByBizType,
+    getWarehouseByBizType,
     fetchAllOptions,
     ensureDataLoaded,
     resetData,
