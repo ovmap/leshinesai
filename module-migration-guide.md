@@ -321,6 +321,12 @@ import { Pagination, Autoplay } from 'swiper/modules'
 | ToC物流商KPI评分 | TocWarehousingScores.vue | 多层级表格+筛选+双导出 | queryToCKpiSummary, exportTocLogisticKpiScoreSummary, exportTocLogisticKpiScoreDetail |
 | 运输开放业务KPI评分 | TransportationOpenScores.vue | 多层级表格+筛选+导出 | queryOpenBusinessKpiSummary, exportOpenBusinessLogisticKpiScoreSummary |
 | 运输快递KPI评分 | TransportationExpressScores.vue | 多层级表格+筛选+双导出 | queryExpressKpiSummary, exportExpressLogisticKpiScoreSummary, exportExpressLogisticKpiScoreDetail |
+| 应签未签 | SignUp.vue | Tab切换+动态表格+筛选+导出 | queryAbnormalOrder, exportAbnormalOrder, queryRegionList, queryAbnormalTypeList |
+| 应签未签明细 | SignUpDetail.vue | Tab切换+固定表头表格+筛选+导出 | queryAbnormalOrderItem, exportAbnormalOrderItem, queryRegionList, queryAbnormalTypeList |
+| 返单及时率 | OrderRate.vue | 日期范围+物流商多选+表格+导出 | queryConfirmInTimeRate, exportConfirmInTimeRate, queryLogisticList |
+| UD返单进展 | UDReorderProgress.vue | Tab切换+日期范围+物流商多选+超期区间+表格+导出 | queryDeliveryNotConfirmStat, exportDeliveryNotConfirmStat, queryLogisticList |
+| 货量占比 | BarPercentage.vue | ECharts横向柱状图+日期范围+统计方式+数据源+体积筛选 | queryVolumeBarRate, queryVolumeStatType |
+| 货量表格占比 | TablePercentage.vue | ant-design表格+日期范围+统计维度+数据源+体积筛选 | queryVolumeTableRate |
 
 ---
 
@@ -625,6 +631,277 @@ import { Pagination, Autoplay } from 'swiper/modules'
    - 使用 selectOptionsStore 的 `getLogisticsByBizType('5')` 和 `getWarehouseByBizType('5')`
    - SCSS → 纯 CSS scoped
    - 添加 header-bar 组件内标题
+
+---
+
+### 2026-09-18 迁移 signUp 模块
+
+**源文件**: `refer/src/components/RenderComponent/chartRender/LS/signUp/index.vue`
+
+**目标文件**: `src/components/dashboard/modules/SignUp.vue`
+
+**页面位置**: `reorderDashboard` (返单看板) 页面，位置 x=1, y=1, 尺寸 24x13
+
+**迁移内容**:
+1. **API 接口** (transportApi.ts):
+   - `queryAbnormalOrder` - 查询应签未签订单数据
+   - `exportAbnormalOrder` - 导出应签未签订单数据
+   - `queryRegionList` - 查询区域列表（已存在）
+   - `queryAbnormalTypeList` - 查询异常分类列表（已存在）
+
+2. **组件功能**:
+   - Tab 页签切换（末端/干线）
+   - RDC&配送商下拉框（根据 tab 动态切换选项）
+   - 大区下拉框（从 API 获取）
+   - 异常分类下拉框（从 API 获取）
+   - 数据源下拉框（从 selectOptionsStore 获取）
+   - 重置按钮
+   - 导出按钮
+   - 动态表格（表头和数据均由 API 返回）
+   - 全局筛选联动（始发仓/目的省/目的RDC 来自 globalFilterStore）
+
+3. **表格结构**:
+   - 动态表头：由 API 返回的第一行数据决定
+   - 数据行：从第二行开始
+   - 第一列固定（sticky）显示，高亮为 RDC 列
+   - 支持横向和纵向滚动
+
+4. **适配要点**:
+   - 替换国际化：`$t('ls.signUp.xxx')` → 直接写中文
+   - 替换 API 导入路径
+   - 全局筛选从 `window.addEventListener('filterChanged', ...)` 改为 `globalFilterStore`
+   - 数据源选项从 store 获取（`selectOptionsStore.dataSourceOptions`）
+   - SCSS → 纯 CSS scoped
+   - 添加 header-bar 组件内标题
+   - 导出按钮从 `a-button` 改为原生 `button`（避免 ant-design-vue 样式冲突）
+
+---
+
+### 2026-09-18 迁移 signUpDetail 模块
+
+**源文件**: `refer/src/components/RenderComponent/chartRender/LS/signUpDetail/index.vue`
+
+**目标文件**: `src/components/dashboard/modules/SignUpDetail.vue`
+
+**页面位置**: `reorderDashboard` (返单看板) 页面，位置 x=25, y=1, 尺寸 24x13（signUp 右侧）
+
+**迁移内容**:
+1. **API 接口** (transportApi.ts，已存在):
+   - `queryAbnormalOrderItem` - 查询应签未签明细数据
+   - `exportAbnormalOrderItem` - 导出应签未签明细数据
+   - `queryRegionList` - 查询区域列表（已存在）
+   - `queryAbnormalTypeList` - 查询异常分类列表（已存在）
+
+2. **组件功能**:
+   - Tab 页签切换（末端/干线）
+   - RDC&配送商下拉框（根据 tab 动态切换选项，末端有 RDC配送/CDC承运商，干线只有 CDC承运商）
+   - 大区下拉框（从 API 获取）
+   - 异常分类下拉框（从 API 获取）
+   - 数据源下拉框（从 selectOptionsStore 获取）
+   - 重置按钮
+   - 导出按钮
+   - 固定表头表格（6列：RDC/CDC、配送商/承运商、异常分类、异常代码、异常描述、应签未签数量）
+   - 全局筛选联动（始发仓/目的省/目的RDC 来自 globalFilterStore）
+   - 定时刷新（5分钟间隔）
+
+3. **表格结构**:
+   - 固定表头：根据 tab 动态切换（末端：RDC/配送商，干线：CDC/承运商）
+   - 数据格式：对象数组（row.warehouse, row.logisticName, row.abnormalTypeName, row.abnormalCode, row.abnormalDesc, row.abnormalOrderNum）
+   - 第一列固定（sticky）显示，高亮为 RDC/CDC 列
+   - 支持横向和纵向滚动
+   - 加载状态遮罩
+
+4. **与 signUp 的区别**:
+   - signUp 使用 `queryAbnormalOrder`（动态表头，二维数组格式）
+   - signUpDetail 使用 `queryAbnormalOrderItem`（固定表头，对象数组格式）
+   - signUpDetail 有定时刷新功能
+   - signUpDetail 有加载状态遮罩
+
+5. **适配要点**:
+   - 替换国际化：`$t('ls.signUpDetail.xxx')` → 直接写中文
+   - 替换 API 导入路径
+   - 全局筛选从 `window.addEventListener('filterChanged', ...)` 改为 `globalFilterStore`
+   - 数据源选项从 store 获取（`selectOptionsStore.dataSourceOptions`）
+   - SCSS → 纯 CSS scoped
+   - 添加 header-bar 组件内标题
+   - 导出按钮从 `a-button` 改为原生 `button`
+   - 加载状态从 `a-spin` 改为自定义 loading 遮罩
+
+---
+
+### 2026-09-18 迁移 orderRate 模块
+
+**源文件**: `refer/src/components/RenderComponent/chartRender/LS/orderRate/index.vue`
+
+**目标文件**: `src/components/dashboard/modules/OrderRate.vue`
+
+**页面位置**: `reorderDashboard` (返单看板) 页面，位置 x=1, y=14, 尺寸 24x14（signUp 下边）
+
+**迁移内容**:
+1. **API 接口** (transportApi.ts):
+   - `queryConfirmInTimeRate` - 查询返单及时率数据
+   - `exportConfirmInTimeRate` - 导出返单及时率数据
+   - `queryLogisticList` - 查询物流商列表（已存在）
+
+2. **组件功能**:
+   - 日期范围选择器（默认当前月份往前2个月）
+   - 物流商多选下拉框（支持搜索，带重置选项）
+   - 搜索按钮
+   - 导出按钮
+   - 固定表头表格（7列：仓库、物流商、年份、月份、返单总数、不及时订单数、返单及时率）
+   - 全局筛选联动（始发仓/目的省 来自 globalFilterStore）
+   - 加载状态遮罩
+
+3. **表格结构**:
+   - 固定表头：仓库、物流商、年份、月份、返单总数、不及时订单数、返单及时率
+   - 数据格式：对象数组（fromwarehouse, logisticName, year, month, confirmTotal, nonCompliantOrderCount, confirmInTimeRate）
+   - 返单及时率显示为百分比格式（保留2位小数）
+   - 支持纵向滚动
+
+4. **适配要点**:
+   - 替换国际化：`$t('ls.dateRange.separator')` → '至'，`$t('ls.orderRate.buttons.export')` → '导出'
+   - 替换 API 导入路径
+   - 全局筛选从 `window.addEventListener('filterChanged', ...)` 改为 `globalFilterStore`
+   - 物流商列表从 `queryLogisticList` API 获取
+   - SCSS → 纯 CSS scoped
+   - 添加 header-bar 组件内标题
+   - 导出按钮从 `a-button` 改为原生 `button`
+   - 加载状态从 `a-spin` 改为自定义 loading 遮罩
+   - 日期选择器使用 ant-design-vue 的 `a-range-picker`
+
+---
+
+### 2026-09-18 迁移 udReorderProgress 模块
+
+**源文件**: `refer/src/components/RenderComponent/chartRender/LS/UDreorderProgress/index.vue`
+
+**目标文件**: `src/components/dashboard/modules/UDReorderProgress.vue`
+
+**页面位置**: `reorderDashboard` (返单看板) 页面，位置 x=25, y=14, 尺寸 24x14（signUpDetail 下边）
+
+**迁移内容**:
+1. **API 接口** (transportApi.ts):
+   - `queryDeliveryNotConfirmStat` - 查询配送未返单统计
+   - `exportDeliveryNotConfirmStat` - 导出配送未返单统计
+   - `queryLogisticList` - 查询物流商列表（已存在）
+
+2. **组件功能**:
+   - Tab 页签切换（签收&配时间/发货确认时间）
+   - 日期范围选择器（根据 tab 动态切换默认值：签收&配时间默认上月，发货确认时间默认当月）
+   - 物流商多选下拉框（支持搜索，带重置选项）
+   - 超期区间下拉框（全部/30天内/30-60天/60天以上）
+   - 搜索按钮、重置按钮、导出按钮
+   - 固定表头表格（6列：仓库、物流商、单据类型、年份、月份、未返单数量）
+   - 全局筛选联动（始发仓/目的省/目的RDC 来自 globalFilterStore）
+   - 加载状态遮罩
+
+3. **表格结构**:
+   - 固定表头：仓库、物流商、单据类型、年份、月份、未返单数量
+   - 数据格式：二维数组（从对象数组转换）
+   - 单据类型映射：1=发票，2=运单
+   - 支持横向和纵向滚动
+
+4. **Tab 切换逻辑**:
+   - 签收&配时间（signReceive）：timeType=1，默认上月
+   - 发货确认时间（confirmTime）：timeType=2，默认当月
+   - 切换 tab 时自动重置筛选条件并刷新数据
+
+5. **适配要点**:
+   - 替换国际化：`$t('ls.dateRange.separator')` → '至'，`$t('ls.buttons.search')` → '搜索'，`$t('ls.buttons.reset')` → '重置'
+   - 替换 API 导入路径
+   - 全局筛选从 `filterStore` 改为 `globalFilterStore`
+   - 物流商列表从 `queryLogisticList` API 获取
+   - SCSS → 纯 CSS scoped
+   - 添加 header-bar 组件内标题
+   - 导出按钮从 `a-button` 改为原生 `button`
+   - 加载状态从 `a-spin` 改为自定义 loading 遮罩
+   - 日期选择器使用 ant-design-vue 的 `a-range-picker`
+
+---
+
+### 2026-09-18 迁移 barPercentage 模块
+
+**源文件**: `refer/src/components/RenderComponent/chartRender/LS/barPercentage/index.vue`
+
+**目标文件**: `src/components/dashboard/modules/BarPercentage.vue`
+
+**页面位置**: `cargoDashboard` (货量看板) 页面，位置 x=25, y=1, 尺寸 24x13（cargoTrend 右边）
+
+**迁移内容**:
+1. **API 接口** (transportApi.ts):
+   - `queryVolumeBarRate` - 查询货量占比数据
+   - `queryVolumeStatType` - 查询货量统计类型
+
+2. **组件功能**:
+   - ECharts 横向柱状图，显示货量占比
+   - 日期范围选择器（默认当月1号到当天）
+   - 统计方式下拉框（单选，从 API 获取选项）
+   - 数据源下拉框（多选，从 selectOptionsStore 获取）
+   - 体积下拉框（单选，从 selectOptionsStore 获取）
+   - 全局筛选联动（始发仓/目的省/目的RDC 来自 globalFilterStore）
+   - 加载状态遮罩
+   - 数据缩放（超过12条数据时显示滚动缩放）
+
+3. **图表特性**:
+   - 横向柱状图，数据按值从小到大排序
+   - 标签显示在柱子右侧，格式：数值 (占比%)
+   - 数值格式化：>=1000000 显示为 xM，>=1000 显示为 xK，体积类型保留2位小数
+   - Tooltip 显示详细信息（名称、数值、占比）
+   - 支持鼠标滚轮缩放和拖拽移动（dataZoom inside 模式）
+   - 使用 ResizeObserver 监听容器尺寸变化
+
+4. **适配要点**:
+   - 替换国际化：`$t('ls.dateRange.separator')` → '至'，图表文本直接写中文
+   - 替换 API 导入路径
+   - 全局筛选从 `filterStore` 改为 `globalFilterStore`
+   - 统计方式选项从 `queryVolumeStatType` API 获取
+   - 数据源和体积选项从 `selectOptionsStore` 获取
+   - SCSS → 纯 CSS scoped
+   - 添加 header-bar 组件内标题
+   - 加载状态从 `a-spin` 改为自定义 loading 遮罩
+   - 日期选择器使用 ant-design-vue 的 `a-range-picker`
+
+---
+
+### 2026-09-18 迁移 tablePercentage 模块
+
+**源文件**: `refer/src/components/RenderComponent/chartRender/LS/tablePercentage/index.vue`
+
+**目标文件**: `src/components/dashboard/modules/TablePercentage.vue`
+
+**页面位置**: `cargoDashboard` (货量看板) 页面，位置 x=1, y=14, 尺寸 24x14（cargoTrend 下边）
+
+**迁移内容**:
+1. **API 接口** (transportApi.ts):
+   - `queryVolumeTableRate` - 查询货量表格占比数据
+
+2. **组件功能**:
+   - ant-design-vue 表格，显示货量占比数据
+   - 日期范围选择器（默认当月1号到当天）
+   - 统计维度下拉框（单选，固定2个选项：始发仓&目的省份/目的城市）
+   - 数据源下拉框（多选，从 selectOptionsStore 获取）
+   - 体积下拉框（单选，从 selectOptionsStore 获取）
+   - 全局筛选联动（始发仓/目的省/目的RDC 来自 globalFilterStore）
+   - 加载状态遮罩
+   - 动态表格列（根据统计维度变化）
+
+3. **表格特性**:
+   - 统计维度1（始发仓&目的省份）：排名、始发仓、目的省份、体积、占比
+   - 统计维度2（目的城市）：排名、目的城市、体积、占比
+   - 体积列根据选择的体积类型动态格式化（普通数值用 toLocaleString，体积类型用 toFixed(2)）
+   - 占比列显示百分比格式（保留2位小数）
+   - 支持横向和纵向滚动
+
+4. **适配要点**:
+   - 替换国际化：`$t('ls.dateRange.separator')` → '至'，表格文本直接写中文
+   - 替换 API 导入路径
+   - 全局筛选从 `filterStore` 改为 `globalFilterStore`
+   - 数据源和体积选项从 `selectOptionsStore` 获取
+   - SCSS → 纯 CSS scoped
+   - 添加 header-bar 组件内标题
+   - 加载状态从 `a-spin` 改为自定义 loading 遮罩
+   - 日期选择器使用 ant-design-vue 的 `a-range-picker`
+   - 表格使用 ant-design-vue 的 `a-table` 组件
 
 ---
 

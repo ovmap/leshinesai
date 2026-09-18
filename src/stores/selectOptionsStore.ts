@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { queryFromWarehouse, queryToProvince, queryToRdc, queryDataSourceList, queryDeliveryList, queryCustomerList, queryLogistics, queryCdcWarehouses } from '../services/transportApi'
+import { queryFromWarehouse, queryToProvince, queryToRdc, queryDataSourceList, queryDeliveryList, queryCustomerList, queryLogistics, queryCdcWarehouses, queryVolumeAggList } from '../services/transportApi'
 
 /**
  * 下拉选项 Store
@@ -19,6 +19,8 @@ export const useSelectOptionsStore = defineStore('selectOptions', () => {
   const deliveryProviderOptions = ref<{ code: string; name: string }[]>([])
   // 客户选项
   const customerOptions = ref<{ code: string; name: string }[]>([])
+  // 体积聚合选项
+  const volumeAggOptions = ref<{ code: string; name: string }[]>([])
   
   // 按业务类型存储物流商选项（Map<bizType, options>）
   const logisticsOptionsByBizType = ref<Map<string, { code: string; name: string }[]>>(new Map())
@@ -141,6 +143,21 @@ export const useSelectOptionsStore = defineStore('selectOptions', () => {
   }
 
   /**
+   * 获取体积聚合选项
+   */
+  async function fetchVolumeAggOptions() {
+    try {
+      const res = await queryVolumeAggList()
+      if (res && res.code === 200 && Array.isArray(res.data)) {
+        volumeAggOptions.value = formatOptions(res.data)
+      }
+    } catch (err) {
+      console.error('获取体积聚合选项失败:', err)
+      volumeAggOptions.value = []
+    }
+  }
+
+  /**
    * 根据业务类型获取物流商选项
    */
   async function fetchLogisticsByBizType(bizType: string = '1') {
@@ -203,6 +220,7 @@ export const useSelectOptionsStore = defineStore('selectOptions', () => {
         fetchDataSourceOptions(),
         fetchDeliveryProviderOptions(),
         fetchCustomerOptions(),
+        fetchVolumeAggOptions(),
       ])
       isDataLoaded.value = true
     } catch (err) {
@@ -246,6 +264,7 @@ export const useSelectOptionsStore = defineStore('selectOptions', () => {
     dataSourceOptions.value = []
     deliveryProviderOptions.value = []
     customerOptions.value = []
+    volumeAggOptions.value = []
     isDataLoaded.value = false
     loading.value = false
   }
@@ -257,6 +276,7 @@ export const useSelectOptionsStore = defineStore('selectOptions', () => {
     dataSourceOptions,
     deliveryProviderOptions,
     customerOptions,
+    volumeAggOptions,
     logisticsOptionsByBizType,
     warehouseOptionsByBizType,
     loading,
@@ -267,6 +287,7 @@ export const useSelectOptionsStore = defineStore('selectOptions', () => {
     fetchDataSourceOptions,
     fetchDeliveryProviderOptions,
     fetchCustomerOptions,
+    fetchVolumeAggOptions,
     fetchLogisticsByBizType,
     fetchWarehouseByBizType,
     getLogisticsByBizType,

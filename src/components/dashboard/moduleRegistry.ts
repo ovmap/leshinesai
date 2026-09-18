@@ -112,6 +112,30 @@ export const pageRegistry: PageMeta[] = [
     ]
   },
   {
+    name: 'reorderDashboard',
+    title: '返单看板',
+    icon: 'icon-niandubaogao',
+    gridConfig: { gridCols: 48, gridRows: 27, gridGap: 12 },
+    components: [
+      { name: 'signUp', x: 1, y: 1, width: 24, height: 13, zoom: 1 },
+      { name: 'signUpDetail', x: 25, y: 1, width: 24, height: 13, zoom: 1 },
+      { name: 'orderRate', x: 1, y: 14, width: 24, height: 14, zoom: 1 },
+      { name: 'udReorderProgress', x: 25, y: 14, width: 24, height: 14, zoom: 1 },
+    ]
+  },
+  {
+    name: 'cargoDashboard',
+    title: '货量看板',
+    icon: 'icon-zhibiao',
+    gridConfig: { gridCols: 48, gridRows: 27, gridGap: 12 },
+    components: [
+      { name: 'cargoTrend', x: 1, y: 1, width: 24, height: 13, zoom: 1 },
+      { name: 'barPercentage', x: 25, y: 1, width: 24, height: 13, zoom: 1 },
+      { name: 'tablePercentage', x: 1, y: 14, width: 24, height: 14, zoom: 1 },
+      { name: 'abnormalTransportation', x: 25, y: 14, width: 24, height: 14, zoom: 1 },
+    ]
+  },
+  {
     name: 'onTimeDelivery',
     title: '准时交付率',
     icon: 'icon-tubiao-zhexiantu',
@@ -357,6 +381,54 @@ export const moduleRegistry: ModuleMeta[] = [
     component: defineAsyncComponent(() => import('./modules/TransportationExpressScores.vue')),
     defaultSpan: 24,
     order: 31,
+  },
+  {
+    name: 'signUp',
+    title: '应签未签',
+    icon: 'sign',
+    component: defineAsyncComponent(() => import('./modules/SignUp.vue')),
+    defaultSpan: 24,
+    order: 32,
+  },
+  {
+    name: 'signUpDetail',
+    title: '应签未签明细',
+    icon: 'sign',
+    component: defineAsyncComponent(() => import('./modules/SignUpDetail.vue')),
+    defaultSpan: 24,
+    order: 33,
+  },
+  {
+    name: 'orderRate',
+    title: '返单及时率',
+    icon: 'time',
+    component: defineAsyncComponent(() => import('./modules/OrderRate.vue')),
+    defaultSpan: 24,
+    order: 34,
+  },
+  {
+    name: 'udReorderProgress',
+    title: 'UD返单进展',
+    icon: 'progress',
+    component: defineAsyncComponent(() => import('./modules/UDReorderProgress.vue')),
+    defaultSpan: 24,
+    order: 35,
+  },
+  {
+    name: 'barPercentage',
+    title: '货量占比',
+    icon: 'trend',
+    component: defineAsyncComponent(() => import('./modules/BarPercentage.vue')),
+    defaultSpan: 24,
+    order: 36,
+  },
+  {
+    name: 'tablePercentage',
+    title: '货量表格占比',
+    icon: 'trend',
+    component: defineAsyncComponent(() => import('./modules/TablePercentage.vue')),
+    defaultSpan: 24,
+    order: 37,
   },
   // ====== 左侧卡片 ======
   {

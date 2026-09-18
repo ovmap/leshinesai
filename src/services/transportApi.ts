@@ -893,4 +893,74 @@ export async function exportExpressLogisticKpiScoreDetail(data: object) {
   return response.data
 }
 
+// ============ 货量占比（BarPercentage） API 接口 ============
+
+/** 查询货量占比数据 */
+export async function queryVolumeBarRate(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/volume/queryVolumeBarRate', data)
+  return response.data
+}
+
+/** 查询货量统计类型 */
+export async function queryVolumeStatType() {
+  const response = await transportDashboardClient.get('/kanban/v1/select/queryVolumeStatType')
+  return response.data
+}
+
+/** 查询货量聚合指标列表下拉 */
+export async function queryVolumeAggList() {
+  const response = await transportDashboardClient.get('/kanban/v1/select/queryVolumeAggList')
+  return response.data
+}
+
+// ============ 货量表格占比（TablePercentage） API 接口 ============
+
+/** 查询货量表格占比数据 */
+export async function queryVolumeTableRate(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/volume/queryVolumeTableRate', data)
+  return response.data
+}
+
+// ============ 应签未签（SignUp） API 接口 ============
+
+/** 查询应签未签订单数据 */
+export async function queryAbnormalOrder(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/abnormal/queryAbnormalOrder', data)
+  return response.data
+}
+
+/** 导出应签未签订单数据 */
+export async function exportAbnormalOrder(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/abnormal/exportAbnormalOrder', data)
+  return response.data
+}
+
+// ============ 返单及时率（OrderRate） API 接口 ============
+
+/** 查询返单及时率数据 */
+export async function queryConfirmInTimeRate(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/confirm/queryConfirmInTimeRate', data)
+  return response.data
+}
+
+/** 导出返单及时率数据 */
+export async function exportConfirmInTimeRate(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/confirm/exportConfirmInTimeRate', data)
+  return response.data
+}
+
+// ============ UD返单进展（UDReorderProgress） API 接口 ============
+
+/** 查询配送未返单统计 */
+export async function queryDeliveryNotConfirmStat(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/confirm/delivery/queryDeliveryNotConfirmStat', data)
+  return response.data
+}
+
+/** 导出配送未返单统计 */
+export async function exportDeliveryNotConfirmStat(data: object) {
+  const response = await transportDashboardClient.post('/kanban/v1/confirm/delivery/exportDeliveryNotConfirmStat', data)
+  return response.data
+}
+
 export { transportDashboardClient, transportAiClient }
