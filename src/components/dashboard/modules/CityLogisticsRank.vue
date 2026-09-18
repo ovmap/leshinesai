@@ -1373,6 +1373,9 @@ onUnmounted(() => {
 
 <template>
   <div class="rank-container">
+    <div class="header-bar">
+      <h2 class="header-title">PFP-城配-物流商KPI排名</h2>
+    </div>
     <!-- 控制面板 -->
     <div class="control-panel">
       <div class="filter-group">
@@ -1651,6 +1654,27 @@ onUnmounted(() => {
   flex-direction: column;
   position: relative;
   overflow: hidden;
+}
+
+.header-bar {
+  width: 100%;
+  height: 1.8rem;
+  flex-shrink: 0;
+  background: url('/dashboard/images/title-bg.png') center/100% 100% no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  border-bottom: 1px solid rgba(74, 158, 255, 0.2);
+}
+
+.header-title {
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin: 0;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 /* 控制面板 */
@@ -1936,27 +1960,59 @@ onUnmounted(() => {
   overflow-x: auto;
   overflow-y: auto;
   width: 100%;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(74, 158, 255, 0.3) rgba(0, 0, 0, 0.1);
 }
 
 .table-section .custom-table :deep(.ant-table-container)::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 4px;
+  height: 4px;
 }
 
 .table-section .custom-table :deep(.ant-table-container)::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 3px;
-  margin: 2px 0;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 2px;
 }
 
 .table-section .custom-table :deep(.ant-table-container)::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.6) 0%, rgba(74, 158, 255, 0.6) 100%);
-  border-radius: 3px;
-  border: 1px solid rgba(59, 130, 246, 0.3);
+  background: rgba(74, 158, 255, 0.3);
+  border-radius: 2px;
+}
+
+.table-section .custom-table :deep(.ant-table-container)::-webkit-scrollbar-thumb:hover {
+  background: rgba(74, 158, 255, 0.5);
 }
 
 .table-section .custom-table :deep(.ant-table-container)::-webkit-scrollbar-corner {
-  background: rgba(0, 0, 0, 0.3);
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.table-section .custom-table :deep(.ant-table-body) {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(74, 158, 255, 0.3) rgba(0, 0, 0, 0.1);
+}
+
+.table-section .custom-table :deep(.ant-table-body::-webkit-scrollbar) {
+  width: 4px;
+  height: 4px;
+}
+
+.table-section .custom-table :deep(.ant-table-body::-webkit-scrollbar-track) {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 2px;
+}
+
+.table-section .custom-table :deep(.ant-table-body::-webkit-scrollbar-thumb) {
+  background: rgba(74, 158, 255, 0.3);
+  border-radius: 2px;
+}
+
+.table-section .custom-table :deep(.ant-table-body::-webkit-scrollbar-thumb:hover) {
+  background: rgba(74, 158, 255, 0.5);
+}
+
+.table-section .custom-table :deep(.ant-table-body::-webkit-scrollbar-corner) {
+  background: rgba(0, 0, 0, 0.1);
 }
 
 /* 操作按钮组 */

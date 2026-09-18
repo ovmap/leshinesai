@@ -884,6 +884,9 @@ onUnmounted(() => {
 
 <template>
   <div class="warehousing-logistics-container">
+    <div class="header-bar">
+      <h2 class="header-title">仓储物流准时交付率</h2>
+    </div>
     <!-- Tab页签 -->
     <div class="tabs-container">
       <div class="tab-item" :class="{ active: activeTab === 'ON_TIME_RATE' }" @click="switchTab('ON_TIME_RATE')">
@@ -1184,6 +1187,27 @@ onUnmounted(() => {
   padding: 0;
   overflow: visible;
   position: relative;
+}
+
+.header-bar {
+  width: 100%;
+  height: 1.8rem;
+  flex-shrink: 0;
+  background: url('/dashboard/images/title-bg.png') center/100% 100% no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  border-bottom: 1px solid rgba(74, 158, 255, 0.2);
+}
+
+.header-title {
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin: 0;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 /* Tab页签样式 */

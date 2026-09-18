@@ -388,6 +388,15 @@ const getPercentageStatus = (value: any): string => {
   return '✗' // 红色叉叉
 }
 
+// 获取百分比文字颜色
+const getTextColor = (value: any): string => {
+  const status = getPercentageStatus(value)
+  if (status === '✓') return '#52c41a'
+  if (status === '−') return '#faad14'
+  if (status === '✗') return '#ff4d4f'
+  return ''
+}
+
 
 // 切换行展开/折叠
 const toggleRowExpand = (key: string) => {
@@ -663,6 +672,9 @@ onUnmounted(() => {
 
 <template>
   <div class="non-lenovo-customer-container">
+    <div class="header-bar">
+      <h2 class="header-title">端到端准时交付率-非联想客户</h2>
+    </div>
     <!-- 筛选区域 -->
     <div class="filter-section">
       <div class="filter-form">
@@ -914,12 +926,7 @@ onUnmounted(() => {
               <span class="percentage-cell">
                 <span 
                   v-if="getPercentageStatus(record[column.key as string])"
-                  class="status-icon"
-                  :class="{
-                    'status-success': getPercentageStatus(record[column.key as string]) === '✓',
-                    'status-warning': getPercentageStatus(record[column.key as string]) === '−',
-                    'status-error': getPercentageStatus(record[column.key as string]) === '✗'
-                  }"
+                  :style="{ color: getTextColor(record[column.key as string]) }"
                 >
                   {{ getPercentageStatus(record[column.key as string]) }}
                 </span>
@@ -940,6 +947,27 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   padding: 0;
+}
+
+.header-bar {
+  width: 100%;
+  height: 1.8rem;
+  flex-shrink: 0;
+  background: url('/dashboard/images/title-bg.png') center/100% 100% no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  border-bottom: 1px solid rgba(74, 158, 255, 0.2);
+}
+
+.header-title {
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin: 0;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 .filter-section {
