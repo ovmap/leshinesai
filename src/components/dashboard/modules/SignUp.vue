@@ -12,7 +12,7 @@ const globalFilterStore = useGlobalFilterStore()
 const activeTab = ref('terminal')
 
 // 内部筛选
-const selectedRdc = ref('RDC配送')
+const selectedRdc = ref('RDC&配送商')
 const selectedRegion = ref('')
 const selectedCategory = ref('')
 const selectedDataSource = ref('')
@@ -28,16 +28,16 @@ const isDataSourceOpen = ref(false)
 
 // RDC 选项（末端）
 const rdcOptions = ref([
-  { value: 'RDC配送', label: 'RDC配送' },
-  { value: 'CDC承运商', label: 'CDC承运商' },
-  { value: 'RDC异常代码', label: 'RDC异常代码' },
-  { value: 'CDC异常代码', label: 'CDC异常代码' },
+  { value: 'RDC&配送商', label: 'RDC&配送商' },
+  { value: 'CDC&承运商', label: 'CDC&承运商' },
+  { value: 'RDC&异常代码', label: 'RDC&异常代码' },
+  { value: 'CDC&异常代码', label: 'CDC&异常代码' },
 ])
 
 // RDC 选项（干线）
 const trunkRdcOptions = ref([
-  { value: 'CDC承运商', label: 'CDC承运商' },
-  { value: 'CDC异常代码', label: 'CDC异常代码' },
+  { value: 'CDC&承运商', label: 'CDC&承运商' },
+  { value: 'CDC&异常代码', label: 'CDC&异常代码' },
 ])
 
 // 大区选项
@@ -62,7 +62,7 @@ const currentRdcOptions = computed(() => {
 // 显示文本
 const selectedRdcText = computed(() => {
   const option = currentRdcOptions.value?.find(item => item.value === selectedRdc.value)
-  return option ? option.label : (activeTab.value === 'terminal' ? 'RDC配送' : 'CDC承运商')
+  return option ? option.label : (activeTab.value === 'terminal' ? 'RDC&配送商' : 'CDC&承运商')
 })
 
 const selectedRegionText = computed(() => {
@@ -191,9 +191,9 @@ const fetchAbnormalOrderData = async () => {
 // 监听 tab 切换
 watch(activeTab, () => {
   if (activeTab.value === 'terminal') {
-    selectedRdc.value = 'RDC配送'
+    selectedRdc.value = 'RDC&配送商'
   } else {
-    selectedRdc.value = 'CDC承运商'
+    selectedRdc.value = 'CDC&承运商'
   }
   selectedRegion.value = ''
   selectedCategory.value = ''
@@ -258,9 +258,9 @@ const selectDataSource = (value: string) => {
 // 重置
 const handleReset = () => {
   if (activeTab.value === 'terminal') {
-    selectedRdc.value = 'RDC配送'
+    selectedRdc.value = 'RDC&配送商'
   } else {
-    selectedRdc.value = 'CDC承运商'
+    selectedRdc.value = 'CDC&承运商'
   }
   selectedRegion.value = ''
   selectedCategory.value = ''
@@ -703,20 +703,18 @@ onUnmounted(() => {
   color: rgba(255, 255, 255, 0.9);
   border-bottom: 0.0625rem solid rgba(74, 158, 255, 0.3);
   border-right: 0.0625rem solid rgba(74, 158, 255, 0.2);
-  background: rgba(74, 158, 255, 0.1);
+  background: #0c2545;
   position: sticky;
   top: 0;
   z-index: 100;
   white-space: nowrap;
-  backdrop-filter: blur(8px);
 }
 .data-table thead th:nth-child(1) {
   min-width: 120px;
   position: sticky;
   left: 0;
   z-index: 101;
-  background: rgba(8, 31, 64, 0.95);
-  backdrop-filter: blur(8px);
+  background: #081F40;
 }
 .data-table thead th:last-child {
   border-right: none;
@@ -745,8 +743,7 @@ onUnmounted(() => {
   position: sticky;
   left: 0;
   z-index: 10;
-  background: rgba(8, 31, 64, 0.95);
-  backdrop-filter: blur(8px);
+  background: #081F40;
 }
 .data-table tbody td:last-child {
   border-right: none;
@@ -755,8 +752,7 @@ onUnmounted(() => {
 .rdc-cell {
   font-weight: 600;
   color: #4a9eff;
-  background: rgba(8, 31, 64, 0.95) !important;
-  backdrop-filter: blur(8px) !important;
+  background: #081F40 !important;
   text-align: left !important;
   padding-left: 1rem !important;
   position: sticky !important;

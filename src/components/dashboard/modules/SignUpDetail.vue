@@ -12,13 +12,12 @@ const globalFilterStore = useGlobalFilterStore()
 const activeTab = ref('terminal')
 
 // 内部筛选
-const selectedRdc = ref('RDC配送')
+const selectedRdc = ref('RDC&配送商')
 const selectedRegion = ref('')
 const selectedCategory = ref('')
 const selectedDataSource = ref('')
 
 // 加载状态
-const loading = ref(false)
 const exportLoading = ref(false)
 
 // 下拉框开关状态
@@ -29,13 +28,13 @@ const isDataSourceOpen = ref(false)
 
 // RDC 选项（末端）
 const rdcOptions = ref([
-  { value: 'RDC配送', label: 'RDC配送' },
-  { value: 'CDC承运商', label: 'CDC承运商' },
+  { value: 'RDC&配送商', label: 'RDC&配送商' },
+  { value: 'CDC&承运商', label: 'CDC&承运商' },
 ])
 
 // RDC 选项（干线）
 const trunkRdcOptions = ref([
-  { value: 'CDC承运商', label: 'CDC承运商' },
+  { value: 'CDC&承运商', label: 'CDC&承运商' },
 ])
 
 // 大区选项
@@ -60,7 +59,7 @@ const currentRdcOptions = computed(() => {
 // 显示文本
 const selectedRdcText = computed(() => {
   const option = currentRdcOptions.value?.find(item => item.value === selectedRdc.value)
-  return option ? option.label : (activeTab.value === 'terminal' ? 'RDC配送' : 'CDC承运商')
+  return option ? option.label : (activeTab.value === 'terminal' ? 'RDC&配送商' : 'CDC&承运商')
 })
 
 const selectedRegionText = computed(() => {
@@ -136,12 +135,11 @@ const fetchDataSourceList = async () => {
 // 获取应签未签明细数据
 const fetchAbnormalOrderData = async () => {
   try {
-    loading.value = true
     const scrollTop = tableContainerRef.value?.scrollTop || 0
 
     const params = {
       page: 1,
-      pageSize: 100,
+      pageSize: 10,
       fromWarehouse: globalFilterStore.selectedWarehouse,
       toProvince: globalFilterStore.selectedProvince,
       toRdc: globalFilterStore.selectedRdc,
@@ -176,17 +174,15 @@ const fetchAbnormalOrderData = async () => {
     } else {
       message.error(error.msg || '获取应签未签明细失败')
     }
-  } finally {
-    loading.value = false
   }
 }
 
 // 监听 tab 切换
 watch(activeTab, () => {
   if (activeTab.value === 'terminal') {
-    selectedRdc.value = 'RDC配送'
+    selectedRdc.value = 'RDC&配送商'
   } else {
-    selectedRdc.value = 'CDC承运商'
+    selectedRdc.value = 'CDC&承运商'
   }
   selectedRegion.value = ''
   selectedCategory.value = ''
@@ -251,9 +247,9 @@ const selectDataSource = (value: string) => {
 // 重置
 const handleReset = () => {
   if (activeTab.value === 'terminal') {
-    selectedRdc.value = 'RDC配送'
+    selectedRdc.value = 'RDC&配送商'
   } else {
-    selectedRdc.value = 'CDC承运商'
+    selectedRdc.value = 'CDC&承运商'
   }
   selectedRegion.value = ''
   selectedCategory.value = ''
@@ -268,7 +264,7 @@ const handleExport = async () => {
     exportLoading.value = true
     const params = {
       page: 1,
-      pageSize: 100,
+      pageSize: 10,
       fromWarehouse: globalFilterStore.selectedWarehouse,
       toProvince: globalFilterStore.selectedProvince,
       toRdc: globalFilterStore.selectedRdc,
@@ -446,10 +442,6 @@ onUnmounted(() => {
 
     <!-- 数据表格 -->
     <div ref="tableContainerRef" class="table-container">
-      <div v-if="loading" class="loading-overlay">
-        <div class="loading-spinner"></div>
-      </div>
-
       <table v-if="tableData.length > 0" class="data-table">
         <thead>
           <tr>
@@ -700,31 +692,6 @@ onUnmounted(() => {
   overflow-y: auto;
 }
 
-/* 加载遮罩 */
-.loading-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10;
-}
-.loading-spinner {
-  width: 2rem;
-  height: 2rem;
-  border: 3px solid rgba(74, 158, 255, 0.3);
-  border-top-color: #4a9eff;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
 /* 表格样式 */
 .data-table {
   width: 100%;
@@ -744,20 +711,18 @@ onUnmounted(() => {
   color: rgba(255, 255, 255, 0.9);
   border-bottom: 0.0625rem solid rgba(74, 158, 255, 0.3);
   border-right: 0.0625rem solid rgba(74, 158, 255, 0.2);
-  background: rgba(74, 158, 255, 0.1);
+  background: #0c2545;
   position: sticky;
   top: 0;
   z-index: 100;
   white-space: nowrap;
-  backdrop-filter: blur(8px);
 }
 .data-table thead th:nth-child(1) {
   min-width: 120px;
   position: sticky;
   left: 0;
   z-index: 101;
-  background: rgba(8, 31, 64, 0.95);
-  backdrop-filter: blur(8px);
+  background: #081F40;
 }
 .data-table thead th:last-child {
   border-right: none;
@@ -786,8 +751,14 @@ onUnmounted(() => {
   position: sticky;
   left: 0;
   z-index: 10;
-  background: rgba(8, 31, 64, 0.95);
-  backdrop-filter: blur(8px);
+  background: #081F40;
+}
+.data-table thead th:nth-child(5),
+.data-table tbody td:nth-child(5) {
+  max-width: 200px;
+  white-space: normal;
+  word-break: break-all;
+  line-height: 1.4;
 }
 .data-table tbody td:last-child {
   border-right: none;
@@ -796,8 +767,7 @@ onUnmounted(() => {
 .rdc-cell {
   font-weight: 600;
   color: #4a9eff;
-  background: rgba(8, 31, 64, 0.95) !important;
-  backdrop-filter: blur(8px) !important;
+  background: #081F40 !important;
   text-align: left !important;
   padding-left: 1rem !important;
   position: sticky !important;
