@@ -355,8 +355,8 @@ onUnmounted(() => {
 
     <!-- 顶部标签页 -->
     <div class="tabs-container">
-      <div class="tab-item" :class="{ active: activeTab === 'terminal' }" @click="activeTab = 'terminal'">末端</div>
-      <div class="tab-item" :class="{ active: activeTab === 'trunk' }" @click="activeTab = 'trunk'">干线</div>
+      <div class="tab-item" :class="{ active: activeTab === 'terminal' }" @click="activeTab = 'terminal'">末端配送异常</div>
+      <div class="tab-item" :class="{ active: activeTab === 'trunk' }" @click="activeTab = 'trunk'">干线到仓异常</div>
     </div>
 
     <!-- 筛选器 + 导出按钮 -->
