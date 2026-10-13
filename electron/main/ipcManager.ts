@@ -675,6 +675,64 @@ export function registerIPCHandlers(): void {
     }
   })
 
+  // Dashboard CLI: 从看板窗口获取当前状态
+  ipcMain.handle('dashboard:get-status', async () => {
+    try {
+      const dashboardWin = getDashboardWindow()
+      if (!dashboardWin || dashboardWin.isDestroyed()) {
+        return { success: false, error: '看板窗口未打开' }
+      }
+
+      const requestId = `status-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+
+      return new Promise((resolve) => {
+        const timeout = setTimeout(() => {
+          ipcMain.removeAllListeners(`dashboard:status-response-${requestId}`)
+          resolve({ success: false, error: '获取状态超时' })
+        }, 3000)
+
+        ipcMain.once(`dashboard:status-response-${requestId}`, (_, data) => {
+          clearTimeout(timeout)
+          resolve({ success: true, data })
+        })
+
+        dashboardWin.webContents.send('dashboard:request-status', { requestId })
+      })
+    } catch (error: any) {
+      console.error('[IPC dashboard:get-status] Error:', error)
+      return { success: false, error: error.message }
+    }
+  })
+
+  // Dashboard CLI: 获取帮助信息（从看板窗口获取）
+  ipcMain.handle('dashboard:help', async (event, params) => {
+    try {
+      const dashboardWin = getDashboardWindow()
+      if (!dashboardWin || dashboardWin.isDestroyed()) {
+        return { success: false, error: '看板窗口未打开' }
+      }
+
+      const requestId = `help-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+
+      return new Promise((resolve) => {
+        const timeout = setTimeout(() => {
+          ipcMain.removeAllListeners(`dashboard:help-response-${requestId}`)
+          resolve({ success: false, error: '获取帮助超时' })
+        }, 3000)
+
+        ipcMain.once(`dashboard:help-response-${requestId}`, (_, data) => {
+          clearTimeout(timeout)
+          resolve({ success: true, data })
+        })
+
+        dashboardWin.webContents.send('dashboard:request-help', { ...params, requestId })
+      })
+    } catch (error: any) {
+      console.error('[IPC dashboard:help] Error:', error)
+      return { success: false, error: error.message }
+    }
+  })
+
   // Notify main window about settings changes
   ipcMain.handle('settings:notify-main-window', (event, data) => {
     try {

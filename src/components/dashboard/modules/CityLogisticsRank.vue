@@ -84,7 +84,7 @@ const loading = ref(false);
 
 // 弹窗相关状态
 const modalVisible = ref(false);
-const modalTitle = ref('PFP-城配-物流商KPI排名详情');
+const modalTitle = ref('城配物流商KPI排名详情');
 const activeTab = ref<'score' | 'reward'>('score');
 const modalLoading = ref(false);
 const exportLoading = ref(false);
@@ -1374,7 +1374,7 @@ onUnmounted(() => {
 <template>
   <div class="rank-container">
     <div class="header-bar">
-      <h2 class="header-title">PFP-城配-物流商KPI排名</h2>
+      <h2 class="header-title">城配物流商KPI排名</h2>
     </div>
     <!-- 控制面板 -->
     <div class="control-panel">

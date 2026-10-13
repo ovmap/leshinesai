@@ -588,7 +588,7 @@ onUnmounted(() => {
 <template>
   <div class="time-dimension-container">
     <div class="header-bar">
-      <h2 class="header-title">准时交付率-时间维度</h2>
+      <h2 class="header-title">准时交付率(时间维度)</h2>
     </div>
 
     <!-- 过滤器行 -->

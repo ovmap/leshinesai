@@ -565,7 +565,7 @@ export async function exportOnTimeRateTime(data: object) {
   return response.data
 }
 
-// ============ 准时交付率-客户（LenovoCustomer） API 接口 ============
+// ============ 准时交付率(联想客户)（LenovoCustomer） API 接口 ============
 
 /** 查询端到端交付率原因分析数据 */
 export async function queryEndToEndDeliveryRateReason(data: object) {
@@ -599,7 +599,7 @@ export async function exportEndToEndDeliveryRateCust(data: object) {
   return response.data
 }
 
-// ============ PFP KPI-仓库（TobWarehousingCard） API 接口 ============
+// ============ ToB物流商KPI评分（TobWarehousingCard） API 接口 ============
 
 /** 查询 ToB 物流商 KPI 评分汇总数据 */
 export async function queryToBKpiSummary(data: object) {
@@ -631,7 +631,7 @@ export async function queryCdcWarehouses(bizType: string) {
   return response.data
 }
 
-// ============ PFP KPI-仓库排名（TobWarehousingRank） API 接口 ============
+// ============ ToB物流商KPI排名（TobWarehousingRank） API 接口 ============
 
 /** 查询 ToB 物流商 KPI 排名数据 */
 export async function queryToBKpiRank(data: object) {
@@ -669,7 +669,7 @@ export async function exportToBLogisticKpiRankPunishDetail(data: object) {
   return response.data
 }
 
-// ============ PFP KPI-运输（TransportationLogisticsScores） API 接口 ============
+// ============ 运输物流商KPI评分（TransportationLogisticsScores） API 接口 ============
 
 /** 导出运输物流商 KPI 评分汇总 */
 export async function exportTransLogisticKpiScoreSummary(data: object) {
@@ -683,7 +683,7 @@ export async function exportTransLogisticKpiScoreDetail(data: object) {
   return response.data
 }
 
-// ============ PFP KPI-运输排名（TransportationLogisticsRank） API 接口 ============
+// ============ 运输物流商KPI排名（TransportationLogisticsRank） API 接口 ============
 
 /** 查询运输物流商 KPI 排名数据 */
 export async function queryTransKpiRank(data: object) {
@@ -721,7 +721,7 @@ export async function exportTransLogisticKpiRankPunishDetail(data: object) {
   return response.data
 }
 
-// ============ PFP KPI-城配（CityLogisticsScores） API 接口 ============
+// ============ 城配物流商KPI评分（CityLogisticsScores） API 接口 ============
 
 /** 查询城配物流商 KPI 评分汇总数据 */
 export async function queryDeliveryKpiSummary(data: object) {
@@ -741,7 +741,7 @@ export async function exportDeliveryLogisticKpiScoreDetail(data: object) {
   return response.data
 }
 
-// ============ PFP KPI-城配排名（CityLogisticsRank） API 接口 ============
+// ============ 城配物流商KPI排名（CityLogisticsRank） API 接口 ============
 
 /** 查询城配物流商 KPI 排名数据 */
 export async function queryDeliveryKpiRank(data: object) {
@@ -779,7 +779,7 @@ export async function exportDeliveryLogisticKpiRankPunishDetail(data: object) {
   return response.data
 }
 
-// ============ TCL华星物流商KPI评分（TclWarehousingScores） API 接口 ============
+// ============ 华星物流商KPI评分（TclWarehousingScores） API 接口 ============
 
 /** 查询TCL华星物流商 KPI 评分汇总数据 */
 export async function queryHuaxingKpiSummary(data: object) {
@@ -913,9 +913,9 @@ export async function queryVolumeAggList() {
   return response.data
 }
 
-// ============ 货量表格占比（TablePercentage） API 接口 ============
+// ============ 货量(表格占比)（TablePercentage） API 接口 ============
 
-/** 查询货量表格占比数据 */
+/** 查询货量(表格占比)数据 */
 export async function queryVolumeTableRate(data: object) {
   const response = await transportDashboardClient.post('/kanban/v1/volume/queryVolumeTableRate', data)
   return response.data
@@ -949,7 +949,7 @@ export async function exportConfirmInTimeRate(data: object) {
   return response.data
 }
 
-// ============ UD返单进展（UDReorderProgress） API 接口 ============
+// ============ 未返单明细（UDReorderProgress） API 接口 ============
 
 /** 查询配送未返单统计 */
 export async function queryDeliveryNotConfirmStat(data: object) {

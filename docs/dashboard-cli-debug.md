@@ -287,8 +287,18 @@ await window.ipcRenderer.invoke('dashboard:control', {
 
 | 页面名 | 标题 | 说明 |
 |--------|------|------|
-| `cargoBanner` | 运输智能体 | 包含货量卡片、趋势图、异常图表等 16 个子组件 |
+| `cargoBanner` | 智能体中心 | 包含货量卡片、趋势图、异常图表等 16 个子组件 |
 | `mapPage` | 地图 | 中国地图，含热力图、在途车辆、仓库、客户、迁徙路线 |
+| `reorderDashboard` | 返单看板 | 应签未签、返单及时率、未返单明细 |
+| `cargoDashboard` | 货量看板 | 货量趋势、货量占比、运输异常 |
+| `onTimeDelivery` | 准时交付率 | 准时交付率(仓+物流)、准时交付率(时间维度) |
+| `onTimeDeliveryCustomer` | 准时交付率(联想客户) | 联想/非联想客户准时交付率 |
+| `pfpKpiWarehouse` | ToB物流商KPI评分 | 仓库 KPI 评分与排名 |
+| `pfpKpiTransport` | 运输物流商KPI评分 | 运输物流 KPI 评分与排名 |
+| `pfpKpiCityDelivery` | 城配物流商KPI评分 | 城配 KPI 评分与排名 |
+| `pfpKpiCustomer` | PFP KPI-客户 | 客户 KPI 评分 |
+| `pfpKpiToC` | PFP KPI-ToC | ToC 物流商 KPI 评分 |
+| `pfpKpiExpress` | PFP KPI-运输快递业务 | 运输快递 KPI 评分 |
 
 ### close — 关闭看板
 
@@ -296,29 +306,97 @@ await window.ipcRenderer.invoke('dashboard:control', {
 await window.ipcRenderer.invoke('dashboard:close')
 ```
 
-### fullscreen — 切换全屏
+### status — 获取看板当前状态
 
 ```js
-// 切换全屏（toggle）
-await window.ipcRenderer.invoke('dashboard:control', {
-  command: 'fullscreen',
-  args: { action: 'toggle' }
-})
-
-// 进入全屏
-await window.ipcRenderer.invoke('dashboard:control', {
-  command: 'fullscreen',
-  args: { action: 'enter' }
-})
-
-// 退出全屏
-await window.ipcRenderer.invoke('dashboard:control', {
-  command: 'fullscreen',
-  args: { action: 'exit' }
-})
+// 获取当前布局、页面、模块信息
+await window.ipcRenderer.invoke('dashboard:get-status')
 ```
 
-action 可选值: `toggle`（默认）| `enter` | `exit`
+返回示例（scroll 布局）：
+```
+## 看板当前状态
+
+- **布局**: scroll
+- **当前页面**: 智能体中心
+- **页面模块**: 累计货量、提货及时率、准时交付率、能源价格、干单价、配单价、货量趋势、签收信息、返单进展、能源价格趋势、运输异常、运力池、加急&重点客户风险、重大活动&极端天气影响
+```
+
+返回示例（single 布局）：
+```
+## 看板当前状态
+
+- **布局**: single
+- **显示模块**: 货量趋势
+```
+
+### help — 查询命令用法（分层帮助 + 状态感知）
+
+help 命令通过 IPC 调用看板窗口，和其他命令保持一致。
+
+**状态感知**：help 会根据当前布局、页面、模块动态返回不同的帮助内容。
+
+#### 在 DevTools 中测试
+
+```js
+// 获取命令总览（带当前状态）
+await window.ipcRenderer.invoke('dashboard:help', {})
+
+// 查询 filter 命令详情
+await window.ipcRenderer.invoke('dashboard:help', { queryCommand: 'filter' })
+
+// 查询 action 命令详情（会显示当前可操作的模块）
+await window.ipcRenderer.invoke('dashboard:help', { queryCommand: 'action' })
+
+// 查询具体模块的操作
+await window.ipcRenderer.invoke('dashboard:help', { queryCommand: 'action', module: 'signingInformation' })
+
+// 查询页面列表（会标记当前页面）
+await window.ipcRenderer.invoke('dashboard:help', { queryCommand: 'page' })
+
+// 查询 show 命令（会根据当前布局提示）
+await window.ipcRenderer.invoke('dashboard:help', { queryCommand: 'show' })
+
+// 查询 data 命令（会显示当前页面模块）
+await window.ipcRenderer.invoke('dashboard:help', { queryCommand: 'data' })
+```
+
+#### 分层查询示例
+
+```
+help()                                        → 命令总览（当前状态 + 10个命令 + 快速开始）
+help({ queryCommand: "filter" })              → filter 参数详情（筛选条件、时间维度、指标类型）
+help({ queryCommand: "action" })              → action 用法总览（当前可操作模块 + 全部支持模块）
+help({ queryCommand: "action", module: "cargoTrend" })  → cargoTrend 具体操作列表
+help({ queryCommand: "page" })                → 12个页面列表（标记当前页面）
+help({ queryCommand: "show" })                → 模块列表 + 布局说明（根据当前布局提示）
+help({ queryCommand: "layout" })              → 4种布局说明（显示当前布局）
+help({ queryCommand: "data" })                → format/scope 说明（显示当前页面模块）
+```
+
+#### 状态感知说明
+
+help 会根据当前状态动态返回内容：
+
+| 命令 | 感知内容 |
+|------|----------|
+| help() | 显示当前布局、页面/模块 |
+| help({ queryCommand: "show" }) | 根据当前布局提示使用方式 |
+| help({ queryCommand: "data" }) | 显示当前页面模块列表 |
+| help({ queryCommand: "action" }) | 显示当前可操作模块 |
+| help({ queryCommand: "layout" }) | 显示当前布局 |
+| help({ queryCommand: "page" }) | 标记当前页面 |
+
+#### 使用场景
+
+1. **AI 不确定参数时**：先调用 help 查询用法
+2. **探索模块操作**：`help({ queryCommand: "action", module: "xxx" })` 查看模块支持的操作
+3. **了解页面结构**：`help({ queryCommand: "page" })` 查看所有页面
+4. **感知当前状态**：help 自动显示当前布局/页面/模块，帮助 AI 做出正确决策
+
+### fullscreen — 已删除
+
+> fullscreen 命令已删除，全屏操作请手动完成。
 
 ## 可用模块
 

@@ -494,7 +494,7 @@ onUnmounted(() => {
 <template>
   <div class="tob-card-container">
     <div class="header-bar">
-      <h2 class="header-title">PFP KPI-仓库</h2>
+      <h2 class="header-title">ToB物流商KPI评分</h2>
     </div>
     <!-- 控制面板 -->
     <div class="control-panel">

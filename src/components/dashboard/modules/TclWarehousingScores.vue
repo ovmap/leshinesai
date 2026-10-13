@@ -400,7 +400,7 @@ const handleExportSummary = async () => {
         const link = document.createElement('a');
         link.href = result.data;
         const xlsxMatch = result.data.match(/([^/]+\.xlsx)$/);
-        const downloadFilename = xlsxMatch ? xlsxMatch[1] : `TCL华星物流商KPI评分汇总_${dateRange.value[0].format('YYYY-MM')}_${dateRange.value[1].format('YYYY-MM')}.xlsx`;
+        const downloadFilename = xlsxMatch ? xlsxMatch[1] : `华星物流商KPI评分汇总_${dateRange.value[0].format('YYYY-MM')}_${dateRange.value[1].format('YYYY-MM')}.xlsx`;
         link.download = downloadFilename;
         link.target = '_blank';
         document.body.appendChild(link);
@@ -450,7 +450,7 @@ const handleExportDetail = async () => {
         const link = document.createElement('a');
         link.href = result.data;
         const xlsxMatch = result.data.match(/([^/]+\.xlsx)$/);
-        const downloadFilename = xlsxMatch ? xlsxMatch[1] : `TCL华星物流商KPI评分明细_${dateRange.value[0].format('YYYY-MM')}_${dateRange.value[1].format('YYYY-MM')}.xlsx`;
+        const downloadFilename = xlsxMatch ? xlsxMatch[1] : `华星物流商KPI评分明细_${dateRange.value[0].format('YYYY-MM')}_${dateRange.value[1].format('YYYY-MM')}.xlsx`;
         link.download = downloadFilename;
         link.target = '_blank';
         document.body.appendChild(link);
@@ -534,7 +534,7 @@ onUnmounted(() => {
 <template>
   <div class="tcl-card-container">
     <div class="header-bar">
-      <h2 class="header-title">TCL华星物流商KPI评分</h2>
+      <h2 class="header-title">华星物流商KPI评分</h2>
     </div>
     <!-- 控制面板 -->
     <div class="control-panel">

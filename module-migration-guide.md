@@ -305,17 +305,17 @@ import { Pagination, Autoplay } from 'swiper/modules'
 | 货量趋势 | CargoTrend.vue | 图表 | queryVolume |
 | 签收信息 | SigningInformation.vue | 表格+图表 | querySign |
 | 返单进展 | ReorderProgress.vue | 双层环形图+导出进度 | queryTransConfirmStat, exportTransNotConfirm |
-| 仓储物流准时交付率 | WarehousingLogistics.vue | 多层级表格+筛选 | queryOnTimeDeliveryRate, exportOnTimeDeliveryRate |
-| 准时交付率-时间维度 | TimeDimension.vue | 动态时间维度表格+筛选 | queryOnTimeRateTime, exportOnTimeRateTime |
-| 准时交付率-客户 | LenovoCustomer.vue | 原因分析表格+筛选 | queryEndToEndDeliveryRateReason, queryProductGroupList, queryBtcpIndicateList |
-| 端到端准时交付率-非联想客户 | NonLenovoCustomer.vue | 多层级表格+筛选+导出 | queryEndToEndDeliveryRateCust, exportEndToEndDeliveryRateCust |
-| PFP KPI-仓库 | TobWarehousingCard.vue | 多层级表格+筛选+双导出 | queryToBKpiSummary, exportToBLogisticKpiScoreSummary, exportToBLogisticKpiScoreDetail |
-| PFP KPI-仓库排名 | TobWarehousingRank.vue | 动态月份列表格+详情弹窗+双导出 | queryToBKpiRank, queryToBKpiRankDetail, queryToBLogisticPunishInfo, exportToBLogisticKpiRank, exportToBLogisticKpiRankScoreDetail, exportToBLogisticKpiRankPunishDetail |
-| PFP KPI-运输 | TransportationLogisticsScores.vue | 多层级表格+筛选+运输方式+双导出 | queryTransKpiSummary, queryTransTypeList, exportTransLogisticKpiScoreSummary, exportTransLogisticKpiScoreDetail |
-| PFP KPI-运输排名 | TransportationLogisticsRank.vue | 动态月份列表格+详情弹窗+双导出 | queryTransKpiRank, queryTransKpiRankDetail, queryTransLogisticPunishInfo, exportTransLogisticKpiRank, exportTransLogisticKpiRankScoreDetail, exportTransLogisticKpiRankPunishDetail |
-| PFP KPI-城配 | CityLogisticsScores.vue | 多层级表格+筛选+双导出 | queryDeliveryKpiSummary, exportDeliveryLogisticKpiScoreSummary, exportDeliveryLogisticKpiScoreDetail |
-| PFP KPI-城配排名 | CityLogisticsRank.vue | 动态月份列表格+详情弹窗+双导出 | queryDeliveryKpiRank, queryDeliveryKpiRankDetail, queryDeliveryLogisticPunishInfo, exportDeliveryLogisticKpiRank, exportDeliveryLogisticKpiRankScoreDetail, exportDeliveryLogisticKpiRankPunishDetail |
-| TCL华星物流商KPI评分 | TclWarehousingScores.vue | 多层级表格+筛选+双导出 | queryHuaxingKpiSummary, exportHuaxingLogisticKpiScoreSummary, exportHuaxingLogisticKpiScoreDetail |
+| 准时交付率(仓+物流) | WarehousingLogistics.vue | 多层级表格+筛选 | queryOnTimeDeliveryRate, exportOnTimeDeliveryRate |
+| 准时交付率(时间维度) | TimeDimension.vue | 动态时间维度表格+筛选 | queryOnTimeRateTime, exportOnTimeRateTime |
+| 准时交付率(联想客户) | LenovoCustomer.vue | 原因分析表格+筛选 | queryEndToEndDeliveryRateReason, queryProductGroupList, queryBtcpIndicateList |
+| 准时交付率(非联想客户) | NonLenovoCustomer.vue | 多层级表格+筛选+导出 | queryEndToEndDeliveryRateCust, exportEndToEndDeliveryRateCust |
+| ToB物流商KPI评分 | TobWarehousingCard.vue | 多层级表格+筛选+双导出 | queryToBKpiSummary, exportToBLogisticKpiScoreSummary, exportToBLogisticKpiScoreDetail |
+| ToB物流商KPI排名 | TobWarehousingRank.vue | 动态月份列表格+详情弹窗+双导出 | queryToBKpiRank, queryToBKpiRankDetail, queryToBLogisticPunishInfo, exportToBLogisticKpiRank, exportToBLogisticKpiRankScoreDetail, exportToBLogisticKpiRankPunishDetail |
+| 运输物流商KPI评分 | TransportationLogisticsScores.vue | 多层级表格+筛选+运输方式+双导出 | queryTransKpiSummary, queryTransTypeList, exportTransLogisticKpiScoreSummary, exportTransLogisticKpiScoreDetail |
+| 运输物流商KPI排名 | TransportationLogisticsRank.vue | 动态月份列表格+详情弹窗+双导出 | queryTransKpiRank, queryTransKpiRankDetail, queryTransLogisticPunishInfo, exportTransLogisticKpiRank, exportTransLogisticKpiRankScoreDetail, exportTransLogisticKpiRankPunishDetail |
+| 城配物流商KPI评分 | CityLogisticsScores.vue | 多层级表格+筛选+双导出 | queryDeliveryKpiSummary, exportDeliveryLogisticKpiScoreSummary, exportDeliveryLogisticKpiScoreDetail |
+| 城配物流商KPI排名 | CityLogisticsRank.vue | 动态月份列表格+详情弹窗+双导出 | queryDeliveryKpiRank, queryDeliveryKpiRankDetail, queryDeliveryLogisticPunishInfo, exportDeliveryLogisticKpiRank, exportDeliveryLogisticKpiRankScoreDetail, exportDeliveryLogisticKpiRankPunishDetail |
+| 华星物流商KPI评分 | TclWarehousingScores.vue | 多层级表格+筛选+双导出 | queryHuaxingKpiSummary, exportHuaxingLogisticKpiScoreSummary, exportHuaxingLogisticKpiScoreDetail |
 | 运输仓储多业务KPI评分 | TransStorageKpiScore.vue | 表格+筛选+导出 | queryTransStorageKpiScore, exportTransStorageKpiScore, queryAssessmentUnit |
 | 运输DOA KPI评分 | TransportationDoaScores.vue | 多层级表格+筛选+双导出 | queryDoaKpiSummary, queryTransTypeList, exportDoaLogisticKpiScoreSummary, exportDoaLogisticKpiScoreDetail |
 | ToC物流商KPI评分 | TocWarehousingScores.vue | 多层级表格+筛选+双导出 | queryToCKpiSummary, exportTocLogisticKpiScoreSummary, exportTocLogisticKpiScoreDetail |
@@ -324,9 +324,9 @@ import { Pagination, Autoplay } from 'swiper/modules'
 | 应签未签 | SignUp.vue | Tab切换+动态表格+筛选+导出 | queryAbnormalOrder, exportAbnormalOrder, queryRegionList, queryAbnormalTypeList |
 | 应签未签明细 | SignUpDetail.vue | Tab切换+固定表头表格+筛选+导出 | queryAbnormalOrderItem, exportAbnormalOrderItem, queryRegionList, queryAbnormalTypeList |
 | 返单及时率 | OrderRate.vue | 日期范围+物流商多选+表格+导出 | queryConfirmInTimeRate, exportConfirmInTimeRate, queryLogisticList |
-| UD返单进展 | UDReorderProgress.vue | Tab切换+日期范围+物流商多选+超期区间+表格+导出 | queryDeliveryNotConfirmStat, exportDeliveryNotConfirmStat, queryLogisticList |
+| 未返单明细 | UDReorderProgress.vue | Tab切换+日期范围+物流商多选+超期区间+表格+导出 | queryDeliveryNotConfirmStat, exportDeliveryNotConfirmStat, queryLogisticList |
 | 货量占比 | BarPercentage.vue | ECharts横向柱状图+日期范围+统计方式+数据源+体积筛选 | queryVolumeBarRate, queryVolumeStatType |
-| 货量表格占比 | TablePercentage.vue | ant-design表格+日期范围+统计维度+数据源+体积筛选 | queryVolumeTableRate |
+| 货量(表格占比) | TablePercentage.vue | ant-design表格+日期范围+统计维度+数据源+体积筛选 | queryVolumeTableRate |
 
 ---
 
@@ -338,7 +338,7 @@ import { Pagination, Autoplay } from 'swiper/modules'
 
 **目标文件**: `src/components/dashboard/modules/CityLogisticsRank.vue`
 
-**页面位置**: `pfpKpiCityDelivery` (PFP KPI-城配) 页面，位置 x=1, y=14, 尺寸 48x14
+**页面位置**: `pfpKpiCityDelivery` (城配物流商KPI评分) 页面，位置 x=1, y=14, 尺寸 48x14
 
 **迁移内容**:
 1. **API 接口** (transportApi.ts):
@@ -420,7 +420,7 @@ import { Pagination, Autoplay } from 'swiper/modules'
 
 **目标文件**: `src/components/dashboard/modules/TransportationLogisticsScores.vue`
 
-**页面位置**: `pfpKpiTransport` (PFP KPI-运输) 页面，位置 x=1, y=1, 尺寸 48x13
+**页面位置**: `pfpKpiTransport` (运输物流商KPI评分) 页面，位置 x=1, y=1, 尺寸 48x13
 
 **迁移内容**:
 1. **API 接口** (transportApi.ts):
@@ -873,7 +873,7 @@ import { Pagination, Autoplay } from 'swiper/modules'
 
 **迁移内容**:
 1. **API 接口** (transportApi.ts):
-   - `queryVolumeTableRate` - 查询货量表格占比数据
+   - `queryVolumeTableRate` - 查询货量(表格占比)数据
 
 2. **组件功能**:
    - ant-design-vue 表格，显示货量占比数据

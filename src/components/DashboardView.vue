@@ -81,10 +81,11 @@ import ModulesRender from './dashboard/ModulesRender.vue'
 import QuickBar from './dashboard/QuickBar.vue'
 import GlobalFilterBar from './dashboard/GlobalFilterBar.vue'
 import type { ModuleConfig } from './dashboard/ModulesRender.vue'
-import { getModuleTitleMap, pageRegistry, getPageByName, LARGE_MODULES } from './dashboard/moduleRegistry'
+import { getModuleTitleMap, pageRegistry, getPageByName, LARGE_MODULES, getModuleByName, getPages, moduleRegistry } from './dashboard/moduleRegistry'
 import type { PageMeta } from './dashboard/moduleRegistry'
 import { useDashboardControlStore } from '../stores/dashboardControlStore'
 import { useDashboardDataStore } from '../stores/dashboardDataStore'
+import { getHelpInfo } from '../utils/dashboard/commands/help'
 
 const controlStore = useDashboardControlStore()
 const dataStore = useDashboardDataStore()
@@ -224,6 +225,24 @@ onMounted(() => {
     window.ipcRenderer?.send(`dashboard:data-response-${requestId}`, data)
   })
 
+  // dashboard:request-status — 状态请求响应
+  window.ipcRenderer?.on('dashboard:request-status', (_event: any, params: any) => {
+    const { requestId } = params
+    const status = getStatusInfo()
+    window.ipcRenderer?.send(`dashboard:status-response-${requestId}`, status)
+  })
+
+  // dashboard:request-help — 帮助请求响应（带状态感知）
+  window.ipcRenderer?.on('dashboard:request-help', (_event: any, params: any) => {
+    const { requestId, queryCommand, module } = params
+    // 获取当前状态
+    const layout = controlStore.currentLayout
+    const currentPage = controlStore.currentPage
+    const activeModules = controlStore.activeModules
+    const help = getHelpInfo(queryCommand, module, { layout, currentPage, activeModules })
+    window.ipcRenderer?.send(`dashboard:help-response-${requestId}`, help)
+  })
+
   // 开发环境直接加载默认模块
   if (!window.ipcRenderer) {
     controlStore.setModules(['cargoTrend', 'signingInformation'])
@@ -293,6 +312,38 @@ function handleCommand(command: any) {
   }
 }
 
+// 获取当前看板状态信息
+function getStatusInfo(): string {
+  const layout = controlStore.currentLayout
+  const currentPage = controlStore.currentPage
+  const activeModules = controlStore.activeModules
+
+  let status = `## 看板当前状态\n\n`
+  status += `- **布局**: ${layout}\n`
+
+  if (layout === 'scroll' && currentPage) {
+    const pageInfo = getPageByName(currentPage)
+    status += `- **当前页面**: ${pageInfo?.title || currentPage}\n`
+    // scroll 布局显示当前页面的模块
+    if (pageInfo?.components) {
+      const moduleNames = pageInfo.components.map(c => moduleTitleMap[c.name] || c.name)
+      status += `- **页面模块**: ${moduleNames.join('、')}\n`
+    }
+  } else if (activeModules.length > 0) {
+    // 非 scroll 布局显示 activeModules
+    const moduleNames = activeModules.map(m => moduleTitleMap[m] || m)
+    if (layout === 'single') {
+      status += `- **显示模块**: ${moduleNames[0] || '无'}\n`
+    } else {
+      status += `- **显示模块**: ${moduleNames.join('、')}\n`
+    }
+  } else {
+    status += `- **显示模块**: 无\n`
+  }
+
+  return status
+}
+
 onUnmounted(() => {
   document.removeEventListener('fullscreenchange', handleFullscreenChange)
   window.ipcRenderer?.removeAllListeners('dashboard:fullscreen-change')
@@ -300,6 +351,8 @@ onUnmounted(() => {
   window.ipcRenderer?.removeAllListeners('dashboard:update')
   window.ipcRenderer?.removeAllListeners('dashboard:command')
   window.ipcRenderer?.removeAllListeners('dashboard:request-data')
+  window.ipcRenderer?.removeAllListeners('dashboard:request-status')
+  window.ipcRenderer?.removeAllListeners('dashboard:request-help')
 })
 </script>
 

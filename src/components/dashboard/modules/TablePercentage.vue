@@ -473,7 +473,7 @@ const calculateTableScrollY = () => {
   <div class="table-percentage-container">
     <!-- 标题栏 -->
     <div class="header-bar">
-      <h2 class="header-title">货量表格占比</h2>
+      <h2 class="header-title">货量(表格占比)</h2>
     </div>
 
     <!-- 控制面板 -->

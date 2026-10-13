@@ -657,7 +657,7 @@ onUnmounted(() => {
 <template>
   <div class="rank-container">
     <div class="header-bar">
-      <h2 class="header-title">PFP KPI-城配</h2>
+      <h2 class="header-title">城配物流商KPI评分</h2>
     </div>
     <div class="control-panel">
       <div class="filter-group">

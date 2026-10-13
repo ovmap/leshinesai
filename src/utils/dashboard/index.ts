@@ -18,8 +18,9 @@ import { handleAction } from './commands/action'
 import { handleReset } from './commands/reset'
 import { handleLayout } from './commands/layout'
 import { handlePage } from './commands/page'
-import { handleFullscreen } from './commands/fullscreen'
 import { handleClose } from './commands/close'
+import { handleStatus } from './commands/status'
+import { handleHelp } from './commands/help'
 
 /**
  * 命令注册表 — 新增命令只需在此添加
@@ -39,6 +40,11 @@ const commandRegistry: CommandRegistration[] = [
     name: 'data',
     description: '获取看板数据（返回 Markdown）',
     handler: handleData,
+  },
+  {
+    name: 'status',
+    description: '获取看板当前状态（布局、页面、模块）',
+    handler: handleStatus,
   },
   {
     name: 'action',
@@ -61,9 +67,9 @@ const commandRegistry: CommandRegistration[] = [
     handler: handlePage,
   },
   {
-    name: 'fullscreen',
-    description: '切换全屏（enter/exit/toggle）',
-    handler: handleFullscreen,
+    name: 'help',
+    description: '查询命令用法（分层帮助）',
+    handler: handleHelp,
   },
   {
     name: 'close',

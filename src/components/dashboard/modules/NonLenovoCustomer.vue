@@ -673,7 +673,7 @@ onUnmounted(() => {
 <template>
   <div class="non-lenovo-customer-container">
     <div class="header-bar">
-      <h2 class="header-title">端到端准时交付率-非联想客户</h2>
+      <h2 class="header-title">准时交付率(非联想客户)</h2>
     </div>
     <!-- 筛选区域 -->
     <div class="filter-section">

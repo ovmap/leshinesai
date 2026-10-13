@@ -141,27 +141,27 @@ export const pageRegistry: PageMeta[] = [
     icon: 'icon-tubiao-zhexiantu',
     gridConfig: { gridCols: 48, gridRows: 27, gridGap: 12 },
     components: [
-      // 仓储物流准时交付率模块（占 48x13）
+      // 准时交付率(仓+物流)模块（占 48x13）
       { name: 'warehousingLogistics', x: 1, y: 1, width: 48, height: 13, zoom: 1 },
-      // 准时交付率-时间维度模块（占 48x14，两个模块合计占满 48x27）
+      // 准时交付率(时间维度)模块（占 48x14，两个模块合计占满 48x27）
       { name: 'timeDimension', x: 1, y: 14, width: 48, height: 14, zoom: 1 },
     ]
   },
   {
     name: 'onTimeDeliveryCustomer',
-    title: '准时交付率-客户',
+    title: '准时交付率(联想客户)',
     icon: 'icon-wushuju',
     gridConfig: { gridCols: 48, gridRows: 27, gridGap: 12 },
     components: [
-      // 准时交付率-客户模块（占 48x13）
+      // 准时交付率(联想客户)模块（占 48x13）
       { name: 'lenovoCustomer', x: 1, y: 1, width: 48, height: 13, zoom: 1 },
-      // 端到端准时交付率-非联想客户模块（占 48x14，两个模块合计占满 48x27）
+      // 准时交付率(非联想客户)模块（占 48x14，两个模块合计占满 48x27）
       { name: 'nonLenovoCustomer', x: 1, y: 14, width: 48, height: 14, zoom: 1 },
     ]
   },
   {
     name: 'pfpKpiWarehouse',
-    title: 'PFP KPI-仓库',
+    title: 'ToB物流商KPI评分',
     icon: 'icon-shuzihuayingxiao',
     gridConfig: { gridCols: 48, gridRows: 27, gridGap: 12 },
     components: [
@@ -171,7 +171,7 @@ export const pageRegistry: PageMeta[] = [
   },
   {
     name: 'pfpKpiTransport',
-    title: 'PFP KPI-运输',
+    title: '运输物流商KPI评分',
     icon: 'icon-falv',
     gridConfig: { gridCols: 48, gridRows: 27, gridGap: 12 },
     components: [
@@ -181,7 +181,7 @@ export const pageRegistry: PageMeta[] = [
   },
   {
     name: 'pfpKpiCityDelivery',
-    title: 'PFP KPI-城配',
+    title: '城配物流商KPI评分',
     icon: 'icon-bumendongtai',
     gridConfig: { gridCols: 48, gridRows: 27, gridGap: 12 },
     components: [
@@ -256,7 +256,7 @@ export const moduleRegistry: ModuleMeta[] = [
   },
   {
     name: 'warehousingLogistics',
-    title: '仓储物流准时交付率',
+    title: '准时交付率(仓+物流)',
     icon: 'delivery',
     component: defineAsyncComponent(() => import('./modules/WarehousingLogistics.vue')),
     defaultSpan: 24,
@@ -264,7 +264,7 @@ export const moduleRegistry: ModuleMeta[] = [
   },
   {
     name: 'timeDimension',
-    title: '准时交付率-时间维度',
+    title: '准时交付率(时间维度)',
     icon: 'delivery',
     component: defineAsyncComponent(() => import('./modules/TimeDimension.vue')),
     defaultSpan: 24,
@@ -272,7 +272,7 @@ export const moduleRegistry: ModuleMeta[] = [
   },
   {
     name: 'lenovoCustomer',
-    title: '准时交付率-客户',
+    title: '准时交付率(联想客户)',
     icon: 'delivery',
     component: defineAsyncComponent(() => import('./modules/LenovoCustomer.vue')),
     defaultSpan: 24,
@@ -280,7 +280,7 @@ export const moduleRegistry: ModuleMeta[] = [
   },
   {
     name: 'nonLenovoCustomer',
-    title: '端到端准时交付率-非联想客户',
+    title: '准时交付率(非联想客户)',
     icon: 'delivery',
     component: defineAsyncComponent(() => import('./modules/NonLenovoCustomer.vue')),
     defaultSpan: 24,
@@ -288,7 +288,7 @@ export const moduleRegistry: ModuleMeta[] = [
   },
   {
     name: 'tobWarehousingCard',
-    title: 'PFP KPI-仓库',
+    title: 'ToB物流商KPI评分',
     icon: 'delivery',
     component: defineAsyncComponent(() => import('./modules/TobWarehousingCard.vue')),
     defaultSpan: 24,
@@ -296,7 +296,7 @@ export const moduleRegistry: ModuleMeta[] = [
   },
   {
     name: 'tobWarehousingRank',
-    title: 'PFP KPI-仓库排名',
+    title: 'ToB物流商KPI排名',
     icon: 'delivery',
     component: defineAsyncComponent(() => import('./modules/TobWarehousingRank.vue')),
     defaultSpan: 24,
@@ -304,7 +304,7 @@ export const moduleRegistry: ModuleMeta[] = [
   },
   {
     name: 'transportationLogisticsScores',
-    title: 'PFP KPI-运输',
+    title: '运输物流商KPI评分',
     icon: 'delivery',
     component: defineAsyncComponent(() => import('./modules/TransportationLogisticsScores.vue')),
     defaultSpan: 24,
@@ -312,7 +312,7 @@ export const moduleRegistry: ModuleMeta[] = [
   },
   {
     name: 'transportationLogisticsRank',
-    title: 'PFP KPI-运输排名',
+    title: '运输物流商KPI排名',
     icon: 'delivery',
     component: defineAsyncComponent(() => import('./modules/TransportationLogisticsRank.vue')),
     defaultSpan: 24,
@@ -320,7 +320,7 @@ export const moduleRegistry: ModuleMeta[] = [
   },
   {
     name: 'cityLogisticsScores',
-    title: 'PFP KPI-城配',
+    title: '城配物流商KPI评分',
     icon: 'delivery',
     component: defineAsyncComponent(() => import('./modules/CityLogisticsScores.vue')),
     defaultSpan: 24,
@@ -328,7 +328,7 @@ export const moduleRegistry: ModuleMeta[] = [
   },
   {
     name: 'cityLogisticsRank',
-    title: 'PFP KPI-城配排名',
+    title: '城配物流商KPI排名',
     icon: 'delivery',
     component: defineAsyncComponent(() => import('./modules/CityLogisticsRank.vue')),
     defaultSpan: 24,
@@ -336,7 +336,7 @@ export const moduleRegistry: ModuleMeta[] = [
   },
   {
     name: 'tclWarehousingScores',
-    title: 'TCL华星物流商KPI评分',
+    title: '华星物流商KPI评分',
     icon: 'delivery',
     component: defineAsyncComponent(() => import('./modules/TclWarehousingScores.vue')),
     defaultSpan: 24,
@@ -408,7 +408,7 @@ export const moduleRegistry: ModuleMeta[] = [
   },
   {
     name: 'udReorderProgress',
-    title: 'UD返单进展',
+    title: '未返单明细',
     icon: 'progress',
     component: defineAsyncComponent(() => import('./modules/UDReorderProgress.vue')),
     defaultSpan: 24,
@@ -424,7 +424,7 @@ export const moduleRegistry: ModuleMeta[] = [
   },
   {
     name: 'tablePercentage',
-    title: '货量表格占比',
+    title: '货量(表格占比)',
     icon: 'trend',
     component: defineAsyncComponent(() => import('./modules/TablePercentage.vue')),
     defaultSpan: 24,

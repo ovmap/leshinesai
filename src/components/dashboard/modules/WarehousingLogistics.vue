@@ -885,7 +885,7 @@ onUnmounted(() => {
 <template>
   <div class="warehousing-logistics-container">
     <div class="header-bar">
-      <h2 class="header-title">仓储物流准时交付率</h2>
+      <h2 class="header-title">准时交付率(仓+物流)</h2>
     </div>
     <!-- Tab页签 -->
     <div class="tabs-container">
