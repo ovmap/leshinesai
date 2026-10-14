@@ -26,6 +26,7 @@ export const handleHelp: CommandHandler = async (args) => {
     const result = await window.ipcRenderer.invoke('dashboard:help', {
       queryCommand: args?.queryCommand,
       module: args?.module,
+      queryFilter: args?.queryFilter,
     })
 
     if (!result.success) {
@@ -45,11 +46,20 @@ export const handleHelp: CommandHandler = async (args) => {
 export function getHelpInfo(
   queryCommand?: string,
   module?: string,
-  currentState?: { layout: string; currentPage: string; activeModules: string[] }
+  currentState?: {
+    layout: string
+    currentPage: string
+    activeModules: string[]
+    currentFilters?: { fromWarehouse: string[]; toProvince: string[]; toRdc: string[] }
+    filterOptions?: { fromWarehouse: string[]; toProvince: string[]; toRdc: string[] }
+  },
+  queryFilter?: string
 ): string {
   const layout = currentState?.layout || 'scroll'
   const currentPage = currentState?.currentPage || ''
   const activeModules = currentState?.activeModules || []
+  const currentFilters = currentState?.currentFilters
+  const filterOptions = currentState?.filterOptions
   const moduleTitleMap = getModuleTitleMap()
 
   // 没有指定命令 → 返回总览（带当前状态）
@@ -145,44 +155,67 @@ show({ modules: ["cargoTrend"] })           // single 全屏货量趋势
       return result
     }
 
-    case 'filter':
-      return `## filter 命令 — 设置筛选条件
+    case 'filter': {
+      // 查询特定筛选字段的可选值
+      if (queryFilter && filterOptions) {
+        const fieldMap: Record<string, { label: string; options: string[] }> = {
+          fromWarehouse: { label: '始发仓', options: filterOptions.fromWarehouse },
+          toProvince: { label: '目的省', options: filterOptions.toProvince },
+          toRdc: { label: '目的RDC', options: filterOptions.toRdc },
+        }
+        const field = fieldMap[queryFilter]
+        if (!field) {
+          return `未知筛选字段: ${queryFilter}。支持: fromWarehouse, toProvince, toRdc`
+        }
+        if (field.options.length === 0) {
+          return `## ${field.label} 可选值\n\n暂无数据，请先打开看板页面加载选项。`
+        }
+        return `## ${field.label} 可选值（共 ${field.options.length} 个）\n\n${field.options.join('、')}`
+      }
+
+      let result = `## filter 命令 — 设置全局筛选条件
+
+筛选条件对应看板顶部 GlobalFilterBar 的三个下拉框，对所有模块全局生效。
 
 ### 参数
 | 参数 | 类型 | 说明 |
 |------|------|------|
-| module | string | 目标模块（对哪个模块生效） |
 | filters.fromWarehouse | string | 始发仓 |
 | filters.toProvince | string | 目的省 |
 | filters.toRdc | string | 目的RDC |
-| filters.modeType | string | 配送模式：区配/直送 |
-| filters.timeType | string | 时间维度 |
-| filters.dateRange | string | 日期范围：YYYY-MM-DD ~ YYYY-MM-DD |
-| filters.dataSource | array | 数据源列表 |
-| filters.metric | string | 指标类型 |
-
-### 时间维度枚举
-- CALENDAR_YEAR — 自然年
-- FICAL_YEAR — 财年
-- MONTH — 月
-- WEEK — 周
-- DAY — 日
-
-### 指标类型枚举
-- VOLUME — 订单数量
-- WEIGHT — 重量
-- VOLUME_SIZE — 体积
 
 ### 示例
 \`\`\`
-filter({
-  module: "cargoTrend",
-  filters: {
-    fromWarehouse: "广州仓",
-    timeType: "MONTH"
-  }
-})
+filter({ filters: { fromWarehouse: "广州仓", toProvince: "广东省" } })
+\`\`\`
+
+### 重置筛选
+传空值或不传某字段即重置：
+\`\`\`
+filter({ filters: {} })  // 清空所有筛选
+filter({ filters: { fromWarehouse: "广州仓" } })  // 只设始发仓，目的省/目的RDC 清空
 \`\`\``
+
+      // 当前筛选状态
+      if (currentFilters) {
+        const { fromWarehouse, toProvince, toRdc } = currentFilters
+        const hasFilters = fromWarehouse.length > 0 || toProvince.length > 0 || toRdc.length > 0
+        result += `\n\n### 当前筛选\n`
+        if (!hasFilters) {
+          result += `无筛选条件`
+        } else {
+          if (fromWarehouse.length > 0) result += `- **始发仓**: ${fromWarehouse.join('、')}\n`
+          if (toProvince.length > 0) result += `- **目的省**: ${toProvince.join('、')}\n`
+          if (toRdc.length > 0) result += `- **目的RDC**: ${toRdc.join('、')}\n`
+        }
+      }
+
+      // 查询可选值提示
+      result += `\n\n### 查询可选值\n`
+      result += `\`\`\`\nhelp({ queryCommand: "filter", queryFilter: "fromWarehouse" })  // 查询始发仓可选值\nhelp({ queryCommand: "filter", queryFilter: "toProvince" })     // 查询目的省可选值\nhelp({ queryCommand: "filter", queryFilter: "toRdc" })          // 查询目的RDC可选值\n\`\`\``
+
+      return result
+    }
 
     case 'data': {
       let result = `## data 命令 — 获取看板数据\n\n`

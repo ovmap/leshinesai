@@ -85,10 +85,14 @@ import { getModuleTitleMap, pageRegistry, getPageByName, LARGE_MODULES, getModul
 import type { PageMeta } from './dashboard/moduleRegistry'
 import { useDashboardControlStore } from '../stores/dashboardControlStore'
 import { useDashboardDataStore } from '../stores/dashboardDataStore'
+import { useGlobalFilterStore } from '../stores/globalFilterStore'
+import { useSelectOptionsStore } from '../stores/selectOptionsStore'
 import { getHelpInfo } from '../utils/dashboard/commands/help'
 
 const controlStore = useDashboardControlStore()
 const dataStore = useDashboardDataStore()
+const globalFilterStore = useGlobalFilterStore()
+const selectOptionsStore = useSelectOptionsStore()
 
 const refreshKey = ref(0)
 const isFullscreen = ref(false)
@@ -234,12 +238,28 @@ onMounted(() => {
 
   // dashboard:request-help — 帮助请求响应（带状态感知）
   window.ipcRenderer?.on('dashboard:request-help', (_event: any, params: any) => {
-    const { requestId, queryCommand, module } = params
+    const { requestId, queryCommand, module, queryFilter } = params
     // 获取当前状态
     const layout = controlStore.currentLayout
     const currentPage = controlStore.currentPage
     const activeModules = controlStore.activeModules
-    const help = getHelpInfo(queryCommand, module, { layout, currentPage, activeModules })
+    // 筛选状态和选项
+    const currentFilters = {
+      fromWarehouse: globalFilterStore.selectedWarehouse,
+      toProvince: globalFilterStore.selectedProvince,
+      toRdc: globalFilterStore.selectedRdc,
+    }
+    const filterOptions = {
+      fromWarehouse: selectOptionsStore.fromWarehouseOptions,
+      toProvince: selectOptionsStore.provinceOptions,
+      toRdc: selectOptionsStore.rdcOptions,
+    }
+    const help = getHelpInfo(
+      queryCommand,
+      module,
+      { layout, currentPage, activeModules, currentFilters, filterOptions },
+      queryFilter
+    )
     window.ipcRenderer?.send(`dashboard:help-response-${requestId}`, help)
   })
 
@@ -281,9 +301,20 @@ function handleCommand(command: any) {
       if (args?.layout) controlStore.setLayout(args.layout)
       break
 
-    case 'filter':
-      controlStore.applyFilters(args?.module, args?.filters || {})
+    case 'filter': {
+      const filters = args?.filters || {}
+      // 始终替换全部字段，未传的字段重置为空
+      const toArray = (v: any) => {
+        if (v === undefined || v === null || v === '') return []
+        return Array.isArray(v) ? v : [v]
+      }
+      globalFilterStore.setSelectedWarehouse(toArray(filters.fromWarehouse))
+      globalFilterStore.setSelectedProvince(toArray(filters.toProvince))
+      globalFilterStore.setSelectedRdc(toArray(filters.toRdc))
+      // 同步到 controlStore（触发模块数据刷新）
+      globalFilterStore.syncToControlStore()
       break
+    }
 
     case 'action':
       if (args?.module && args?.action) {
@@ -293,6 +324,10 @@ function handleCommand(command: any) {
 
     case 'reset':
       controlStore.resetFilters(args?.module)
+      // 同步清空 globalFilterStore（更新 UI）
+      if (!args?.module) {
+        globalFilterStore.resetFilters()
+      }
       break
 
     case 'layout':

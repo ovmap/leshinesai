@@ -19,9 +19,9 @@ const dataStore = useDashboardDataStore()
 
 // 接收模块专属筛选（来自 ModulesRender 传递的控制 Store 筛选）
 const props = defineProps<{
-  fromWarehouse?: string
-  toProvince?: string
-  toRdc?: string
+  fromWarehouse?: string[]
+  toProvince?: string[]
+  toRdc?: string[]
   timeType?: string
   dateRange?: string
   dataSource?: string[]
@@ -575,9 +575,9 @@ const syncToDataStore = () => {
         dateRange: selectedDateTimeRange.value
           ? `${selectedDateTimeRange.value[0]?.format('YYYY-MM-DD')} ~ ${selectedDateTimeRange.value[1]?.format('YYYY-MM-DD')}`
           : '未设置',
-        fromWarehouse: props.fromWarehouse || '',
-        toProvince: props.toProvince || '',
-        toRdc: props.toRdc || '',
+        fromWarehouse: props.fromWarehouse?.join(',') || '',
+        toProvince: props.toProvince?.join(',') || '',
+        toRdc: props.toRdc?.join(',') || '',
       },
     },
   )
@@ -588,9 +588,9 @@ const callQueryVolume = async () => {
   try {
     const { startDate, endDate } = formatDateRange(selectedDateTimeRange.value)
     const params = {
-      fromWarehouse: props.fromWarehouse ? [props.fromWarehouse] : [],
-      toProvince: props.toProvince ? [props.toProvince] : [],
-      toRdc: props.toRdc ? [props.toRdc] : [],
+      fromWarehouse: props.fromWarehouse || [],
+      toProvince: props.toProvince || [],
+      toRdc: props.toRdc || [],
       startDate,
       endDate,
       timeType: selectedYear.value,

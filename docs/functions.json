@@ -556,7 +556,12 @@
             },
             "filters": {
               "type": "object",
-              "description": "筛选条件 (filter 命令)。用 help 查询可用筛选参数"
+              "description": "全局筛选条件 (filter 命令)，对应看板顶部 GlobalFilterBar。支持字段: fromWarehouse(始发仓), toProvince(目的省), toRdc(目的RDC)。示例: { \"fromWarehouse\": \"广州仓\", \"toProvince\": \"广东省\" }"
+            },
+            "queryFilter": {
+              "type": "string",
+              "enum": ["fromWarehouse", "toProvince", "toRdc"],
+              "description": "查询筛选字段的可选值 (help 命令)。配合 queryCommand: \"filter\" 使用，返回该字段的动态可选值列表"
             },
             "format": {
               "type": "string",

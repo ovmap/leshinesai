@@ -11,9 +11,9 @@ const controlStore = useDashboardControlStore()
 const dataStore = useDashboardDataStore()
 
 const props = defineProps<{
-  fromWarehouse?: string
-  toProvince?: string
-  toRdc?: string
+  fromWarehouse?: string[]
+  toProvince?: string[]
+  toRdc?: string[]
 }>()
 
 const warehouseOptions = ref<string[]>([])
@@ -179,13 +179,13 @@ const syncGlobalFiltersToCddParams = () => {
   // 只有当CDD搜索参数为空时才同步全局筛选条件
   // 避免覆盖用户在CDD搜索中已做的选择
   if (cddSearchParams.value.fromWarehouse.length === 0) {
-    cddSearchParams.value.fromWarehouse = props.fromWarehouse ? [props.fromWarehouse] : [];
+    cddSearchParams.value.fromWarehouse = props.fromWarehouse || [];
   }
   if (cddSearchParams.value.toProvince.length === 0) {
-    cddSearchParams.value.toProvince = props.toProvince ? [props.toProvince] : [];
+    cddSearchParams.value.toProvince = props.toProvince || [];
   }
   if (cddSearchParams.value.toRdc.length === 0) {
-    cddSearchParams.value.toRdc = props.toRdc ? [props.toRdc] : [];
+    cddSearchParams.value.toRdc = props.toRdc || [];
   }
 };
 
@@ -301,9 +301,9 @@ const fetchCddAlertStats = async () => {
     // 优先使用header组件的数据，如果没有则使用全局筛选条件
     const { startDate, endDate } = getCurrentMonthRange()
     const filterParams = {
-      fromWarehouse: headerWarehouseData.value.length > 0 ? headerWarehouseData.value : (props.fromWarehouse ? [props.fromWarehouse] : []),
-      toProvince: headerProvinceData.value.length > 0 ? headerProvinceData.value : (props.toProvince ? [props.toProvince] : []),
-      toRdc: headerRdcData.value.length > 0 ? headerRdcData.value : (props.toRdc ? [props.toRdc] : []),
+      fromWarehouse: headerWarehouseData.value.length > 0 ? headerWarehouseData.value : (props.fromWarehouse || []),
+      toProvince: headerProvinceData.value.length > 0 ? headerProvinceData.value : (props.toProvince || []),
+      toRdc: headerRdcData.value.length > 0 ? headerRdcData.value : (props.toRdc || []),
       startDate,
       endDate
     }
@@ -449,9 +449,9 @@ const fetchIsgRiskAlert = async () => {
 const fetchRiskOrderData = async () => {
   try {
     const filterParams = {
-      fromWarehouse: headerWarehouseData.value.length > 0 ? headerWarehouseData.value : (props.fromWarehouse ? [props.fromWarehouse] : []),
-      toProvince: headerProvinceData.value.length > 0 ? headerProvinceData.value : (props.toProvince ? [props.toProvince] : []),
-      toRdc: headerRdcData.value.length > 0 ? headerRdcData.value : (props.toRdc ? [props.toRdc] : [])
+      fromWarehouse: headerWarehouseData.value.length > 0 ? headerWarehouseData.value : (props.fromWarehouse || []),
+      toProvince: headerProvinceData.value.length > 0 ? headerProvinceData.value : (props.toProvince || []),
+      toRdc: headerRdcData.value.length > 0 ? headerRdcData.value : (props.toRdc || [])
     }
     const riskResult = await queryRiskOrderStats(filterParams)
     // 添加更严格的保护判断：检查 data 不为 null，且 content 存在且为数组
@@ -1063,9 +1063,9 @@ const fetchModalData = async (currentPageNum: number = currentPage.value) => {
     
     // 优先使用header组件的数据，如果没有则使用全局筛选条件
     const filterParams = {
-      fromWarehouse: headerWarehouseData.value.length > 0 ? headerWarehouseData.value : (props.fromWarehouse ? [props.fromWarehouse] : []),
-      toProvince: headerProvinceData.value.length > 0 ? headerProvinceData.value : (props.toProvince ? [props.toProvince] : []),
-      toRdc: headerRdcData.value.length > 0 ? headerRdcData.value : (props.toRdc ? [props.toRdc] : [])
+      fromWarehouse: headerWarehouseData.value.length > 0 ? headerWarehouseData.value : (props.fromWarehouse || []),
+      toProvince: headerProvinceData.value.length > 0 ? headerProvinceData.value : (props.toProvince || []),
+      toRdc: headerRdcData.value.length > 0 ? headerRdcData.value : (props.toRdc || [])
     }
     
     // 调用异常预警订单分页查询API
@@ -1244,9 +1244,9 @@ const handleCddReset = () => {
     endDate: '',
     dataSource: [],
     customer: [],
-    fromWarehouse: props.fromWarehouse ? [props.fromWarehouse] : [],
-    toProvince: props.toProvince ? [props.toProvince] : [],
-    toRdc: props.toRdc ? [props.toRdc] : [],
+    fromWarehouse: props.fromWarehouse || [],
+    toProvince: props.toProvince || [],
+    toRdc: props.toRdc || [],
     nonComplianceType: [],
     modeType: []
   }
@@ -1651,9 +1651,9 @@ const handleExport = async () => {
     
     // 使用header组件的数据，如果没有则使用全局筛选条件
     const filterParams = {
-      fromWarehouse: headerWarehouseData.value.length > 0 ? headerWarehouseData.value : (props.fromWarehouse ? [props.fromWarehouse] : []),
-      toProvince: headerProvinceData.value.length > 0 ? headerProvinceData.value : (props.toProvince ? [props.toProvince] : []),
-      toRdc: headerRdcData.value.length > 0 ? headerRdcData.value : (props.toRdc ? [props.toRdc] : [])
+      fromWarehouse: headerWarehouseData.value.length > 0 ? headerWarehouseData.value : (props.fromWarehouse || []),
+      toProvince: headerProvinceData.value.length > 0 ? headerProvinceData.value : (props.toProvince || []),
+      toRdc: headerRdcData.value.length > 0 ? headerRdcData.value : (props.toRdc || [])
     }
 
     const result = await exportRiskOrder({
@@ -2878,13 +2878,13 @@ watch(
   () => props,
   (newProps) => {
     if (newProps.fromWarehouse !== undefined) {
-      headerWarehouseData.value = newProps.fromWarehouse ? [newProps.fromWarehouse] : []
+      headerWarehouseData.value = newProps.fromWarehouse || []
     }
     if (newProps.toProvince !== undefined) {
-      headerProvinceData.value = newProps.toProvince ? [newProps.toProvince] : []
+      headerProvinceData.value = newProps.toProvince || []
     }
     if (newProps.toRdc !== undefined) {
-      headerRdcData.value = newProps.toRdc ? [newProps.toRdc] : []
+      headerRdcData.value = newProps.toRdc || []
     }
     fetchRiskOrderStats()
   },

@@ -25,16 +25,11 @@ await window.ipcRenderer.invoke('dashboard:control', {
 })
 ```
 
-### filter — 设置筛选条件
+### filter — 设置全局筛选条件
+
+对应看板顶部 GlobalFilterBar 的三个下拉框，对所有模块全局生效。
 
 ```js
-// 指定模块筛选
-await window.ipcRenderer.invoke('dashboard:control', {
-  command: 'filter',
-  args: { module: 'cargoTrend', filters: { fromWarehouse: '天津宁河CDC' } }
-})
-
-// 全局筛选（应用到所有模块）
 await window.ipcRenderer.invoke('dashboard:control', {
   command: 'filter',
   args: { filters: { fromWarehouse: '天津宁河CDC', toProvince: '北京' } }
@@ -365,7 +360,7 @@ await window.ipcRenderer.invoke('dashboard:help', { queryCommand: 'data' })
 
 ```
 help()                                        → 命令总览（当前状态 + 10个命令 + 快速开始）
-help({ queryCommand: "filter" })              → filter 参数详情（筛选条件、时间维度、指标类型）
+help({ queryCommand: "filter" })              → filter 参数详情（始发仓、目的省、目的RDC）
 help({ queryCommand: "action" })              → action 用法总览（当前可操作模块 + 全部支持模块）
 help({ queryCommand: "action", module: "cargoTrend" })  → cargoTrend 具体操作列表
 help({ queryCommand: "page" })                → 12个页面列表（标记当前页面）
