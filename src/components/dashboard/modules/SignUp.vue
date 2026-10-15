@@ -4,9 +4,11 @@ import { message } from 'ant-design-vue'
 import { queryAbnormalOrder, exportAbnormalOrder, queryRegionList, queryAbnormalTypeList } from '../../../services/transportApi'
 import { useSelectOptionsStore } from '../../../stores/selectOptionsStore'
 import { useGlobalFilterStore } from '../../../stores/globalFilterStore'
+import { useDashboardDataStore } from '../../../stores/dashboardDataStore'
 
 const selectOptionsStore = useSelectOptionsStore()
 const globalFilterStore = useGlobalFilterStore()
+const dataStore = useDashboardDataStore()
 
 // Tab 页签
 const activeTab = ref('terminal')
@@ -144,6 +146,7 @@ const fetchAbnormalOrderData = async () => {
     const result = await queryAbnormalOrder(params)
 
     if (result && result.data) {
+      dataStore.updateModuleData('signUp', result.data)
       let dataArray: any[] = []
 
       if (Array.isArray(result.data)) {

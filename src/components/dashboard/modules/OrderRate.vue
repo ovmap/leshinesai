@@ -4,8 +4,10 @@ import dayjs from 'dayjs'
 import { message } from 'ant-design-vue'
 import { queryConfirmInTimeRate, exportConfirmInTimeRate, queryLogisticList } from '../../../services/transportApi'
 import { useGlobalFilterStore } from '../../../stores/globalFilterStore'
+import { useDashboardDataStore } from '../../../stores/dashboardDataStore'
 
 const globalFilterStore = useGlobalFilterStore()
+const dataStore = useDashboardDataStore()
 
 // 物流商相关（多选）
 const selectedLogistic = ref<string[]>([])
@@ -151,6 +153,7 @@ const loadData = async () => {
 
     const result = await queryConfirmInTimeRate(params)
     if (result && result.code === 200 && result.data) {
+      dataStore.updateModuleData('orderRate', result.data)
       // 处理返回的数据
       if (Array.isArray(result.data)) {
         tableData.value = result.data.map((item: any) => ({

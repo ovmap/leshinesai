@@ -5,10 +5,12 @@ import { message } from 'ant-design-vue'
 import { queryVolumeTableRate } from '../../../services/transportApi'
 import { useSelectOptionsStore } from '../../../stores/selectOptionsStore'
 import { useGlobalFilterStore } from '../../../stores/globalFilterStore'
+import { useDashboardDataStore } from '../../../stores/dashboardDataStore'
 
 // 使用公共 store
 const selectOptionsStore = useSelectOptionsStore()
 const globalFilterStore = useGlobalFilterStore()
+const dataStore = useDashboardDataStore()
 const dataSourceOptions = computed(() => selectOptionsStore.dataSourceOptions)
 const volumeAggOptions = computed(() => selectOptionsStore.volumeAggOptions)
 
@@ -301,6 +303,7 @@ const fetchTableData = async () => {
 
     const result = await queryVolumeTableRate(params)
     if (result && result.code === 200 && result.data) {
+      dataStore.updateModuleData('tablePercentage', result.data)
       const data = Array.isArray(result.data) ? result.data : []
       tableData.value = data.map((item: any, index: number) => {
         // 处理 value：字符串转数字

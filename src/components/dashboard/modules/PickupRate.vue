@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, watch } from 'vue'
 import { queryPickupRate } from '../../../services/transportApi'
+import { useDashboardDataStore } from '../../../stores/dashboardDataStore'
+
+const dataStore = useDashboardDataStore()
 
 const props = defineProps<{
   fromWarehouse?: string[]
@@ -68,6 +71,7 @@ const fetchData = async () => {
       cdcWarehouse: [],
     })
     if (result?.code === 200 && Array.isArray(result.data)) {
+      dataStore.updateModuleData('pickupRate', result.data)
       rawData.value = result.data
     } else {
       rawData.value = []

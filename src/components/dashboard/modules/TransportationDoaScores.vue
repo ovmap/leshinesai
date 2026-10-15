@@ -4,6 +4,7 @@ import dayjs, { type Dayjs } from 'dayjs';
 import { message } from 'ant-design-vue';
 import { queryDoaKpiSummary, queryTransTypeList, exportDoaLogisticKpiScoreSummary, exportDoaLogisticKpiScoreDetail } from '../../../services/transportApi';
 import { useSelectOptionsStore } from '../../../stores/selectOptionsStore';
+import { useDashboardDataStore } from '../../../stores/dashboardDataStore';
 
 const props = defineProps<{
   fromWarehouse?: string[]
@@ -13,6 +14,7 @@ const props = defineProps<{
 
 // 使用公共 store
 const selectOptionsStore = useSelectOptionsStore();
+const dataStore = useDashboardDataStore();
 
 // 筛选表单数据
 // 初始化默认日期范围（上一个月）
@@ -548,6 +550,7 @@ const fetchData = async () => {
     const result = await queryDoaKpiSummary(params);
     
     if (result && result.code === 200 && result.data) {
+      dataStore.updateModuleData('transportationDoaScores', result.data);
       if (Array.isArray(result.data)) {
         const processedData: any[] = [];
         

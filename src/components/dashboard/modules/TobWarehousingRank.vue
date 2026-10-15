@@ -3,6 +3,7 @@ import { ref, computed, onMounted, onUnmounted, watch, nextTick, Teleport } from
 import dayjs, { type Dayjs } from 'dayjs';
 import { message } from 'ant-design-vue';
 import { useSelectOptionsStore } from '../../../stores/selectOptionsStore';
+import { useDashboardDataStore } from '../../../stores/dashboardDataStore';
 import {
   queryToBKpiRank,
   queryToBKpiRankDetail,
@@ -19,6 +20,7 @@ const props = defineProps<{
 }>();
 
 const selectOptionsStore = useSelectOptionsStore();
+const dataStore = useDashboardDataStore();
 
 const getInitialDateRange = (): [Dayjs, Dayjs] => {
   const now = dayjs();
@@ -265,6 +267,7 @@ const fetchRankData = async () => {
     const result = await queryToBKpiRank(params);
 
     if (result && result.code === 200 && result.data) {
+      dataStore.updateModuleData('tobWarehousingRank', result.data)
       if (Array.isArray(result.data)) {
         const monthSet = new Set<string>();
         result.data.forEach((item: any) => {

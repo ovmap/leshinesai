@@ -4,9 +4,11 @@ import dayjs, { type Dayjs } from 'dayjs';
 import { message } from 'ant-design-vue';
 import { queryToCKpiSummary, exportTocLogisticKpiScoreSummary, exportTocLogisticKpiScoreDetail } from '../../../services/transportApi';
 import { useSelectOptionsStore } from '../../../stores/selectOptionsStore';
+import { useDashboardDataStore } from '../../../stores/dashboardDataStore';
 
 // 使用公共 store
 const selectOptionsStore = useSelectOptionsStore();
+const dataStore = useDashboardDataStore();
 
 // 筛选表单数据
 // 默认前2个月：当月-2 至 当月-1
@@ -569,6 +571,7 @@ const fetchTableData = async () => {
     const result = await queryToCKpiSummary(params);
     
     if (result && result.code === 200 && result.data) {
+      dataStore.updateModuleData('tocWarehousingScores', result.data);
       // 处理接口返回的数据结构
       if (Array.isArray(result.data) && result.data.length > 0) {
         // 将接口返回的数据转换为表格需要的格式

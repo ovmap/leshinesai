@@ -4,8 +4,10 @@ import dayjs, { type Dayjs } from 'dayjs'
 import { message } from 'ant-design-vue'
 import { queryLogisticList, queryDeliveryNotConfirmStat, exportDeliveryNotConfirmStat } from '../../../services/transportApi'
 import { useGlobalFilterStore } from '../../../stores/globalFilterStore'
+import { useDashboardDataStore } from '../../../stores/dashboardDataStore'
 
 const globalFilterStore = useGlobalFilterStore()
+const dataStore = useDashboardDataStore()
 
 // Tab页签
 const activeTab = ref('signReceive')
@@ -190,6 +192,7 @@ const fetchTableData = async () => {
 
     // 处理返回的数据，更新表格数据
     if (result && result.code === 200 && result.data) {
+      dataStore.updateModuleData('udReorderProgress', result.data)
       let dataArray: any[] = []
 
       // 如果接口返回的数据结构是 { data: [...] }

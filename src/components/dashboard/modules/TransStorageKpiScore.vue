@@ -2,6 +2,7 @@
 import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue';
 import dayjs, { type Dayjs } from 'dayjs';
 import { message } from 'ant-design-vue';
+import { useDashboardDataStore } from '../../../stores/dashboardDataStore';
 import { queryTransStorageKpiScore, exportTransStorageKpiScore, queryAssessmentUnit } from '../../../services/transportApi';
 
 const props = defineProps<{
@@ -9,6 +10,8 @@ const props = defineProps<{
   toProvince?: string[]
   toRdc?: string[]
 }>();
+
+const dataStore = useDashboardDataStore();
 
 // 初始化默认日期（前2个月的首月）
 const getInitialDate = (): Dayjs => {
@@ -324,6 +327,7 @@ const fetchData = async () => {
     const result = await queryTransStorageKpiScore(params);
     
     if (result && result.code === 200 && result.data) {
+      dataStore.updateModuleData('transStorageKpiScore', result.data);
       if (Array.isArray(result.data)) {
         const processedData: any[] = [];
         

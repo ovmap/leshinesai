@@ -4,9 +4,11 @@ import dayjs, { type Dayjs } from 'dayjs';
 import { message } from 'ant-design-vue';
 import { queryOpenBusinessKpiSummary, exportOpenBusinessLogisticKpiScoreSummary } from '../../../services/transportApi';
 import { useSelectOptionsStore } from '../../../stores/selectOptionsStore';
+import { useDashboardDataStore } from '../../../stores/dashboardDataStore';
 
 // 使用公共 store
 const selectOptionsStore = useSelectOptionsStore();
+const dataStore = useDashboardDataStore();
 
 // 筛选表单数据
 // 默认前2个月：当月-2 至 当月-1
@@ -451,6 +453,7 @@ const fetchTableData = async () => {
     const result = await queryOpenBusinessKpiSummary(params);
 
     if (result && result.code === 200 && result.data) {
+      dataStore.updateModuleData('transportationOpenScores', result.data);
       if (Array.isArray(result.data) && result.data.length > 0) {
         tableData.value = result.data.map((item: any, index: number) => {
           const row: any = {

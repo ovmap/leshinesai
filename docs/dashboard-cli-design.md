@@ -362,7 +362,7 @@ AI tool_call → functionCaller → dashboard/index.ts → IPC:dashboard:control
 **UI → AI（数据流）：**
 ```
 UI 组件获取数据 / 状态变化 → 实时同步到 dashboardDataStore
-→ AI 调用 data 命令 → IPC:dashboard:get-data
+→ AI 调用 data 命令 → IPC:dashboard:data
 → 主进程转发 → 读取 dataStore（当前 UI 完整快照）→ 返回 Markdown
 ```
 
@@ -473,7 +473,7 @@ interface ModuleDataSchema {
 | `src/stores/dashboardDataStore.ts` | 看板窗口内的数据缓存（看板窗口侧） |
 | `src/utils/functionCaller.ts` | 注册 `dashboard_command` 工具 |
 | `docs/functions.json` | 工具定义 |
-| `electron/main/ipcManager.ts` | `dashboard:control` 和 `dashboard:get-data` IPC |
+| `electron/main/ipcManager.ts` | `dashboard:control` 和 `dashboard:data` IPC |
 | `electron/main/windowManager.ts` | 转发控制指令到看板窗口 |
 
 ---

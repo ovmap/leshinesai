@@ -645,7 +645,7 @@ export function registerIPCHandlers(): void {
   })
 
   // Dashboard CLI: 从看板窗口获取数据
-  ipcMain.handle('dashboard:get-data', async (event, params) => {
+  ipcMain.handle('dashboard:data', async (event, params) => {
     try {
       const dashboardWin = getDashboardWindow()
       if (!dashboardWin || dashboardWin.isDestroyed()) {
@@ -670,7 +670,7 @@ export function registerIPCHandlers(): void {
         dashboardWin.webContents.send('dashboard:request-data', { ...params, requestId })
       })
     } catch (error: any) {
-      console.error('[IPC dashboard:get-data] Error:', error)
+      console.error('[IPC dashboard:data] Error:', error)
       return { success: false, error: error.message }
     }
   })

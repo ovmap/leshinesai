@@ -3,6 +3,9 @@ import { ref, onMounted, onUnmounted, computed, nextTick } from 'vue'
 import { queryEndToEndDeliveryRateReason, queryProductGroupList, queryBtcpIndicateList } from '../../../services/transportApi'
 import dayjs, { type Dayjs } from 'dayjs'
 import { message } from 'ant-design-vue'
+import { useDashboardDataStore } from '../../../stores/dashboardDataStore'
+
+const dataStore = useDashboardDataStore()
 
 // 接口数据类型定义
 interface ReasonItem {
@@ -159,6 +162,7 @@ const loadTableData = async () => {
     const result = await queryEndToEndDeliveryRateReason(params)
 
     if (result && result.code === 200 && result.data) {
+      dataStore.updateModuleData('lenovoCustomer', result.data)
       let dataArray: ReasonItem[] = []
       
       // 处理不同的数据结构

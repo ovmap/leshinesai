@@ -3,6 +3,7 @@ import { ref, onMounted, onUnmounted, computed, watch, nextTick } from 'vue'
 import dayjs from 'dayjs'
 import { message } from 'ant-design-vue'
 import { useSelectOptionsStore } from '../../../stores/selectOptionsStore'
+import { useDashboardDataStore } from '../../../stores/dashboardDataStore'
 import { queryOnTimeRateTime, exportOnTimeRateTime } from '../../../services/transportApi'
 
 // 定义zoom属性
@@ -15,6 +16,7 @@ const props = defineProps({
 
 // 获取 stores
 const selectOptionsStore = useSelectOptionsStore()
+const dataStore = useDashboardDataStore()
 
 // 从Header组件接收的下拉框数据
 const headerWarehouseData = ref<string[]>([])
@@ -347,6 +349,7 @@ const loadData = async () => {
     const result = await queryOnTimeRateTime(params)
 
     if (result && result.code === 200 && result.data) {
+      dataStore.updateModuleData('timeDimension', result.data)
       // 处理返回的数据
       processApiData(result.data)
       } else {

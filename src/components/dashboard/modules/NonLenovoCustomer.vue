@@ -2,6 +2,7 @@
 import { ref, onMounted, onUnmounted, computed, nextTick } from 'vue'
 import { queryEndToEndDeliveryRateCust, exportEndToEndDeliveryRateCust } from '../../../services/transportApi'
 import { useSelectOptionsStore } from '../../../stores/selectOptionsStore'
+import { useDashboardDataStore } from '../../../stores/dashboardDataStore'
 import dayjs, { type Dayjs } from 'dayjs'
 import { message } from 'ant-design-vue'
 
@@ -54,6 +55,7 @@ const filterForm = ref({
 
 // 获取 selectOptions store
 const selectOptionsStore = useSelectOptionsStore()
+const dataStore = useDashboardDataStore()
 
 // 下拉框选项
 const timeDimensionOptions = ref<Array<{ code: string; name: string }>>([
@@ -291,6 +293,7 @@ const loadTableData = async () => {
     const result = await queryEndToEndDeliveryRateCust(params)
     
     if (result && result.code === 200 && result.data) {
+      dataStore.updateModuleData('nonLenovoCustomer', result.data)
       // 从heardList中提取时间列
       if (result.data.heardList && Array.isArray(result.data.heardList)) {
         const { columns, timeStartIndex: startIndex } = extractTimeColumns(result.data.heardList)

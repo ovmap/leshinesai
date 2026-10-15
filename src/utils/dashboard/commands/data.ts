@@ -17,7 +17,7 @@ export const handleData: CommandHandler = async (args) => {
   }
 
   try {
-    const result = await window.ipcRenderer.invoke('dashboard:get-data', {
+    const result = await window.ipcRenderer.invoke('dashboard:data', {
       module,
       format,
       scope,

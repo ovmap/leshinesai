@@ -84,134 +84,43 @@ await window.ipcRenderer.invoke('dashboard:control', {
 })
 ```
 
-### data — 获取数据（布局感知，返回 Markdown）
+### data — 获取数据（状态感知，返回 Markdown）
 
-data 命令会根据当前布局状态智能返回数据。
+data 命令会根据当前布局状态智能返回数据，并感知当前筛选条件。
 
 #### 参数
 
 | 参数 | 说明 | 可选值 |
 |------|------|--------|
-| `module` | 模块名（不传则返回页面概览） | 见下方模块列表 |
+| `module` | 模块名（不传则返回当前页面概览） | 见可用模块列表 |
 | `format` | 格式 | `markdown`（默认）, `json` |
 | `scope` | 数据范围 | `summary`（默认）, `detail`, `full` |
 
-#### 基础测试
+#### 示例
 
 ```js
-// 1. 获取页面概览（scroll 布局下不指定模块，返回当前页面所有模块摘要）
-await window.ipcRenderer.invoke('dashboard:get-data', {
-  format: 'markdown',
-  scope: 'summary'
-})
+// 获取当前页面概览（含状态 + 筛选 + 当前页面模块摘要）
+await window.ipcRenderer.invoke('dashboard:data', {})
 
-// 2. 获取单个模块数据（布局感知）
-await window.ipcRenderer.invoke('dashboard:get-data', {
-  module: 'cargoTrend',
-  format: 'markdown',
-  scope: 'summary'
-})
+// 获取单个模块数据（任意模块，不受当前页面限制）
+await window.ipcRenderer.invoke('dashboard:data', { module: 'cargoTrend' })
 
-// 3. 获取模块详细数据
-await window.ipcRenderer.invoke('dashboard:get-data', {
-  module: 'signingInformation',
-  format: 'markdown',
-  scope: 'detail'
-})
+// 获取模块详细数据
+await window.ipcRenderer.invoke('dashboard:data', { module: 'signingInformation', scope: 'detail' })
 
-// 4. 获取模块完整数据
-await window.ipcRenderer.invoke('dashboard:get-data', {
-  module: 'cargoTrend',
-  format: 'markdown',
-  scope: 'full'
-})
-
-// 5. 获取 JSON 格式原始数据
-await window.ipcRenderer.invoke('dashboard:get-data', {
-  module: 'cargoTrend',
-  format: 'json',
-  scope: 'full'
-})
+// 获取 JSON 格式原始数据
+await window.ipcRenderer.invoke('dashboard:data', { module: 'cargoTrend', format: 'json', scope: 'full' })
 ```
 
-#### 各模块数据测试
+#### 状态感知行为
 
-```js
-// ===== 小卡片模块 =====
-await window.ipcRenderer.invoke('dashboard:get-data', { module: 'cargoVolume' })
-await window.ipcRenderer.invoke('dashboard:get-data', { module: 'onTime' })
-await window.ipcRenderer.invoke('dashboard:get-data', { module: 'endToEnd' })
-await window.ipcRenderer.invoke('dashboard:get-data', { module: 'energyPricesCard' })
-await window.ipcRenderer.invoke('dashboard:get-data', { module: 'unitPrice' })
-await window.ipcRenderer.invoke('dashboard:get-data', { module: 'dryPrice' })
+| 布局 | 不指定 module | 指定 module |
+|------|--------------|-------------|
+| scroll | 当前页面概览（状态 + 筛选 + 当前页面模块摘要） | 直接返回模块数据（不受当前页面限制） |
+| grid | 所有模块数据快照（状态 + 筛选） | 模块在当前 grid→返回数据；不在→提示切换 |
+| single | 当前全屏模块数据（状态 + 筛选） | 模块是当前全屏→返回数据；不是→提示切换 |
 
-// ===== 大模块 =====
-await window.ipcRenderer.invoke('dashboard:get-data', { module: 'energyPrices' })
-await window.ipcRenderer.invoke('dashboard:get-data', { module: 'abnormalTransportation' })
-await window.ipcRenderer.invoke('dashboard:get-data', { module: 'capacityPool' })
-await window.ipcRenderer.invoke('dashboard:get-data', { module: 'urgentCustomer' })
-await window.ipcRenderer.invoke('dashboard:get-data', { module: 'majorEvents' })
-await window.ipcRenderer.invoke('dashboard:get-data', { module: 'cargoTrend' })
-await window.ipcRenderer.invoke('dashboard:get-data', { module: 'signingInformation' })
-await window.ipcRenderer.invoke('dashboard:get-data', { module: 'reorderProgress' })
-
-// ===== 特殊模块 =====
-await window.ipcRenderer.invoke('dashboard:get-data', { module: 'mapPage' })
-```
-
-#### 布局感知行为测试
-
-```js
-// --- scroll 布局（默认）---
-
-// 无模块 → 返回页面概览
-await window.ipcRenderer.invoke('dashboard:get-data', {})
-
-// 模块在当前页 → 返回数据 + 大模块提示聚焦
-await window.ipcRenderer.invoke('dashboard:get-data', { module: 'cargoTrend' })
-
-// 模块不在当前页 → 提示切换页面
-await window.ipcRenderer.invoke('dashboard:get-data', { module: 'mapPage' })
-
-// --- 切换到 grid 布局 ---
-await window.ipcRenderer.invoke('dashboard:control', {
-  command: 'layout',
-  args: { layout: 'grid', modules: ['cargoTrend', 'signingInformation'] }
-})
-
-// 模块在当前 grid → 返回详细数据（scope 自动提升到 detail）
-await window.ipcRenderer.invoke('dashboard:get-data', { module: 'cargoTrend' })
-
-// 模块不在当前 grid → 提示切换
-await window.ipcRenderer.invoke('dashboard:get-data', { module: 'energyPrices' })
-
-// --- 切换到 single 布局 ---
-await window.ipcRenderer.invoke('dashboard:control', {
-  command: 'layout',
-  args: { layout: 'single', modules: ['cargoTrend'] }
-})
-
-// 模块是当前全屏 → 返回完整数据
-await window.ipcRenderer.invoke('dashboard:get-data', { module: 'cargoTrend' })
-
-// 模块不是当前全屏 → 提示切换
-await window.ipcRenderer.invoke('dashboard:get-data', { module: 'signingInformation' })
-
-// --- 切回 scroll ---
-await window.ipcRenderer.invoke('dashboard:control', {
-  command: 'layout',
-  args: { layout: 'scroll' }
-})
-```
-
-#### scope 在不同布局下的行为
-
-| 布局 | scope=summary | scope=detail | scope=full |
-|------|---------------|--------------|------------|
-| scroll（无模块） | 页面概览 | 页面概览 | 页面概览 |
-| scroll（指定模块） | 模块数据 | 模块详细数据 | 模块完整数据 |
-| grid（指定模块） | 自动提升到 detail | 详细数据 | 完整数据 |
-| single（指定模块） | 自动提升到 detail | 详细数据 | 完整数据 |
+> grid/single 布局下 `scope=summary` 自动提升到 `detail`。
 
 ### reset — 重置筛选
 

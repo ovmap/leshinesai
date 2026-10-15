@@ -6,10 +6,12 @@ import { message } from 'ant-design-vue'
 import { queryVolumeBarRate, queryVolumeStatType } from '../../../services/transportApi'
 import { useSelectOptionsStore } from '../../../stores/selectOptionsStore'
 import { useGlobalFilterStore } from '../../../stores/globalFilterStore'
+import { useDashboardDataStore } from '../../../stores/dashboardDataStore'
 
 // 使用公共 store
 const selectOptionsStore = useSelectOptionsStore()
 const globalFilterStore = useGlobalFilterStore()
+const dataStore = useDashboardDataStore()
 
 // 使用 computed 包装，保持响应式并确保类型正确
 const dataSourceOptions = computed(() => selectOptionsStore.dataSourceOptions)
@@ -207,6 +209,7 @@ const fetchChartData = async () => {
     const result = await queryVolumeBarRate(params)
 
     if (result && result.code === 200 && result.data) {
+      dataStore.updateModuleData('barPercentage', result.data)
       const data = Array.isArray(result.data) ? result.data : []
 
       chartData.value = data.map((item: any) => {

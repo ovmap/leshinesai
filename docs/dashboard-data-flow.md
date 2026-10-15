@@ -316,7 +316,7 @@ data.ts 通过 IPC 转发到看板窗口，看板窗口的 DashboardView.vue 监
 
 ```
 AI 调用 dashboard_command({ command: 'data', args: { module: 'cargoTrend' } })
-  → data.ts 转发 IPC: dashboard:get-data
+  → data.ts 转发 IPC: dashboard:data
   → ipcManager.ts handler → 看板窗口
   → DashboardView.vue 监听 dashboard:request-data
   → dataStore.getSmartData(module, format, scope)

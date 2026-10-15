@@ -135,8 +135,10 @@ import dayjs, { type Dayjs } from 'dayjs';
 import { message } from 'ant-design-vue';
 import { queryExpressKpiSummary, exportExpressLogisticKpiScoreSummary, exportExpressLogisticKpiScoreDetail } from '../../../services/transportApi';
 import { useSelectOptionsStore } from '../../../stores/selectOptionsStore';
+import { useDashboardDataStore } from '../../../stores/dashboardDataStore';
 
 const selectOptionsStore = useSelectOptionsStore();
+const dataStore = useDashboardDataStore();
 
 const getInitialDateRange = (): [Dayjs, Dayjs] => {
   const now = dayjs();
@@ -614,6 +616,7 @@ const fetchTableData = async () => {
     const result = await queryExpressKpiSummary(params);
     
     if (result && result.code === 200 && result.data) {
+      dataStore.updateModuleData('transportationExpressScores', result.data);
       if (Array.isArray(result.data) && result.data.length > 0) {
         tableData.value = result.data.map((item: any, index: number) => {
           const row: any = {

@@ -6,6 +6,7 @@ import {
   exportOnTimeDeliveryRate,
 } from '../../../services/transportApi'
 import { useSelectOptionsStore } from '../../../stores/selectOptionsStore'
+import { useDashboardDataStore } from '../../../stores/dashboardDataStore'
 import dayjs, { type Dayjs } from 'dayjs'
 
 // 接口数据类型定义
@@ -70,6 +71,7 @@ const filterForm = ref(getInitialFilterForm())
 
 // 获取 selectOptions store
 const selectOptionsStore = useSelectOptionsStore()
+const dataStore = useDashboardDataStore()
 
 // 下拉框选项
 const timeDimensionOptions = ref<Array<{ code: string; name: string }>>([
@@ -344,6 +346,7 @@ const loadTableData = async () => {
     const result = await queryOnTimeDeliveryRate(params)
 
     if (result && result.code === 200 && result.data) {
+      dataStore.updateModuleData('warehousingLogistics', result.data)
       // 从heardList中提取时间列
       if (result.data.heardList && Array.isArray(result.data.heardList)) {
         const { columns, timeStartIndex: startIndex } = extractTimeColumns(result.data.heardList)

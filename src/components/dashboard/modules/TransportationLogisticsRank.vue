@@ -3,6 +3,7 @@ import { ref, computed, onMounted, onUnmounted, watch, nextTick, Teleport } from
 import dayjs, { type Dayjs } from 'dayjs';
 import { message } from 'ant-design-vue';
 import { useSelectOptionsStore } from '../../../stores/selectOptionsStore';
+import { useDashboardDataStore } from '../../../stores/dashboardDataStore';
 import { queryTransKpiRank, queryTransKpiRankDetail, queryTransTypeList, queryTransLogisticPunishInfo, exportTransLogisticKpiRank, exportTransLogisticKpiRankScoreDetail, exportTransLogisticKpiRankPunishDetail } from '../../../services/transportApi';
 
 const props = defineProps<{
@@ -12,6 +13,7 @@ const props = defineProps<{
 }>();
 
 const selectOptionsStore = useSelectOptionsStore();
+const dataStore = useDashboardDataStore();
 
 const getInitialDateRange = (): [Dayjs, Dayjs] => {
   const now = dayjs();
@@ -347,6 +349,7 @@ const fetchRankData = async () => {
     const result = await queryTransKpiRank(params);
 
     if (result && result.code === 200 && result.data) {
+      dataStore.updateModuleData('transportationLogisticsRank', result.data)
       if (Array.isArray(result.data)) {
         const monthSet = new Set<string>();
 

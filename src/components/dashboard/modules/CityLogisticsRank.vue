@@ -3,6 +3,7 @@ import { ref, computed, onMounted, onUnmounted, watch, nextTick, Teleport } from
 import dayjs, { type Dayjs } from 'dayjs';
 import { message } from 'ant-design-vue';
 import { useSelectOptionsStore } from '../../../stores/selectOptionsStore';
+import { useDashboardDataStore } from '../../../stores/dashboardDataStore';
 import { queryDeliveryKpiRank, queryDeliveryKpiRankDetail, queryDeliveryLogisticPunishInfo, exportDeliveryLogisticKpiRank, exportDeliveryLogisticKpiRankScoreDetail, exportDeliveryLogisticKpiRankPunishDetail } from '../../../services/transportApi';
 
 // 定义zoom属性
@@ -15,6 +16,7 @@ const props = defineProps({
 
 // 使用公共 store
 const selectOptionsStore = useSelectOptionsStore();
+const dataStore = useDashboardDataStore();
 
 // 筛选表单数据
 // 初始化默认日期范围（最近三个月，不包括本月）
@@ -325,6 +327,7 @@ const fetchRankData = async () => {
     const result = await queryDeliveryKpiRank(params);
     
     if (result && result.code === 200 && result.data) {
+      dataStore.updateModuleData('cityLogisticsRank', result.data);
       if (Array.isArray(result.data)) {
         // 首先收集所有唯一的月份
         const monthSet = new Set<string>();

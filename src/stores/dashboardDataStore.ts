@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { useDashboardControlStore } from './dashboardControlStore'
+import { useGlobalFilterStore } from './globalFilterStore'
 import {
   getModuleTitleMap,
   getPageByName,
@@ -8,6 +9,7 @@ import {
   findModulePage,
   isLargeModule,
   LARGE_MODULES,
+  getPages,
 } from '../components/dashboard/moduleRegistry'
 import { formatters } from './dashboardFormatters'
 
@@ -31,6 +33,9 @@ export const useDashboardDataStore = defineStore('dashboardData', () => {
 
   // 控制 Store 引用
   const controlStore = useDashboardControlStore()
+  
+  // 全局筛选 Store 引用
+  const globalFilterStore = useGlobalFilterStore()
 
   // 更新模块数据（模块只传 raw 数据）
   function updateModuleData(module: string, raw: any) {
@@ -74,39 +79,59 @@ export const useDashboardDataStore = defineStore('dashboardData', () => {
     const activeModules = controlStore.activeModules
     const layout = controlStore.currentLayout
     const filters = controlStore.moduleFilters
+    const titleMap = getModuleTitleMap()
 
     let result = `# 物流看板状态快照\n\n`
+    result += `## 当前状态\n\n`
     result += `- **布局**: ${layout}\n`
-    result += `- **活跃模块**: ${activeModules.join(', ')}\n`
-    result += `- **更新时间**: ${new Date(lastUpdated.value).toLocaleString('zh-CN')}\n\n`
-
-    // 各模块筛选条件
-    const hasFilters = activeModules.some(m => {
-      const f = filters[m]
-      return f && Object.keys(f).length > 0
-    })
-    if (hasFilters) {
-      result += `## 当前筛选\n\n`
-      activeModules.forEach(mod => {
-        const f = filters[mod]
-        if (f && Object.keys(f).length > 0) {
-          const filterDesc = Object.entries(f)
-            .filter(([, v]) => v !== '' && v !== null && v !== undefined)
-            .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`)
-            .join(', ')
-          if (filterDesc) {
-            result += `- **${mod}**: ${filterDesc}\n`
-          }
-        }
-      })
-      result += '\n'
+    
+    // scroll 布局显示当前页面
+    if (layout === 'scroll') {
+      const page = getPageByName(controlStore.currentPage)
+      result += `- **当前页面**: ${page?.title || controlStore.currentPage}\n`
     }
+    
+    // 显示活跃模块
+    if (activeModules.length > 0) {
+      const moduleNames = activeModules.map(m => titleMap[m] || m)
+      if (layout === 'single') {
+        result += `- **显示模块**: ${moduleNames[0] || '无'}\n`
+      } else {
+        result += `- **显示模块**: ${moduleNames.join('、')}\n`
+      }
+    } else {
+      result += `- **显示模块**: 无\n`
+    }
+    
+    result += `- **更新时间**: ${new Date(lastUpdated.value).toLocaleString('zh-CN')}\n`
+    
+    // 全局筛选状态
+    const { selectedWarehouse, selectedProvince, selectedRdc } = globalFilterStore
+    const hasGlobalFilters = selectedWarehouse.length > 0 || selectedProvince.length > 0 || selectedRdc.length > 0
+    if (hasGlobalFilters) {
+      result += `- **筛选条件**:\n`
+      if (selectedWarehouse.length > 0) result += `  - 始发仓: ${selectedWarehouse.join('、')}\n`
+      if (selectedProvince.length > 0) result += `  - 目的省: ${selectedProvince.join('、')}\n`
+      if (selectedRdc.length > 0) result += `  - 目的RDC: ${selectedRdc.join('、')}\n`
+    } else {
+      result += `- **筛选条件**: 无\n`
+    }
+    
+    result += '\n'
 
     // 各模块数据
+    result += `## 模块数据\n\n`
     activeModules.forEach(mod => {
+      const title = titleMap[mod] || mod
+      result += `### ${mod} (${title})\n\n`
       result += getModuleFormattedData(mod, scope)
       result += '\n\n'
     })
+
+    // 提示
+    result += `## 提示\n\n`
+    result += `- 获取模块详细数据: \`dashboard:data({ module: "模块名" })\`\n`
+    result += `- 获取模块详细数据: \`dashboard:data({ module: "模块名", scope: "detail" })\`\n`
 
     return result.trim()
   }
@@ -261,50 +286,140 @@ export const useDashboardDataStore = defineStore('dashboardData', () => {
         const summary = cards.map((c: any, i: number) => `${i}:${c.title || '未知'}(${c.content?.length || 0}条)`).join(', ')
         return `${title}: [${summary}]`
       }
+      // 准时交付率系列
+      case 'warehousingLogistics': {
+        const rate = data?.onTimeDeliveryRate
+        return rate ? `${title}: ${rate}` : `${title}: 暂无数据`
+      }
+      case 'timeDimension': {
+        const rate = data?.onTimeDeliveryRate
+        return rate ? `${title}: ${rate}` : `${title}: 暂无数据`
+      }
+      case 'lenovoCustomer': {
+        const rate = data?.onTimeDeliveryRate
+        return rate ? `${title}: ${rate}` : `${title}: 暂无数据`
+      }
+      case 'nonLenovoCustomer': {
+        const rate = data?.onTimeDeliveryRate
+        return rate ? `${title}: ${rate}` : `${title}: 暂无数据`
+      }
+      // 提货及时率
+      case 'pickupRate': {
+        const rate = data?.pickupRate || data?.rate
+        if (!rate) return `${title}: 暂无数据`
+        const rateStr = typeof rate === 'string' && rate.includes('%') ? rate : `${Math.round(parseFloat(String(rate)))}%`
+        return `${title}: ${rateStr}`
+      }
+      // KPI 评分系列 (data 可能是数组或对象)
+      case 'tobWarehousingCard':
+      case 'transportationLogisticsScores':
+      case 'cityLogisticsScores':
+      case 'tclWarehousingScores':
+      case 'transStorageKpiScore':
+      case 'transportationDoaScores':
+      case 'tocWarehousingScores':
+      case 'transportationOpenScores':
+      case 'transportationExpressScores': {
+        const list = Array.isArray(data) ? data : (data?.list || data?.items || [])
+        if (list.length > 0) {
+          return `${title}: ${list.length} 条记录`
+        }
+        const score = data?.kpiScore || data?.score
+        return score ? `${title}: ${score}` : `${title}: 暂无数据`
+      }
+      // KPI 排名系列 (data 可能是数组或对象)
+      case 'tobWarehousingRank':
+      case 'transportationLogisticsRank':
+      case 'cityLogisticsRank': {
+        const list = Array.isArray(data) ? data : (data?.list || data?.items || [])
+        return `${title}: ${list.length} 条记录`
+      }
+      // 应签未签系列 (data 可能是数组或对象)
+      case 'signUp': {
+        const list = Array.isArray(data) ? data : (data?.list || data?.items || [])
+        const count = data?.total || data?.count || list.length
+        return `${title}: ${count} 条`
+      }
+      case 'signUpDetail': {
+        const list = Array.isArray(data) ? data : (data?.list || data?.items || [])
+        const count = data?.total || list.length
+        return `${title}: ${count} 条`
+      }
+      // 返单系列 (data 可能是数组或对象)
+      case 'orderRate': {
+        const rate = data?.rate || data?.onTimeRate
+        if (rate) {
+          const rateStr = typeof rate === 'string' && rate.includes('%') ? rate : `${Math.round(parseFloat(String(rate)))}%`
+          return `${title}: ${rateStr}`
+        }
+        const list = Array.isArray(data) ? data : (data?.list || data?.items || [])
+        return list.length > 0 ? `${title}: ${list.length} 条记录` : `${title}: 暂无数据`
+      }
+      case 'udReorderProgress': {
+        const list = Array.isArray(data) ? data : (data?.list || data?.items || [])
+        const count = data?.total || list.length
+        return `${title}: ${count} 条`
+      }
+      // 货量占比系列 (data 可能是数组或对象)
+      case 'barPercentage': {
+        const list = Array.isArray(data) ? data : (data?.items || data?.list || [])
+        return `${title}: ${list.length} 条数据`
+      }
+      case 'tablePercentage': {
+        const list = Array.isArray(data) ? data : (data?.list || data?.items || [])
+        return `${title}: ${list.length} 条数据`
+      }
       default:
         return `${title}: 已加载`
     }
   }
 
-  /** 获取页面概览（scroll 布局用） */
+  /** 获取当前页面概览（scroll 布局用） */
   function getPageOverview(): string {
     const ctx = getLayoutContext()
     const titleMap = getModuleTitleMap()
-    const page = getPageByName(ctx.currentPage)
 
     let md = `# ${ctx.currentPageTitle}页面\n\n`
-    md += `当前布局: scroll\n`
+    md += `## 当前状态\n\n`
+    md += `- **布局**: ${ctx.layout}\n`
+    md += `- **当前页面**: ${ctx.currentPageTitle}\n`
+    
+    // 全局筛选状态
+    const { selectedWarehouse, selectedProvince, selectedRdc } = globalFilterStore
+    const hasFilters = selectedWarehouse.length > 0 || selectedProvince.length > 0 || selectedRdc.length > 0
+    if (hasFilters) {
+      md += `- **筛选条件**:\n`
+      if (selectedWarehouse.length > 0) md += `  - 始发仓: ${selectedWarehouse.join('、')}\n`
+      if (selectedProvince.length > 0) md += `  - 目的省: ${selectedProvince.join('、')}\n`
+      if (selectedRdc.length > 0) md += `  - 目的RDC: ${selectedRdc.join('、')}\n`
+    } else {
+      md += `- **筛选条件**: 无\n`
+    }
+    
+    md += `\n`
     md += `当前页面包含 ${ctx.pageModules.length} 个模块\n\n`
 
     // 模块概览表
     md += `## 模块概览\n\n`
-    md += `| 模块 | 摘要 |\n`
-    md += `|------|------|\n`
+    md += `| 模块名 | 标题 | 摘要 |\n`
+    md += `|--------|------|------|\n`
 
     ctx.pageModules.forEach(mod => {
+      const title = titleMap[mod] || mod
       const summary = getModuleSummary(mod)
-      md += `| ${titleMap[mod] || mod} | ${summary.replace(`${titleMap[mod] || mod}: `, '')} |\n`
+      md += `| ${mod} | ${title} | ${summary.replace(`${title}: `, '')} |\n`
     })
 
     // 提示
     md += `\n## 提示\n\n`
-    md += `- 请求某个模块的详细数据，请指定模块名\n`
+    md += `- 获取当前页面概览: \`dashboard:data({})\`\n`
+    md += `- 获取模块详细数据: \`dashboard:data({ module: "模块名" })\`\n`
+    md += `- 获取模块详细数据: \`dashboard:data({ module: "模块名", scope: "detail" })\`\n`
 
     const largeInPage = ctx.pageModules.filter(m => isLargeModule(m))
     if (largeInPage.length > 0) {
       const names = largeInPage.map(m => titleMap[m] || m).join('、')
       md += `- 大模块（${names}）支持聚焦显示\n`
-    }
-
-    // 检查其他页面
-    const allPages = [
-      { name: 'cargoBanner', title: '运输智能体' },
-      { name: 'mapPage', title: '地图' },
-    ]
-    const otherPages = allPages.filter(p => p.name !== ctx.currentPage)
-    if (otherPages.length > 0) {
-      const pageNames = otherPages.map(p => p.title).join('、')
-      md += `- 其他页面（${pageNames}）有独立数据，需要切换页面查看\n`
     }
 
     return md
@@ -325,26 +440,18 @@ export const useDashboardDataStore = defineStore('dashboardData', () => {
 
     // ========== scroll 布局 ==========
     if (layout === 'scroll') {
-      // 没指定模块 → 返回页面概览
+      // 没指定模块 → 返回当前页面概览
       if (!module) {
         return getPageOverview()
       }
 
-      // 指定了模块但不在当前页面
-      if (!isModuleInCurrentView(module)) {
-        const targetPage = findModulePage(module)
-        const titleMap = getModuleTitleMap()
-        const moduleTitle = titleMap[module] || module
-        const currentPageTitle = getPageByName(controlStore.currentPage)?.title || controlStore.currentPage
-
-        if (targetPage) {
-          const targetPageTitle = getPageByName(targetPage)?.title || targetPage
-          return `模块 [${moduleTitle}] 在"${targetPageTitle}"页面，当前显示"${currentPageTitle}"页面。\n\n建议: 切换到"${targetPageTitle}"页面？\n执行: dashboard_command({ command: 'page', args: { page: '${targetPage}' } })`
-        }
-        return `模块 [${moduleTitle}] 不在任何页面中。`
+      // 指定了模块 → 直接返回数据（不限制当前页面）
+      const targetPage = findModulePage(module)
+      if (!targetPage) {
+        return `模块 [${module}] 不在任何页面中。`
       }
 
-      // 模块在当前页面 → 返回详细数据
+      // 返回模块数据
       let result = getModuleFormattedData(module, scope)
 
       // 大模块额外提示聚焦

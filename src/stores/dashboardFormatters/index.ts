@@ -5,6 +5,7 @@
  * 新增模块时，在此文件中注册即可。
  */
 
+// ========== 原有格式化器 ==========
 import { formatCargoVolume } from './cargoVolume'
 import { formatOnTime } from './onTime'
 import { formatEndToEnd } from './endToEnd'
@@ -21,12 +22,52 @@ import { formatCargoTrend } from './cargoTrend'
 import { formatSigningInformation } from './signingInformation'
 import { formatCargoBanner } from './cargoBanner'
 
+// ========== 新增格式化器 ==========
+// 准时交付率系列
+import { formatWarehousingLogistics } from './warehousingLogistics'
+import { formatTimeDimension } from './timeDimension'
+import { formatLenovoCustomer } from './lenovoCustomer'
+import { formatNonLenovoCustomer } from './nonLenovoCustomer'
+
+// 提货及时率
+import { formatPickupRate } from './pickupRate'
+
+// 地图
+import { formatMapPage } from './mapPage'
+
+// KPI 评分/排名系列
+import { formatTobWarehousingCard } from './tobWarehousingCard'
+import { formatTobWarehousingRank } from './tobWarehousingRank'
+import { formatTransportationLogisticsScores } from './transportationLogisticsScores'
+import { formatTransportationLogisticsRank } from './transportationLogisticsRank'
+import { formatCityLogisticsScores } from './cityLogisticsScores'
+import { formatCityLogisticsRank } from './cityLogisticsRank'
+import { formatTclWarehousingScores } from './tclWarehousingScores'
+import { formatTransStorageKpiScore } from './transStorageKpiScore'
+import { formatTransportationDoaScores } from './transportationDoaScores'
+import { formatTocWarehousingScores } from './tocWarehousingScores'
+import { formatTransportationOpenScores } from './transportationOpenScores'
+import { formatTransportationExpressScores } from './transportationExpressScores'
+
+// 应签未签系列
+import { formatSignUp } from './signUp'
+import { formatSignUpDetail } from './signUpDetail'
+
+// 返单系列
+import { formatOrderRate } from './orderRate'
+import { formatUdReorderProgress } from './udReorderProgress'
+
+// 货量占比系列
+import { formatBarPercentage } from './barPercentage'
+import { formatTablePercentage } from './tablePercentage'
+
 /**
  * 模块格式化函数注册表
  * key: 模块名（对应 moduleRegistry 中的 name）
  * value: 格式化函数 (data, scope) => string
  */
 export const formatters: Record<string, (data: any, scope: string) => string> = {
+  // 原有
   cargoVolume: formatCargoVolume,
   onTime: formatOnTime,
   endToEnd: formatEndToEnd,
@@ -42,6 +83,44 @@ export const formatters: Record<string, (data: any, scope: string) => string> = 
   cargoTrend: formatCargoTrend,
   signingInformation: formatSigningInformation,
   cargoBanner: formatCargoBanner,
+
+  // 准时交付率系列
+  warehousingLogistics: formatWarehousingLogistics,
+  timeDimension: formatTimeDimension,
+  lenovoCustomer: formatLenovoCustomer,
+  nonLenovoCustomer: formatNonLenovoCustomer,
+
+  // 提货及时率
+  pickupRate: formatPickupRate,
+
+  // 地图
+  mapPage: formatMapPage,
+
+  // KPI 评分/排名系列
+  tobWarehousingCard: formatTobWarehousingCard,
+  tobWarehousingRank: formatTobWarehousingRank,
+  transportationLogisticsScores: formatTransportationLogisticsScores,
+  transportationLogisticsRank: formatTransportationLogisticsRank,
+  cityLogisticsScores: formatCityLogisticsScores,
+  cityLogisticsRank: formatCityLogisticsRank,
+  tclWarehousingScores: formatTclWarehousingScores,
+  transStorageKpiScore: formatTransStorageKpiScore,
+  transportationDoaScores: formatTransportationDoaScores,
+  tocWarehousingScores: formatTocWarehousingScores,
+  transportationOpenScores: formatTransportationOpenScores,
+  transportationExpressScores: formatTransportationExpressScores,
+
+  // 应签未签系列
+  signUp: formatSignUp,
+  signUpDetail: formatSignUpDetail,
+
+  // 返单系列
+  orderRate: formatOrderRate,
+  udReorderProgress: formatUdReorderProgress,
+
+  // 货量占比系列
+  barPercentage: formatBarPercentage,
+  tablePercentage: formatTablePercentage,
 }
 
 /**
