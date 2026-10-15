@@ -87,8 +87,7 @@ export function getHelpInfo(
 | data | 获取数据（Markdown） | 读取当前页面或指定模块数据 |
 | status | 获取当前状态 | 确认布局/页面/模块是否正确 |
 | action | 触发 UI 操作 | 翻页、排序、钻取等交互 |
-| reset | 重置筛选 | 清除所有筛选条件 |
-| layout | 切换布局 | single/grid/cards/scroll |
+| layout | 放大展示单个模块 | single 布局，全屏显示 |
 | page | 切换页面 | 12个页面间切换 |
 | close | 关闭看板 | 结束使用 |
 | help | 查询命令用法 | 不确定参数时查询 |
@@ -112,9 +111,7 @@ export function getHelpInfo(
   // 根据命令返回详情（带状态感知）
   switch (queryCommand) {
     case 'show': {
-      const largeModules = LARGE_MODULES.map(m => moduleTitleMap[m] || m)
-      
-      let result = `## show 命令 — 显示/切换模块\n\n`
+      let result = `## show 命令 — 打开看板\n\n`
       
       // 当前状态提示
       result += `### 当前状态\n`
@@ -130,27 +127,15 @@ export function getHelpInfo(
         result += `\n`
       }
       
-      result += `### 参数
-| 参数 | 类型 | 说明 |
-|------|------|------|
-| modules | array | 模块名称列表 |
+      result += `### 说明
+show 命令用于打开看板窗口，默认进入 scroll 布局。
 
-### 布局与模块的关系
-- **single 布局**：与大模块对应，单个模块全屏显示，仅支持大模块
-- **scroll 布局**：与页面对应，每个页面包含多个模块，用 \`page\` 命令切换
-
-### 大模块（支持 single）
-| 模块名 | 标题 |
-|--------|------|
-`
-      for (const m of LARGE_MODULES) {
-        result += `| ${m} | ${moduleTitleMap[m] || m} |\n`
-      }
-      result += `
 ### 示例
 \`\`\`
-show({ modules: ["cargoTrend"] })           // single 全屏货量趋势
-\`\`\``
+show()  // 打开看板，默认 scroll 布局
+\`\`\`
+
+> 提示: 放大展示单个模块请使用 \`layout\` 命令`
       
       return result
     }
@@ -176,17 +161,22 @@ show({ modules: ["cargoTrend"] })           // single 全屏货量趋势
       let result = `## filter 命令 — 设置全局筛选条件
 
 筛选条件对应看板顶部 GlobalFilterBar 的三个下拉框，对所有模块全局生效。
+支持多选，传字符串或数组均可。
 
 ### 参数
 | 参数 | 类型 | 说明 |
 |------|------|------|
-| filters.fromWarehouse | string | 始发仓 |
-| filters.toProvince | string | 目的省 |
-| filters.toRdc | string | 目的RDC |
+| filters.fromWarehouse | string / string[] | 始发仓（支持多选） |
+| filters.toProvince | string / string[] | 目的省（支持多选） |
+| filters.toRdc | string / string[] | 目的RDC（支持多选） |
 
 ### 示例
 \`\`\`
-filter({ filters: { fromWarehouse: "广州仓", toProvince: "广东省" } })
+// 单选
+filter({ filters: { fromWarehouse: "广州仓" } })
+
+// 多选
+filter({ filters: { fromWarehouse: ["广州仓", "深圳仓"], toProvince: ["广东省", "北京"] } })
 \`\`\`
 
 ### 重置筛选
@@ -242,22 +232,15 @@ filter({ filters: { fromWarehouse: "广州仓" } })  // 只设始发仓，目的
 | 参数 | 类型 | 说明 |
 |------|------|------|
 | module | string | 目标模块（不指定则返回当前页面概览） |
-| format | string | 数据格式：markdown / json（默认 markdown） |
-| scope | string | 数据范围：summary / detail / full（默认 summary） |
-
-### 数据范围说明
-- **summary** — 摘要信息
-- **detail** — 明细数据
-- **full** — 完整数据
 
 ### 智能行为
 - 不指定 module → 返回当前页面概览
-- single 布局下 summary → 自动提升到 detail
+- 根据当前布局自动返回合适的数据格式
 
 ### 示例
 \`\`\`
 data()                                    // 当前页面概览
-data({ module: "cargoTrend" })            // 货量趋势摘要
+data({ module: "cargoTrend" })            // 货量趋势数据
 \`\`\``
       
       return result
@@ -352,19 +335,6 @@ action({ module: "signingInformation", action: "setPage", params: { page: 2 } })
       return result
     }
 
-    case 'reset':
-      return `## reset 命令 — 重置筛选条件
-
-### 参数
-| 参数 | 类型 | 说明 |
-|------|------|------|
-| module | string | 目标模块（不指定则重置所有） |
-
-### 示例
-\`\`\`
-reset({ module: "cargoTrend" })
-\`\`\``
-
     case 'layout': {
       let result = `## layout 命令 — 切换布局\n\n`
       
@@ -372,31 +342,35 @@ reset({ module: "cargoTrend" })
       result += `### 当前状态\n`
       result += `- **当前布局**: ${layout}\n\n`
       
-      result += `### 参数
+      result += `### 说明
+layout 命令用于放大展示、单独显示某个模块查看数据。目前仅支持 single 布局。
+
+### 参数
 | 参数 | 类型 | 说明 |
 |------|------|------|
-| layout | string | 布局名称（必填） |
+| modules | array | 模块列表（必填），取第一个模块全屏显示 |
 
-### 布局类型
-| 布局 | 说明 |
-|------|------|
-| single | 单模块全屏 |
-| grid | 网格布局 |
-| cards | 卡片布局 |
-| scroll | 滚动页面 |
-
+### 支持的大模块
+| 模块名 | 标题 |
+|--------|------|
+`
+      for (const m of LARGE_MODULES) {
+        result += `| ${m} | ${moduleTitleMap[m] || m} |\n`
+      }
+      result += `
 ### 示例
 \`\`\`
-layout({ layout: "single" })
-\`\`\``
+layout({ modules: ["cargoTrend"] })  // 全屏显示货量趋势
+\`\`\`
+
+> 提示: 切换到 scroll 布局请使用 \`show\` 或 \`page\` 命令`
       
       return result
     }
 
     case 'page': {
       const pages = getPages()
-      const largeModules = LARGE_MODULES.map(m => moduleTitleMap[m] || m)
-      let result = `## page 命令 — 切换页面\n\n`
+      let result = `## page 命令 — 切换页面（scroll 布局专用）\n\n`
       
       // 当前状态提示
       result += `### 当前状态\n`
@@ -405,16 +379,16 @@ layout({ layout: "single" })
         const pageInfo = getPageByName(currentPage)
         result += `- **当前页面**: ${pageInfo?.title || currentPage}\n\n`
       } else {
-        result += `- **当前页面**: 无（非 scroll 布局）\n\n`
+        result += `- **当前页面**: 无（非 scroll 布局）\n`
+        result += `> 提示: 当前不是 scroll 布局，请先使用 \`show\` 命令打开看板\n\n`
       }
       
       result += `### 参数\n| 参数 | 类型 | 说明 |\n|------|------|------|\n| page | string | 页面名称（必填） |\n\n`
       
-      result += `### 布局与页面/模块的关系
-- **scroll 布局**：与页面对应，每个页面包含多个模块，用 \`page\` 命令切换
-- **single 布局**：与大模块对应，单个模块全屏显示，用 \`show\` 命令切换
+      result += `### 说明
+page 命令用于在 scroll 布局下切换页面。每个页面是一个独立的全屏视图，包含多个模块。
 
-### 可用页面（scroll 布局）
+### 可用页面
 | 页面标识 | 标题 |
 |----------|------|
 `
@@ -423,20 +397,13 @@ layout({ layout: "single" })
         result += `| ${p.name} | ${p.title}${isCurrent} |\n`
       }
       
-      result += `\n### 大模块（single 布局）
-single 布局用于放大、全屏显示单个模块，仅支持以下大模块：
-| 模块名 | 标题 |
-|--------|------|
-`
-      for (const m of LARGE_MODULES) {
-        result += `| ${m} | ${moduleTitleMap[m] || m} |\n`
-      }
-      
       result += `\n### 示例
 \`\`\`
-page({ page: "cargoBanner" })    // 切换到智能体中心（scroll 布局）
-show({ modules: ["cargoTrend"] }) // 货量趋势全屏（single 布局）
-\`\`\``
+page({ page: "cargoBanner" })  // 切换到智能体中心
+page({ page: "mapPage" })      // 切换到地图
+\`\`\`
+
+> 提示: 放大展示单个模块请使用 \`layout\` 命令`
       
       return result
     }

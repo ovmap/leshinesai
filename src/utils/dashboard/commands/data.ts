@@ -9,8 +9,6 @@ const AVAILABLE_MODULES = getModuleNames()
 
 export const handleData: CommandHandler = async (args) => {
   const module = args?.module
-  const format = args?.format || 'markdown'
-  const scope = args?.scope || 'summary'
 
   if (module && !AVAILABLE_MODULES.includes(module)) {
     return `错误: 未知模块 "${module}"。可用模块: ${AVAILABLE_MODULES.join(', ')}`
@@ -19,8 +17,6 @@ export const handleData: CommandHandler = async (args) => {
   try {
     const result = await window.ipcRenderer.invoke('dashboard:data', {
       module,
-      format,
-      scope,
     })
 
     if (!result.success) {

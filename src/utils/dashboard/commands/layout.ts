@@ -1,50 +1,49 @@
 /**
- * layout 命令 — 切换布局
+ * layout 命令 — 切换到 single 布局（放大展示单个模块）
  */
 
-import { getModuleTitleMap, LARGE_MODULES } from '../../../components/dashboard/moduleRegistry'
+import { getModuleNames, getModuleTitleMap, LARGE_MODULES } from '../../../components/dashboard/moduleRegistry'
 import type { CommandHandler } from '../types'
 
-const VALID_LAYOUTS = ['single', 'grid', 'cards', 'scroll']
-
-// grid/cards 布局最多支持的模块数
-const MAX_GRID_MODULES = 3
-
+const AVAILABLE_MODULES = getModuleNames()
 const MODULE_NAMES = getModuleTitleMap()
 
 export const handleLayout: CommandHandler = async (args) => {
-  const layout = args?.layout || 'grid'
   const modules = args?.modules
 
-  if (!VALID_LAYOUTS.includes(layout)) {
-    return `错误: 无效布局 "${layout}"。可选: ${VALID_LAYOUTS.join(', ')}`
+  // modules 是必须的
+  if (!modules || !Array.isArray(modules) || modules.length === 0) {
+    return `错误: 请指定 modules 参数（模块列表）`
   }
 
-  // single/grid/cards 布局校验：如果指定了模块，检查是否都支持
-  if ((layout === 'single' || layout === 'grid' || layout === 'cards') && modules?.length) {
-    const unsupported = modules.filter((m: string) => !LARGE_MODULES.includes(m))
-    if (unsupported.length > 0) {
-      const names = unsupported.map((m: string) => MODULE_NAMES[m] || m).join('、')
-      return `错误: 以下模块不支持 ${layout} 布局: ${names}。支持的模块: ${LARGE_MODULES.map(m => MODULE_NAMES[m] || m).join('、')}`
-    }
+  // 取第一个模块
+  const moduleName = modules[0]
+
+  // 验证模块名
+  if (!AVAILABLE_MODULES.includes(moduleName)) {
+    return `错误: 未知模块 "${moduleName}"。可用模块: ${AVAILABLE_MODULES.join(', ')}`
   }
 
-  // grid/cards 布局最多 3 个模块
-  if ((layout === 'grid' || layout === 'cards') && modules?.length > MAX_GRID_MODULES) {
-    return `错误: ${layout} 布局最多支持 ${MAX_GRID_MODULES} 个模块，当前指定了 ${modules.length} 个`
+  // 只支持大模块
+  if (!LARGE_MODULES.includes(moduleName)) {
+    return `错误: 模块 "${moduleName}" 不支持 single 布局。支持的大模块: ${LARGE_MODULES.map(m => MODULE_NAMES[m] || m).join('、')}`
   }
 
   try {
-    const result = await window.ipcRenderer.invoke('dashboard:control', {
-      command: 'layout',
-      args: { layout, modules },
+    // 先打开看板窗口
+    await window.ipcRenderer.invoke('dashboard:open', {
+      modules: [moduleName],
+      layout: 'single',
     })
 
-    if (!result.success) {
-      return `切换布局失败: ${result.error}`
-    }
+    // 再发送控制命令
+    await window.ipcRenderer.invoke('dashboard:control', {
+      command: 'layout',
+      args: { layout: 'single', modules: [moduleName] },
+    })
 
-    return `布局已切换为: ${layout}`
+    const moduleTitle = MODULE_NAMES[moduleName] || moduleName
+    return `已切换到 single 布局，全屏显示: ${moduleTitle}`
   } catch (error: any) {
     return `切换布局失败: ${error.message}`
   }

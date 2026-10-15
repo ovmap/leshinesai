@@ -427,16 +427,11 @@ export const useDashboardDataStore = defineStore('dashboardData', () => {
 
   /** 布局感知的数据获取（主入口） */
   function getSmartData(
-    module?: string,
-    format: 'markdown' | 'json' = 'markdown',
-    scope: 'summary' | 'detail' | 'full' = 'summary'
+    module?: string
   ): string {
     const layout = controlStore.currentLayout
-
-    // JSON 格式直接返回原始数据
-    if (format === 'json') {
-      return getFormattedData(module, 'json', scope)
-    }
+    const format = 'markdown'
+    const scope = 'summary'
 
     // ========== scroll 布局 ==========
     if (layout === 'scroll') {
@@ -474,7 +469,7 @@ export const useDashboardDataStore = defineStore('dashboardData', () => {
           const moduleTitle = titleMap[module] || module
           return `当前显示 [${currentNames}]，模块 [${moduleTitle}] 不在其中。\n\n建议: 切换显示？\n执行: dashboard_command({ command: 'show', args: { modules: ['${module}'], layout: 'grid' } })`
         }
-        return getModuleFormattedData(module, scope === 'summary' ? 'detail' : scope)
+        return getModuleFormattedData(module, 'detail')
       }
 
       // 没指定模块 → 返回当前所有模块数据

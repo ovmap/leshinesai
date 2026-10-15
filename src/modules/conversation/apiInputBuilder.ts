@@ -23,6 +23,7 @@ export interface ConversationHistoryMessage {
 export interface ApiInputBuilderDependencies {
   getChatHistory(): ConversationHistoryMessage[]
   getMaxHistoryMessagesForApi(): number
+  getMaxMessageLengthForApi(): number
   getAiProvider(): string
 }
 
@@ -35,6 +36,12 @@ export interface ApiInputBuilder {
 export function createApiInputBuilder(
   dependencies: ApiInputBuilderDependencies
 ): ApiInputBuilder {
+  const truncateText = (text: string, maxLength: number): string => {
+    if (text.length <= maxLength) return text
+    const truncated = text.slice(0, maxLength)
+    return truncated + '\n\n[... Content truncated due to length limit ...]'
+  }
+
   return {
     async build({
       isNewChain,
@@ -44,6 +51,7 @@ export function createApiInputBuilder(
 
       const historyToBuildFrom = [...dependencies.getChatHistory()]
       const maxHistory = dependencies.getMaxHistoryMessagesForApi()
+      const maxMessageLength = dependencies.getMaxMessageLengthForApi()
       const apiInput: OpenAI.Responses.Request.InputItemLike[] = []
       const recentHistory = historyToBuildFrom.slice(0, maxHistory).reverse()
 
@@ -51,9 +59,21 @@ export function createApiInputBuilder(
         msg => msg.role === 'user'
       )?.local_id_temp
 
+      // Find the index of the latest user message in recentHistory
+      // Messages after (and including) the latest user message are "current" and should not be truncated
+      const latestUserMessageIndex = recentHistory.findIndex(
+        msg => msg.local_id_temp === lastUserMessageInFullHistoryId
+      )
+
       const aiProvider = dependencies.getAiProvider()
 
-      for (const msg of recentHistory) {
+      for (let i = 0; i < recentHistory.length; i++) {
+        const msg = recentHistory[i]
+        // After reverse(), messages are ordered from oldest to newest
+        // Messages from latestUserMessageIndex to end are "current" (user message and any tool calls before it in chatHistory)
+        // Messages before latestUserMessageIndex are "history" and should be truncated
+        const isCurrentMessage =
+          latestUserMessageIndex === -1 || i >= latestUserMessageIndex
         let apiItemPartial: any
 
         if (msg.role === 'system') {
@@ -61,13 +81,16 @@ export function createApiInputBuilder(
         }
 
         if (msg.role === 'tool') {
+          const toolOutput =
+            typeof msg.content === 'string'
+              ? msg.content
+              : JSON.stringify(msg.content)
           apiItemPartial = {
             type: 'function_call_output',
             call_id: msg.tool_call_id || `unknown_call_id_${Date.now()}`,
-            output:
-              typeof msg.content === 'string'
-                ? msg.content
-                : JSON.stringify(msg.content),
+            output: isCurrentMessage
+              ? toolOutput
+              : truncateText(toolOutput, maxMessageLength),
           }
         } else {
           const currentApiRole = msg.role as 'user' | 'assistant' | 'developer'
@@ -82,7 +105,12 @@ export function createApiInputBuilder(
               currentApiRole === 'user' || currentApiRole === 'developer'
                 ? 'input_text'
                 : 'output_text'
-            messageContentParts = [{ type: typeForPart, text: msg.content }]
+            messageContentParts = [
+              {
+                type: typeForPart,
+                text: truncateText(msg.content, maxMessageLength),
+              },
+            ]
           } else if (Array.isArray(msg.content)) {
             const isLastUserMessageWithPotentialImage =
               currentApiRole === 'user' &&
@@ -95,7 +123,10 @@ export function createApiInputBuilder(
                     currentApiRole === 'user' || currentApiRole === 'developer'
                       ? 'input_text'
                       : 'output_text'
-                  return { type: typeForPart, text: appPart.text || '' }
+                  return {
+                    type: typeForPart,
+                    text: truncateText(appPart.text || '', maxMessageLength),
+                  }
                 }
 
                 if (appPart.type === 'app_image_uri') {

@@ -66,6 +66,7 @@ export interface LeshineSettings {
   assistantAvatar: string
   mcpServersConfig?: string
   MAX_HISTORY_MESSAGES_FOR_API: number
+  MAX_MESSAGE_LENGTH_FOR_API: number
   SUMMARIZATION_MESSAGE_COUNT: number
   SUMMARIZATION_MODEL: string
   SUMMARIZATION_SYSTEM_PROMPT: string
@@ -177,6 +178,7 @@ const defaultSettings: LeshineSettings = {
   assistantAvatar: 'leshine',
   mcpServersConfig: '[]',
   MAX_HISTORY_MESSAGES_FOR_API: 10,
+  MAX_MESSAGE_LENGTH_FOR_API: 3000,
   SUMMARIZATION_MESSAGE_COUNT: 20,
   SUMMARIZATION_MODEL: 'gpt-4.1-nano',
   SUMMARIZATION_SYSTEM_PROMPT: DEFAULT_SUMMARIZATION_SYSTEM_PROMPT,
@@ -248,6 +250,7 @@ const settingKeyToLabelMap: Record<keyof LeshineSettings, string> = {
   assistantTools: 'Enabled Assistant Tools',
   assistantAvatar: 'Assistant Avatar',
   MAX_HISTORY_MESSAGES_FOR_API: 'Max History Messages for API',
+  MAX_MESSAGE_LENGTH_FOR_API: 'Max Message Length for API',
   SUMMARIZATION_MESSAGE_COUNT: 'Summarization Message Count',
   SUMMARIZATION_MODEL: 'Summarization Model',
   SUMMARIZATION_SYSTEM_PROMPT: 'Summarization System Prompt',
@@ -557,6 +560,7 @@ export const useSettingsStore = defineStore('settings', () => {
             key.startsWith('VITE_') ||
             key.startsWith('assistant') ||
             key === 'MAX_HISTORY_MESSAGES_FOR_API' ||
+            key === 'MAX_MESSAGE_LENGTH_FOR_API' ||
             key === 'SUMMARIZATION_MESSAGE_COUNT' ||
             key === 'SUMMARIZATION_MODEL' ||
             key === 'SUMMARIZATION_SYSTEM_PROMPT' ||
@@ -567,6 +571,7 @@ export const useSettingsStore = defineStore('settings', () => {
         .map(([key, value]) => {
           if (
             key === 'MAX_HISTORY_MESSAGES_FOR_API' ||
+            key === 'MAX_MESSAGE_LENGTH_FOR_API' ||
             key === 'SUMMARIZATION_MESSAGE_COUNT' ||
             key === 'assistantTemperature' ||
             key === 'assistantTopP' ||
@@ -667,6 +672,7 @@ export const useSettingsStore = defineStore('settings', () => {
               key === 'assistantTemperature' ||
               key === 'assistantTopP' ||
               key === 'MAX_HISTORY_MESSAGES_FOR_API' ||
+              key === 'MAX_MESSAGE_LENGTH_FOR_API' ||
               key === 'SUMMARIZATION_MESSAGE_COUNT'
             ) {
               ;(devCombinedSettings as any)[key] = parseFloat(
@@ -753,6 +759,7 @@ export const useSettingsStore = defineStore('settings', () => {
       key === 'assistantTemperature' ||
       key === 'assistantTopP' ||
       key === 'MAX_HISTORY_MESSAGES_FOR_API' ||
+      key === 'MAX_MESSAGE_LENGTH_FOR_API' ||
       key === 'SUMMARIZATION_MESSAGE_COUNT' ||
       key === 'websocketPort' ||
       key === 'ragTopK' ||
@@ -907,6 +914,8 @@ export const useSettingsStore = defineStore('settings', () => {
         mcpServersConfig: settings.value.mcpServersConfig,
         MAX_HISTORY_MESSAGES_FOR_API:
           settings.value.MAX_HISTORY_MESSAGES_FOR_API,
+        MAX_MESSAGE_LENGTH_FOR_API:
+          settings.value.MAX_MESSAGE_LENGTH_FOR_API,
         SUMMARIZATION_MESSAGE_COUNT: settings.value.SUMMARIZATION_MESSAGE_COUNT,
         SUMMARIZATION_MODEL: settings.value.SUMMARIZATION_MODEL,
         SUMMARIZATION_SYSTEM_PROMPT: settings.value.SUMMARIZATION_SYSTEM_PROMPT,

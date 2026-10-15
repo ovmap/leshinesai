@@ -245,6 +245,27 @@
           </div>
           <div>
             <label
+              for="max-message-length"
+              class="block mb-1 text-sm flex items-center"
+              >Max Message Length (characters)
+              <div
+                class="tooltip tooltip-right"
+                data-tip="Maximum length for a single message sent to the AI. Longer messages will be truncated. Helps prevent context overflow from very long responses."
+              >
+                <img :src="infoIcon" class="size-4 ml-1" /></div
+            ></label>
+            <input
+              id="max-message-length"
+              type="number"
+              min="500"
+              max="20000"
+              step="500"
+              v-model.number="currentSettings.MAX_MESSAGE_LENGTH_FOR_API"
+              class="input input-bordered w-full focus:input-primary"
+            />
+          </div>
+          <div>
+            <label
               for="summarization-messages"
               class="block mb-1 text-sm flex items-center"
               >Summarization Message Count

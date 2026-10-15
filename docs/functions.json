@@ -523,31 +523,23 @@
   {
     "type": "function",
     "name": "dashboard_command",
-    "description": "控制运输智能体看板的 CLI 工具。可用命令：show/filter/data/status/action/reset/layout/page/help/close。**不确定参数时，先调用 help 查询用法。**",
+    "description": "控制运输智能体看板的 CLI 工具。可用命令：show/filter/data/status/action/layout/page/help/close。**不确定参数时，先调用 help 查询用法。**",
     "strict": false,
     "parameters": {
       "type": "object",
       "properties": {
         "command": {
           "type": "string",
-          "enum": ["show", "filter", "data", "action", "reset", "layout", "page", "close", "status", "help"],
+          "enum": ["show", "filter", "data", "action", "layout", "page", "close", "status", "help"],
           "description": "命令名。不确定用法时先用 help 查询"
         },
         "args": {
           "type": "object",
           "description": "命令参数。不确定参数时，先用 help 查询",
           "properties": {
-            "modules": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "enum": ["cargoBanner", "mapPage", "cargoVolume", "onTime", "endToEnd", "energyPricesCard", "energyPrices", "abnormalTransportation", "capacityPool", "urgentCustomer", "majorEvents", "unitPrice", "dryPrice", "cargoTrend", "signingInformation", "reorderProgress"]
-              },
-              "description": "模块列表 (show 命令)。show 搭配 single 布局使用，仅支持大模块: energyPrices, abnormalTransportation, capacityPool, urgentCustomer, majorEvents, cargoTrend, signingInformation, reorderProgress。scroll 布局用 page 命令切换页面"
-            },
             "module": {
               "type": "string",
-              "description": "目标模块 (filter/data/action/reset/help 命令)"
+              "description": "目标模块 (filter/data/action/help 命令)"
             },
             "page": {
               "type": "string",
@@ -556,24 +548,9 @@
             },
             "filters": {
               "type": "object",
-              "description": "全局筛选条件 (filter 命令)，对应看板顶部 GlobalFilterBar。支持字段: fromWarehouse(始发仓), toProvince(目的省), toRdc(目的RDC)。示例: { \"fromWarehouse\": \"广州仓\", \"toProvince\": \"广东省\" }"
-            },
-            "queryFilter": {
-              "type": "string",
-              "enum": ["fromWarehouse", "toProvince", "toRdc"],
-              "description": "查询筛选字段的可选值 (help 命令)。配合 queryCommand: \"filter\" 使用，返回该字段的动态可选值列表"
+              "description": "全局筛选条件 (filter 命令)，支持字段: fromWarehouse(始发仓), toProvince(目的省), toRdc(目的RDC)。每个字段支持单选(字符串)或多选(数组)，用于查看不同发货地、目的地的数据。示例: {\"fromWarehouse\": \"广州仓\"} 或 {\"fromWarehouse\": [\"广州仓\", \"深圳仓\"], \"toProvince\": \"广东省\"}。可通过 help 命令查询可用筛选值列表"
             },
             "format": {
-              "type": "string",
-              "enum": ["markdown", "json"],
-              "description": "数据格式 (data 命令)"
-            },
-            "scope": {
-              "type": "string",
-              "enum": ["summary", "detail", "full"],
-              "description": "数据范围 (data 命令)"
-            },
-            "action": {
               "type": "string",
               "description": "操作名称 (action 命令)。先用 help 查询模块可用操作"
             },
@@ -583,12 +560,12 @@
             },
             "layout": {
               "type": "string",
-              "enum": ["scroll", "single", "grid", "cards"],
-              "description": "布局模式 (show/layout 命令)"
+              "enum": ["single"],
+              "description": "布局模式 (layout 命令)。用于放大展示、单独显示某个模块查看数据。可用模块名通过 help({ queryCommand: 'layout' }) 查询。不涉及 scroll 布局"
             },
             "queryCommand": {
               "type": "string",
-              "enum": ["show", "filter", "data", "action", "reset", "layout", "page", "close", "status", "help"],
+              "enum": ["show", "filter", "data", "action", "layout", "page", "close", "status", "help"],
               "description": "要查询的命令名 (help 命令)"
             }
           }

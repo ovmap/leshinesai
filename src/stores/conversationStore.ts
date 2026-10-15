@@ -443,6 +443,8 @@ export const useConversationStore = defineStore('conversation', () => {
       getChatHistory: () => [...chatHistory.value],
       getMaxHistoryMessagesForApi: () =>
         settingsStore.config.MAX_HISTORY_MESSAGES_FOR_API,
+      getMaxMessageLengthForApi: () =>
+        settingsStore.config.MAX_MESSAGE_LENGTH_FOR_API,
       getAiProvider: () => settingsStore.config.aiProvider,
     }
   }

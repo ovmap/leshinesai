@@ -223,8 +223,8 @@ onMounted(() => {
 
   // dashboard:request-data — 数据请求响应（使用布局感知的 getSmartData）
   window.ipcRenderer?.on('dashboard:request-data', (_event: any, params: any) => {
-    const { requestId, module, format, scope } = params
-    const data = dataStore.getSmartData(module, format || 'markdown', scope || 'summary')
+    const { requestId, module } = params
+    const data = dataStore.getSmartData(module)
     // 直接发送给主进程（主进程 ipcMain.once 直接捕获，无需通过主窗口转发）
     window.ipcRenderer?.send(`dashboard:data-response-${requestId}`, data)
   })
@@ -319,14 +319,6 @@ function handleCommand(command: any) {
     case 'action':
       if (args?.module && args?.action) {
         controlStore.addAction(args.module, args.action, args.params || {})
-      }
-      break
-
-    case 'reset':
-      controlStore.resetFilters(args?.module)
-      // 同步清空 globalFilterStore（更新 UI）
-      if (!args?.module) {
-        globalFilterStore.resetFilters()
       }
       break
 

@@ -26,53 +26,27 @@ AI 读取数据: dashboard data mapPage
 
 | 命令 | 功能 | 返回值 |
 |------|------|--------|
-| `dashboard show` | 显示/切换模块 | 确认信息 |
+| `dashboard show` | 打开看板（默认 scroll 布局） | 确认信息 |
 | `dashboard filter` | 设置筛选条件 | 确认信息 |
 | `dashboard data` | 获取当前数据 | Markdown 格式数据 |
 | `dashboard action` | 触发 UI 操作 | 操作结果 |
-| `dashboard reset` | 重置所有筛选 | 确认信息 |
-| `dashboard layout` | 切换布局模式 | 确认信息 |
-| `dashboard page` | 切换页面 | 确认信息 |
+| `dashboard layout` | 放大展示单个模块（single 布局） | 确认信息 |
+| `dashboard page` | scroll 布局下切换页面 | 确认信息 |
 | `dashboard close` | 关闭看板窗口 | 确认信息 |
 
 ### 2.2 命令详细定义
 
-#### `dashboard show` — 显示模块
+#### `dashboard show` — 打开看板
 
 ```json
 {
-  "command": "show",
-  "args": {
-    "modules": ["cargoTrend", "signingInformation"],
-    "layout": "grid"
-  }
+  "command": "show"
 }
 ```
 
-- `modules`: 要显示的模块列表（可选，不传则保持当前）
-- `layout`: 布局模式（可选）
-  - `scroll` — 页面模式（默认），每个页面独占全屏，右侧 QuickBar 切换
-  - `single` — 一次只显示一个模块，全屏聚焦（仅大模块支持）
-  - `grid` — 网格布局，多模块并排
-  - `cards` — 卡片流（目前同 grid，后续会做动效）
+show 命令用于打开看板窗口，默认进入 scroll 布局。无参数。
 
-已注册模块（16 个）：
-- `cargoBanner` — 运输智能体（视频+数据卡片+弹窗）
-- `mapPage` — 地图（ECharts 中国地图）
-- `cargoVolume` — 累计货量（Swiper 轮播）
-- `onTime` — 提货及时率（静态卡片）
-- `endToEnd` — 准时交付率（静态卡片）
-- `energyPricesCard` — 能源价格（Swiper 轮播）
-- `energyPrices` — 能源价格趋势（ECharts 折线/柱状图）
-- `abnormalTransportation` — 运输异常（ECharts 矩形树图）
-- `capacityPool` — 运力池（自动滚动表格）
-- `urgentCustomer` — 加急&重点客户风险（自动滚动表格）
-- `majorEvents` — 重大活动&极端天气影响（自动滚动表格）
-- `unitPrice` — 干单价（静态卡片）
-- `dryPrice` — 配单价（静态卡片）
-- `cargoTrend` — 货量趋势（图表）
-- `signingInformation` — 签收信息（表格+图表）
-- `reorderProgress` — 返单进展（双层环形图）
+> 提示: 放大展示单个模块请使用 `layout` 命令
 
 #### `dashboard filter` — 设置筛选
 
@@ -154,31 +128,24 @@ AI 读取数据: dashboard data mapPage
 - `cargoTrend.changeMetric` — 切换指标
 - `cargoTrend.refresh` — 刷新数据
 
-#### `dashboard reset` — 重置
-
-```json
-{
-  "command": "reset",
-  "args": {
-    "module": "signingInformation"
-  }
-}
-```
-
-- `module`: 可选，不传则重置所有模块
-
-#### `dashboard layout` — 切换布局
+#### `dashboard layout` — 切换布局（放大展示）
 
 ```json
 {
   "command": "layout",
   "args": {
-    "layout": "scroll"
+    "modules": ["cargoTrend"]
   }
 }
 ```
 
-#### `dashboard page` — 切换页面
+layout 命令用于放大展示、单独显示某个模块查看数据。
+
+- `modules`: 模块列表（必填），取第一个模块全屏显示，仅支持大模块
+
+> 提示: 切换到 scroll 布局请使用 `show` 或 `page` 命令
+
+#### `dashboard page` — 切换页面（scroll 布局专用）
 
 ```json
 {
@@ -189,11 +156,13 @@ AI 读取数据: dashboard data mapPage
 }
 ```
 
-- `page`: 目标页面名称
+- `page`: 目标页面名称（必填）
   - `cargoBanner` — 运输智能体（默认）
   - `mapPage` — 地图
 
-scroll 布局下，每个页面是一个独立的全屏视图，通过 QuickBar 导航切换。
+page 命令用于在 scroll 布局下切换页面。每个页面是一个独立的全屏视图，包含多个模块。
+
+> 提示: 放大展示单个模块请使用 `layout` 命令
 
 #### `dashboard close` — 关闭看板
 
@@ -220,7 +189,7 @@ scroll 布局下，每个页面是一个独立的全屏视图，通过 QuickBar 
     "properties": {
       "command": {
         "type": "string",
-        "enum": ["show", "filter", "data", "action", "reset", "layout", "page", "close"],
+        "enum": ["show", "filter", "data", "action", "layout", "page", "close"],
         "description": "要执行的命令"
       },
       "args": {
@@ -271,8 +240,8 @@ scroll 布局下，每个页面是一个独立的全屏视图，通过 QuickBar 
           },
           "layout": {
             "type": "string",
-            "enum": ["single", "grid", "cards", "scroll"],
-            "description": "布局模式 (show/layout 命令)"
+            "enum": ["single"],
+            "description": "布局模式 (layout 命令)，用于放大展示单个模块"
           }
         }
       }

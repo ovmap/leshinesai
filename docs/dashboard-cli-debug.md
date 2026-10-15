@@ -6,24 +6,14 @@
 
 ## 可用命令
 
-### show — 显示/切换模块
+### show — 打开看板（默认 scroll 布局）
 
 ```js
-// 打开看板（默认 scroll 页面模式，modules 参数忽略，按 pageRegistry 渲染）
-await window.ipcRenderer.invoke('dashboard:open', {})
-
-// 打开看板并指定 grid 布局
-await window.ipcRenderer.invoke('dashboard:open', {
-  modules: ['cargoTrend', 'signingInformation'],
-  layout: 'grid'
-})
-
-// 单模块全屏（仅大模块支持）
-await window.ipcRenderer.invoke('dashboard:control', {
-  command: 'show',
-  args: { modules: ['cargoTrend'], layout: 'single' }
-})
+// 打开看板窗口，默认 scroll 布局
+await window.ipcRenderer.invoke('dashboard:open', { layout: 'scroll' })
 ```
+
+> 提示: 放大展示单个模块请使用 `layout` 命令
 
 ### filter — 设置全局筛选条件
 
@@ -93,8 +83,6 @@ data 命令会根据当前布局状态智能返回数据，并感知当前筛选
 | 参数 | 说明 | 可选值 |
 |------|------|--------|
 | `module` | 模块名（不传则返回当前页面概览） | 见可用模块列表 |
-| `format` | 格式 | `markdown`（默认）, `json` |
-| `scope` | 数据范围 | `summary`（默认）, `detail`, `full` |
 
 #### 示例
 
@@ -105,11 +93,8 @@ await window.ipcRenderer.invoke('dashboard:data', {})
 // 获取单个模块数据（任意模块，不受当前页面限制）
 await window.ipcRenderer.invoke('dashboard:data', { module: 'cargoTrend' })
 
-// 获取模块详细数据
-await window.ipcRenderer.invoke('dashboard:data', { module: 'signingInformation', scope: 'detail' })
-
-// 获取 JSON 格式原始数据
-await window.ipcRenderer.invoke('dashboard:data', { module: 'cargoTrend', format: 'json', scope: 'full' })
+// 获取签收信息数据
+await window.ipcRenderer.invoke('dashboard:data', { module: 'signingInformation' })
 ```
 
 #### 状态感知行为
@@ -117,46 +102,21 @@ await window.ipcRenderer.invoke('dashboard:data', { module: 'cargoTrend', format
 | 布局 | 不指定 module | 指定 module |
 |------|--------------|-------------|
 | scroll | 当前页面概览（状态 + 筛选 + 当前页面模块摘要） | 直接返回模块数据（不受当前页面限制） |
-| grid | 所有模块数据快照（状态 + 筛选） | 模块在当前 grid→返回数据；不在→提示切换 |
 | single | 当前全屏模块数据（状态 + 筛选） | 模块是当前全屏→返回数据；不是→提示切换 |
 
-> grid/single 布局下 `scope=summary` 自动提升到 `detail`。
-
-### reset — 重置筛选
+### layout — 切换布局（single 布局，放大展示）
 
 ```js
-// 重置指定模块
-await window.ipcRenderer.invoke('dashboard:control', {
-  command: 'reset',
-  args: { module: 'cargoTrend' }
-})
-
-// 重置所有模块
-await window.ipcRenderer.invoke('dashboard:control', {
-  command: 'reset',
-  args: {}
-})
-```
-
-### layout — 切换布局
-
-```js
+// 单模块全屏显示
 await window.ipcRenderer.invoke('dashboard:control', {
   command: 'layout',
-  args: { layout: 'scroll' }
+  args: { modules: ['cargoTrend'] }
 })
 ```
 
-layout 可选值: `single` | `grid` | `cards` | `scroll`
+layout 命令用于放大展示、单独显示某个模块查看数据。`modules` 参数必填，取第一个模块全屏显示。
 
-| 值 | 说明 |
-|---|---|
-| `scroll` | 页面模式（默认），每个页面独占全屏，右侧 QuickBar 切换页面 |
-| `grid` | 网格布局，多模块并排，自动分配列宽 |
-| `cards` | 卡片流（目前同 grid，后续会做动效） |
-| `single` | 单模块全屏聚焦（仅大模块支持，见下方说明） |
-
-**single 布局支持的模块：**
+**支持的模块（大模块）：**
 - `energyPrices` — 能源价格趋势
 - `abnormalTransportation` — 运输异常
 - `capacityPool` — 运力池
@@ -166,10 +126,7 @@ layout 可选值: `single` | `grid` | `cards` | `scroll`
 - `signingInformation` — 签收信息
 - `reorderProgress` — 返单进展
 
-**不支持 single 的模块（小卡片/特殊组件）：**
-- `cargoBanner` — 运输智能体（视频+弹窗）
-- `mapPage` — 地图（独占整页）
-- `cargoVolume` / `onTime` / `endToEnd` / `energyPricesCard` / `unitPrice` / `dryPrice` — 4×3 小卡片
+> 提示: 切换到 scroll 布局请使用 `show` 或 `page` 命令
 
 ### page — 切换页面（scroll 布局专用）
 
@@ -186,6 +143,8 @@ await window.ipcRenderer.invoke('dashboard:control', {
   args: { page: 'cargoBanner' }
 })
 ```
+
+page 命令用于在 scroll 布局下切换页面。每个页面是一个独立的全屏视图，包含多个模块。
 
 可用页面:
 
@@ -263,19 +222,28 @@ await window.ipcRenderer.invoke('dashboard:help', { queryCommand: 'show' })
 
 // 查询 data 命令（会显示当前页面模块）
 await window.ipcRenderer.invoke('dashboard:help', { queryCommand: 'data' })
+
+// 查询始发仓可选值（动态从 selectOptionsStore 获取）
+await window.ipcRenderer.invoke('dashboard:help', { queryCommand: 'filter', queryFilter: 'fromWarehouse' })
+
+// 查询目的省可选值
+await window.ipcRenderer.invoke('dashboard:help', { queryCommand: 'filter', queryFilter: 'toProvince' })
+
+// 查询目的RDC可选值
+await window.ipcRenderer.invoke('dashboard:help', { queryCommand: 'filter', queryFilter: 'toRdc' })
 ```
 
 #### 分层查询示例
 
 ```
-help()                                        → 命令总览（当前状态 + 10个命令 + 快速开始）
+help()                                        → 命令总览（当前状态 + 9个命令 + 快速开始）
 help({ queryCommand: "filter" })              → filter 参数详情（始发仓、目的省、目的RDC）
 help({ queryCommand: "action" })              → action 用法总览（当前可操作模块 + 全部支持模块）
 help({ queryCommand: "action", module: "cargoTrend" })  → cargoTrend 具体操作列表
-help({ queryCommand: "page" })                → 12个页面列表（标记当前页面）
-help({ queryCommand: "show" })                → 模块列表 + 布局说明（根据当前布局提示）
-help({ queryCommand: "layout" })              → 4种布局说明（显示当前布局）
-help({ queryCommand: "data" })                → format/scope 说明（显示当前页面模块）
+help({ queryCommand: "page" })                → 12个页面列表（scroll 布局专用，标记当前页面）
+help({ queryCommand: "show" })                → 打开看板说明（提示使用 layout 放大展示模块）
+help({ queryCommand: "layout" })              → single 布局说明 + 大模块列表
+help({ queryCommand: "data" })                → 数据获取说明（显示当前页面模块）
 ```
 
 #### 状态感知说明
@@ -285,11 +253,11 @@ help 会根据当前状态动态返回内容：
 | 命令 | 感知内容 |
 |------|----------|
 | help() | 显示当前布局、页面/模块 |
-| help({ queryCommand: "show" }) | 根据当前布局提示使用方式 |
+| help({ queryCommand: "show" }) | 提示使用 layout 命令放大展示模块 |
 | help({ queryCommand: "data" }) | 显示当前页面模块列表 |
 | help({ queryCommand: "action" }) | 显示当前可操作模块 |
-| help({ queryCommand: "layout" }) | 显示当前布局 |
-| help({ queryCommand: "page" }) | 标记当前页面 |
+| help({ queryCommand: "layout" }) | 显示当前布局，列出支持的大模块 |
+| help({ queryCommand: "page" }) | 标记当前页面，提示需要先切换到 scroll 布局 |
 
 #### 使用场景
 

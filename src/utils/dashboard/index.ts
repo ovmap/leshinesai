@@ -15,7 +15,6 @@ import { handleShow } from './commands/show'
 import { handleFilter } from './commands/filter'
 import { handleData } from './commands/data'
 import { handleAction } from './commands/action'
-import { handleReset } from './commands/reset'
 import { handleLayout } from './commands/layout'
 import { handlePage } from './commands/page'
 import { handleClose } from './commands/close'
@@ -50,11 +49,6 @@ const commandRegistry: CommandRegistration[] = [
     name: 'action',
     description: '触发 UI 操作',
     handler: handleAction,
-  },
-  {
-    name: 'reset',
-    description: '重置筛选',
-    handler: handleReset,
   },
   {
     name: 'layout',
