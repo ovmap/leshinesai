@@ -6,6 +6,7 @@
  *          11=返单及时率, 5=运作准确率, 18=客户满意度
  */
 export function formatCityLogisticsScores(data: any, scope: string): string {
+  const MAX_ROWS = 5
   const list = Array.isArray(data) ? data : (data?.list || data?.items || [])
   if (!list.length) return '## 城配物流商KPI评分\n\n暂无数据'
 
@@ -13,10 +14,15 @@ export function formatCityLogisticsScores(data: any, scope: string): string {
   md += `| 年月 | 物流商 | CDC仓库 | 得分合计 | SEC入库周期达标率 | 发货及时率 | 库存准确率 | 准时交货率 | 货损率 | 异常解决及时率 | SEC APP签收率 | TMS APP签收率 | 信息签收及时性 | 返单及时率 | 运作准确率 | 客户满意度 |\n`
   md += `|------|--------|---------|----------|-----------------|-----------|-----------|-----------|--------|--------------|-------------|-------------|--------------|-----------|-----------|----------|\n`
 
-  list.forEach((row: any) => {
+  const totalRows = list.length
+  list.slice(0, MAX_ROWS).forEach((row: any) => {
     const k = buildKpiMap(row.kpi)
     md += `| ${row.month || '-'} | ${row.logistic || '-'} | ${row.cdcWarehouse || '-'} | ${row.totalScore ?? '-'} | ${fmtRate(k[12])} | ${fmtRate(k[1])} | ${fmtRate(k[4])} | ${fmtRate(k[13])} | ${fmtRate(k[14])} | ${fmtRate(k[15])} | ${fmtRate(k[43])} | ${fmtRate(k[16])} | ${fmtRate(k[17])} | ${fmtRate(k[11])} | ${fmtRate(k[5])} | ${fmtSatisfact(k[18])} |\n`
   })
+
+  if (totalRows > MAX_ROWS) {
+    md += `\n> 显示前 ${MAX_ROWS} 条，共 ${totalRows} 条数据\n`
+  }
 
   return md
 }

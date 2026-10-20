@@ -1,6 +1,7 @@
 import type OpenAI from 'openai'
 import type { ToolCallHandler, ToolCallHandlerDependencies } from './types'
 import type { AudioState } from '../../stores/generalStore'
+import { withRetry, isRetryableError } from '../../utils/retry'
 
 const PREVIOUS_RESPONSE_NOT_FOUND = 'Previous response with id'
 const NOT_FOUND_SUFFIX = 'not found'
@@ -73,12 +74,18 @@ export function createToolCallHandler(
 
       const attemptContinuation = async (responseId: string | null) => {
         const systemPrompt = dependencies.getAssistantSystemPrompt()
-        const stream = await dependencies.createOpenAIResponse(
-          nextApiInput,
-          responseId,
-          true,
-          systemPrompt,
-          abortController.signal
+        const stream = await withRetry(
+          () => dependencies.createOpenAIResponse(
+            nextApiInput,
+            responseId,
+            true,
+            systemPrompt,
+            abortController.signal
+          ),
+          [2000, 1000], // 重试延时：2s, 1s
+          (attempt, error) => {
+            dependencies.logInfo(`[Retry] Tool continuation failed, retrying (${attempt}/2)...`, error?.message)
+          }
         )
         await dependencies.processStream(stream, placeholderTempId, true)
       }

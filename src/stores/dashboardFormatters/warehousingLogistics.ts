@@ -5,6 +5,7 @@
  * 动态列：heardList 去掉固定列后为时间列
  */
 export function formatWarehousingLogistics(data: any, scope: string): string {
+  const MAX_ROWS = 5
   let md = `## 准时交付率(仓+物流)\n\n`
 
   if (!data) return md + '暂无数据'
@@ -20,22 +21,21 @@ export function formatWarehousingLogistics(data: any, scope: string): string {
   md += `| ${fixedCols.join(' | ')} | ${timeCols.join(' | ')} |\n`
   md += `|${fixedCols.map(() => '------').join('|')}|${timeCols.map(() => '------').join('|')}|\n`
 
-  // 递归展开树，根据层级获取 key 值
+  // 收集所有行用于计数
+  const allRows: string[] = []
   function walk(items: any[], level: number, parentValues: string[]) {
     items.forEach((item: any) => {
-      // 当前层级的值存储在 key 字段中
       const currentValues = [...parentValues]
       currentValues[level] = item.key || '-'
 
-      // 只有最底层（level 2）才显示完整行
       if (level === 2 || !item.childList?.length) {
         const fixed = [
-          currentValues[0] || '-',  // 始发仓
-          currentValues[1] || '-',  // 目的仓
-          currentValues[2] || '-',  // 物流商
+          currentValues[0] || '-',
+          currentValues[1] || '-',
+          currentValues[2] || '-',
         ]
         const rates = (item.rateList || []).map((r: any) => r ?? '-')
-        md += `| ${fixed.join(' | ')} | ${rates.join(' | ')} |\n`
+        allRows.push(`| ${fixed.join(' | ')} | ${rates.join(' | ')} |\n`)
       }
 
       if (item.childList?.length) {
@@ -44,6 +44,13 @@ export function formatWarehousingLogistics(data: any, scope: string): string {
     })
   }
   walk(treeList, 0, [])
+
+  const totalRows = allRows.length
+  allRows.slice(0, MAX_ROWS).forEach(row => { md += row })
+
+  if (totalRows > MAX_ROWS) {
+    md += `\n> 显示前 ${MAX_ROWS} 条，共 ${totalRows} 条数据\n`
+  }
 
   return md
 }

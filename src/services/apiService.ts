@@ -402,6 +402,18 @@ const dashScopeTTS = async (
     throw new DOMException('The user aborted a request.', 'AbortError')
   }
 
+  // Create a timeout controller to prevent hanging
+  const timeoutMs = 5000 // 5 seconds timeout for TTS
+  const timeoutController = new AbortController()
+  const timeoutId = setTimeout(() => timeoutController.abort(), timeoutMs)
+
+  // Combine the external signal with our timeout signal
+  const combinedController = new AbortController()
+  const onExternalAbort = () => combinedController.abort()
+  const onTimeoutAbort = () => combinedController.abort()
+  signal.addEventListener('abort', onExternalAbort, { once: true })
+  timeoutController.signal.addEventListener('abort', onTimeoutAbort, { once: true })
+
   let response: Response
 
   try {
@@ -409,7 +421,7 @@ const dashScopeTTS = async (
       'https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation',
       {
         method: 'POST',
-        signal,
+        signal: combinedController.signal,
         headers: {
           'Authorization': `Bearer ${apiKey}`,
           'Content-Type': 'application/json',
@@ -427,9 +439,16 @@ const dashScopeTTS = async (
   } catch (error: any) {
     // Re-throw AbortError without wrapping it
     if (error.name === 'AbortError') {
+      if (timeoutController.signal.aborted) {
+        throw new Error(`DashScope TTS: Request timeout after ${timeoutMs}ms`)
+      }
       throw error
     }
     throw new Error(`DashScope TTS Network Error: ${error.message}`)
+  } finally {
+    clearTimeout(timeoutId)
+    signal.removeEventListener('abort', onExternalAbort)
+    timeoutController.signal.removeEventListener('abort', onTimeoutAbort)
   }
 
   if (!response.ok) {
@@ -449,13 +468,30 @@ const dashScopeTTS = async (
 
   // Fetch actual audio from OSS URL
   let audioResponse: Response
+  const downloadTimeoutMs = 5000 // 5 seconds for audio download
+  const downloadTimeoutController = new AbortController()
+  const downloadTimeoutId = setTimeout(() => downloadTimeoutController.abort(), downloadTimeoutMs)
+
+  const downloadCombinedController = new AbortController()
+  const onDownloadExternalAbort = () => downloadCombinedController.abort()
+  const onDownloadTimeoutAbort = () => downloadCombinedController.abort()
+  signal.addEventListener('abort', onDownloadExternalAbort, { once: true })
+  downloadTimeoutController.signal.addEventListener('abort', onDownloadTimeoutAbort, { once: true })
+
   try {
-    audioResponse = await fetch(audioUrl, { signal })
+    audioResponse = await fetch(audioUrl, { signal: downloadCombinedController.signal })
   } catch (error: any) {
     if (error.name === 'AbortError') {
+      if (downloadTimeoutController.signal.aborted) {
+        throw new Error(`DashScope TTS: Audio download timeout after ${downloadTimeoutMs}ms`)
+      }
       throw error
     }
     throw new Error(`DashScope TTS: Failed to download audio from OSS`)
+  } finally {
+    clearTimeout(downloadTimeoutId)
+    signal.removeEventListener('abort', onDownloadExternalAbort)
+    downloadTimeoutController.signal.removeEventListener('abort', onDownloadTimeoutAbort)
   }
 
   if (!audioResponse.ok) {
@@ -1003,10 +1039,13 @@ export const createSummarizationResponse = async (
       ],
       stream: false,
     } as any
+    // 使用独立的 AbortController，避免受主 LLM 请求影响
+    const summarizationController = new AbortController()
     const response = await createChatCompletionForProvider(
       settings.aiProvider,
       () => client,
-      params
+      params,
+      summarizationController.signal
     )
 
     const content = response.choices[0]?.message?.content?.trim()
@@ -1071,10 +1110,13 @@ export const createContextAnalysisResponse = async (
       ],
       stream: false,
     } as any
+    // 使用独立的 AbortController，避免受主 LLM 请求影响
+    const analysisController = new AbortController()
     const response = await createChatCompletionForProvider(
       settings.aiProvider,
       () => client,
-      params
+      params,
+      analysisController.signal
     )
 
     const content = response.choices[0]?.message?.content?.trim()

@@ -7,10 +7,13 @@ import type { CommandHandler } from '../types'
 
 const AVAILABLE_MODULES = getModuleNames()
 
+// 特殊虚拟模块（从 cargoBanner 数据中提取，不在 moduleRegistry 中注册）
+const VIRTUAL_MODULES = ['cddWeeklyReport', 'pfpAssessment']
+
 export const handleData: CommandHandler = async (args) => {
   const module = args?.module
 
-  if (module && !AVAILABLE_MODULES.includes(module)) {
+  if (module && !AVAILABLE_MODULES.includes(module) && !VIRTUAL_MODULES.includes(module)) {
     return `错误: 未知模块 "${module}"。可用模块: ${AVAILABLE_MODULES.join(', ')}`
   }
 

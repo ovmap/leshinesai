@@ -357,6 +357,27 @@ export async function queryIsgRiskAlert() {
   return response.data
 }
 
+// ============ CDD 周报 & PFP 考核 API 接口 ============
+
+/** 查询CDD周报内容（运输准时交付率） */
+export async function queryLatestWeeklyReportContent(data: {
+  startTime: string
+  endTime: string
+}) {
+  const response = await transportAiClient.post('/ai/v1/cddReport/queryLatestWeeklyReportContent', data)
+  return response.data
+}
+
+/** 查询PFP考核邮件内容 */
+export async function queryLatestPfpAssessmentContent(data: {
+  startTime: string
+  endTime: string
+  month: number
+}) {
+  const response = await transportAiClient.post('/ai/v1/cddReport/queryLatestPfpAssessmentContent', data)
+  return response.data
+}
+
 // ============ 业务指标卡片 API 接口 ============
 
 /** 查询能源价格（汽油/柴油/航空燃油） */

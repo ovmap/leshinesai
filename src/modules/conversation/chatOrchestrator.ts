@@ -1,6 +1,7 @@
 import type OpenAI from 'openai'
 import type { ChatMessage } from '../../types/chat'
 import type { RagSearchResult } from '../../types/rag'
+import { withRetry, isRetryableError } from '../../utils/retry'
 
 export interface ChatDependencies {
   isInitialized(): boolean
@@ -446,10 +447,16 @@ export function createChatOrchestrator(
     dependencies.setLlmAbortController(abortController)
 
     try {
-      const streamResult = await dependencies.createOpenAIResponse(
-        finalApiInput,
-        dependencies.getCurrentResponseId(),
-        abortController.signal
+      const streamResult = await withRetry(
+        () => dependencies.createOpenAIResponse(
+          finalApiInput,
+          dependencies.getCurrentResponseId(),
+          abortController.signal
+        ),
+        [2000, 1000], // 重试延时：2s, 1s
+        (attempt, error) => {
+          dependencies.logInfo(`[Retry] LLM request failed, retrying (${attempt}/2)...`, error?.message)
+        }
       )
       await dependencies.processStream(streamResult, placeholderTempId, false)
     } catch (error: any) {

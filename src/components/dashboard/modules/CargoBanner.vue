@@ -1,7 +1,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, nextTick, computed, watch } from 'vue'
-import { queryRiskOrderStats, queryRiskOrderByPage, exportRiskOrder, queryCddAlertStats, queryCddAlertDetails, exportCddAlertDataByFilter, queryAbnormalVehicleStats, queryIsgDelayRisk, queryIsgInTransitAbnormal, queryIsgDeliveryAbnormal, queryIsgRiskAlert, queryFromWarehouse, queryToProvince, queryToRdc } from '../../../services/transportApi'
+import { queryRiskOrderStats, queryRiskOrderByPage, exportRiskOrder, queryCddAlertStats, queryCddAlertDetails, exportCddAlertDataByFilter, queryAbnormalVehicleStats, queryIsgDelayRisk, queryIsgInTransitAbnormal, queryIsgDeliveryAbnormal, queryIsgRiskAlert, queryFromWarehouse, queryToProvince, queryToRdc, queryLatestWeeklyReportContent, queryLatestPfpAssessmentContent } from '../../../services/transportApi'
 import dayjs from 'dayjs'
 import { message } from 'ant-design-vue'
 import { useDashboardControlStore } from '../../../stores/dashboardControlStore'
@@ -530,12 +530,21 @@ const fetchRiskOrderStats = async () => {
   dataLoading.value = false
   
   try {
-    // 并行调用四个接口，每个接口都有独立的错误处理，互不影响
-    const [riskContent, cddContent, vehicleData, isgContent] = await Promise.allSettled([
+    // 并行调用六个接口，每个接口都有独立的错误处理，互不影响
+    const [riskContent, cddContent, vehicleData, isgContent, cddWeeklyReport, pfpAssessment] = await Promise.allSettled([
       fetchRiskOrderData(),
       fetchCddAlertData(),
       fetchVehicleData(),
-      fetchIsgData()
+      fetchIsgData(),
+      queryLatestWeeklyReportContent({
+        startTime: '2026-06-11 00:00:00',
+        endTime: '2026-07-18 15:32:11'
+      }),
+      queryLatestPfpAssessmentContent({
+        startTime: '2026-06-11 00:00:00',
+        endTime: '2026-07-18 15:32:11',
+        month: 5
+      })
     ])
     
     // 处理各个接口返回的数据，即使某个接口失败也不影响其他接口
@@ -543,6 +552,10 @@ const fetchRiskOrderStats = async () => {
     const finalCddContent = cddContent.status === 'fulfilled' ? cddContent.value : []
     const finalVehicleData = vehicleData.status === 'fulfilled' ? vehicleData.value : { content: [], rawData: [] }
     const finalIsgContent = isgContent.status === 'fulfilled' ? isgContent.value : []
+    const finalCddWeeklyReport = cddWeeklyReport.status === 'fulfilled' && cddWeeklyReport.value?.code === 200
+      ? cddWeeklyReport.value.data : null
+    const finalPfpAssessment = pfpAssessment.status === 'fulfilled' && pfpAssessment.value?.code === 200
+      ? pfpAssessment.value.data : null
     
     // 更新卡片数据 - 4个卡片：去掉PFP和底部中间的卡片，保留左右两侧
     dataCards.value = [
@@ -568,7 +581,9 @@ const fetchRiskOrderStats = async () => {
 
     // 推送数据到 Store，供智能体使用
     dataStore.updateModuleData('cargoBanner', {
-      cards: dataCards.value
+      cards: dataCards.value,
+      cddWeeklyReport: finalCddWeeklyReport,
+      pfpAssessment: finalPfpAssessment
     })
   } catch (error) {
     console.error('fetchRiskOrderStats error:', error)

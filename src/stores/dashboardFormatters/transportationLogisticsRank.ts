@@ -4,6 +4,7 @@
  * UI 列顺序: 运输方式 | 物流商 | 仓库 | (月份→排名|总成绩)×N | (月份→是否进行奖励|红线/重大/严重问题)×N
  */
 export function formatTransportationLogisticsRank(data: any, scope: string): string {
+  const MAX_ROWS = 5
   let md = `## 运输物流商KPI排名\n\n`
 
   const list = Array.isArray(data) ? data : (data ? [data] : [])
@@ -43,7 +44,10 @@ export function formatTransportationLogisticsRank(data: any, scope: string): str
     })
   })
 
+  const totalGroups = groups.size
+  let rowCount = 0
   groups.forEach((g: any) => {
+    if (rowCount >= MAX_ROWS) return
     const fixed = [g.transType, g.logistic, g.cdcWarehouse]
     const perfData = months.flatMap(m => {
       const r = g.rankMap[m]
@@ -57,7 +61,12 @@ export function formatTransportationLogisticsRank(data: any, scope: string): str
       return [reward, punish]
     })
     md += `| ${[...fixed, ...perfData, ...rewardData].join(' | ')} |\n`
+    rowCount++
   })
+
+  if (totalGroups > MAX_ROWS) {
+    md += `\n> 显示前 ${MAX_ROWS} 条，共 ${totalGroups} 条数据\n`
+  }
 
   return md
 }

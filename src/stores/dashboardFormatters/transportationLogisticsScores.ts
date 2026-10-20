@@ -4,6 +4,7 @@
  * kpiType: 6=干线准时交货率, 7=提货及时率, 8=干线破损率, 9=7天异常订单处理及时率, 10=信息反馈及时率, 11=返单及时率, 5=运作准确率
  */
 export function formatTransportationLogisticsScores(data: any, scope: string): string {
+  const MAX_ROWS = 5
   const list = Array.isArray(data) ? data : (data?.list || data?.items || [])
   if (!list.length) return '## 运输物流商KPI评分\n\n暂无数据'
 
@@ -11,10 +12,15 @@ export function formatTransportationLogisticsScores(data: any, scope: string): s
   md += `| 年月 | 运输方式 | 物流商 | CDC仓库 | 得分合计 | 干线准时交货率 | 提货及时率 | 干线破损率 | 7天异常处理及时率 | 信息反馈及时率 | 返单及时率 | 运作准确率 |\n`
   md += `|------|----------|--------|---------|----------|--------------|-----------|-----------|----------------|--------------|-----------|----------|\n`
 
-  list.forEach((row: any) => {
+  const totalRows = list.length
+  list.slice(0, MAX_ROWS).forEach((row: any) => {
     const k = buildKpiMap(row.kpi)
     md += `| ${row.month || '-'} | ${row.transType || '-'} | ${row.logistic || '-'} | ${row.cdcWarehouse || '-'} | ${row.totalScore ?? '-'} | ${fmtRate(k[6])} | ${fmtRate(k[7])} | ${fmtRate(k[8])} | ${fmtRate(k[9])} | ${fmtRate(k[10])} | ${fmtRate(k[11])} | ${fmtRate(k[5])} |\n`
   })
+
+  if (totalRows > MAX_ROWS) {
+    md += `\n> 显示前 ${MAX_ROWS} 条，共 ${totalRows} 条数据\n`
+  }
 
   return md
 }

@@ -61,9 +61,38 @@ export const useDashboardDataStore = defineStore('dashboardData', () => {
     module: string,
     scope: 'summary' | 'detail' | 'full' = 'summary'
   ): string {
+    // 特殊处理：cddWeeklyReport 和 pfpAssessment 从 cargoBanner 数据中提取
+    if (module === 'cddWeeklyReport' || module === 'pfpAssessment') {
+      const cargoBannerData = moduleData.value['cargoBanner']
+      const subData = cargoBannerData?.[module]
+      
+      if (!subData) {
+        const title = module === 'cddWeeklyReport' ? 'CDD 周报' : 'PFP 考核'
+        return `## ${title}\n暂无数据\n\n> 提示: 请先使用 page({ page: "cargoBanner" }) 打开智能体中心页面`
+      }
+      
+      const formatter = formatters[module]
+      if (formatter) {
+        return formatter(subData, scope)
+      }
+      return `## ${module}\n${JSON.stringify(subData, null, 2)}`
+    }
+    
     const data = moduleData.value[module]
-    if (!data) {
-      return `## ${module}\n暂无数据`
+    // 检查数据是否为空（undefined、null、空对象、空数组）
+    const isEmpty = !data || 
+      (Array.isArray(data) && data.length === 0) || 
+      (typeof data === 'object' && !Array.isArray(data) && Object.keys(data).length === 0)
+    
+    if (isEmpty) {
+      const titleMap = getModuleTitleMap()
+      const title = titleMap[module] || module
+      let hint = ''
+      const page = findModulePage(module)
+      if (page) {
+        hint = `\n\n> 提示: 请先使用 page({ page: "${page}" }) 打开对应页面`
+      }
+      return `## ${title}\n暂无数据${hint}`
     }
 
     const formatter = formatters[module]
@@ -282,9 +311,15 @@ export const useDashboardDataStore = defineStore('dashboardData', () => {
         return `${title}: 地图页面`
       case 'cargoBanner': {
         const cards = data.cards || []
-        if (cards.length === 0) return `${title}: 暂无数据`
-        const summary = cards.map((c: any, i: number) => `${i}:${c.title || '未知'}(${c.content?.length || 0}条)`).join(', ')
-        return `${title}: [${summary}]`
+        const parts: string[] = []
+        if (cards.length > 0) {
+          const summary = cards.map((c: any, i: number) => `${i}:${c.title || '未知'}(${c.content?.length || 0}条)`).join(', ')
+          parts.push(`[${summary}]`)
+        }
+        if (data.cddWeeklyReport) parts.push('CDD周报✓')
+        if (data.pfpAssessment) parts.push('PFP考核✓')
+        if (parts.length === 0) return `${title}: 暂无数据`
+        return `${title}: ${parts.join(', ')}`
       }
       // 准时交付率系列
       case 'warehousingLogistics': {
@@ -440,10 +475,15 @@ export const useDashboardDataStore = defineStore('dashboardData', () => {
         return getPageOverview()
       }
 
+      // 特殊虚拟模块（cddWeeklyReport, pfpAssessment）跳过页面检查
+      const isVirtualModule = module === 'cddWeeklyReport' || module === 'pfpAssessment'
+      
       // 指定了模块 → 直接返回数据（不限制当前页面）
-      const targetPage = findModulePage(module)
-      if (!targetPage) {
-        return `模块 [${module}] 不在任何页面中。`
+      if (!isVirtualModule) {
+        const targetPage = findModulePage(module)
+        if (!targetPage) {
+          return `模块 [${module}] 不在任何页面中。`
+        }
       }
 
       // 返回模块数据
@@ -462,8 +502,9 @@ export const useDashboardDataStore = defineStore('dashboardData', () => {
     // ========== grid/cards 布局 ==========
     if (layout === 'grid' || layout === 'cards') {
       if (module) {
-        // 指定模块但不在当前 grid 中
-        if (!controlStore.activeModules.includes(module)) {
+        // 虚拟模块直接返回数据
+        const isVirtualModule = module === 'cddWeeklyReport' || module === 'pfpAssessment'
+        if (!isVirtualModule && !controlStore.activeModules.includes(module)) {
           const titleMap = getModuleTitleMap()
           const currentNames = controlStore.activeModules.map(m => titleMap[m] || m).join('、')
           const moduleTitle = titleMap[module] || module
@@ -479,8 +520,9 @@ export const useDashboardDataStore = defineStore('dashboardData', () => {
     // ========== single 布局 ==========
     if (layout === 'single') {
       if (module) {
-        // 指定模块但不是当前全屏模块
-        if (!controlStore.activeModules.includes(module)) {
+        // 虚拟模块直接返回数据
+        const isVirtualModule = module === 'cddWeeklyReport' || module === 'pfpAssessment'
+        if (!isVirtualModule && !controlStore.activeModules.includes(module)) {
           const titleMap = getModuleTitleMap()
           const currentModule = controlStore.activeModules[0]
           const currentTitle = titleMap[currentModule] || currentModule

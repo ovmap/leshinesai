@@ -1,12 +1,14 @@
 /**
  * 运输智能体预警卡片格式化
- * data 结构: { cards: [{ title, content, rawData? }] }
+ * data 结构: { cards: [{ title, content, rawData? }], cddWeeklyReport?: any, pfpAssessment?: any }
  * 
  * scope 支持:
- * - 'summary': 汇总所有卡片（标题+数量+索引）
+ * - 'summary': 汇总所有卡片（标题+数量+索引）+ CDD/PFP 摘要
  * - 'detail:N': 输出第 N 个卡片的详情（N=0,1,2,3）
- * - 'full': 输出所有卡片的完整数据
+ * - 'full': 输出所有卡片的完整数据 + CDD/PFP 完整内容
  */
+import { formatCddWeeklyReport } from './cddWeeklyReport'
+import { formatPfpAssessment } from './pfpAssessment'
 export function formatCargoBanner(data: any, scope: string): string {
   console.log('[formatter:cargoBanner] data keys:', data ? Object.keys(data) : 'null', 'scope:', scope)
   let md = `## 运输智能体预警\n\n`
@@ -36,6 +38,17 @@ export function formatCargoBanner(data: any, scope: string): string {
       const count = Array.isArray(card.content) ? card.content.length : 0
       md += `${idx}. **${title}**: ${count} 条\n`
     })
+    
+    // 附加 CDD 周报和 PFP 考核摘要（仅提示有数据，不输出全量内容）
+    if (data.cddWeeklyReport) {
+      md += `\n- **CDD 周报**: 有数据（运输准时交付率报告）\n`
+      md += `  > 获取全量: data({ module: "cddWeeklyReport" })\n`
+    }
+    if (data.pfpAssessment) {
+      md += `\n- **PFP 考核**: 有数据（物流商考核邮件内容）\n`
+      md += `  > 获取全量: data({ module: "pfpAssessment" })\n`
+    }
+    
     md += `\n> 查看详情: 使用 scope='detail:N'（N=0,1,2,3）获取单个卡片详情`
     return md.trim()
   }
@@ -46,6 +59,18 @@ export function formatCargoBanner(data: any, scope: string): string {
       md += formatSingleCard(card, idx, true)
       md += '\n\n---\n\n'
     })
+    
+    // 附加 CDD 周报和 PFP 考核完整内容
+    if (data.cddWeeklyReport) {
+      md += `\n---\n`
+      md += formatCddWeeklyReport(data.cddWeeklyReport, 'full')
+      md += '\n\n---\n\n'
+    }
+    if (data.pfpAssessment) {
+      md += `\n---\n`
+      md += formatPfpAssessment(data.pfpAssessment, 'full')
+    }
+    
     return md.trim()
   }
 

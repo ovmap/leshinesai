@@ -99,6 +99,13 @@ export function getHelpInfo(
 4. 不确定当前状态？用 \`status\`
 5. 不确定参数？用 \`help\`
 
+### 重要数据（智能评估结果）
+打开智能体中心页面后，以下两个重要数据会自动获取，可单独精准获取：
+- **CDD 周报**：运输准时交付率（Committed Delivery Date %），包含指标定义、达成情况表等
+  - 获取：\`data({ module: "cddWeeklyReport" })\`
+- **PFP 考核**：物流商考核邮件内容，包含物流商平均成绩、排名、考核评级、奖惩等
+  - 获取：\`data({ module: "pfpAssessment" })\`
+
 ### 深入查询
 - \`help({ queryCommand: "filter" })\` 查看筛选参数详情
 - \`help({ queryCommand: "action" })\` 查看操作指令详情
@@ -180,10 +187,13 @@ filter({ filters: { fromWarehouse: ["广州仓", "深圳仓"], toProvince: ["广
 \`\`\`
 
 ### 重置筛选
-传空值或不传某字段即重置：
+传空值、null、空字符串或不传某字段即重置：
 \`\`\`
 filter({ filters: {} })  // 清空所有筛选
 filter({ filters: { fromWarehouse: "广州仓" } })  // 只设始发仓，目的省/目的RDC 清空
+filter({ filters: { fromWarehouse: null } })  // 清空始发仓
+filter({ filters: { toProvince: "" } })  // 清空目的省
+filter({ filters: { fromWarehouse: [] } })  // 清空始发仓（空数组）
 \`\`\``
 
       // 当前筛选状态
@@ -237,10 +247,21 @@ filter({ filters: { fromWarehouse: "广州仓" } })  // 只设始发仓，目的
 - 不指定 module → 返回当前页面概览
 - 根据当前布局自动返回合适的数据格式
 
+### 重要数据（智能评估结果）
+以下两个数据会自动获取并全量返回，可单独精准获取：
+- **CDD 周报**：运输准时交付率报告，包含指标定义、达成情况表、各维度分析等
+  - 获取：\`data({ module: "cddWeeklyReport" })\`
+- **PFP 考核**：物流商考核邮件内容，包含物流商平均成绩、排名、考核评级、奖惩等
+  - 获取：\`data({ module: "pfpAssessment" })\`
+
+这两个数据是 AI 智能评估的结果，对分析物流运输时效性和物流商绩效非常重要。
+
 ### 示例
 \`\`\`
 data()                                    // 当前页面概览
 data({ module: "cargoTrend" })            // 货量趋势数据
+data({ module: "cddWeeklyReport" })       // CDD 周报（运输准时交付率）
+data({ module: "pfpAssessment" })         // PFP 考核（物流商考核）
 \`\`\``
       
       return result

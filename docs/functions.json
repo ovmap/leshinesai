@@ -539,7 +539,7 @@
           "properties": {
             "module": {
               "type": "string",
-              "description": "目标模块 (filter/data/action/help 命令)"
+              "description": "目标模块 (data/action/help 命令)"
             },
             "page": {
               "type": "string",

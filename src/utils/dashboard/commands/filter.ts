@@ -6,11 +6,10 @@
 import type { CommandHandler } from '../types'
 
 export const handleFilter: CommandHandler = async (args) => {
-  if (!args?.filters || Object.keys(args.filters).length === 0) {
-    return '错误: filter 命令需要 filters 参数，例如 { "fromWarehouse": "天津宁河CDC" }'
-  }
+  const filters = args?.filters
 
-  const filters = args.filters
+  // 检查是否为重置筛选操作
+  const isReset = !filters || Object.keys(filters).length === 0
 
   try {
     // 确保看板窗口已打开
@@ -18,15 +17,26 @@ export const handleFilter: CommandHandler = async (args) => {
 
     const result = await window.ipcRenderer.invoke('dashboard:control', {
       command: 'filter',
-      args: { filters },
+      args: { filters: filters || {} },
     })
 
     if (!result.success) {
       return `筛选失败: ${result.error}`
     }
 
+    // 重置筛选的提示
+    if (isReset) {
+      return '已清空所有筛选条件'
+    }
+
     const filterDesc = Object.entries(filters)
-      .map(([k, v]) => `${k}=${Array.isArray(v) ? v.join(',') : v}`)
+      .map(([k, v]) => {
+        // 处理 null、空字符串和数组
+        if (v === null || v === '' || (Array.isArray(v) && v.length === 0)) {
+          return `${k}=已清空`
+        }
+        return `${k}=${Array.isArray(v) ? v.join(',') : v}`
+      })
       .join(', ')
     return `全局筛选已应用: ${filterDesc}`
   } catch (error: any) {

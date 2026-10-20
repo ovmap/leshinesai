@@ -61,6 +61,10 @@ import { formatUdReorderProgress } from './udReorderProgress'
 import { formatBarPercentage } from './barPercentage'
 import { formatTablePercentage } from './tablePercentage'
 
+// CDD 周报 & PFP 考核
+import { formatCddWeeklyReport } from './cddWeeklyReport'
+import { formatPfpAssessment } from './pfpAssessment'
+
 /**
  * 模块格式化函数注册表
  * key: 模块名（对应 moduleRegistry 中的 name）
@@ -121,6 +125,10 @@ export const formatters: Record<string, (data: any, scope: string) => string> = 
   // 货量占比系列
   barPercentage: formatBarPercentage,
   tablePercentage: formatTablePercentage,
+
+  // CDD 周报 & PFP 考核
+  cddWeeklyReport: formatCddWeeklyReport,
+  pfpAssessment: formatPfpAssessment,
 }
 
 /**
