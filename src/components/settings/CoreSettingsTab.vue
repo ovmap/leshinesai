@@ -817,6 +817,34 @@
         </div>
       </div>
     </fieldset>
+
+    <!-- Language Settings Section -->
+    <fieldset
+      class="fieldset bg-gray-900/90 border-blue-500/50 rounded-box w-full border p-4"
+    >
+      <legend class="fieldset-legend">Language / 语言</legend>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-2">
+        <div>
+          <label for="locale" class="block mb-1 text-sm"
+            >Interface Language / 界面语言</label
+          >
+          <select
+            id="locale"
+            v-model="currentSettings.locale"
+            class="select select-bordered w-full focus:select-primary"
+            @change="
+              e => $emit('update:setting', 'locale', getTargetValue(e))
+            "
+          >
+            <option value="zh-CN">中文 (简体)</option>
+            <option value="en-US">English (US)</option>
+          </select>
+          <p class="text-xs text-gray-400 mt-1">
+            {{ currentSettings.locale === 'zh-CN' ? '切换界面语言为中文' : 'Switch interface language to English' }}
+          </p>
+        </div>
+      </div>
+    </fieldset>
   </div>
 </template>
 

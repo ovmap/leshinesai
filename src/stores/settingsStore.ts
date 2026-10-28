@@ -100,6 +100,7 @@ export interface LeshineSettings {
 
   approvedCommands: string[]
   onboardingCompleted: boolean
+  locale: 'zh-CN' | 'en-US'
 }
 
 function hasMinimumConfigForOnboarding(config: LeshineSettings): boolean {
@@ -212,6 +213,7 @@ const defaultSettings: LeshineSettings = {
 
   approvedCommands: ['ls', 'dir'],
   onboardingCompleted: false,
+  locale: 'zh-CN',
 }
 
 const settingKeyToLabelMap: Record<keyof LeshineSettings, string> = {
@@ -283,6 +285,7 @@ const settingKeyToLabelMap: Record<keyof LeshineSettings, string> = {
   mcpServersConfig: 'MCP Servers JSON Configuration',
   approvedCommands: 'Approved Commands',
   onboardingCompleted: 'Onboarding Completed',
+  locale: 'Language',
 }
 
 const ESSENTIAL_CORE_API_KEYS: (keyof LeshineSettings)[] = [
@@ -943,6 +946,7 @@ export const useSettingsStore = defineStore('settings', () => {
         websocketPort: settings.value.websocketPort,
         approvedCommands: Array.from(settings.value.approvedCommands || []),
         onboardingCompleted: settings.value.onboardingCompleted,
+        locale: settings.value.locale,
       }
 
       const saveResult = await window.settingsAPI.saveSettings(plainSettings)

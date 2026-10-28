@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { queryPickupRate } from '../../../services/transportApi'
 import { useDashboardDataStore } from '../../../stores/dashboardDataStore'
 
+const { t } = useI18n()
 const dataStore = useDashboardDataStore()
 
 const props = defineProps<{
@@ -77,7 +79,7 @@ const fetchData = async () => {
       rawData.value = []
     }
   } catch (error) {
-    console.error('获取揽收及时率数据失败:', error)
+    console.error(t('dashboard.pickupRate.messages.fetchDataFailed'), error)
     rawData.value = []
   } finally {
     loading.value = false
@@ -144,14 +146,14 @@ onMounted(() => {
     <div class="toolbar">
       <div class="date-range">
         <input type="month" v-model="startDate" class="month-input" />
-        <span class="date-separator">至</span>
+        <span class="date-separator">{{ t('dashboard.pickupRate.toolbar.separator') }}</span>
         <input type="month" v-model="endDate" class="month-input" />
-        <button class="query-btn" @click="handleQuery">查询</button>
+        <button class="query-btn" @click="handleQuery">{{ t('dashboard.pickupRate.toolbar.query') }}</button>
       </div>
       <div class="toggle-detail">
         <label class="toggle-label">
           <input type="checkbox" v-model="showDetail" />
-          <span>显示明细</span>
+          <span>{{ t('dashboard.pickupRate.toolbar.showDetail') }}</span>
         </label>
       </div>
     </div>
@@ -159,13 +161,13 @@ onMounted(() => {
     <!-- 表格区域 -->
     <div class="table-section">
       <div v-if="loading" class="loading-mask">
-        <span class="loading-text">加载中...</span>
+        <span class="loading-text">{{ t('dashboard.pickupRate.loading') }}</span>
       </div>
       <table class="custom-table">
         <thead>
           <tr>
-            <th class="fixed-col warehouse-col">始发仓库</th>
-            <th class="fixed-col customer-col">客户</th>
+            <th class="fixed-col warehouse-col">{{ t('dashboard.pickupRate.tableColumns.fromWarehouse') }}</th>
+            <th class="fixed-col customer-col">{{ t('dashboard.pickupRate.tableColumns.customer') }}</th>
             <template v-for="month in months" :key="month">
               <th v-if="showDetail" :colspan="3" class="month-group-header">
                 <div class="month-header">{{ formatMonth(month) }}</div>
@@ -179,16 +181,16 @@ onMounted(() => {
             <th class="fixed-col warehouse-col"></th>
             <th class="fixed-col customer-col"></th>
             <template v-for="month in months" :key="month + '_sub'">
-              <th class="sub-header">达标单数</th>
-              <th class="sub-header">总单数</th>
-              <th class="sub-header">揽收及时率</th>
+              <th class="sub-header">{{ t('dashboard.pickupRate.tableColumns.standardCount') }}</th>
+              <th class="sub-header">{{ t('dashboard.pickupRate.tableColumns.totalCount') }}</th>
+              <th class="sub-header">{{ t('dashboard.pickupRate.tableColumns.pickupRate') }}</th>
             </template>
           </tr>
         </thead>
         <tbody>
           <tr v-if="tableData.length === 0 && !loading">
             <td :colspan="2 + (showDetail ? months.length * 3 : months.length)" class="empty-cell">
-              暂无数据
+              {{ t('dashboard.pickupRate.noData') }}
             </td>
           </tr>
           <tr v-for="(row, idx) in tableData" :key="idx">

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed, watch, nextTick } from 'vue'
+import { useI18n } from 'vue-i18n'
 import dayjs from 'dayjs'
 import { message } from 'ant-design-vue'
 import { useSelectOptionsStore } from '../../../stores/selectOptionsStore'
@@ -13,6 +14,9 @@ const props = defineProps({
     default: 1,
   },
 })
+
+// i18n
+const { t } = useI18n()
 
 // 获取 stores
 const selectOptionsStore = useSelectOptionsStore()
@@ -39,10 +43,10 @@ const isLogisticProviderOpen = ref(false)
 const isCustomerOpen = ref(false)
 
 // 运输模式选项（固定选项）
-const transModeOptions = ref<Array<{ code: string; name: string; value: number }>>([
-  { code: '1', name: '干线', value: 1 },
-  { code: '2', name: '配送', value: 2 },
-  { code: '3', name: '端到端', value: 3 },
+const transModeOptions = computed(() => [
+  { code: '1', name: t('dashboard.timeDimension.transModeTrunk') },
+  { code: '2', name: t('dashboard.timeDimension.transModeDelivery') },
+  { code: '3', name: t('dashboard.timeDimension.transModeEndToEnd') },
 ])
 
 // 加载状态
@@ -58,10 +62,10 @@ const tableData = ref<Array<Record<string, any>>>([])
 const timeDimensionColumns = ref<string[]>([]) // 动态列：['202501', '202502', '2025Q1', '2025年']
 
 // 时间维度选项（只保留财年、自然年、月）
-const timeDimensionOptions = ref([
-  { code: 'FICAL_YEAR', name: '财年' },
-  { code: 'CALENDAR_YEAR', name: '自然年' },
-  { code: 'MONTH', name: '月' },
+const timeDimensionOptions = computed(() => [
+  { code: 'FICAL_YEAR', name: t('dashboard.timeDimension.fiscalYear') },
+  { code: 'CALENDAR_YEAR', name: t('dashboard.timeDimension.calendarYear') },
+  { code: 'MONTH', name: t('dashboard.timeDimension.month') },
 ])
 
 // 数据源选项
@@ -91,7 +95,7 @@ const filteredLogisticProviderOptions = computed(() => {
   }
   
   // 在列表开头添加重置选项
-  return [{ code: '__reset__', name: '重置' }, ...filtered]
+  return [{ code: '__reset__', name: t('dashboard.timeDimension.reset') }, ...filtered]
 })
 
 // 过滤后的客户选项（包含重置选项）
@@ -108,7 +112,7 @@ const filteredCustomerOptions = computed(() => {
   }
   
   // 在列表开头添加重置选项
-  return [{ code: '__reset__', name: '重置' }, ...filtered]
+  return [{ code: '__reset__', name: t('dashboard.timeDimension.reset') }, ...filtered]
 })
 
 // 初始化日期范围（财年）
@@ -137,36 +141,36 @@ watch(() => dataSourceOptions.value, (options) => {
 
 // 显示文本
 const selectedDataSourceText = computed(() => {
-  if (selectedDataSource.value.length === 0) return '数据源'
+  if (selectedDataSource.value.length === 0) return t('dashboard.timeDimension.dataSource')
   const names = selectedDataSource.value.map((code: string) => {
     const option = dataSourceOptions.value.find((item: { code: string; name: string }) => item.code === code)
     return option ? option.name : code
   })
-  return names.join(', ') || '数据源'
+  return names.join(', ') || t('dashboard.timeDimension.dataSource')
 })
 
 const selectedTimeDimensionText = computed(() => {
   const option = timeDimensionOptions.value.find(item => item.code === selectedTimeDimension.value)
-  return option ? option.name : '时间维度'
+  return option ? option.name : t('dashboard.timeDimension.timeDimension')
 })
 
 const selectedTransModeText = computed(() => {
-  if (!selectedTransMode.value) return '运输模式'
+  if (!selectedTransMode.value) return t('dashboard.timeDimension.transMode')
   const option = transModeOptions.value.find(item => item.code === selectedTransMode.value)
-  return option ? option.name : '运输模式'
+  return option ? option.name : t('dashboard.timeDimension.transMode')
 })
 
 const selectedLogisticProviderText = computed(() => {
-  if (selectedLogisticProvider.value.length === 0) return '物流商'
+  if (selectedLogisticProvider.value.length === 0) return t('dashboard.timeDimension.logisticProvider')
   const names = selectedLogisticProvider.value.map((code: string) => {
     const option = logisticProviderOptions.value.find((item: { code: string; name: string }) => item.code === code)
     return option ? option.name : code
   })
-  return names.join(', ') || '物流商'
+  return names.join(', ') || t('dashboard.timeDimension.logisticProvider')
 })
 
 const selectedCustomerText = computed(() => {
-  if (selectedCustomer.value.length === 0) return '客户'
+  if (selectedCustomer.value.length === 0) return t('dashboard.timeDimension.customer')
   const names = selectedCustomer.value.map((code: string) => {
     const option = customerOptions.value.find((item: { code: string; name: string }) => item.code === code)
     return option ? option.name : code
@@ -360,8 +364,8 @@ const loadData = async () => {
       }
     }
   } catch (error) {
-    console.error('加载数据失败:', error)
-    message.error('加载数据失败')
+    console.error(t('dashboard.timeDimension.loadDataFailed'), error)
+    message.error(t('dashboard.timeDimension.loadDataFailed'))
     tableData.value = []
     timeDimensionColumns.value = []
   } finally {
@@ -439,28 +443,28 @@ const handleExport = async () => {
         link.href = result.data
         // 尝试从 URL 中提取文件名，如果没有则使用默认名称
         const xlsxMatch = result.data.match(/([^/]+\.xlsx)$/)
-        const downloadFilename = xlsxMatch ? xlsxMatch[1] : `准时交付率-纯时间维度-${dayjs().format('YYYY-MM-DD')}.xlsx`
+        const downloadFilename = xlsxMatch ? xlsxMatch[1] : `${t('dashboard.timeDimension.exportFilename')}-${dayjs().format('YYYY-MM-DD')}.xlsx`
         link.download = downloadFilename
         link.target = '_blank'
         document.body.appendChild(link)
         link.click()
         document.body.removeChild(link)
-        message.success('导出成功')
+        message.success(t('dashboard.timeDimension.exportSuccess'))
       } else {
-        message.error('导出失败：未返回文件数据')
+        message.error(t('dashboard.timeDimension.exportFailedNoData'))
       }
     } else {
-      message.error(result?.msg || '导出失败')
+      message.error(result?.msg || t('dashboard.timeDimension.exportFailed'))
     }
   } catch (error: any) {
-    console.error('导出失败:', error)
+    console.error(t('dashboard.timeDimension.exportFailed'), error)
     
     // 检查是否是409或504状态码
     const errCode = error?.code || error?.response?.status
     if (errCode === 409 || errCode === 504 || errCode === 505) {
-      message.error(error.msg || '导出数据量过大，请缩小查询范围')
+      message.error(error.msg || t('dashboard.timeDimension.exportDataTooLarge'))
     } else {
-      message.error(error.msg || '导出失败')
+      message.error(error.msg || t('dashboard.timeDimension.exportFailed'))
     }
   } finally {
     exportLoading.value = false
@@ -591,7 +595,7 @@ onUnmounted(() => {
 <template>
   <div class="time-dimension-container">
     <div class="header-bar">
-      <h2 class="header-title">准时交付率(时间维度)</h2>
+      <h2 class="header-title">{{ t('dashboard.timeDimension.title') }}</h2>
     </div>
 
     <!-- 过滤器行 -->
@@ -602,8 +606,8 @@ onUnmounted(() => {
           <a-range-picker
             v-model:value="dateRange"
             format="YYYY-MM-DD"
-            separator="至"
-            :placeholder="['开始...', '结束...']"
+            :separator="t('dashboard.timeDimension.separator')"
+            :placeholder="[t('dashboard.timeDimension.startDate'), t('dashboard.timeDimension.endDate')]"
             class="date-range-picker"
             :show-time="false"
             @change="handleDateRangeChange"
@@ -687,7 +691,7 @@ onUnmounted(() => {
               <input 
                 v-model="logisticSearch" 
                 type="text" 
-                placeholder="搜索物流商..." 
+                :placeholder="t('dashboard.timeDimension.searchLogisticProvider')" 
                 class="search-input"
                 @click.stop 
               />
@@ -707,7 +711,7 @@ onUnmounted(() => {
                 {{ option.name }}
               </div>
               <div v-if="filteredLogisticProviderOptions.length === 1 && logisticSearch" class="no-results">
-                暂无搜索结果
+                {{ t('dashboard.timeDimension.noSearchResults') }}
               </div>
             </div>
           </div>
@@ -724,7 +728,7 @@ onUnmounted(() => {
               <input 
                 v-model="customerSearch" 
                 type="text" 
-                placeholder="搜索客户..." 
+                :placeholder="t('dashboard.timeDimension.searchCustomer')" 
                 class="search-input"
                 @click.stop 
               />
@@ -744,7 +748,7 @@ onUnmounted(() => {
                 {{ option.name }}
               </div>
               <div v-if="filteredCustomerOptions.length === 1 && customerSearch" class="no-results">
-                暂无搜索结果
+                {{ t('dashboard.timeDimension.noSearchResults') }}
               </div>
             </div>
           </div>
@@ -753,7 +757,7 @@ onUnmounted(() => {
         <!-- 导出按钮 -->
         <div class="export-item">
           <a-button type="primary" :loading="exportLoading" @click="handleExport" class="export-btn">
-            导出
+            {{ t('dashboard.timeDimension.export') }}
           </a-button>
         </div>
       </div>
@@ -774,7 +778,7 @@ onUnmounted(() => {
             <tbody>
               <tr v-if="tableData.length === 0 && !loading">
                 <td :colspan="timeDimensionColumns.length" class="no-data">
-                  暂无数据
+                  {{ t('dashboard.timeDimension.noData') }}
                 </td>
               </tr>
               <tr v-for="(row, rowIndex) in tableData" :key="rowIndex">

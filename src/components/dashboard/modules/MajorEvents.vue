@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, Teleport, computed, nextTick, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import {
   queryTrafficInfo,
   queryAffectOrderItemByPage,
@@ -8,6 +9,7 @@ import {
 } from '../../../services/transportApi'
 import { useDashboardDataStore } from '../../../stores/dashboardDataStore'
 
+const { t } = useI18n()
 const dataStore = useDashboardDataStore()
 
 const props = defineProps<{
@@ -93,9 +95,9 @@ const selectFromWarehouse = (value: string) => {
 
 // 显示文本
 const selectedFromWarehouseText = computed(() => {
-  if (searchForm.value.fromWarehouse.length === 0) return '始发仓库'
+  if (searchForm.value.fromWarehouse.length === 0) return t('dashboard.majorEvents.filters.fromWarehouse')
   if (searchForm.value.fromWarehouse.length === 1) return searchForm.value.fromWarehouse[0]
-  return `已选${searchForm.value.fromWarehouse.length}项`
+  return t('dashboard.majorEvents.filters.selectedCount', { count: searchForm.value.fromWarehouse.length })
 })
 
 // 过滤后的选项
@@ -106,7 +108,7 @@ const filteredWarehouseOptions = computed(() => {
       option.toLowerCase().includes(warehouseSearch.value.toLowerCase()),
     )
   }
-  return [{ value: '__reset__', label: '重置' }, ...filtered.map(o => ({ value: o, label: o }))]
+  return [{ value: '__reset__', label: t('dashboard.majorEvents.filters.reset') }, ...filtered.map(o => ({ value: o, label: o }))]
 })
 
 // 获取交通信息数据
@@ -133,7 +135,7 @@ const fetchTrafficInfo = async () => {
       })
     }
   } catch (error) {
-    console.error('获取重大活动数据失败:', error)
+    console.error(t('dashboard.majorEvents.messages.fetchTrafficInfoFailed'), error)
   }
 }
 
@@ -260,7 +262,7 @@ const fetchUnsignedDetails = async () => {
       totalCount.value = 0
     }
   } catch (error) {
-    console.error('获取影响运单数据失败:', error)
+    console.error(t('dashboard.majorEvents.messages.fetchUnsignedDetailsFailed'), error)
     unsignedDetailData.value = []
     totalCount.value = 0
   } finally {
@@ -308,7 +310,7 @@ const handleExport = async () => {
     const result = await exportAffectOrderItem(params)
 
     if (result.code === 409 || result.code === 504 || result.code === 505) {
-      alert(result.msg || '导出数据量过大')
+      alert(result.msg || t('dashboard.majorEvents.messages.exportTooLarge'))
       return
     }
 
@@ -325,7 +327,7 @@ const handleExport = async () => {
     }
   } catch (error: any) {
     console.error(error)
-    alert(error.msg || '导出失败')
+    alert(error.msg || t('dashboard.majorEvents.messages.exportFailed'))
   } finally {
     exportLoading.value = false
   }
@@ -373,16 +375,16 @@ const calculateModalTableScrollY = () => {
 }
 
 // 表格列配置
-const tableColumns = [
-  { title: '始发仓库', dataIndex: 'fromWarehouse', key: 'fromWarehouse', width: 120 },
-  { title: '目的仓库', dataIndex: 'toWarehouse', key: 'toWarehouse', width: 120 },
-  { title: '物流商', dataIndex: 'logisticName', key: 'logisticName', width: 100 },
-  { title: '发货单号', dataIndex: 'invoiceNo', key: 'invoiceNo', width: 200 },
-  { title: '发货时间', dataIndex: 'deliverTime', key: 'deliverTime', width: 150 },
-  { title: '预计到达时间', dataIndex: 'predictArriveTime', key: 'predictArriveTime', width: 150 },
-  { title: '运输方式', dataIndex: 'transType', key: 'transType', width: 100 },
-  { title: '数据源', dataIndex: 'dataSource', key: 'dataSource', width: 100 },
-]
+const tableColumns = computed(() => [
+  { title: t('dashboard.majorEvents.tableColumns.fromWarehouse'), dataIndex: 'fromWarehouse', key: 'fromWarehouse', width: 120 },
+  { title: t('dashboard.majorEvents.tableColumns.toWarehouse'), dataIndex: 'toWarehouse', key: 'toWarehouse', width: 120 },
+  { title: t('dashboard.majorEvents.tableColumns.logisticName'), dataIndex: 'logisticName', key: 'logisticName', width: 100 },
+  { title: t('dashboard.majorEvents.tableColumns.invoiceNo'), dataIndex: 'invoiceNo', key: 'invoiceNo', width: 200 },
+  { title: t('dashboard.majorEvents.tableColumns.deliverTime'), dataIndex: 'deliverTime', key: 'deliverTime', width: 150 },
+  { title: t('dashboard.majorEvents.tableColumns.predictArriveTime'), dataIndex: 'predictArriveTime', key: 'predictArriveTime', width: 150 },
+  { title: t('dashboard.majorEvents.tableColumns.transType'), dataIndex: 'transType', key: 'transType', width: 100 },
+  { title: t('dashboard.majorEvents.tableColumns.dataSource'), dataIndex: 'dataSource', key: 'dataSource', width: 100 },
+])
 
 onMounted(async () => {
   await fetchTrafficInfo()
@@ -406,7 +408,7 @@ onUnmounted(() => {
 <template>
   <div class="major-events-wrapper">
     <div class="header-bar">
-      <h2 class="header-title">重大活动&极端天气影响</h2>
+      <h2 class="header-title">{{ t('dashboard.majorEvents.title') }}</h2>
     </div>
     <div class="major-events-container">
       <!-- 数据表格 -->
@@ -416,10 +418,10 @@ onUnmounted(() => {
           <table class="data-table">
             <thead>
               <tr>
-                <th>路段/区域</th>
-                <th>影响</th>
-                <th>订单数</th>
-                <th>影响运单</th>
+                <th>{{ t('dashboard.majorEvents.tableHeaders.roadSection') }}</th>
+                <th>{{ t('dashboard.majorEvents.tableHeaders.impact') }}</th>
+                <th>{{ t('dashboard.majorEvents.tableHeaders.orderCount') }}</th>
+                <th>{{ t('dashboard.majorEvents.tableHeaders.affectedOrders') }}</th>
               </tr>
             </thead>
           </table>
@@ -435,14 +437,14 @@ onUnmounted(() => {
           <table class="data-table">
             <tbody>
               <tr v-if="tableData.length === 0">
-                <td colspan="4" class="no-data">暂无重大活动</td>
+                <td colspan="4" class="no-data">{{ t('dashboard.majorEvents.messages.noData') }}</td>
               </tr>
               <tr v-for="row in tableData" :key="row.id" v-else>
                 <td class="road-section">{{ row.roadSection }}</td>
                 <td class="impact">{{ row.impact }}</td>
                 <td class="order-count">{{ row.affectedOrders }}</td>
                 <td class="affected-orders">
-                  <button @click="viewAffectedOrders" class="view-btn">查看</button>
+                  <button @click="viewAffectedOrders" class="view-btn">{{ t('dashboard.majorEvents.buttons.view') }}</button>
                 </td>
               </tr>
             </tbody>
@@ -456,7 +458,7 @@ onUnmounted(() => {
           <div class="custom-modal">
             <!-- 弹窗头部 -->
             <div class="modal-header">
-              <h3 class="modal-title">影响运单详情</h3>
+              <h3 class="modal-title">{{ t('dashboard.majorEvents.modal.title') }}</h3>
               <button class="close-btn" @click="closeModal">×</button>
             </div>
 
@@ -477,7 +479,7 @@ onUnmounted(() => {
                           <input
                             v-model="warehouseSearch"
                             type="text"
-                            placeholder="搜索仓库..."
+                            :placeholder="t('dashboard.majorEvents.placeholders.searchWarehouse')"
                             class="search-input"
                             @click.stop
                           />
@@ -503,7 +505,7 @@ onUnmounted(() => {
                     <input
                       v-model="searchForm.invoiceNo"
                       type="text"
-                      placeholder="发货单号"
+                      :placeholder="t('dashboard.majorEvents.placeholders.invoiceNo')"
                       class="invoice-input"
                     />
                   </div>
@@ -514,23 +516,23 @@ onUnmounted(() => {
                       v-model="searchForm.startDate"
                       type="date"
                       class="date-input"
-                      placeholder="开始日期"
+                      :placeholder="t('dashboard.majorEvents.placeholders.startDate')"
                     />
-                    <span class="date-separator">至</span>
+                    <span class="date-separator">{{ t('dashboard.majorEvents.dateRange.separator') }}</span>
                     <input
                       v-model="searchForm.endDate"
                       type="date"
                       class="date-input"
-                      placeholder="结束日期"
+                      :placeholder="t('dashboard.majorEvents.placeholders.endDate')"
                     />
                   </div>
 
                   <!-- 操作按钮 -->
                   <div class="filter-actions">
-                    <button @click="handleSearch" class="action-btn primary">查询</button>
-                    <button @click="handleReset" class="action-btn">重置</button>
+                    <button @click="handleSearch" class="action-btn primary">{{ t('dashboard.majorEvents.buttons.query') }}</button>
+                    <button @click="handleReset" class="action-btn">{{ t('dashboard.majorEvents.buttons.reset') }}</button>
                     <button @click="handleExport" class="action-btn" :disabled="exportLoading">
-                      {{ exportLoading ? '导出中...' : '导出' }}
+                      {{ exportLoading ? t('dashboard.majorEvents.buttons.exporting') : t('dashboard.majorEvents.buttons.export') }}
                     </button>
                   </div>
                 </div>
@@ -538,7 +540,7 @@ onUnmounted(() => {
 
               <!-- 表格区域 -->
               <div class="table-section" ref="modalTableSectionRef">
-                <div v-if="modalLoading" class="loading-mask">加载中...</div>
+                <div v-if="modalLoading" class="loading-mask">{{ t('dashboard.majorEvents.messages.loading') }}</div>
                 <table class="modal-table">
                   <thead>
                     <tr>
@@ -552,26 +554,26 @@ onUnmounted(() => {
                       <td v-for="col in tableColumns" :key="col.key">{{ row[col.dataIndex] || '-' }}</td>
                     </tr>
                     <tr v-if="unsignedDetailData.length === 0 && !modalLoading">
-                      <td :colspan="tableColumns.length" class="empty-cell">暂无数据</td>
+                      <td :colspan="tableColumns.length" class="empty-cell">{{ t('dashboard.majorEvents.messages.empty') }}</td>
                     </tr>
                   </tbody>
                 </table>
 
                 <!-- 分页 -->
                 <div v-if="totalCount > 0" class="pagination">
-                  <span class="pagination-info">共 {{ totalCount }} 条</span>
+                  <span class="pagination-info">{{ t('dashboard.majorEvents.pagination.total', { total: totalCount }) }}</span>
                   <div class="pagination-controls">
                     <button
                       class="page-btn"
                       :disabled="currentPage <= 1"
                       @click="handleTableChange({ current: currentPage - 1, pageSize })"
-                    >上一页</button>
+                    >{{ t('dashboard.majorEvents.pagination.prev') }}</button>
                     <span class="page-number">{{ currentPage }} / {{ Math.ceil(totalCount / pageSize) }}</span>
                     <button
                       class="page-btn"
                       :disabled="currentPage >= Math.ceil(totalCount / pageSize)"
                       @click="handleTableChange({ current: currentPage + 1, pageSize })"
-                    >下一页</button>
+                    >{{ t('dashboard.majorEvents.pagination.next') }}</button>
                   </div>
                 </div>
               </div>

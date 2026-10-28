@@ -1,0 +1,2208 @@
+{
+  "cardTitles": {
+    "riskOrderOver7Days": "Risk Orders Over 7 Days Unresolved",
+    "cddAlert": "CDD Alert This Month",
+    "vehicleSafety": "Vehicle Safety Monitoring",
+    "isgAlert": "ISG Electronic Tag Alert"
+  },
+  "modalTitles": {
+    "riskOrderDetail": "Risk Order Details",
+    "cddAlertDetail": "CDD Alert Details",
+    "isgAlertDetail": "ISG Electronic Tag Alert Details"
+  },
+  "categories": {
+    "highPriority": "High Priority",
+    "normalPriority": "Normal Priority"
+  },
+  "tableColumns": {
+    "dataSource": "Data Source",
+    "customer": "Customer",
+    "transMode": "Transport Mode",
+    "custOrderNo": "Customer Order No.",
+    "invoiceNo": "Invoice No.",
+    "fromWarehouse": "From Warehouse",
+    "toRdc": "To RDC",
+    "carrierName": "Carrier",
+    "deliveryName": "Delivery Provider",
+    "abnormalCode": "Abnormal Code",
+    "abnormalTime": "Abnormal Time",
+    "abnormalDesc": "Abnormal Description",
+    "abnormalCount": "Abnormal Count",
+    "productNo": "Product No.",
+    "productName": "Product Name",
+    "actionAdvice": "Action Advice",
+    "dataCheckTime": "Data Check Time",
+    "location": "Location",
+    "predictArriveTime": "Predicted Arrival Time",
+    "riskInfo": "Risk",
+    "reason": "Reason",
+    "measure": "Measure",
+    "etagSn": "Electronic Tag Serial No.",
+    "consigneeAddress": "Consignee Address",
+    "abnormalType": "Abnormal Type",
+    "lenovoOrderNo": "Lenovo Order No.",
+    "logisticName": "Logistics Provider",
+    "transType": "Transport Type",
+    "onDemandTime": "On-Demand Time",
+    "toProvince": "To Province",
+    "toCity": "To City",
+    "abnormalInfo": "Abnormal Info",
+    "transNo": "Waybill No.",
+    "modeType": "Transport Mode",
+    "eteOnTime": "ETE On Time",
+    "mainLineOnTime": "Main Line On Time",
+    "deliveryOnTime": "Delivery On Time",
+    "lastAbnormalCode": "Last Abnormal Code",
+    "shipConfirmTime": "Ship Confirm Time",
+    "signTime": "Sign Time",
+    "category": "Category"
+  },
+  "isgTabs": {
+    "delay": "ISG Customer Delay Risk Orders",
+    "inTransit": "ISG Customer Orders In-Transit Abnormal",
+    "delivery": "On-Demand Customer Delivery Abnormal Orders"
+  },
+  "buttons": {
+    "search": "Search",
+    "reset": "Reset",
+    "export": "Export",
+    "confirm": "Confirm",
+    "cancel": "Cancel"
+  },
+  "placeholders": {
+    "invoiceNo": "Invoice No.",
+    "email": "Email",
+    "nonComplianceType": "Non-Compliance Type"
+  },
+  "messages": {
+    "currentLocation": "Current Location: ",
+    "exportDataTooMuch": "Export data too much",
+    "exportFileName": "Risk Order Data.xlsx",
+    "vehicleIcon": "Vehicle Icon"
+  },
+  "dateRange": {
+    "separator": "To"
+  },
+  "pagination": {
+    "pageInfo": "Page {0}-{1} / Total {2} (Total {3} pages)"
+  },
+  "udReorderProgress": {
+    "title": "Unreturned Order Details",
+    "tabs": {
+      "signReceive": "Sign & Receive Time",
+      "confirmTime": "Shipping Confirmation Time"
+    },
+    "overduePeriod": {
+      "all": "All",
+      "within30d": "Within 30 Days",
+      "30to60d": "30-60 Days",
+      "over60d": "Over 60 Days",
+      "label": "Overdue Period"
+    },
+    "logistic": {
+      "label": "Logistics Provider",
+      "reset": "Reset",
+      "searchPlaceholder": "Search logistics provider...",
+      "selectedCount": "{0} selected"
+    },
+    "billTypes": {
+      "invoice": "Invoice",
+      "waybill": "Waybill"
+    },
+    "tableHeaders": {
+      "warehouse": "Warehouse",
+      "logisticName": "Logistics Provider",
+      "billType": "Bill Type",
+      "year": "Year",
+      "month": "Month",
+      "count": "Unreturned Count"
+    },
+    "dateRange": {
+      "separator": "to"
+    },
+    "buttons": {
+      "search": "Search",
+      "reset": "Reset",
+      "export": "Export"
+    },
+    "messages": {
+      "fetchLogisticListFailed": "Failed to fetch logistic list:",
+      "fetchTableDataFailed": "Failed to fetch table data:",
+      "exportLimitExceeded": "Export quantity cannot exceed 100000, please narrow the query range and try again",
+      "exportFailed": "Export failed, please try again later",
+      "resetFailed": "Reset failed:",
+      "noData": "No Data",
+      "noDataDesc": "Please select filter conditions to view data",
+      "noSearchResults": "No search results",
+      "searching": "Searching...",
+      "exporting": "Exporting...",
+      "exportFileName": "Unreturned_Statistics_{0}.xlsx"
+    }
+  },
+  "reorderProgress": {
+    "title": "Return Progress",
+    "filters": {
+      "customer": "Customer"
+    },
+    "placeholders": {
+      "searchCustomer": "Search customer..."
+    },
+    "buttons": {
+      "reset": "Reset",
+      "confirm": "OK",
+      "cancel": "Cancel"
+    },
+    "legend": {
+      "confirmed": "Confirmed",
+      "notConfirmed": "Unconfirmed",
+      "within30d": "Within 30 Days",
+      "30to60d": "30-60 Days",
+      "over60d": "Over 60 Days"
+    },
+    "chart": {
+      "seriesName": "Return Progress",
+      "innerSeriesName": "Inner Time Distribution"
+    },
+    "tooltip": {
+      "unit": " orders"
+    },
+    "modal": {
+      "exporting": "Exporting",
+      "exportingData": "Exporting data...",
+      "elapsedTime": "Elapsed {seconds}s",
+      "confirmExport": "Confirm Export",
+      "confirmExportContent": "Are you sure you want to export \"{title}\" data?"
+    },
+    "messages": {
+      "loadCustomerOptionsFailed": "Failed to load customer options:",
+      "serverError": "Server Error",
+      "exportSuccess": "Export Successful",
+      "exportFailed": "Export Failed",
+      "queryExportProgressFailed": "Failed to query export progress:",
+      "serverErrorRetry": "Server error, please retry",
+      "exportTimeout": "Export timeout",
+      "exportFailedRetry": "Export failed, please retry",
+      "noSearchResults": "No search results"
+    }
+  },
+  "abnormalTransportation": {
+    "title": "Transportation Abnormal",
+    "modalTitle": "Abnormal Order Details",
+    "modalTitles": {
+      "detail": "Transportation Abnormal Details"
+    },
+    "loading": "Loading...",
+    "noData": "No Data",
+    "filters": {
+      "dataSource": "Data Source",
+      "fromWarehouse": "From Warehouse",
+      "toRdc": "To RDC",
+      "abnormalType": "Abnormal Type",
+      "carrierName": "Carrier",
+      "deliveryName": "Delivery Provider"
+    },
+    "placeholders": {
+      "searchWarehouse": "Search warehouse...",
+      "searchRdc": "Search RDC...",
+      "searchCarrier": "Search carrier...",
+      "searchDelivery": "Search delivery provider..."
+    },
+    "buttons": {
+      "viewDetail": "View Details",
+      "query": "Query",
+      "reset": "Reset",
+      "export": "Export",
+      "exporting": "Exporting..."
+    },
+    "tableColumns": {
+      "dataSource": "Data Source",
+      "abnormalTypeName": "Abnormal Type",
+      "abnormalDays": "Abnormal Days",
+      "formWarehouse": "From Warehouse",
+      "carrierName": "Carrier",
+      "deliveryName": "Delivery Provider",
+      "transNo": "Trans No",
+      "invoiceNo": "Invoice No",
+      "toRdc": "To RDC",
+      "toProvince": "To Province",
+      "status": "Status",
+      "waybill": "Waybill",
+      "invoice": "Invoice",
+      "transType": "Transport Type",
+      "modetype": "Transport Mode",
+      "toWarehouse": "To Warehouse",
+      "toCounty": "To County",
+      "consignee": "Consignee",
+      "channel": "Channel",
+      "shipConfirmTime": "Ship Confirm Time",
+      "predictArriveRdcTime": "Predicted Arrive RDC Time",
+      "arriveRdcTime": "Arrive RDC Time",
+      "productCount": "Product Count",
+      "volume": "Volume",
+      "abnormalOccurTime": "Abnormal Occur Time",
+      "abnormalDesc": "Abnormal Description",
+      "lastAbnormalCode": "Last Abnormal Code"
+    },
+    "tooltip": {
+      "abnormalType": "Abnormal Type",
+      "timeRange": "Time Range",
+      "count": "Count",
+      "categoryRate": "Category Rate",
+      "overallRate": "Overall Rate",
+      "classifyRate": "Classify Rate"
+    },
+    "pagination": {
+      "total": "Total {0} items",
+      "prev": "Previous",
+      "next": "Next"
+    },
+    "chart": {
+      "rootName": "Transportation Abnormal",
+      "tooltip": {
+        "abnormalType": "Abnormal Type",
+        "timeRange": "Time Range",
+        "count": "Count",
+        "classifyRate": "Classify Rate",
+        "overallRate": "Overall Rate"
+      }
+    },
+    "messages": {
+      "fetchDataSourceListFailed": "Failed to fetch data source list:",
+      "fetchAbnormalTypeListFailed": "Failed to fetch abnormal type list:",
+      "fetchCarrierListFailed": "Failed to fetch carrier list:",
+      "fetchWarehouseListFailed": "Failed to fetch warehouse list:",
+      "fetchRdcListFailed": "Failed to fetch RDC list:",
+      "fetchDataFailed": "Failed to fetch transportation abnormal data:",
+      "fetchModalDataFailed": "Failed to fetch modal data:",
+      "exportFailed": "Export failed:",
+      "noSearchResults": "No search results"
+    }
+  },
+  "audit": {
+    "tabs": {
+      "todo": "My To-Do",
+      "initiated": "My Initiated",
+      "today": "Today's Approval"
+    },
+    "tasks": {
+      "dryDistribution": {
+        "title": "Dry Distribution Handover",
+        "description": "Large-scale transportation from central warehouse to regional warehouse, please note XXX"
+      },
+      "customerSign": {
+        "title": "Customer Sign Confirmation",
+        "description": "Customer sign confirmation process"
+      },
+      "warehouseDry": {
+        "title": "Warehouse-Dry Handover Confirmation",
+        "description": "Warehouse trunk handover confirmation"
+      },
+      "abnormalHandling": {
+        "title": "Abnormal Handling",
+        "description": "Handle abnormal situations during transportation"
+      }
+    }
+  },
+  "capacityPool": {
+    "title": "Capacity Pool",
+    "loading": "Loading...",
+    "noData": "No Data",
+    "noSearchResults": "No search results",
+    "modalTitles": {
+      "detail": "Vehicle Details",
+      "vehicleDetail": "Capacity Pool Vehicle Details"
+    },
+    "filters": {
+      "fromCity": "From City",
+      "toCity": "To City",
+      "logisticName": "Logistics Provider",
+      "licenseNumber": "Enter License Number",
+      "selectedCount": "{count} selected"
+    },
+    "placeholders": {
+      "searchFromCity": "Search from city...",
+      "searchToCity": "Search to city...",
+      "searchLogistic": "Search logistics provider...",
+      "licenseNumber": "Enter License Number"
+    },
+    "buttons": {
+      "view": "View",
+      "query": "Query",
+      "reset": "Reset"
+    },
+    "tableHeaders": {
+      "thirdParty": "3PL",
+      "route": "Route",
+      "vehicleCount": "Vehicle Count",
+      "vehicleType": "Vehicle Type",
+      "action": "Action"
+    },
+    "tableColumns": {
+      "route": "Route",
+      "licenseNumber": "License Number",
+      "vehicleType": "Vehicle Type",
+      "belongType": "Vehicle Owner",
+      "logisticName": "Logistics Provider",
+      "driverName": "Driver Name",
+      "phone": "Contact",
+      "vehicleCount": "Vehicle Count",
+      "action": "Action"
+    },
+    "pagination": {
+      "info": "{start}-{end} of {total} items",
+      "prev": "Previous",
+      "next": "Next"
+    },
+    "messages": {
+      "loadDataFailed": "Failed to load capacity pool data:",
+      "loadDropdownOptionsFailed": "Failed to load dropdown options:",
+      "fetchModalDataFailed": "Failed to fetch modal data:",
+      "selectedCount": "{count} selected",
+      "noSearchResults": "No search results"
+    }
+  },
+  "cargoMap": {
+    "timeSwitch": {
+      "label": "Time",
+      "currentMonth": "Month",
+      "recent30Days": "30 Days"
+    },
+    "statistics": {
+      "normalVehicles": "Normal In-Transit",
+      "abnormalVehicles": "Abnormal In-Transit",
+      "unsignedPackages": "Unsigned",
+      "unitVehicle": "",
+      "unitPackage": "",
+      "exportAbnormal": "Export Abnormal"
+    },
+    "top3": {
+      "title": "TOP3 Hot Routes",
+      "rank": "Rank",
+      "fromWarehouse": "From",
+      "toProvince": "To",
+      "volume": "Volume",
+      "unknown": "N/A",
+      "volumeUnit": "10K m³"
+    },
+    "layers": {
+      "cdcWarehouse": "CDC",
+      "rdcWarehouse": "RDC",
+      "trunkVehicles": "Trunk",
+      "deliveryVehicles": "Delivery",
+      "keyCustomers": "Key Customers",
+      "transportRoutes": "Routes"
+    },
+    "modal": {
+      "titles": {
+        "route": "Route Info",
+        "vehicle": "Vehicle Info",
+        "warehouse": "Warehouse Info",
+        "customer": "Customer Info"
+      },
+      "route": {
+        "volume": "Volume",
+        "unit": "m³"
+      },
+      "warehouse": {
+        "name": "Name",
+        "province": "Province",
+        "truckCount": "Vehicles",
+        "staffCount": "Staff",
+        "area": "Area",
+        "type": "Type",
+        "typeCdc": "CDC",
+        "typeRdc": "RDC"
+      },
+      "vehicle": {
+        "licenseNumber": "Plate No.",
+        "driver": "Driver",
+        "phone": "Phone",
+        "truckType": "Type",
+        "location": "Location",
+        "orderCount": "Orders",
+        "fromPlace": "From",
+        "toPlace": "To",
+        "belongType": "Owner Type",
+        "belongSupplier": "Supplier",
+        "orderCustomer": "Customer",
+        "goodsCount": "Goods",
+        "volume": "Volume",
+        "alert": "Vehicle abnormal, please check!",
+        "notSet": "N/A"
+      },
+      "customer": {
+        "name": "Name",
+        "address": "Address",
+        "contactPerson": "Contact",
+        "contactPhone": "Phone",
+        "customerType": "Type",
+        "location": "Location"
+      },
+      "unknown": "N/A",
+      "notSet": "N/A"
+    },
+    "legend": {
+      "volumeRanges": {
+        "over6000": ">6000",
+        "4000to6000": "4000-6000",
+        "3000to4000": "3000-4000",
+        "2000to3000": "2000-3000",
+        "1000to2000": "1000-2000",
+        "500to1000": "500-1000",
+        "200to500": "200-500",
+        "under200": "<200"
+      },
+      "trunkVehicles": "Trunk",
+      "keyCustomers": "Customers",
+      "cdcWarehouse": "CDC",
+      "rdcWarehouse": "RDC",
+      "transportRoutes": "Routes",
+      "airRoute": "Air",
+      "railRoute": "Rail",
+      "roadRoute": "Road",
+      "air": "Air",
+      "rail": "Rail",
+      "road": "Road"
+    },
+    "tooltip": {
+      "noData": "No Data",
+      "volumeLabel": "Vol {value}m³",
+      "customerInfoUnknown": "Unknown",
+      "customerNameLabel": "Name: {name}"
+    },
+    "transport": {
+      "exportConfirm": "Export abnormal vehicle data?",
+      "exportSuccess": "Exported",
+      "exportFailed": "Export failed",
+      "exportTooLarge": "Data too large, narrow range",
+      "exportFileNamePrefix": "AbnormalVehicles"
+    },
+    "messages": {
+      "loadTop3Failed": "Load TOP3 failed:",
+      "loadUnsignedFailed": "Load unsigned failed:",
+      "updateRippleFailed": "Update ripple failed:",
+      "loadTruckDataFailed": "Load trucks failed:",
+      "loadCustomerDataFailed": "Load customers failed:",
+      "loadWarehouseDataFailed": "Load warehouses failed:",
+      "loadMigrationFailed": "Load routes failed:",
+      "initMapFailed": "Map init failed:",
+      "cleanupFailed": "Cleanup failed:",
+      "resizeObserverFailed": "ResizeObserver failed:",
+      "resizeFailed": "Resize failed:",
+      "unknownWarehouse": "Unknown",
+      "unknownProvince": "Unknown",
+      "trunkVehicles": "Trunk",
+      "deliveryVehicles": "Delivery",
+      "keyCustomers": "Customers",
+      "warehouseData": "Warehouses",
+      "volumeData": "Volume",
+      "customer": "Customer"
+    }
+  },
+  "cargoTrend": {
+    "title": "Cargo Volume Trend",
+    "timePresets": {
+      "thisMonth": "This Month",
+      "lastMonth": "Last Month",
+      "recent3Months": "Recent 3 Months",
+      "thisYear": "This Year",
+      "lastYear": "Last Year"
+    },
+    "timeTypes": {
+      "calendarYear": "Calendar Year"
+    },
+    "dataSource": {
+      "all": "All Data Sources"
+    },
+    "metrics": {
+      "volume": "Order Quantity",
+      "weight": "Weight",
+      "volumeSize": "Volume"
+    },
+    "placeholders": {
+      "startDate": "Start Date",
+      "endDate": "End Date"
+    },
+    "options": {
+      "reset": "Reset",
+      "customer": "Customer",
+      "bizType": "Business Type",
+      "mot": "MOT",
+      "cityLevel": "City Level",
+      "productType": "Product Type",
+      "other": "Other Options"
+    },
+    "defaults": {
+      "calendarYear": "Calendar Year",
+      "dataSource": "Data Source",
+      "orderQuantity": "Order Quantity",
+      "customer": "Customer",
+      "bizType": "Business Type",
+      "mot": "MOT",
+      "cityLevel": "City Level",
+      "productType": "Product Type"
+    },
+    "sidePanel": {
+      "selectCustomer": "Select Customer",
+      "selectBizType": "Select Business Type",
+      "selectMot": "Select MOT",
+      "selectCityLevel": "Select City Level",
+      "selectProductType": "Select Product Type"
+    },
+    "datePicker": {
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "separator": "To"
+    },
+    "series": {
+      "mom": "MoM",
+      "yoy": "YoY"
+    },
+    "messages": {
+      "serverError": "Server Error",
+      "fetchError": "Failed to fetch cargo trend data:",
+      "loadOptionsError": "Failed to load options data:",
+      "notSet": "Not Set",
+      "getTimeTypeListFailed": "Failed to get time type list, server internal error",
+      "getDataSourceListFailed": "Failed to get data source list, server internal error",
+      "getVolumeAggListFailed": "Failed to get volume aggregation list, server internal error",
+      "getCustomerListFailed": "Failed to get customer list, server internal error",
+      "getBizTypeListFailed": "Failed to get business type list, server internal error",
+      "getCityLevelListFailed": "Failed to get city level list, server internal error",
+      "getMotListFailed": "Failed to get MOT list, server internal error",
+      "getProductTypeListFailed": "Failed to get product type list, server internal error",
+      "updateChartDataFailed": "Failed to update chart data:",
+      "callQueryVolumeFailed": "Failed to call queryVolume API:",
+      "queryVolumeDataFormatError": "queryVolume API returned data format error:",
+      "chartContainerNotFound": "Chart container not found",
+      "componentInitFailed": "cargoTrend component initialization failed:",
+      "chartInstanceNotFound": "Chart instance does not exist or data format error"
+    }
+  },
+  "cargoVolume": {
+    "titles": {
+      "yearlyVolume": "Annual Volume (m³)",
+      "monthlyVolume": "Monthly Volume (m³)",
+      "dailyVolume": "Daily Volume (m³)"
+    },
+    "tooltip": {
+      "increase": "Increase",
+      "decrease": "Decrease",
+      "add": "Add",
+      "drop": "Drop",
+      "yoy": "YoY",
+      "mom": "MoM",
+      "vs": "vs",
+      "value": "Value:",
+      "compare": "vs"
+    },
+    "messages": {
+      "fetchError": "Failed to fetch volume data:",
+      "fetchVolumeDataFailed": "Failed to fetch volume data:",
+      "yearlyDataFormatError": "Yearly data format incorrect:",
+      "monthlyDataFormatError": "Monthly data format incorrect:",
+      "dailyDataFormatError": "Daily data format incorrect:",
+      "swiperContainerNotFound": "Swiper container element .carousel-swiper not found",
+      "noDataToDisplay": "No data to display, skipping Swiper initialization",
+      "swiperReinitFailed": "Swiper reinitialization failed:",
+      "swiperInitFailed": "Swiper initialization failed:"
+    }
+  },
+  "dryPrice": {
+    "title": "Delivery Price",
+    "unit": "¥/m³",
+    "messages": {
+      "fetchError": "Failed to fetch delivery price data:",
+      "fetchDeliveryPriceFailed": "Failed to fetch delivery price:"
+    }
+  },
+  "endToEnd": {
+    "title": "Delivery Rate",
+    "messages": {
+      "dataFormatError": "End-to-end on-time delivery rate data format incorrect:",
+      "fetchDataFailed": "Failed to fetch end-to-end on-time delivery rate data:"
+    }
+  },
+  "energyPrices": {
+    "title": "Energy Price Trend",
+    "tabs": {
+      "domestic": "Domestic",
+      "international": "International"
+    },
+    "fuelTypes": {
+      "gasoline": "Gasoline",
+      "diesel": "Diesel",
+      "aircraftFuel": "Aircraft Fuel"
+    },
+    "units": {
+      "gallon": "Gallon",
+      "cnyPerTon": "CNY/Ton",
+      "usdPerBarrel": "USD/Barrel",
+      "yuanPerTon": "¥/Ton",
+      "dollarPerBarrel": "$/Barrel"
+    },
+    "keyEvent": "Key Event",
+    "monthSuffix": "",
+    "tooltip": {
+      "keyEvent": "Key Event:"
+    },
+    "month": "Month",
+    "messages": {
+      "fetchError": "Failed to fetch energy price data:",
+      "loadDataFailed": "Failed to load energy price data:",
+      "fetchDataFailed": "Failed to fetch energy price data:"
+    }
+  },
+  "energyPricesCard": {
+    "fuelTypes": {
+      "gasoline": "Gasoline",
+      "diesel": "Diesel",
+      "aircraftFuel": "Aircraft Fuel"
+    },
+    "units": {
+      "pricePerTon": "CNY/Ton"
+    },
+    "defaults": {
+      "gasoline": "Gasoline",
+      "diesel": "Diesel",
+      "aircraftFuel": "Aircraft Fuel",
+      "unit": "¥/Ton"
+    },
+    "trend": {
+      "priceUp": "Price Up",
+      "priceDown": "Price Down"
+    },
+    "messages": {
+      "fetchError": "Failed to fetch energy price data:",
+      "swiperContainerNotFound": "Swiper container element .energy-price-swiper not found",
+      "noDataToDisplay": "No data to display, skipping Swiper initialization",
+      "swiperReinitFailedOnTab": "Swiper reinitialization failed on tab switch:",
+      "swiperReinitFailed": "Swiper reinitialization failed:",
+      "swiperInitFailed": "Swiper initialization failed:"
+    }
+  },
+  "majorEvents": {
+    "title": "Major Events & Severe Weather Impact",
+    "tableHeaders": {
+      "roadSection": "Road Section/Area",
+      "impact": "Impact",
+      "orderCount": "Orders",
+      "affectedOrders": "Affected"
+    },
+    "tableColumns": {
+      "fromWarehouse": "From Warehouse",
+      "toWarehouse": "To Warehouse",
+      "logisticName": "Logistics",
+      "invoiceNo": "Invoice No.",
+      "deliverTime": "Ship Time",
+      "predictArriveTime": "Est. Arrival",
+      "transType": "Trans. Type",
+      "dataSource": "Data Source"
+    },
+    "filters": {
+      "fromWarehouse": "From Warehouse",
+      "selectedCount": "{count} selected",
+      "reset": "Reset"
+    },
+    "placeholders": {
+      "searchWarehouse": "Search warehouse...",
+      "invoiceNo": "Invoice No.",
+      "startDate": "Start Date",
+      "endDate": "End Date"
+    },
+    "dateRange": {
+      "separator": "To"
+    },
+    "modal": {
+      "title": "Affected Orders Details"
+    },
+    "buttons": {
+      "view": "View",
+      "query": "Query",
+      "reset": "Reset",
+      "export": "Export",
+      "exporting": "Exporting..."
+    },
+    "pagination": {
+      "total": "Total {total}",
+      "prev": "Prev",
+      "next": "Next"
+    },
+    "messages": {
+      "noData": "No major events",
+      "loading": "Loading...",
+      "empty": "No data",
+      "fetchTrafficInfoFailed": "Failed to fetch traffic info:",
+      "fetchUnsignedDetailsFailed": "Failed to fetch affected orders:",
+      "exportTooLarge": "Export data too large",
+      "exportFailed": "Export failed"
+    }
+  },
+  "onTime": {
+    "title": "Pickup Rate",
+    "messages": {
+      "fetchError": "Failed to fetch pickup on-time rate:"
+    }
+  },
+  "pickupRate": {
+    "toolbar": {
+      "separator": "To",
+      "query": "Query",
+      "showDetail": "Show Details"
+    },
+    "loading": "Loading...",
+    "noData": "No Data",
+    "tableColumns": {
+      "fromWarehouse": "From Warehouse",
+      "customer": "Customer",
+      "standardCount": "Std. Count",
+      "totalCount": "Total Count",
+      "pickupRate": "Pickup Rate"
+    },
+    "messages": {
+      "fetchDataFailed": "Failed to fetch pickup rate data:"
+    }
+  },
+  "signingInformation": {
+    "title": "Signing Information",
+    "cards": {
+      "todaySigned": "Today Signed",
+      "todayPending": "Today Pending"
+    },
+    "signingData": {
+      "todaySigned": "Today Signed",
+      "todayPending": "Today Pending"
+    },
+    "modal": {
+      "title": "Unsigned Details",
+      "detailTitle": "Unsigned Details"
+    },
+    "filters": {
+      "fromWarehouse": "From Warehouse",
+      "toProvince": "To Province",
+      "toRdc": "To RDC",
+      "modeType": "Delivery Mode"
+    },
+    "modeTypeOptions": {
+      "zoneDelivery": "Zone Delivery",
+      "directDelivery": "Direct Delivery"
+    },
+    "placeholders": {
+      "fromWarehouse": "From Warehouse",
+      "toProvince": "To Province",
+      "toRdc": "To RDC",
+      "modeType": "Transport Mode",
+      "searchWarehouse": "Search warehouse...",
+      "searchProvince": "Search province...",
+      "searchRdc": "Search RDC..."
+    },
+    "buttons": {
+      "reset": "Reset",
+      "search": "Search",
+      "query": "Query",
+      "export": "Export"
+    },
+    "tableColumns": {
+      "fromWarehouse": "From Warehouse",
+      "dataSource": "Data Source",
+      "carrierName": "Carrier",
+      "deliveryName": "Delivery Provider",
+      "transNo": "Transport No.",
+      "invoiceNo": "Invoice No.",
+      "orderStatus": "Order Status",
+      "transType": "Transport Type",
+      "modeType": "Transport Mode",
+      "toWarehouse": "To Warehouse",
+      "toProvince": "To Province",
+      "toCity": "To City",
+      "toCounty": "To County",
+      "deliveryParty": "Delivery Party",
+      "channelName": "Channel Name",
+      "deliverTime": "Delivery Time",
+      "arrivalRdcTime": "Arrival RDC Time",
+      "predictArrivalCustomerTime": "Estimated Arrival Customer Time",
+      "goodsNum": "Goods Quantity",
+      "volume": "Volume"
+    },
+    "chart": {
+      "seriesName": "Signing Information",
+      "tooltipFormatter": "{b}: {c} orders",
+      "labelFormatter": "{value} orders",
+      "unit": " orders",
+      "status": {
+        "signed": "Signed"
+      }
+    },
+    "pagination": {
+      "pageInfo": "Items {0}-{1} of {2} (Total {3} pages)",
+      "showTotal": "Total {total} items"
+    },
+    "messages": {
+      "exportFailed": "Export failed:",
+      "exportDataTooMuch": "Export data too much",
+      "noSearchResults": "No search results",
+      "exportSuccess": "Export successful",
+      "exportFailedMsg": "Export failed",
+      "fetchModalDataFailed": "Failed to fetch unsigned details"
+    }
+  },
+  "signUp": {
+    "title": "Pending Signatures",
+    "tabs": {
+      "terminal": "Terminal Delivery Exception",
+      "trunk": "Trunk to Warehouse Exception"
+    },
+    "rdcOptions": {
+      "rdcDelivery": "RDC & Delivery Provider",
+      "cdcCarrier": "CDC & Carrier",
+      "rdcAbnormalCode": "RDC & Abnormal Code",
+      "cdcAbnormalCode": "CDC & Abnormal Code"
+    },
+    "placeholders": {
+      "region": "Region",
+      "category": "Abnormal Category",
+      "dataSource": "Data Source"
+    },
+    "buttons": {
+      "reset": "Reset",
+      "export": "Export",
+      "exporting": "Exporting..."
+    },
+    "messages": {
+      "fetchRegionListFailed": "Failed to fetch region list:",
+      "fetchAbnormalReasonListFailed": "Failed to fetch abnormal category list:",
+      "fetchDataSourceListFailed": "Failed to fetch data source list:",
+      "fetchAbnormalOrderDataFailed": "Failed to fetch pending signature data:",
+      "queryTooMuch": "Query result too large, please narrow the search range",
+      "exportLimitExceeded": "Export quantity exceeds limit",
+      "exportFailed": "Export failed",
+      "exportSuccess": "Export successful",
+      "resetFailed": "Reset failed:",
+      "exportFileName": "Abnormal_Order_Data_{0}.xlsx"
+    },
+    "noData": {
+      "text": "No Data",
+      "description": "Please adjust filters and try again"
+    }
+  },
+  "signUpDetail": {
+    "title": "Unsigned Order Details",
+    "tabs": {
+      "terminal": "Terminal Delivery Exception",
+      "trunk": "Trunk Line to Warehouse Exception"
+    },
+    "rdcOptions": {
+      "rdcDelivery": "RDC & Delivery Provider",
+      "cdcCarrier": "CDC & Carrier"
+    },
+    "placeholders": {
+      "region": "Region",
+      "category": "Exception Category",
+      "dataSource": "Data Source"
+    },
+    "buttons": {
+      "reset": "Reset",
+      "export": "Export",
+      "exporting": "Exporting..."
+    },
+    "tableColumns": {
+      "rdc": "RDC",
+      "cdc": "CDC",
+      "deliveryProvider": "Delivery Provider",
+      "carrier": "Carrier",
+      "abnormalCategory": "Exception Category",
+      "abnormalCode": "Exception Code",
+      "abnormalDesc": "Exception Description",
+      "unsignedQuantity": "Unsigned Quantity"
+    },
+    "messages": {
+      "fetchRegionListFailed": "Failed to fetch region list",
+      "fetchAbnormalReasonListFailed": "Failed to fetch exception category list",
+      "fetchDataSourceListFailed": "Failed to fetch data source list",
+      "fetchAbnormalOrderDataFailed": "Failed to fetch unsigned order details",
+      "queryDataTooMuch": "Query data volume is too large, please narrow the query range",
+      "exportLimitExceeded": "Export quantity exceeds limit",
+      "exportFailed": "Export failed"
+    },
+    "noData": {
+      "text": "No Data",
+      "description": "Please adjust filters and try again"
+    }
+  },
+  "task": {
+    "loading": "Loading...",
+    "unknownType": "Unknown Type",
+    "description": {
+      "pendingOrderCount": "Pending Orders: ",
+      "pendingType": "Pending Type: ",
+      "clickToView": ", click to view details."
+    },
+    "messages": {
+      "fetchTaskListFailed": "Failed to fetch task list:"
+    }
+  },
+  "unitPrice": {
+    "title": "Trunk Line Price (m³)",
+    "units": {
+      "yuanPerKm": "CNY/km"
+    },
+    "unit": "¥/km",
+    "messages": {
+      "fetchError": "Failed to fetch trunk line price data:",
+      "fetchTrunkLinePriceFailed": "Failed to fetch trunk line price:"
+    }
+  },
+  "warehousingLogistics": {
+    "title": "On-time Delivery Rate (Warehouse + Logistics)",
+    "tabs": {
+      "onTimeRate": "On-time Delivery Rate",
+      "totalOrders": "Total + Non-compliant + On-time Rate"
+    },
+    "filters": {
+      "dataSource": "Data Source",
+      "transMode": "Transport Mode",
+      "logisticProvider": "Logistics Provider",
+      "customer": "Customer"
+    },
+    "timeDimension": {
+      "fiscalYear": "Fiscal Year",
+      "calendarYear": "Calendar Year",
+      "month": "Month"
+    },
+    "transMode": {
+      "trunkLine": "Trunk Line",
+      "delivery": "Delivery",
+      "endToEnd": "End-to-End"
+    },
+    "dateRange": {
+      "separator": "To",
+      "start": "Start...",
+      "end": "End..."
+    },
+    "placeholders": {
+      "searchLogisticProvider": "Search logistics provider...",
+      "searchCustomer": "Search customer..."
+    },
+    "buttons": {
+      "reset": "Reset",
+      "exportDetail": "Export Details",
+      "exportTable": "Export Table",
+      "exporting": "Exporting..."
+    },
+    "tableColumns": {
+      "originWarehouse": "Origin Warehouse",
+      "destinationWarehouse": "Dest. Warehouse",
+      "logisticProvider": "Logistics Provider",
+      "totalOrders": "Total Orders",
+      "nonCompliance": "Non-compliant",
+      "onTimeRate": "On-time Rate",
+      "subtotal": "Subtotal"
+    },
+    "messages": {
+      "loading": "Loading...",
+      "noData": "No data",
+      "noSearchResults": "No results",
+      "fetchDataFailed": "Failed to fetch data:",
+      "exportFailed": "Export failed:",
+      "exportTableFailed": "Failed to export table:",
+      "exportDataTooLarge": "Data too large, please narrow the query range",
+      "exportDetailFileName": "E2E_OnTime_Delivery_Rate",
+      "exportTableFileName": "OnTime_Rate_Table"
+    }
+  },
+  "urgentCustomer": {
+    "title": "Urgent & Key Customer Risk",
+    "modalTitles": {
+      "detail": "Urgent & Key Customer Risk Details"
+    },
+    "filters": {
+      "signStatus": "Sign Status",
+      "notSigned": "Unsigned",
+      "signed": "Signed",
+      "destWarehouse": "Dest. Warehouse",
+      "selectedCount": "{count} selected",
+      "orderStatus": "Order Status",
+      "riskType": "Risk Type",
+      "reset": "Reset",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "to": "To",
+      "customerOrderNo": "Customer Order No.",
+      "searchWarehouse": "Search warehouse...",
+      "searchStatus": "Search status...",
+      "searchRisk": "Search risk..."
+    },
+    "transTypes": {
+      "road": "Road",
+      "air": "Air",
+      "rail": "Rail",
+      "express": "Express"
+    },
+    "buttons": {
+      "viewDetail": "View Details",
+      "reset": "Reset",
+      "query": "Query",
+      "export": "Export",
+      "exporting": "Exporting..."
+    },
+    "tableColumns": {
+      "dataSource": "Data Source",
+      "orderStatus": "Order Status",
+      "riskType": "Risk Type",
+      "riskInfo": "Risk Info",
+      "transType": "Trans. Type",
+      "location": "Location",
+      "actualTransNo": "Trans. No.",
+      "customerOrderNo": "Customer Order No.",
+      "invoiceNo": "Invoice No.",
+      "onTime": "On Time",
+      "yes": "Yes",
+      "no": "No",
+      "predictArriveTime": "Est. Arrival",
+      "fromWarehouse": "From Warehouse",
+      "toWarehouse": "To Warehouse",
+      "destProvince": "Dest. Province",
+      "carrierName": "Carrier",
+      "deliveryName": "Delivery",
+      "consignee": "Consignee",
+      "consigneeAddress": "Address",
+      "goodsCode": "Material No.",
+      "goodsName": "Material Name",
+      "goodsCount": "Quantity",
+      "arrivalSignTime": "Sign Time",
+      "lastAbnormalCode": "Last Abnormal Code",
+      "cost": "Freight"
+    },
+    "pagination": {
+      "total": "Total {total}",
+      "prev": "Prev",
+      "next": "Next"
+    },
+    "messages": {
+      "fetchError": "Failed to fetch urgent customer data:",
+      "exportTooLarge": "Export data too large",
+      "exportFailed": "Export failed",
+      "noData": "No urgent orders",
+      "hasRisk": "Has Risk",
+      "normal": "Normal",
+      "loading": "Loading...",
+      "empty": "No data"
+    }
+  },
+  "header": {
+    "placeholders": {
+      "fromWarehouse": "From Warehouse",
+      "toProvince": "To Province",
+      "toRdc": "To RDC",
+      "searchWarehouse": "Search warehouse...",
+      "searchProvince": "Search province...",
+      "searchRdc": "Search RDC...",
+      "invoiceNo": "Invoice No."  
+    },
+    "buttons": {
+      "reset": "Reset",
+      "done": "Done",
+      "logout": "Logout"
+    },
+    "messages": {
+      "noSearchResults": "No search results",
+      "fetchMockSwitchConfigFailed": "Failed to fetch Mock switch config:",
+      "updateMockSwitchFailed": "Failed to update Mock config",
+      "mockConfigUpdated": "Mock config {0}, page will refresh...",
+      "mockConfigEnabled": "enabled",
+      "mockConfigDisabled": "disabled"
+    },
+    "mock": {
+      "enabled": "Mock:On",
+      "disabled": "Mock:Off",
+      "titleEnabled": "Mock config enabled, click to disable",
+      "titleDisabled": "Mock config disabled, click to enable"
+    },
+    "weather": {
+      "loading": "Loading weather...",
+      "error": "Failed to fetch weather"
+    },
+    "user": {
+      "defaultName": "User",
+      "avatarAlt": "User avatar"
+    }
+  },
+  "barPercentage": {
+    "title": "Volume Share",
+    "placeholders": {
+      "statType": "Stat Type",
+      "customer": "Customer",
+      "dataSource": "Data Source",
+      "volume": "Volume"
+    },
+    "chart": {
+      "seriesName": "Volume Share",
+      "value": "Value",
+      "percentage": "Share"
+    },
+    "tooltip": {
+      "valueLabel": "Value",
+      "percentageLabel": "Share"
+    },
+    "messages": {
+      "loadOptionsFailed": "Failed to load options",
+      "loadStatTypeFailed": "Failed to load stat type options",
+      "fetchDataFailed": "Failed to fetch volume share data",
+      "noSearchResults": "No search results"
+    }
+  },
+  "tablePercentage": {
+    "title": "Volume (Table %)",
+    "dateRange": {
+      "separator": "To"
+    },
+    "statDimension": {
+      "warehouseProvince": "From WH & To Province",
+      "city": "To City"
+    },
+    "placeholders": {
+      "statDimension": "Stat Dimension",
+      "toProvince": "To Province",
+      "dataSource": "Data Source",
+      "dataSourceCount": "Data Source ({count})",
+      "volume": "Volume"
+    },
+    "tableColumns": {
+      "rank": "Rank",
+      "fromWarehouse": "From Warehouse",
+      "toProvince": "To Province",
+      "toCity": "To City",
+      "volume": "Volume",
+      "percentage": "Percentage"
+    },
+    "messages": {
+      "loadOptionsFailed": "Failed to load options",
+      "fetchDataFailed": "Failed to fetch data"
+    }
+  },
+  "lenovoCustomer": {
+    "title": "Delivery Rate (Lenovo)",
+    "dateRange": {
+      "separator": "To"
+    },
+    "filters": {
+      "productType": "Product Type",
+      "bizType": "Business Type"
+    },
+    "tableColumns": {
+      "reasonOne": "Reason Category",
+      "reasonTwoName": "Reason Analysis",
+      "soCount": "SO Count",
+      "goodsCount": "Goods Count",
+      "deliveryRate": "Delivery Rate"
+    },
+    "buttons": {
+      "search": "Search",
+      "reset": "Reset"
+    },
+    "messages": {
+      "loadOptionsFailed": "Failed to load options",
+      "fetchDataFailed": "Failed to fetch data"
+    }
+  },
+  "orderRate": {
+    "title": "Return Order Timeliness Rate",
+    "dateRange": {
+      "separator": "To"
+    },
+    "filters": {
+      "logisticName": "Logistics Provider",
+      "selectedCount": "{count} selected"
+    },
+    "placeholders": {
+      "searchLogistic": "Search logistics provider..."
+    },
+    "tableColumns": {
+      "warehouse": "Warehouse",
+      "logisticName": "Logistics Provider",
+      "year": "Year",
+      "month": "Month",
+      "confirmTotal": "Total Return Orders",
+      "nonCompliantOrderCount": "Late Orders",
+      "confirmInTimeRate": "Timeliness Rate"
+    },
+    "buttons": {
+      "search": "Search",
+      "searching": "Searching...",
+      "export": "Export",
+      "exporting": "Exporting...",
+      "reset": "Reset"
+    },
+    "messages": {
+      "noData": "No Data",
+      "noDataDesc": "Please adjust filters and retry",
+      "noSearchResults": "No results",
+      "selectDateRange": "Please select a date range",
+      "exportSuccess": "Export successful",
+      "exportFailed": "Export failed",
+      "exportDataTooLarge": "Data too large, please narrow the query range",
+      "exportFileName": "Return_Order_Rate_{start}_{end}.xlsx"
+    }
+  },
+  "timeDimension": {
+    "title": "On-Time Delivery Rate (Time Dimension)",
+    "dataSource": "Data Source",
+    "timeDimension": "Time Dimension",
+    "transMode": "Transport Mode",
+    "logisticProvider": "Logistics Provider",
+    "customer": "Customer",
+    "fiscalYear": "Fiscal Year",
+    "calendarYear": "Calendar Year",
+    "month": "Month",
+    "transModeTrunk": "Trunk Line",
+    "transModeDelivery": "Delivery",
+    "transModeEndToEnd": "End-to-End",
+    "reset": "Reset",
+    "separator": "To",
+    "startDate": "Start...",
+    "endDate": "End...",
+    "export": "Export",
+    "searchLogisticProvider": "Search logistics provider...",
+    "searchCustomer": "Search customer...",
+    "noSearchResults": "No results",
+    "noData": "No Data",
+    "loadDataFailed": "Failed to load data:",
+    "exportSuccess": "Export successful",
+    "exportFailed": "Export failed",
+    "exportFailedNoData": "Export failed: no file data returned",
+    "exportDataTooLarge": "Data too large, please narrow the query range",
+    "exportFilename": "On-Time-Delivery-Rate-TimeDimension"
+  },
+  "nonLenovoCustomer": {
+    "title": "On-Time Delivery Rate (Non-Lenovo)",
+    "dateRange": {
+      "separator": "To"
+    },
+    "timeDimensionOptions": {
+      "fiscalYear": "Fiscal Year",
+      "calendarYear": "Calendar Year",
+      "month": "Month"
+    },
+    "filters": {
+      "deliveryProvider": "Delivery Provider",
+      "customer": "Customer",
+      "reset": "Reset"
+    },
+    "placeholders": {
+      "searchDeliveryProvider": "Search provider...",
+      "searchCustomer": "Search customer..."
+    },
+    "tableColumns": {
+      "customerName": "Customer",
+      "fromProvince": "From Province",
+      "toProvince": "To Province",
+      "deliveryProvider": "Delivery Provider",
+      "subtotal": "Subtotal"
+    },
+    "buttons": {
+      "export": "Export"
+    },
+    "messages": {
+      "fetchDataFailed": "Failed to fetch data",
+      "exportSuccess": "Export successful",
+      "exportFailed": "Export failed",
+      "exportDataTooLarge": "Data too large, please narrow the query range",
+      "exportFileName": "On-Time_Delivery_Rate",
+      "noSearchResults": "No results"
+    }
+  },
+  "transportationLogisticsRank": {
+    "title": "Transport Logistics KPI Ranking",
+    "modalTitle": "PFP-Transport-Logistics KPI Ranking Details",
+    "separator": "To",
+    "startMonth": "Start Month",
+    "endMonth": "End Month",
+    "reset": "Reset",
+    "logisticProvider": "Logistics Provider",
+    "cdcWarehouse": "CDC Warehouse",
+    "transType": "Transport Type",
+    "warehouse": "Warehouse",
+    "rank": "Rank",
+    "totalScore": "Total Score",
+    "hasReward": "Has Reward",
+    "redLineMajorSerious": "Red Line/Major/Serious Issue",
+    "yes": "Yes",
+    "no": "No",
+    "yearMonth": "Year-Month",
+    "summary": "Summary",
+    "monthFormat": "MMM YYYY",
+    "monthFormat00": "0000-00",
+    "viewDetails": "View Details",
+    "export": "Export",
+    "searchLogisticProvider": "Search logistics provider...",
+    "searchCdcWarehouse": "Search CDC warehouse...",
+    "searchTransType": "Search transport type...",
+    "noSearchResults": "No results",
+    "scoreDetail": "Score Details",
+    "rewardDetail": "Reward Details",
+    "fetchDataFailed": "Failed to fetch data",
+    "fetchTransTypeListFailed": "Failed to fetch transport type list",
+    "fetchScoreDetailFailed": "Failed to fetch score details",
+    "fetchRewardDetailFailed": "Failed to fetch reward details",
+    "fetchDetailFailed": "Failed to fetch details",
+    "selectDateRangeFirst": "Please select date range first",
+    "exportSuccess": "Export successful",
+    "exportFailed": "Export failed",
+    "trunkLineOnTimeScore": "Trunk Line On-time Score (Max: 50)",
+    "pickupTimelinessScore": "Pickup Timeliness (Max: 10)",
+    "trunkLineDamageScore": "Trunk Line Damage Score (Max: 10)",
+    "abnormalOrderProcessingScore": "7-Day Abnormal Order Processing (Max: 10)",
+    "infoFeedbackTimelinessScore": "Info Feedback Timeliness (Max: 5)",
+    "returnOrderTimelinessScore": "Return Order Timeliness (Max: 10)",
+    "operationAccuracyScore": "Operation Accuracy Score (Max: 5)",
+    "scoreSummary": "Score Summary",
+    "redLineIssue": "Red Line Issue",
+    "majorIssue": "Major Issue",
+    "seriousIssue": "Serious Issue",
+    "minorIssue": "Minor Issue",
+    "issueDescription": "Issue Description",
+    "bonusDeductionTotal": "Bonus/Deduction Total",
+    "redLineIssueYuan": "Red Line Issue (CNY)",
+    "majorIssueYuan": "Major Issue (CNY)",
+    "seriousIssueYuan": "Serious Issue (CNY)",
+    "minorIssueYuan": "Minor Issue (CNY)",
+    "breachHandling": "Breach Handling (CNY)",
+    "totalPenalty": "Total Penalty (CNY)",
+    "rewardAmount": "Reward Amount (CNY)",
+    "remarkReason": "Remark Reason",
+    "avgMonthlyShipVolume": "Avg Monthly Ship Volume (m³)",
+    "standardBreachAmount": "Standard Breach Amount (CNY)",
+    "breachCoefficient": "Breach Coefficient",
+    "isReward": "Has Reward"
+  },
+  "tobWarehousingRank": {
+    "title": "ToB Logistics KPI Ranking",
+    "common": {
+      "yes": "Yes",
+      "no": "No"
+    },
+    "modalTitles": {
+      "detail": "PFP-Warehouse-ToB Logistics KPI Ranking Details"
+    },
+    "tabs": {
+      "scoreDetail": "Score Details",
+      "rewardDetail": "Reward & Penalty Details"
+    },
+    "filters": {
+      "logisticProvider": "Logistics",
+      "cdcWarehouse": "CDC Warehouse",
+      "reset": "Reset"
+    },
+    "placeholders": {
+      "searchLogistic": "Search logistics...",
+      "searchCdcWarehouse": "Search CDC warehouse..."
+    },
+    "dateRange": {
+      "separator": "To",
+      "startMonth": "Start Month",
+      "endMonth": "End Month",
+      "yearMonth": "{year}/{month}",
+      "invalidMonth": "0000/00",
+      "summary": "Summary"
+    },
+    "buttons": {
+      "viewDetail": "View Details",
+      "export": "Export",
+      "reset": "Reset",
+      "query": "Query"
+    },
+    "tableColumns": {
+      "logistic": "Logistics",
+      "warehouse": "Warehouse",
+      "rank": "Rank",
+      "totalScore": "Total Score",
+      "hasReward": "Has Reward",
+      "redLineMajorSerious": "Red-line/Major/Serious Issue",
+      "yearMonth": "Year-Month"
+    },
+    "scoreTableColumns": {
+      "deliveryOnTimeScore": "Delivery On-time Score (Max: 50)",
+      "inboundOnTimeScore": "Inbound On-time Score (Max: 20)",
+      "stdComplianceScore": "Storage STD Compliance Score (Max: 10)",
+      "inventoryAccuracyScore": "Inventory Accuracy Score (Max: 10)",
+      "operationAccuracyScore": "Operation Accuracy Score (Max: 10)",
+      "scoreSummary": "Score Summary",
+      "redLineIssue": "Red-line Issue",
+      "majorIssue": "Major Issue",
+      "seriousIssue": "Serious Issue",
+      "minorIssue": "Minor Issue",
+      "issueDescription": "Issue Description",
+      "bonusDeductionTotal": "Total Bonus/Deduction"
+    },
+    "rewardTableColumns": {
+      "redLineIssue": "Red-line Issue (CNY)",
+      "majorIssue": "Major Issue (CNY)",
+      "seriousIssue": "Serious Issue (CNY)",
+      "minorIssue": "Minor Issue (CNY)",
+      "breachHandling": "Breach Handling (CNY)",
+      "totalPenalty": "Total Penalty (CNY)",
+      "rewardAmount": "Reward Amount (CNY)",
+      "remarkReason": "Remark",
+      "avgMonthlyShipVolume": "Avg Monthly Ship Volume (m³)",
+      "standardBreachAmount": "Standard Breach Amount (CNY)",
+      "breachCoefficient": "Breach Coefficient",
+      "hasReward": "Assessment Reward"
+    },
+    "messages": {
+      "fetchDataFailed": "Failed to fetch data",
+      "fetchScoreDetailFailed": "Failed to fetch score details",
+      "fetchRewardDetailFailed": "Failed to fetch reward/penalty details",
+      "fetchDetailFailed": "Failed to fetch details",
+      "selectDateRange": "Please select a date range",
+      "exportSuccess": "Export successful",
+      "exportFailed": "Export failed",
+      "exportDataTooLarge": "Data too large, please narrow the query range",
+      "noSearchResults": "No results",
+      "exportFileName": "ToB_Logistics_KPI_Ranking",
+      "exportScoreDetailFileName": "ToB_Logistics_KPI_Score_Details",
+      "exportRewardDetailFileName": "ToB_Logistics_KPI_Reward_Details"
+    }
+  },
+  "tobWarehousing": {
+    "title": "ToB Logistics KPI Score",
+    "reset": "Reset",
+    "logisticProvider": "Logistics",
+    "cdcWarehouse": "CDC Warehouse",
+    "showDetails": "Show Details",
+    "noSearchResults": "No results",
+    "dateRange": {
+      "separator": "To",
+      "startMonth": "Start Month",
+      "endMonth": "End Month"
+    },
+    "placeholders": {
+      "searchLogisticProvider": "Search logistics...",
+      "searchCdcWarehouse": "Search CDC warehouse..."
+    },
+    "buttons": {
+      "exportSummary": "Export Summary",
+      "exportDetail": "Export Detail"
+    },
+    "tableColumns": {
+      "month": "Month",
+      "logisticProvider": "Logistics",
+      "cdcWarehouse": "CDC Warehouse",
+      "totalScore": "Total Score",
+      "deliveryOnTimeRate": "Delivery On-Time Rate",
+      "standardDeliveryVolume": "Std Delivery Volume",
+      "totalDeliveryVolume": "Total Delivery Volume",
+      "deliveryScore": "Score (Max 50)",
+      "warehousingOnTimeRate": "Warehousing On-Time Rate",
+      "warehousingStandardCount": "Std Warehousing Count",
+      "totalShipmentCount": "Total Shipments",
+      "warehousingScore": "Score (Max 10)",
+      "storageStdRate": "Storage STD (24h) Rate",
+      "storageStandardCount": "Std Count",
+      "storageTotalShipmentCount": "Total Shipments",
+      "storageScore": "Score (Max 20)",
+      "inventoryAccuracyRate": "Inventory Accuracy",
+      "inventoryStandardQuantity": "Std Quantity",
+      "monthEndInventoryTotal": "Month-End Inventory",
+      "inventoryScore": "Score (Max 10)",
+      "operationAccuracyRate": "Operation Accuracy",
+      "operationScore": "Score (Max 10)"
+    },
+    "messages": {
+      "fetchDataFailed": "Failed to fetch data",
+      "fetchTableDataFailed": "Failed to fetch table data:",
+      "selectDateRange": "Please select a date range",
+      "noDataToExport": "No data to export",
+      "exportSummarySuccess": "Summary exported",
+      "exportSummaryFailed": "Export summary failed",
+      "exportDetailSuccess": "Detail exported",
+      "exportDetailFailed": "Export detail failed",
+      "exportDataTooLarge": "Data too large, please narrow the query range",
+      "exportSummaryFileName": "ToB_Logistics_KPI_Summary_{0}_{1}.xlsx",
+      "exportDetailFileName": "ToB_Logistics_KPI_Detail_{0}_{1}.xlsx"
+    }
+  },
+  "transportationLogistics": {
+    "title": "Transport Logistics KPI Score",
+    "reset": "Reset",
+    "yearMonth": "Year/Month",
+    "year": "",
+    "month": "",
+    "transType": "Trans. Type",
+    "logisticProvider": "Logistics Provider",
+    "cdcWarehouse": "CDC Warehouse",
+    "totalScore": "Total Score",
+    "dateSeparator": "To",
+    "startMonth": "Start Month",
+    "endMonth": "End Month",
+    "searchLogisticProvider": "Search provider...",
+    "searchCdcWarehouse": "Search warehouse...",
+    "searchTransType": "Search trans. type...",
+    "noSearchResults": "No results",
+    "showDetails": "Show Details",
+    "exportSummary": "Export Summary",
+    "exportDetail": "Export Detail",
+    "selectDateRange": "Please select date range",
+    "noDataToExport": "No data to export",
+    "exportSummarySuccess": "Summary exported",
+    "exportSummaryFailed": "Export summary failed",
+    "exportDetailSuccess": "Detail exported",
+    "exportDetailFailed": "Export detail failed",
+    "exportDataTooLarge": "Data too large, please narrow the query range",
+    "exportSummaryFilename": "Logistics_KPI_Summary",
+    "exportDetailFilename": "Logistics_KPI_Detail",
+    "fetchDataFailed": "Failed to fetch data",
+    "fetchTransTypeFailed": "Failed to fetch trans. type list",
+    "trunkOnTimeDeliveryRate": "Trunk On-time Delivery Rate",
+    "deliveryOrderCount": "Delivery Order Count",
+    "totalDeliveryOrderCount": "Total Delivery Orders",
+    "scoreFull50": "Score (Max 50)",
+    "pickupTimelinessRate": "Pickup Timeliness Rate",
+    "onTimeShipmentCount": "On-time Shipment Count",
+    "totalShipmentCount": "Total Shipments",
+    "scoreFull10": "Score (Max 10)",
+    "trunkDamageRate": "Trunk Damage Rate",
+    "damagedShipmentCount": "Damaged Shipment Count",
+    "abnormal7dRate": "7-day Abnormal Resolution Rate",
+    "resolvedOrderCount": "Resolved Order Count",
+    "totalAbnormalCount": "Total Abnormal Orders",
+    "scoreFull5": "Score (Max 5)",
+    "infoFeedbackRate": "Info Feedback Timeliness Rate",
+    "timelyFeedbackCount": "Timely Feedback Count",
+    "returnOrderTimelinessRate": "Return Order Timeliness Rate",
+    "timelyReturnCount": "Timely Return Count",
+    "operationAccuracyRate": "Operation Accuracy Rate"
+  },
+  "tclWarehousing": {
+    "title": "Huaxing Logistics KPI Score",
+    "reset": "Reset",
+    "showDetails": "Show Details",
+    "noSearchResults": "No results",
+    "dateRange": {
+      "separator": "To",
+      "startMonth": "Start Month",
+      "endMonth": "End Month"
+    },
+    "placeholders": {
+      "searchLogisticProvider": "Search provider...",
+      "searchCdcWarehouse": "Search platform..."
+    },
+    "buttons": {
+      "exportSummary": "Export Summary",
+      "exportDetail": "Export Detail"
+    },
+    "tableColumns": {
+      "month": "Month",
+      "logisticProvider": "Provider",
+      "transType": "Trans. Type",
+      "cdcWarehouse": "Platform",
+      "totalScore": "Total Score",
+      "scoreSummary": "Score Summary"
+    },
+    "kpiColumns": {
+      "pickupTimelinessRate": "Pickup Timeliness",
+      "deliveryTimelinessRate": "Delivery Timeliness",
+      "returnTimelinessRate": "Return Timeliness",
+      "numerator": "Std Count",
+      "denominator": "Total Count",
+      "rate": "Std Rate",
+      "scoreFull10": "Score (Max 10)",
+      "scoreFull20": "Score (Max 20)"
+    },
+    "deductionColumns": {
+      "title": "Deductions",
+      "quality": "Quality (Max 30)",
+      "service": "Service (Max 15)",
+      "safety": "Safety (Max 15)",
+      "other": "Other Deductions",
+      "description": "Deduction Notes"
+    },
+    "bonusColumns": {
+      "title": "Bonuses",
+      "other": "Other Bonuses",
+      "description": "Bonus Notes"
+    },
+    "messages": {
+      "fetchDataFailed": "Failed to fetch data",
+      "fetchTableDataFailed": "Failed to fetch table data:",
+      "selectDateRange": "Please select a date range",
+      "noDataToExport": "No data to export",
+      "exportSummarySuccess": "Summary exported",
+      "exportSummaryFailed": "Export summary failed",
+      "exportDetailSuccess": "Detail exported",
+      "exportDetailFailed": "Export detail failed",
+      "exportDataTooLarge": "Data too large, please narrow the query range",
+      "exportSummaryFileName": "Huaxing_Logistics_KPI_Summary_{0}_{1}.xlsx",
+      "exportDetailFileName": "Huaxing_Logistics_KPI_Detail_{0}_{1}.xlsx"
+    }
+  },
+  "tocWarehousing": {
+    "title": "ToC Logistics KPI Score",
+    "reset": "Reset",
+    "logisticProvider": "Logistics",
+    "cdcWarehouse": "Warehouse",
+    "showDetails": "Show Details",
+    "noSearchResults": "No results",
+    "dateRange": {
+      "startMonth": "Start Month",
+      "endMonth": "End Month"
+    },
+    "placeholders": {
+      "searchLogisticProvider": "Search provider...",
+      "searchCdcWarehouse": "Search warehouse..."
+    },
+    "buttons": {
+      "exportSummary": "Export Summary",
+      "exportDetail": "Export Detail"
+    },
+    "tableColumns": {
+      "month": "Month",
+      "logisticProvider": "Logistics",
+      "cdcWarehouse": "Warehouse",
+      "totalScore": "Total Score",
+      "onTimeReceivedItemsCount": "On-time Received Items",
+      "actualGoodsCountReceived": "Total Received Items",
+      "inventoryOnTimeRate": "Inbound On-time Rate",
+      "inventoryScore": "Score (Max 30)",
+      "outboundOnTimeCount": "On-time Outbound Orders",
+      "outboundOrderTotalCount": "Total Outbound Orders",
+      "outboundOnTimeRate": "Outbound On-time Rate",
+      "deliveryScore": "Score (Max 50)",
+      "operationErrorCount": "Operation Errors (Count)",
+      "operationErrorTimes": "Count",
+      "operationErrorScore": "Score (Max 10)",
+      "customerSatisfaction": "Customer Satisfaction",
+      "customerRating": "Customer Rating",
+      "customerSatisfactionScore": "Score (Max 10)",
+      "scoreSummary": "Score Summary",
+      "totalDeduction": "Deductions",
+      "deductionDesc": "Deduction Notes",
+      "totalBonus": "Bonuses",
+      "bonusDescription": "Bonus Notes"
+    },
+    "messages": {
+      "fetchDataFailed": "Failed to fetch data",
+      "fetchTableDataFailed": "Failed to fetch table data:",
+      "selectDateRange": "Please select date range",
+      "exportSummarySuccess": "Summary exported",
+      "exportSummaryFailed": "Export summary failed",
+      "exportDetailSuccess": "Detail exported",
+      "exportDetailFailed": "Export detail failed",
+      "exportDataTooLarge": "Data too large, please narrow the query range",
+      "exportSummaryFileName": "ToC_Logistics_KPI_Summary_{0}_{1}.xlsx",
+      "exportDetailFileName": "ToC_Logistics_KPI_Detail_{0}_{1}.xlsx",
+      "unknownError": "Unknown error",
+      "noData": "No data"
+    },
+    "monthFormat": "{year}/{month}"
+  },
+  "transportationOpen": {
+    "title": "Open Business KPI Score",
+    "reset": "Reset",
+    "startMonth": "Start Month",
+    "endMonth": "End Month",
+    "monthFormat": "{0}/{1}",
+    "logisticProvider": "Logistics",
+    "customer": "Customer",
+    "showDetails": "Show Details",
+    "exportSummary": "Export Summary",
+    "noSearchResults": "No results",
+    "searchLogisticProvider": "Search provider...",
+    "searchCustomer": "Search customer...",
+    "colMonth": "Month",
+    "deliveryOnTimeRate": "On-time Delivery Rate",
+    "pickupAccuracyRate": "Pickup Accuracy Rate",
+    "cargoDamageRate": "Cargo Damage Rate",
+    "returnTimelinessRate": "Return Timeliness Rate",
+    "complianceCount": "Std Count",
+    "totalCount": "Total Count",
+    "scoreFull30": "Score (Max 30)",
+    "scoreFull10": "Score (Max 10)",
+    "totalScore": "Total Score",
+    "scoreSummary": "Score Summary",
+    "deductionItem": "Deductions",
+    "deductionDesc": "Deduction Notes",
+    "bonusItem": "Bonuses",
+    "bonusDesc": "Bonus Notes",
+    "msgDataFormatInvalid": "Invalid data format:",
+    "msgFetchDataFailed": "Failed to fetch data",
+    "msgFetchTableDataFailed": "Failed to fetch table data:",
+    "msgSelectDateRange": "Please select date range",
+    "exportSummaryFilename": "Open_Business_KPI_Summary_{0}_{1}.xlsx",
+    "msgExportSuccess": "Summary exported",
+    "msgExportSummaryFailed": "Export summary failed",
+    "msgUnknownError": "Unknown error",
+    "msgExportDataTooLarge": "Data too large, please narrow the query range"
+  },
+  "transStorageKpi": {
+    "title": "Transport & Storage KPI Score",
+    "reset": "Reset",
+    "bizType": "Business Type",
+    "assessUnit": "Assessment Unit",
+    "logistic": "Logistics",
+    "assessProject": "Assessment Item",
+    "weight": "Weight",
+    "projectScore": "Project Score",
+    "finalScore": "Final Score",
+    "colMonth": "Year/Month",
+    "yearMonthFormat": "{0}/{1}",
+    "customerOptionStorage": "Storage & Transport-Storage",
+    "customerOptionTransport": "Storage & Transport-Transport",
+    "selectMonth": "Select month",
+    "searchBizType": "Search business type...",
+    "searchAssessUnit": "Search assessment unit...",
+    "noSearchResults": "No results",
+    "export": "Export",
+    "selectMonthFirst": "Please select month first",
+    "noDataToExport": "No data to export",
+    "exportSuccess": "Export successful",
+    "exportFailed": "Export failed",
+    "fetchDataFailed": "Failed to fetch data",
+    "fetchAssessUnitFailed": "Failed to fetch assessment unit list"
+  },
+  "cityLogistics": {
+    "title": "City Logistics KPI Score",
+    "filters": {
+      "logisticProvider": "Logistics Provider",
+      "cdcWarehouse": "CDC Warehouse",
+      "reset": "Reset",
+      "showDetails": "Show Details",
+      "separator": "To",
+      "startMonth": "Start Month",
+      "endMonth": "End Month"
+    },
+    "placeholders": {
+      "searchLogisticProvider": "Search logistics provider...",
+      "searchCdcWarehouse": "Search CDC warehouse...",
+      "noSearchResults": "No results"
+    },
+    "buttons": {
+      "exportSummary": "Export Summary",
+      "exportDetail": "Export Detail"
+    },
+    "tableColumns": {
+      "yearMonth": "Year/Month",
+      "logisticProvider": "Logistics Provider",
+      "cdcWarehouse": "CDC Warehouse",
+      "totalScore": "Total Score",
+      "summary": "Summary",
+      "yearMonthFormat": "{year}/{month}",
+      "secInboundCycleComplianceRate": "SEC Inbound Cycle Rate",
+      "secNumerator": "On-time Inbound Orders",
+      "secDenominator": "Total Inbound Orders",
+      "secRate": "SEC Inbound Cycle Rate",
+      "deliveryOnTimeRate": "Delivery On-Time Rate",
+      "deliveryNumerator": "On-time Line Items",
+      "deliveryDenominator": "Total Line Items",
+      "deliveryRate": "Delivery On-Time Rate",
+      "inventoryAccuracyRate": "Inventory Accuracy",
+      "inventoryNumerator": "Compliant Count",
+      "inventoryDenominator": "Month-End Inventory",
+      "inventoryRate": "Inventory Accuracy",
+      "onTimeDeliveryRate": "On-Time Delivery Rate",
+      "ontimeNumerator": "On-time Delivery Orders",
+      "ontimeDenominator": "Total Delivery Orders",
+      "ontimeRate": "On-Time Delivery Rate",
+      "cargoDamageRate": "Cargo Damage Rate",
+      "damageNumerator": "Damaged/Lost Shipments",
+      "damageDenominator": "Total Shipments",
+      "damageRate": "Cargo Damage Rate",
+      "abnormalResolutionRate": "Abnormal Resolution Rate",
+      "abnormalNumerator": "Resolved in Cycle",
+      "abnormalDenominator": "Total Abnormal",
+      "abnormalRate": "Abnormal Resolution Rate",
+      "secAppSignOffRate": "SEC APP Sign-off Rate",
+      "secAppNumerator": "APP Signed Shipments",
+      "secAppDenominator": "Total Shipments",
+      "secAppRate": "APP Sign-off Rate",
+      "tmsAppSignOffRate": "TMS APP Sign-off Rate",
+      "tmsAppNumerator": "APP Signed Shipments",
+      "tmsAppDenominator": "Total Shipments",
+      "tmsAppRate": "APP Sign-off Rate",
+      "tmsInfoSignOffTimeliness": "Info Sign-off Timeliness",
+      "tmsNumerator": "Timely Signed Shipments",
+      "tmsDenominator": "Total Shipments",
+      "tmsRate": "Info Sign-off Timeliness",
+      "returnOrderTimelinessRate": "Return Order Timeliness",
+      "returnNumerator": "Timely Returns",
+      "returnDenominator": "Total Returns",
+      "returnRate": "Return Timeliness Rate",
+      "operationAccuracyRate": "Operation Accuracy",
+      "operationRate": "Operation Accuracy",
+      "customerSatisfaction": "Customer Satisfaction",
+      "customerRating": "Customer Rating",
+      "scoreLabel": "Score (Max {max})"
+    },
+    "messages": {
+      "fetchDataFailed": "Failed to fetch data",
+      "selectDateRange": "Please select date range",
+      "noDataToExport": "No data to export",
+      "exportSummarySuccess": "Summary exported",
+      "exportSummaryFailed": "Export summary failed",
+      "exportDetailSuccess": "Detail exported",
+      "exportDetailFailed": "Export detail failed",
+      "exportDataTooLarge": "Data too large, please narrow the query range",
+      "exportSummaryFilename": "City_Logistics_KPI_Summary_{0}_{1}.xlsx",
+      "exportDetailFilename": "City_Logistics_KPI_Detail_{0}_{1}.xlsx"
+    }
+  },
+  "cityLogisticsRank": {
+    "title": "City Logistics KPI Ranking",
+    "modalTitle": "City Logistics KPI Ranking Details",
+    "separator": "To",
+    "startMonth": "Start Month",
+    "endMonth": "End Month",
+    "reset": "Reset",
+    "query": "Query",
+    "logisticProvider": "Logistics Provider",
+    "cdcWarehouse": "CDC Warehouse",
+    "warehouse": "Warehouse",
+    "rank": "Rank",
+    "totalScore": "Total Score",
+    "hasReward": "Has Reward",
+    "redLineMajorSerious": "Red Line/Major/Serious Issue",
+    "yes": "Yes",
+    "no": "No",
+    "yearMonth": "Year-Month",
+    "summary": "Summary",
+    "monthFormat": "MMM YYYY",
+    "monthFormat00": "0000-00",
+    "viewDetails": "View Details",
+    "export": "Export",
+    "searchLogisticProvider": "Search logistics provider...",
+    "searchCdcWarehouse": "Search CDC warehouse...",
+    "noSearchResults": "No results",
+    "scoreDetail": "Score Details",
+    "rewardDetail": "Reward & Penalty Details",
+    "fetchDataFailed": "Failed to fetch data",
+    "fetchScoreDetailFailed": "Failed to fetch score details",
+    "fetchRewardDetailFailed": "Failed to fetch reward/penalty details",
+    "fetchDetailFailed": "Failed to fetch details",
+    "selectDateRangeFirst": "Please select date range first",
+    "exportSuccess": "Export successful",
+    "exportFailed": "Export failed",
+    "secInboundCycleScore": "SEC Inbound Cycle Rate (Max: 15)",
+    "deliveryOnTimeScore": "Delivery On-time Rate (Max: 5)",
+    "inventoryAccuracyScore": "Inventory Accuracy (Max: 5)",
+    "onTimeDeliveryScore": "On-time Delivery Rate (Max: 30)",
+    "cargoDamageScore": "Cargo Damage Rate (Max: 5)",
+    "abnormalResolutionScore": "Abnormal Resolution Rate (Max: 5)",
+    "tmsSecAppScore": "TMS&SEC APP Sign Rate (Max: 5)",
+    "tmsInfoSignScore": "TMS Info Sign Timeliness (Max: 10)",
+    "returnOrderScore": "Return Order Timeliness (Max: 10)",
+    "operationAccuracyScore": "Operation Accuracy Score (Max: 5)",
+    "customerSatisfactionScore": "Customer Satisfaction (Max: 5)",
+    "scoreSummary": "Score Summary",
+    "redLineIssue": "Red Line Issue",
+    "majorIssue": "Major Issue",
+    "seriousIssue": "Serious Issue",
+    "minorIssue": "Minor Issue",
+    "issueDescription": "Issue Description",
+    "bonusDeductionTotal": "Bonus/Deduction Total",
+    "redLineIssueYuan": "Red Line Issue (CNY)",
+    "majorIssueYuan": "Major Issue (CNY)",
+    "seriousIssueYuan": "Serious Issue (CNY)",
+    "minorIssueYuan": "Minor Issue (CNY)",
+    "breachHandling": "Breach Handling (CNY)",
+    "totalPenalty": "Total Penalty (CNY)",
+    "rewardAmount": "Reward Amount (CNY)",
+    "remarkReason": "Remark",
+    "avgMonthlyShipVolume": "Avg Monthly Ship Volume (m³)",
+    "standardBreachAmount": "Standard Breach Amount (CNY)",
+    "breachCoefficient": "Breach Coefficient",
+    "isReward": "Assessment Reward",
+    "yearMonthFormat": "MMM YYYY"
+  },
+  "transportationExpress": {
+    "title": "Express Logistics KPI Score",
+    "reset": "Reset",
+    "showDetails": "Show Details",
+    "logisticProvider": "Logistics Provider",
+    "cdcWarehouse": "Warehouse",
+    "noSearchResults": "No results",
+    "dateRange": {
+      "startMonth": "Start Month",
+      "endMonth": "End Month"
+    },
+    "placeholders": {
+      "searchLogisticProvider": "Search provider...",
+      "searchCdcWarehouse": "Search warehouse..."
+    },
+    "buttons": {
+      "exportSummary": "Export Summary",
+      "exportDetail": "Export Detail"
+    },
+    "tableColumns": {
+      "yearMonth": "Year/Month",
+      "yearMonthFormat": "{0}/{1}",
+      "logisticProvider": "Logistics Provider",
+      "cdcWarehouse": "Warehouse",
+      "totalScore": "Total Score",
+      "onTimeDeliveryRate": "On-time Delivery Rate",
+      "expressDeliverRate": "Express Deliver Rate",
+      "damageRate": "Damage Rate",
+      "lossRate": "Loss Rate",
+      "customerSatisfaction": "Customer Satisfaction",
+      "scoreSummary": "Score Summary",
+      "deductionItem": "Deductions",
+      "deductionDesc": "Deduction Notes",
+      "bonusItem": "Bonuses",
+      "bonusDescription": "Bonus Notes"
+    },
+    "kpiDetail": {
+      "onTimeDeliveryRate": "On-time Delivery Rate",
+      "onTimeDeliveryNumerator": "On-time Delivery Orders",
+      "totalDeliveryOrders": "Total Delivery Orders",
+      "scoreFull50": "Score (Max 50)",
+      "expressDeliverRate": "Express Deliver Rate",
+      "expressDeliverNumerator": "Timely Delivery Orders",
+      "totalExpressOrders": "Total Express Orders",
+      "scoreFull20": "Score (Max 20)",
+      "damageRate": "Damage Rate",
+      "damageNumerator": "Damaged Cargo Pieces",
+      "totalCargoPieces": "Total Cargo Pieces",
+      "scoreFull10": "Score (Max 10)",
+      "lossRate": "Loss Rate",
+      "lossNumerator": "Lost Cargo Pieces",
+      "customerSatisfaction": "Customer Satisfaction",
+      "customerRating": "Customer Rating"
+    },
+    "messages": {
+      "fetchDataFailed": "Failed to fetch data",
+      "fetchTableDataFailed": "Failed to fetch table data:",
+      "selectDateRange": "Please select date range",
+      "unknownError": "Unknown error",
+      "exportDataTooLarge": "Data too large, please narrow the query range",
+      "exportSummarySuccess": "Summary exported",
+      "exportSummaryFailed": "Export summary failed",
+      "exportSummaryFilename": "Express_Logistics_KPI_Summary",
+      "exportDetailSuccess": "Detail exported",
+      "exportDetailFailed": "Export detail failed",
+      "exportDetailFilename": "Express_Logistics_KPI_Detail"
+    }
+  },
+  "transportationDoa": {
+    "title": "Transport DOA KPI Score",
+    "reset": "Reset",
+    "logisticProvider": "Logistics",
+    "cdcWarehouse": "Pickup DC",
+    "transType": "Trans. Type",
+    "showDetails": "Show Details",
+    "noSearchResults": "No results",
+    "dateRange": {
+      "startMonth": "Start Month",
+      "endMonth": "End Month"
+    },
+    "placeholders": {
+      "searchLogisticProvider": "Search provider...",
+      "searchCdcWarehouse": "Search pickup DC...",
+      "searchTransType": "Search trans. type..."
+    },
+    "buttons": {
+      "exportSummary": "Export Summary",
+      "exportDetail": "Export Detail"
+    },
+    "tableColumns": {
+      "yearMonth": "Year/Month",
+      "logistic": "Logistics",
+      "totalScore": "Total Score",
+      "cdcWarehouse": "Pickup DC",
+      "scoreSummary": "Score Summary",
+      "totalDeduction": "Deductions",
+      "deductionDesc": "Deduction Notes",
+      "totalBonus": "Bonuses",
+      "bonusDescription": "Bonus Notes",
+      "yearMonthFormat": "{year}/{month}"
+    },
+    "kpiColumns": {
+      "doaOnTimeRate": "DOA On-time Delivery Rate",
+      "doaPickupTimelinessRate": "DOA Pickup Timeliness Rate",
+      "doaDamageDppm": "DOA Damage DPPM",
+      "doaCustomerSatisfaction": "DOA Customer Satisfaction"
+    },
+    "detailColumns": {
+      "doaOntimeNumerator": "On-time Reverse Pickup Count",
+      "doaOntimeDenominator": "Total Reverse Pickup Count",
+      "doaPickupNumerator": "On-time Pickup Count",
+      "doaPickupDenominator": "Total Reverse Pickup Count",
+      "customerRating": "Customer Rating",
+      "scoreFull50": "Score (Max 50)",
+      "scoreFull30": "Score (Max 30)",
+      "scoreFull10": "Score (Max 10)"
+    },
+    "messages": {
+      "fetchDataFailed": "Failed to fetch data",
+      "fetchTransTypeListFailed": "Failed to fetch trans. type list",
+      "selectDateRange": "Please select date range",
+      "exportDataTooLarge": "Data too large, please narrow the query range",
+      "exportSummarySuccess": "Summary exported",
+      "exportSummaryFailed": "Export summary failed",
+      "exportDetailSuccess": "Detail exported",
+      "exportDetailFailed": "Export detail failed",
+      "exportSummaryFilename": "Transport_DOA_KPI_Summary_{start}_{end}.xlsx",
+      "exportDetailFilename": "Transport_Logistics_KPI_Detail_{start}_{end}.xlsx"
+    }
+  },
+  "globalFilterBar": {
+    "placeholders": {
+      "searchWarehouse": "Search Warehouse",
+      "searchProvince": "Search Province",
+      "searchRdc": "Search RDC",
+      "noResults": "No results"
+    },
+    "buttons": {
+      "done": "Done"
+    },
+    "labels": {
+      "all": "All",
+      "fromWarehouse": "From Warehouse",
+      "toProvince": "To Province",
+      "toRdc": "To RDC"
+    }
+  },
+  "dashboardView": {
+    "title": "Leshines Transport Agent",
+    "buttons": {
+      "refresh": "Refresh",
+      "fullscreen": "Fullscreen",
+      "exitFullscreen": "Exit Fullscreen",
+      "close": "Close"
+    },
+    "status": {
+      "layout": "Layout",
+      "currentPage": "Current Page",
+      "pageModules": "Page Modules",
+      "displayModules": "Display Modules",
+      "none": "None"
+    }
+  },
+  "cargoBanner": {
+    "cardTitles": {
+      "cddAlert": "Monthly CDD Alert",
+      "vehicleSafety": "Vehicle Safety Monitoring",
+      "isgAlert": "ISG Electronic Tag Alert",
+      "riskOrder7Days": "Risk Orders Over 7 Days",
+      "riskOrderOver7Days": "Risk Orders Over 7 Days Unresolved"
+    },
+    "modalTitles": {
+      "riskOrderDetail": "Risk Order Details",
+      "cddAlertDetail": "CDD Alert Details",
+      "isgAlertDetail": "ISG Electronic Tag Alert Details"
+    },
+    "categories": {
+      "highPriority": "High Priority",
+      "normalPriority": "Normal Priority"
+    },
+    "filters": {
+      "fromWarehouse": "From Warehouse",
+      "toProvince": "To Province",
+      "toRdc": "To RDC",
+      "dataSource": "Data Source",
+      "customer": "Customer",
+      "transMode": "Transport Mode",
+      "nonComplianceType": "Non-compliance Type",
+      "reset": "Reset"
+    },
+    "placeholders": {
+      "searchWarehouse": "Search Warehouse",
+      "searchProvince": "Search Province",
+      "searchRdc": "Search RDC",
+      "invoiceNo": "Invoice No.",
+      "noResults": "No matching results"
+    },
+    "buttons": {
+      "search": "Search",
+      "reset": "Reset",
+      "export": "Export",
+      "expand": "Expand View"
+    },
+    "isgTabs": {
+      "delay": "ISG Customer Delay Risk",
+      "inTransit": "ISG In-Transit Exception",
+      "delivery": "On-Demand Delivery Exception"
+    },
+    "tableColumns": {
+      "dataSource": "Data Source",
+      "customer": "Customer",
+      "custOrderNo": "Customer Order No.",
+      "invoiceNo": "Invoice No.",
+      "fromWarehouse": "From Warehouse",
+      "toRdc": "To RDC",
+      "carrierName": "Carrier",
+      "deliveryName": "Delivery Provider",
+      "abnormalCode": "Abnormal Code",
+      "abnormalTime": "Abnormal Time",
+      "abnormalDesc": "Abnormal Description",
+      "abnormalCount": "Abnormal Count",
+      "productNo": "Product No.",
+      "productName": "Product Name",
+      "actionAdvice": "Action Advice",
+      "dataCheckTime": "Data Check Time",
+      "location": "Location",
+      "predictArriveTime": "Predicted Arrival Time",
+      "riskInfo": "Risk Info",
+      "reason": "Reason",
+      "measure": "Measure",
+      "etagSn": "Electronic Tag SN",
+      "consigneeAddress": "Consignee Address",
+      "abnormalType": "Abnormal Type",
+      "lenovoOrderNo": "Lenovo Order No.",
+      "logisticName": "Logistics Provider",
+      "transType": "Transport Mode",
+      "onDemandTime": "On-Demand Time",
+      "toProvince": "To Province",
+      "toCity": "To City",
+      "abnormalInfo": "Abnormal Info",
+      "transNo": "Transport No.",
+      "eteOnTime": "End-to-End On-Time",
+      "mainLineOnTime": "Main Line On-Time",
+      "deliveryOnTime": "Delivery On-Time",
+      "lastAbnormalCode": "Last Abnormal Code",
+      "shipConfirmTime": "Shipment Confirm Time",
+      "signTime": "Sign Time",
+      "category": "Category"
+    },
+    "isgDeliveryAbnormalInfo": {
+      "1": "On-demand time and sign time are not on the same day",
+      "2": "Electronic tag and cargo not unbound, but order signed",
+      "3": "Cargo arrived at customer then left with electronic tag not unbound"
+    },
+    "cddOptions": {
+      "customers": {
+        "fenxiao": "Distribution Outsourcing",
+        "huazhi": "Huazhi Wine",
+        "lenovo": "Lenovo Finished Products",
+        "laiku": "Laiku Technology",
+        "youdao": "Youdao"
+      },
+      "modeTypes": {
+        "direct": "Direct Delivery",
+        "zone": "Zone Delivery"
+      },
+      "nonComplianceTypes": {
+        "ete": "End-to-End Delay",
+        "trunkline": "Trunk Line Delay",
+        "distribution": "Distribution Delay"
+      }
+    },
+    "messages": {
+      "loadFilterOptionsFailed": "Failed to load filter options",
+      "requestTimeout": "Request timeout, possibly due to slow network or server response",
+      "fetchModalDataFailed": "Failed to fetch modal data",
+      "fetchCddDataFailed": "Failed to fetch CDD data",
+      "fetchIsgDataFailed": "Failed to fetch ISG data",
+      "exportCddFailed": "Failed to export CDD",
+      "exportFailed": "Export failed",
+      "exportDataTooLarge": "Export data too large, please narrow the range",
+      "exportFilename": "Export_File.xlsx",
+      "noData": "No Data",
+      "currentLocation": "Current Location: "
+    },
+    "pagination": {
+      "showTotal": "Items {start}-{end} of {total} (Total {pages} pages)"
+    },
+    "altText": {
+      "vehicleIcon": "Vehicle Icon",
+      "emptyImage": "No Data"
+    }
+  }
+}

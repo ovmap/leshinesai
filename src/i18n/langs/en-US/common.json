@@ -1,0 +1,28 @@
+{
+  "buttons": {
+    "search": "Search",
+    "reset": "Reset",
+    "export": "Export",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "close": "Close",
+    "save": "Save",
+    "refresh": "Refresh"
+  },
+  "placeholders": {
+    "search": "Enter search content...",
+    "select": "Please select"
+  },
+  "messages": {
+    "noData": "No data",
+    "loading": "Loading...",
+    "success": "Operation successful",
+    "failed": "Operation failed",
+    "confirmDelete": "Are you sure to delete?"
+  },
+  "table": {
+    "columns": "Columns",
+    "actions": "Actions",
+    "total": "Total {total} items"
+  }
+}

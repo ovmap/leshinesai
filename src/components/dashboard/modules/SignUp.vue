@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { message } from 'ant-design-vue'
 import { queryAbnormalOrder, exportAbnormalOrder, queryRegionList, queryAbnormalTypeList } from '../../../services/transportApi'
 import { useSelectOptionsStore } from '../../../stores/selectOptionsStore'
 import { useGlobalFilterStore } from '../../../stores/globalFilterStore'
 import { useDashboardDataStore } from '../../../stores/dashboardDataStore'
 
+const { t } = useI18n()
 const selectOptionsStore = useSelectOptionsStore()
 const globalFilterStore = useGlobalFilterStore()
 const dataStore = useDashboardDataStore()
@@ -29,17 +31,17 @@ const isCategoryOpen = ref(false)
 const isDataSourceOpen = ref(false)
 
 // RDC 选项（末端）
-const rdcOptions = ref([
-  { value: 'RDC&配送商', label: 'RDC&配送商' },
-  { value: 'CDC&承运商', label: 'CDC&承运商' },
-  { value: 'RDC&异常代码', label: 'RDC&异常代码' },
-  { value: 'CDC&异常代码', label: 'CDC&异常代码' },
+const rdcOptions = computed(() => [
+  { value: 'RDC&配送商', label: t('dashboard.signUp.rdcOptions.rdcDelivery') },
+  { value: 'CDC&承运商', label: t('dashboard.signUp.rdcOptions.cdcCarrier') },
+  { value: 'RDC&异常代码', label: t('dashboard.signUp.rdcOptions.rdcAbnormalCode') },
+  { value: 'CDC&异常代码', label: t('dashboard.signUp.rdcOptions.cdcAbnormalCode') },
 ])
 
 // RDC 选项（干线）
-const trunkRdcOptions = ref([
-  { value: 'CDC&承运商', label: 'CDC&承运商' },
-  { value: 'CDC&异常代码', label: 'CDC&异常代码' },
+const trunkRdcOptions = computed(() => [
+  { value: 'CDC&承运商', label: t('dashboard.signUp.rdcOptions.cdcCarrier') },
+  { value: 'CDC&异常代码', label: t('dashboard.signUp.rdcOptions.cdcAbnormalCode') },
 ])
 
 // 大区选项
@@ -64,22 +66,22 @@ const currentRdcOptions = computed(() => {
 // 显示文本
 const selectedRdcText = computed(() => {
   const option = currentRdcOptions.value?.find(item => item.value === selectedRdc.value)
-  return option ? option.label : (activeTab.value === 'terminal' ? 'RDC&配送商' : 'CDC&承运商')
+  return option ? option.label : (activeTab.value === 'terminal' ? t('dashboard.signUp.rdcOptions.rdcDelivery') : t('dashboard.signUp.rdcOptions.cdcCarrier'))
 })
 
 const selectedRegionText = computed(() => {
   const option = regionOptions.value?.find(item => item.value === selectedRegion.value)
-  return option ? option.label : '大区'
+  return option ? option.label : t('dashboard.signUp.placeholders.region')
 })
 
 const selectedCategoryText = computed(() => {
   const option = categoryOptions.value?.find(item => item.value === selectedCategory.value)
-  return option ? option.label : '异常分类'
+  return option ? option.label : t('dashboard.signUp.placeholders.category')
 })
 
 const selectedDataSourceText = computed(() => {
   const option = dataSourceOptions.value?.find(item => item.value === selectedDataSource.value)
-  return option ? option.label : '数据源'
+  return option ? option.label : t('dashboard.signUp.placeholders.dataSource')
 })
 
 // 表格数据
@@ -98,7 +100,7 @@ const fetchRegionList = async () => {
         .map((item: any) => ({ value: item.code, label: item.name }))
     }
   } catch (error) {
-    console.error('获取大区列表失败:', error)
+    console.error(t('dashboard.signUp.messages.fetchRegionListFailed'), error)
   }
 }
 
@@ -112,7 +114,7 @@ const fetchAbnormalReasonList = async () => {
         .map((item: any) => ({ value: item.code, label: item.name }))
     }
   } catch (error) {
-    console.error('获取异常分类列表失败:', error)
+    console.error(t('dashboard.signUp.messages.fetchAbnormalReasonListFailed'), error)
   }
 }
 
@@ -121,7 +123,7 @@ const fetchDataSourceList = async () => {
   try {
     await selectOptionsStore.ensureDataLoaded()
   } catch (error) {
-    console.error('获取数据源列表失败:', error)
+    console.error(t('dashboard.signUp.messages.fetchDataSourceListFailed'), error)
   }
 }
 
@@ -181,12 +183,12 @@ const fetchAbnormalOrderData = async () => {
       tableContainerRef.value.scrollTop = scrollTop
     }
   } catch (error: any) {
-    console.error('获取应签未签数据失败:', error)
+    console.error(t('dashboard.signUp.messages.fetchAbnormalOrderDataFailed'), error)
     const errCode = error?.code
     if (errCode === 409 || errCode === 504 || errCode === 505) {
-      message.error(error.msg || '查询数据量过大，请缩小查询范围')
+      message.error(error.msg || t('dashboard.signUp.messages.queryTooMuch'))
     } else {
-      message.error(error.msg || '获取应签未签数据失败')
+      message.error(error.msg || t('dashboard.signUp.messages.fetchAbnormalOrderDataFailed'))
     }
   }
 }
@@ -292,7 +294,7 @@ const handleExport = async () => {
     const result = await exportAbnormalOrder(params)
 
     if (result.code === 409 || result.code === 504 || result.code === 505) {
-      message.error(result.msg || '导出数量超过限制')
+      message.error(result.msg || t('dashboard.signUp.messages.exportLimitExceeded'))
       return
     }
 
@@ -303,19 +305,19 @@ const handleExport = async () => {
       const link = document.createElement('a')
       link.href = url
       const dateStr = new Date().toISOString().slice(0, 10)
-      link.download = `应签未签_${dateStr}.xlsx`
+      link.download = `${t('dashboard.signUp.title')}_${dateStr}.xlsx`
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)
       window.URL.revokeObjectURL(url)
     }
   } catch (error: any) {
-    console.error('导出失败:', error)
+    console.error(t('dashboard.signUp.messages.exportFailed'), error)
     const errCode = error?.code || error?.response?.status
     if (errCode === 409 || errCode === 504 || errCode === 505) {
-      message.error(error.msg || '导出数量超过限制')
+      message.error(error.msg || t('dashboard.signUp.messages.exportLimitExceeded'))
     } else {
-      message.error(error.msg || '导出失败')
+      message.error(error.msg || t('dashboard.signUp.messages.exportFailed'))
     }
   } finally {
     exportLoading.value = false
@@ -347,13 +349,13 @@ onUnmounted(() => {
   <div class="signup-container">
     <!-- 标题栏 -->
     <div class="header-bar">
-      <h2 class="header-title">应签未签</h2>
+      <h2 class="header-title">{{ t('dashboard.signUp.title') }}</h2>
     </div>
 
     <!-- 顶部标签页 -->
     <div class="tabs-container">
-      <div class="tab-item" :class="{ active: activeTab === 'terminal' }" @click="activeTab = 'terminal'">末端配送异常</div>
-      <div class="tab-item" :class="{ active: activeTab === 'trunk' }" @click="activeTab = 'trunk'">干线到仓异常</div>
+      <div class="tab-item" :class="{ active: activeTab === 'terminal' }" @click="activeTab = 'terminal'">{{ t('dashboard.signUp.tabs.terminal') }}</div>
+      <div class="tab-item" :class="{ active: activeTab === 'trunk' }" @click="activeTab = 'trunk'">{{ t('dashboard.signUp.tabs.trunk') }}</div>
     </div>
 
     <!-- 筛选器 + 导出按钮 -->
@@ -430,9 +432,9 @@ onUnmounted(() => {
 
       <!-- 重置 + 导出 -->
       <div class="export-container">
-        <button class="action-btn reset-btn" @click="handleReset">重置</button>
+        <button class="action-btn reset-btn" @click="handleReset">{{ t('dashboard.signUp.buttons.reset') }}</button>
         <button class="action-btn export-btn" :disabled="exportLoading" @click="handleExport">
-          {{ exportLoading ? '导出中...' : '导出' }}
+          {{ exportLoading ? t('dashboard.signUp.buttons.exporting') : t('dashboard.signUp.buttons.export') }}
         </button>
       </div>
     </div>
@@ -456,8 +458,8 @@ onUnmounted(() => {
       </table>
 
       <div v-else class="no-data-container">
-        <div class="no-data-text">暂无数据</div>
-        <div class="no-data-desc">请调整筛选条件后重试</div>
+        <div class="no-data-text">{{ t('dashboard.signUp.noData.text') }}</div>
+        <div class="no-data-desc">{{ t('dashboard.signUp.noData.description') }}</div>
       </div>
     </div>
   </div>

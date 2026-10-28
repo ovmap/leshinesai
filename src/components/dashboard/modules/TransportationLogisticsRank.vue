@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch, nextTick, Teleport } from 'vue';
+import { useI18n } from 'vue-i18n';
 import dayjs, { type Dayjs } from 'dayjs';
 import { message } from 'ant-design-vue';
 import { useSelectOptionsStore } from '../../../stores/selectOptionsStore';
@@ -14,6 +15,26 @@ const props = defineProps<{
 
 const selectOptionsStore = useSelectOptionsStore();
 const dataStore = useDashboardDataStore();
+const { t } = useI18n();
+
+const formatMonthLabel = (month: string): string => {
+  if (month === '0000-00' || !month || month.startsWith('0000')) {
+    return t('dashboard.transportationLogisticsRank.monthFormat00');
+  }
+  const d = dayjs(month);
+  return d.format(t('dashboard.transportationLogisticsRank.monthFormat'));
+};
+
+const renderYesNo = (text: boolean | null): string => {
+  if (text === true) return t('dashboard.transportationLogisticsRank.yes');
+  if (text === false) return t('dashboard.transportationLogisticsRank.no');
+  return '-';
+};
+
+const renderYesNoText = (val: any): string => {
+  if (val === undefined || val === null) return '-';
+  return val ? t('dashboard.transportationLogisticsRank.yes') : t('dashboard.transportationLogisticsRank.no');
+};
 
 const getInitialDateRange = (): [Dayjs, Dayjs] => {
   const now = dayjs();
@@ -47,7 +68,7 @@ const filteredLogisticProviderOptions = computed(() => {
       option.name.toLowerCase().includes(searchLower)
     );
   }
-  return [{ code: '__reset__', name: '重置' }, ...filtered];
+  return [{ code: '__reset__', name: t('dashboard.transportationLogisticsRank.reset') }, ...filtered];
 });
 
 const filteredCdcWarehouseOptions = computed(() => {
@@ -60,7 +81,7 @@ const filteredCdcWarehouseOptions = computed(() => {
       option.name.toLowerCase().includes(searchLower)
     );
   }
-  return [{ code: '__reset__', name: '重置' }, ...filtered];
+  return [{ code: '__reset__', name: t('dashboard.transportationLogisticsRank.reset') }, ...filtered];
 });
 
 const filteredTransTypeOptions = computed(() => {
@@ -73,7 +94,7 @@ const filteredTransTypeOptions = computed(() => {
       option.name.toLowerCase().includes(searchLower)
     );
   }
-  return [{ code: '__reset__', name: '重置' }, ...filtered];
+  return [{ code: '__reset__', name: t('dashboard.transportationLogisticsRank.reset') }, ...filtered];
 });
 
 const isTransTypeOpen = ref(false);
@@ -109,7 +130,7 @@ const modalTableSectionRef = ref<HTMLElement | null>(null);
 const modalTableScrollY = ref<number | undefined>(200);
 
 const selectedLogisticProviderText = computed(() => {
-  if (selectedLogisticProvider.value.length === 0) return '物流商';
+  if (selectedLogisticProvider.value.length === 0) return t('dashboard.transportationLogisticsRank.logisticProvider');
   const names = selectedLogisticProvider.value.map(code => {
     const option = logisticProviderOptions.value.find(item => item.code === code);
     return option ? option.name : code;
@@ -118,7 +139,7 @@ const selectedLogisticProviderText = computed(() => {
 });
 
 const selectedCdcWarehouseText = computed(() => {
-  if (selectedCdcWarehouse.value.length === 0) return 'CDC仓库';
+  if (selectedCdcWarehouse.value.length === 0) return t('dashboard.transportationLogisticsRank.cdcWarehouse');
   const names = selectedCdcWarehouse.value.map(code => {
     const option = cdcWarehouseOptions.value.find(item => item.code === code);
     return option ? option.name : code;
@@ -127,7 +148,7 @@ const selectedCdcWarehouseText = computed(() => {
 });
 
 const selectedTransTypeText = computed(() => {
-  if (selectedTransType.value.length === 0) return '运输方式';
+  if (selectedTransType.value.length === 0) return t('dashboard.transportationLogisticsRank.transType');
   const names = selectedTransType.value.map(code => {
     const option = transTypeOptions.value.find(item => item.code === code);
     return option ? option.name : code;
@@ -227,21 +248,21 @@ const monthList = ref<string[]>([]);
 const tableColumns = computed(() => {
   const baseColumns = [
     {
-      title: '运输方式',
+      title: t('dashboard.transportationLogisticsRank.transType'),
       key: 'transType',
       dataIndex: 'transType',
       width: 120,
       align: 'center' as const,
     },
     {
-      title: '物流商',
+      title: t('dashboard.transportationLogisticsRank.logisticProvider'),
       key: 'logistic',
       dataIndex: 'logistic',
       width: 120,
       align: 'center' as const,
     },
     {
-      title: '仓库',
+      title: t('dashboard.transportationLogisticsRank.warehouse'),
       key: 'warehouse',
       dataIndex: 'warehouse',
       width: 120,
@@ -255,12 +276,7 @@ const tableColumns = computed(() => {
   });
 
   sortedMonths.forEach((month) => {
-    let monthLabel: string;
-    if (month === '0000-00' || !month || month.startsWith('0000')) {
-      monthLabel = '0000年00月';
-    } else {
-      monthLabel = dayjs(month).format('YYYY年M月');
-    }
+    const monthLabel = formatMonthLabel(month);
 
     monthColumns.push({
       title: monthLabel,
@@ -268,14 +284,14 @@ const tableColumns = computed(() => {
       align: 'center' as const,
       children: [
         {
-          title: '排名',
+          title: t('dashboard.transportationLogisticsRank.rank'),
           key: `${month}_rank`,
           dataIndex: `${month}_rank`,
           width: 80,
           align: 'center' as const,
         },
         {
-          title: '总成绩',
+          title: t('dashboard.transportationLogisticsRank.totalScore'),
           key: `${month}_totalScore`,
           dataIndex: `${month}_totalScore`,
           width: 100,
@@ -286,12 +302,7 @@ const tableColumns = computed(() => {
   });
 
   sortedMonths.forEach((month) => {
-    let monthLabel: string;
-    if (month === '0000-00' || !month || month.startsWith('0000')) {
-      monthLabel = '-';
-    } else {
-      monthLabel = dayjs(month).format('YYYY年M月');
-    }
+    const monthLabel = month === '0000-00' || !month || month.startsWith('0000') ? '-' : formatMonthLabel(month);
 
     monthColumns.push({
       title: monthLabel,
@@ -299,28 +310,20 @@ const tableColumns = computed(() => {
       align: 'center' as const,
       children: [
         {
-          title: '是否进行奖励',
+          title: t('dashboard.transportationLogisticsRank.hasReward'),
           key: `${month}_hasReward`,
           dataIndex: `${month}_hasReward`,
           width: 120,
           align: 'center' as const,
-          customRender: ({ text }: { text: boolean | null }) => {
-            if (text === true) return '是';
-            if (text === false) return '否';
-            return '-';
-          },
+          customRender: ({ text }: { text: boolean | null }) => renderYesNo(text),
         },
         {
-          title: '红线/重大/严重问题',
+          title: t('dashboard.transportationLogisticsRank.redLineMajorSerious'),
           key: `${month}_hasPunish`,
           dataIndex: `${month}_hasPunish`,
           width: 150,
           align: 'center' as const,
-          customRender: ({ text }: { text: boolean | null }) => {
-            if (text === true) return '是';
-            if (text === false) return '否';
-            return '-';
-          },
+          customRender: ({ text }: { text: boolean | null }) => renderYesNo(text),
         },
       ],
     });
@@ -403,13 +406,13 @@ const fetchRankData = async () => {
         monthList.value = [];
       }
     } else {
-      message.error(result?.msg || '获取数据失败');
+      message.error(result?.msg || t('dashboard.transportationLogisticsRank.fetchDataFailed'));
       tableData.value = [];
       monthList.value = [];
     }
   } catch (error) {
-    console.error('获取排名数据失败:', error);
-    message.error('获取数据失败');
+    console.error('fetchRankData:', error);
+    message.error(t('dashboard.transportationLogisticsRank.fetchDataFailed'));
     tableData.value = [];
   } finally {
     loading.value = false;
@@ -466,8 +469,8 @@ const fetchTransTypeList = async () => {
         .filter((option: { code: string; name: string }) => option.code && option.name);
     }
   } catch (error) {
-    console.error('获取运输方式列表失败:', error);
-    message.error('获取运输方式列表失败');
+    console.error('fetchTransTypeList:', error);
+    message.error(t('dashboard.transportationLogisticsRank.fetchTransTypeListFailed'));
   }
 };
 
@@ -609,7 +612,7 @@ const fetchDetailData = async () => {
           detailTableData.value = [];
         }
       } else {
-        message.error(result?.msg || '获取得分详情数据失败');
+        message.error(result?.msg || t('dashboard.transportationLogisticsRank.fetchScoreDetailFailed'));
         scoreTableData.value = [];
         detailTableData.value = [];
       }
@@ -648,7 +651,7 @@ const fetchDetailData = async () => {
               avgMonthlyShipVolume: item.avgMonthlyShipVolume !== undefined ? item.avgMonthlyShipVolume : null,
               standardBreachAmount: item.standardBreachAmount !== undefined ? item.standardBreachAmount : null,
               breachCoefficient: item.breachCoefficient || '-',
-              hasReward: item.hasReward !== undefined ? (item.hasReward ? '是' : '否') : '-',
+              hasReward: item.hasReward !== undefined ? renderYesNoText(item.hasReward) : '-',
             });
           });
 
@@ -659,15 +662,15 @@ const fetchDetailData = async () => {
           detailTableData.value = [];
         }
       } else {
-        message.error(result?.msg || '获取奖惩详情数据失败');
+        message.error(result?.msg || t('dashboard.transportationLogisticsRank.fetchRewardDetailFailed'));
         rewardTableData.value = [];
         detailTableData.value = [];
       }
     }
   } catch (error) {
     if (isStale()) return;
-    console.error('获取详情数据失败:', error);
-    message.error('获取详情数据失败');
+    console.error('fetchDetailData:', error);
+    message.error(t('dashboard.transportationLogisticsRank.fetchDetailFailed'));
     scoreTableData.value = [];
     rewardTableData.value = [];
     detailTableData.value = [];
@@ -688,7 +691,7 @@ const modalFilteredLogisticProviderOptions = computed(() => {
       option.name.toLowerCase().includes(searchLower)
     );
   }
-  return [{ code: '__reset__', name: '重置' }, ...filtered];
+  return [{ code: '__reset__', name: t('dashboard.transportationLogisticsRank.reset') }, ...filtered];
 });
 
 const modalFilteredCdcWarehouseOptions = computed(() => {
@@ -701,11 +704,11 @@ const modalFilteredCdcWarehouseOptions = computed(() => {
       option.name.toLowerCase().includes(searchLower)
     );
   }
-  return [{ code: '__reset__', name: '重置' }, ...filtered];
+  return [{ code: '__reset__', name: t('dashboard.transportationLogisticsRank.reset') }, ...filtered];
 });
 
 const modalSelectedLogisticProviderText = computed(() => {
-  if (modalSelectedLogisticProvider.value.length === 0) return '物流商';
+  if (modalSelectedLogisticProvider.value.length === 0) return t('dashboard.transportationLogisticsRank.logisticProvider');
   const names = modalSelectedLogisticProvider.value.map(code => {
     const option = logisticProviderOptions.value.find(item => item.code === code);
     return option ? option.name : code;
@@ -714,7 +717,7 @@ const modalSelectedLogisticProviderText = computed(() => {
 });
 
 const modalSelectedCdcWarehouseText = computed(() => {
-  if (modalSelectedCdcWarehouse.value.length === 0) return 'CDC仓库';
+  if (modalSelectedCdcWarehouse.value.length === 0) return t('dashboard.transportationLogisticsRank.cdcWarehouse');
   const names = modalSelectedCdcWarehouse.value.map(code => {
     const option = cdcWarehouseOptions.value.find(item => item.code === code);
     return option ? option.name : code;
@@ -828,7 +831,7 @@ const handleExport = async () => {
 
     if (modalVisible.value) {
       if (!modalDateRange.value || !modalDateRange.value[0] || !modalDateRange.value[1]) {
-        message.warning('请先选择日期范围');
+        message.warning(t('dashboard.transportationLogisticsRank.selectDateRangeFirst'));
         return;
       }
 
@@ -857,13 +860,13 @@ const handleExport = async () => {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        message.success('导出成功');
+        message.success(t('dashboard.transportationLogisticsRank.exportSuccess'));
       } else {
-        message.error(result?.msg || '导出失败');
+        message.error(result?.msg || t('dashboard.transportationLogisticsRank.exportFailed'));
       }
     } else {
       if (!dateRange.value || !dateRange.value[0] || !dateRange.value[1]) {
-        message.warning('请先选择日期范围');
+        message.warning(t('dashboard.transportationLogisticsRank.selectDateRangeFirst'));
         return;
       }
 
@@ -887,14 +890,14 @@ const handleExport = async () => {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        message.success('导出成功');
+        message.success(t('dashboard.transportationLogisticsRank.exportSuccess'));
       } else {
-        message.error(result?.msg || '导出失败');
+        message.error(result?.msg || t('dashboard.transportationLogisticsRank.exportFailed'));
       }
     }
   } catch (error: any) {
-    console.error('导出失败:', error);
-    message.error(error?.msg || '导出失败');
+    console.error('handleExport:', error);
+    message.error(error?.msg || t('dashboard.transportationLogisticsRank.exportFailed'));
   } finally {
     exportLoading.value = false;
   }
@@ -902,47 +905,40 @@ const handleExport = async () => {
 
 const scoreTableColumns = computed(() => [
   {
-    title: '年月',
+    title: t('dashboard.transportationLogisticsRank.yearMonth'),
     key: 'yearMonth',
     dataIndex: 'yearMonth',
     width: 100,
     align: 'center' as const,
     customRender: ({ text }: { text: string }) => {
       if (!text) return '-';
-      if (text === '汇总') return '汇总';
-      if (text === '0000-00' || text.startsWith('0000')) {
-        return '0000年00月';
-      }
-      const parts = text.split('-');
-      if (parts.length === 2 && parts[0] && parts[1]) {
-        return `${parts[0]}年${parseInt(parts[1])}月`;
-      }
-      return text;
+      if (text === '汇总') return t('dashboard.transportationLogisticsRank.summary');
+      return formatMonthLabel(text);
     },
   },
   {
-    title: '运输方式',
+    title: t('dashboard.transportationLogisticsRank.transType'),
     key: 'transType',
     dataIndex: 'transType',
     width: 120,
     align: 'center' as const,
   },
   {
-    title: '物流商',
+    title: t('dashboard.transportationLogisticsRank.logisticProvider'),
     key: 'logistic',
     dataIndex: 'logistic',
     width: 120,
     align: 'center' as const,
   },
   {
-    title: '仓库',
+    title: t('dashboard.transportationLogisticsRank.warehouse'),
     key: 'warehouse',
     dataIndex: 'warehouse',
     width: 120,
     align: 'center' as const,
   },
   {
-    title: '总成绩',
+    title: t('dashboard.transportationLogisticsRank.totalScore'),
     key: 'totalScore',
     dataIndex: 'totalScore',
     width: 100,
@@ -952,7 +948,7 @@ const scoreTableColumns = computed(() => [
     },
   },
   {
-    title: '干线准时交货率得分(满分: 50)',
+    title: t('dashboard.transportationLogisticsRank.trunkLineOnTimeScore'),
     key: 'trunkLineOnTimeScore',
     dataIndex: 'trunkLineOnTimeScore',
     width: 220,
@@ -962,7 +958,7 @@ const scoreTableColumns = computed(() => [
     },
   },
   {
-    title: '提货及时率(满分: 10)',
+    title: t('dashboard.transportationLogisticsRank.pickupTimelinessScore'),
     key: 'pickupTimelinessScore',
     dataIndex: 'pickupTimelinessScore',
     width: 160,
@@ -972,7 +968,7 @@ const scoreTableColumns = computed(() => [
     },
   },
   {
-    title: '干线破损率得分(满分: 10)',
+    title: t('dashboard.transportationLogisticsRank.trunkLineDamageScore'),
     key: 'trunkLineDamageScore',
     dataIndex: 'trunkLineDamageScore',
     width: 180,
@@ -982,7 +978,7 @@ const scoreTableColumns = computed(() => [
     },
   },
   {
-    title: '7天异常订单处理及时率得分(满分: 10)',
+    title: t('dashboard.transportationLogisticsRank.abnormalOrderProcessingScore'),
     key: 'abnormalOrderProcessingScore',
     dataIndex: 'abnormalOrderProcessingScore',
     width: 300,
@@ -992,7 +988,7 @@ const scoreTableColumns = computed(() => [
     },
   },
   {
-    title: '信息反馈及时率得分(满分: 5)',
+    title: t('dashboard.transportationLogisticsRank.infoFeedbackTimelinessScore'),
     key: 'infoFeedbackTimelinessScore',
     dataIndex: 'infoFeedbackTimelinessScore',
     width: 200,
@@ -1002,7 +998,7 @@ const scoreTableColumns = computed(() => [
     },
   },
   {
-    title: '返单及时率得分(满分: 10)',
+    title: t('dashboard.transportationLogisticsRank.returnOrderTimelinessScore'),
     key: 'returnOrderTimelinessScore',
     dataIndex: 'returnOrderTimelinessScore',
     width: 180,
@@ -1012,7 +1008,7 @@ const scoreTableColumns = computed(() => [
     },
   },
   {
-    title: '运作准确率得分(满分: 5)',
+    title: t('dashboard.transportationLogisticsRank.operationAccuracyScore'),
     key: 'operationAccuracyScore',
     dataIndex: 'operationAccuracyScore',
     width: 180,
@@ -1022,7 +1018,7 @@ const scoreTableColumns = computed(() => [
     },
   },
   {
-    title: '得分汇总',
+    title: t('dashboard.transportationLogisticsRank.scoreSummary'),
     key: 'kpiScore',
     dataIndex: 'kpiScore',
     width: 120,
@@ -1032,7 +1028,7 @@ const scoreTableColumns = computed(() => [
     },
   },
   {
-    title: '红线问题',
+    title: t('dashboard.transportationLogisticsRank.redLineIssue'),
     key: 'redLineIssue',
     dataIndex: 'redLineIssue',
     width: 100,
@@ -1042,7 +1038,7 @@ const scoreTableColumns = computed(() => [
     },
   },
   {
-    title: '重大问题',
+    title: t('dashboard.transportationLogisticsRank.majorIssue'),
     key: 'majorIssue',
     dataIndex: 'majorIssue',
     width: 100,
@@ -1052,7 +1048,7 @@ const scoreTableColumns = computed(() => [
     },
   },
   {
-    title: '严重问题',
+    title: t('dashboard.transportationLogisticsRank.seriousIssue'),
     key: 'seriousIssue',
     dataIndex: 'seriousIssue',
     width: 100,
@@ -1062,7 +1058,7 @@ const scoreTableColumns = computed(() => [
     },
   },
   {
-    title: '一般问题',
+    title: t('dashboard.transportationLogisticsRank.minorIssue'),
     key: 'minorIssue',
     dataIndex: 'minorIssue',
     width: 100,
@@ -1072,14 +1068,14 @@ const scoreTableColumns = computed(() => [
     },
   },
   {
-    title: '问题描述',
+    title: t('dashboard.transportationLogisticsRank.issueDescription'),
     key: 'issueDescription',
     dataIndex: 'issueDescription',
     width: 200,
     align: 'center' as const,
   },
   {
-    title: '加分/扣分合计',
+    title: t('dashboard.transportationLogisticsRank.bonusDeductionTotal'),
     key: 'bonusDeductionTotal',
     dataIndex: 'bonusDeductionTotal',
     width: 120,
@@ -1092,47 +1088,40 @@ const scoreTableColumns = computed(() => [
 
 const rewardTableColumns = computed(() => [
   {
-    title: '年月',
+    title: t('dashboard.transportationLogisticsRank.yearMonth'),
     key: 'yearMonth',
     dataIndex: 'yearMonth',
     width: 100,
     align: 'center' as const,
     customRender: ({ text }: { text: string }) => {
       if (!text) return '-';
-      if (text === '汇总') return '汇总';
-      if (text === '0000-00' || text.startsWith('0000')) {
-        return '0000年00月';
-      }
-      const parts = text.split('-');
-      if (parts.length === 2 && parts[0] && parts[1]) {
-        return `${parts[0]}年${parseInt(parts[1])}月`;
-      }
-      return text;
+      if (text === '汇总') return t('dashboard.transportationLogisticsRank.summary');
+      return formatMonthLabel(text);
     },
   },
   {
-    title: '运输方式',
+    title: t('dashboard.transportationLogisticsRank.transType'),
     key: 'transType',
     dataIndex: 'transType',
     width: 120,
     align: 'center' as const,
   },
   {
-    title: '物流商',
+    title: t('dashboard.transportationLogisticsRank.logisticProvider'),
     key: 'logistic',
     dataIndex: 'logistic',
     width: 120,
     align: 'center' as const,
   },
   {
-    title: '仓库',
+    title: t('dashboard.transportationLogisticsRank.warehouse'),
     key: 'warehouse',
     dataIndex: 'warehouse',
     width: 120,
     align: 'center' as const,
   },
   {
-    title: '红线问题(元)',
+    title: t('dashboard.transportationLogisticsRank.redLineIssueYuan'),
     key: 'redLineIssue',
     dataIndex: 'redLineIssue',
     width: 120,
@@ -1142,7 +1131,7 @@ const rewardTableColumns = computed(() => [
     },
   },
   {
-    title: '重大问题(元)',
+    title: t('dashboard.transportationLogisticsRank.majorIssueYuan'),
     key: 'majorIssue',
     dataIndex: 'majorIssue',
     width: 120,
@@ -1152,7 +1141,7 @@ const rewardTableColumns = computed(() => [
     },
   },
   {
-    title: '严重问题(元)',
+    title: t('dashboard.transportationLogisticsRank.seriousIssueYuan'),
     key: 'seriousIssue',
     dataIndex: 'seriousIssue',
     width: 120,
@@ -1162,7 +1151,7 @@ const rewardTableColumns = computed(() => [
     },
   },
   {
-    title: '一般问题(元)',
+    title: t('dashboard.transportationLogisticsRank.minorIssueYuan'),
     key: 'minorIssue',
     dataIndex: 'minorIssue',
     width: 120,
@@ -1172,7 +1161,7 @@ const rewardTableColumns = computed(() => [
     },
   },
   {
-    title: '违约处理(元)',
+    title: t('dashboard.transportationLogisticsRank.breachHandling'),
     key: 'breachHandling',
     dataIndex: 'breachHandling',
     width: 120,
@@ -1182,7 +1171,7 @@ const rewardTableColumns = computed(() => [
     },
   },
   {
-    title: '总罚款金额(元)',
+    title: t('dashboard.transportationLogisticsRank.totalPenalty'),
     key: 'totalPenalty',
     dataIndex: 'totalPenalty',
     width: 140,
@@ -1192,7 +1181,7 @@ const rewardTableColumns = computed(() => [
     },
   },
   {
-    title: '奖励金额(元)',
+    title: t('dashboard.transportationLogisticsRank.rewardAmount'),
     key: 'rewardAmount',
     dataIndex: 'rewardAmount',
     width: 120,
@@ -1202,14 +1191,14 @@ const rewardTableColumns = computed(() => [
     },
   },
   {
-    title: '备注原因',
+    title: t('dashboard.transportationLogisticsRank.remarkReason'),
     key: 'remarkReason',
     dataIndex: 'remarkReason',
     width: 200,
     align: 'center' as const,
   },
   {
-    title: '总成绩',
+    title: t('dashboard.transportationLogisticsRank.totalScore'),
     key: 'totalScore',
     dataIndex: 'totalScore',
     width: 100,
@@ -1219,7 +1208,7 @@ const rewardTableColumns = computed(() => [
     },
   },
   {
-    title: '月均发货体积(m³)',
+    title: t('dashboard.transportationLogisticsRank.avgMonthlyShipVolume'),
     key: 'avgMonthlyShipVolume',
     dataIndex: 'avgMonthlyShipVolume',
     width: 140,
@@ -1229,7 +1218,7 @@ const rewardTableColumns = computed(() => [
     },
   },
   {
-    title: '标准违约金(元)',
+    title: t('dashboard.transportationLogisticsRank.standardBreachAmount'),
     key: 'standardBreachAmount',
     dataIndex: 'standardBreachAmount',
     width: 140,
@@ -1239,14 +1228,14 @@ const rewardTableColumns = computed(() => [
     },
   },
   {
-    title: '违约系数',
+    title: t('dashboard.transportationLogisticsRank.breachCoefficient'),
     key: 'breachCoefficient',
     dataIndex: 'breachCoefficient',
     width: 100,
     align: 'center' as const,
   },
   {
-    title: '是否奖励',
+    title: t('dashboard.transportationLogisticsRank.isReward'),
     key: 'hasReward',
     dataIndex: 'hasReward',
     width: 100,
@@ -1278,7 +1267,7 @@ onUnmounted(() => {
 <template>
   <div class="rank-container">
     <div class="header-bar">
-      <h2 class="header-title">运输物流商KPI排名</h2>
+      <h2 class="header-title">{{ t('dashboard.transportationLogisticsRank.title') }}</h2>
     </div>
     <div class="control-panel">
       <div class="filter-group">
@@ -1287,8 +1276,8 @@ onUnmounted(() => {
             v-model:value="dateRange"
             picker="month"
             format="YYYY-MM"
-            separator="至"
-            :placeholder="['开始月份', '结束月份']"
+            :separator="t('dashboard.transportationLogisticsRank.separator')"
+            :placeholder="[t('dashboard.transportationLogisticsRank.startMonth'), t('dashboard.transportationLogisticsRank.endMonth')]"
             class="date-range-picker"
           />
         </div>
@@ -1303,7 +1292,7 @@ onUnmounted(() => {
               <input 
                 v-model="logisticProviderSearch" 
                 type="text" 
-                placeholder="搜索物流商..." 
+                :placeholder="t('dashboard.transportationLogisticsRank.searchLogisticProvider')" 
                 class="search-input"
                 @click.stop 
               />
@@ -1323,7 +1312,7 @@ onUnmounted(() => {
                 {{ option.name }}
               </div>
               <div v-if="filteredLogisticProviderOptions.length === 1 && logisticProviderSearch" class="no-results">
-                暂无搜索结果
+                {{ t('dashboard.transportationLogisticsRank.noSearchResults') }}
               </div>
             </div>
           </div>
@@ -1339,7 +1328,7 @@ onUnmounted(() => {
               <input 
                 v-model="cdcWarehouseSearch" 
                 type="text" 
-                placeholder="搜索CDC仓库..." 
+                :placeholder="t('dashboard.transportationLogisticsRank.searchCdcWarehouse')" 
                 class="search-input"
                 @click.stop 
               />
@@ -1359,7 +1348,7 @@ onUnmounted(() => {
                 {{ option.name }}
               </div>
               <div v-if="filteredCdcWarehouseOptions.length === 1 && cdcWarehouseSearch" class="no-results">
-                暂无搜索结果
+                {{ t('dashboard.transportationLogisticsRank.noSearchResults') }}
               </div>
             </div>
           </div>
@@ -1375,7 +1364,7 @@ onUnmounted(() => {
               <input 
                 v-model="transTypeSearch" 
                 type="text" 
-                placeholder="搜索运输方式..." 
+                :placeholder="t('dashboard.transportationLogisticsRank.searchTransType')" 
                 class="search-input"
                 @click.stop 
               />
@@ -1395,7 +1384,7 @@ onUnmounted(() => {
                 {{ option.name }}
               </div>
               <div v-if="filteredTransTypeOptions.length === 1 && transTypeSearch" class="no-results">
-                暂无搜索结果
+                {{ t('dashboard.transportationLogisticsRank.noSearchResults') }}
               </div>
             </div>
           </div>
@@ -1404,10 +1393,10 @@ onUnmounted(() => {
       
       <div class="action-buttons">
         <a-button @click="showDetailModal" class="action-btn">
-          查看详情
+          {{ t('dashboard.transportationLogisticsRank.viewDetails') }}
         </a-button>
         <a-button @click="handleExport" class="action-btn" :loading="exportLoading">
-          导出
+          {{ t('dashboard.transportationLogisticsRank.export') }}
         </a-button>
       </div>
     </div>
@@ -1429,7 +1418,7 @@ onUnmounted(() => {
       <div v-if="modalVisible" class="custom-modal-overlay" @click="handleModalClose">
         <div class="custom-modal" @click.stop>
           <div class="modal-header">
-            <h3 class="modal-title">PFP-运输-物流商KPI排名详情</h3>
+            <h3 class="modal-title">{{ t('dashboard.transportationLogisticsRank.modalTitle') }}</h3>
             <button class="modal-close" @click="handleModalClose">×</button>
           </div>
           
@@ -1440,8 +1429,8 @@ onUnmounted(() => {
                   v-model:value="modalDateRange"
                   picker="month"
                   format="YYYY-MM"
-                  separator="至"
-                  :placeholder="['开始月份', '结束月份']"
+                  :separator="t('dashboard.transportationLogisticsRank.separator')"
+                  :placeholder="[t('dashboard.transportationLogisticsRank.startMonth'), t('dashboard.transportationLogisticsRank.endMonth')]"
                   class="date-range-picker"
                 />
               </div>
@@ -1456,7 +1445,7 @@ onUnmounted(() => {
                     <input 
                       v-model="modalLogisticProviderSearch" 
                       type="text" 
-                      placeholder="搜索物流商..." 
+                      :placeholder="t('dashboard.transportationLogisticsRank.searchLogisticProvider')" 
                       class="search-input"
                       @click.stop 
                     />
@@ -1476,7 +1465,7 @@ onUnmounted(() => {
                       {{ option.name }}
                     </div>
                     <div v-if="modalFilteredLogisticProviderOptions.length === 1 && modalLogisticProviderSearch" class="no-results">
-                      暂无搜索结果
+                      {{ t('dashboard.transportationLogisticsRank.noSearchResults') }}
                     </div>
                   </div>
                 </div>
@@ -1492,7 +1481,7 @@ onUnmounted(() => {
                     <input 
                       v-model="modalCdcWarehouseSearch" 
                       type="text" 
-                      placeholder="搜索CDC仓库..." 
+                      :placeholder="t('dashboard.transportationLogisticsRank.searchCdcWarehouse')" 
                       class="search-input"
                       @click.stop 
                     />
@@ -1512,14 +1501,14 @@ onUnmounted(() => {
                       {{ option.name }}
                     </div>
                     <div v-if="modalFilteredCdcWarehouseOptions.length === 1 && modalCdcWarehouseSearch" class="no-results">
-                      暂无搜索结果
+                      {{ t('dashboard.transportationLogisticsRank.noSearchResults') }}
                     </div>
                   </div>
                 </div>
               </div>
 
               <a-button @click="handleModalReset" class="reset-btn">
-                重置
+                {{ t('dashboard.transportationLogisticsRank.reset') }}
               </a-button>
             </div>
           </div>
@@ -1530,14 +1519,14 @@ onUnmounted(() => {
               :class="{ active: activeTab === 'score' }"
               @click="handleTabChange('score')"
             >
-              得分详情
+              {{ t('dashboard.transportationLogisticsRank.scoreDetail') }}
             </div>
             <div 
               class="tab-item" 
               :class="{ active: activeTab === 'reward' }"
               @click="handleTabChange('reward')"
             >
-              奖惩详情
+              {{ t('dashboard.transportationLogisticsRank.rewardDetail') }}
             </div>
           </div>
 

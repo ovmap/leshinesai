@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { queryOnTimeRateCard } from '../../../services/transportApi'
 import { useDashboardDataStore } from '../../../stores/dashboardDataStore'
 
+const { t } = useI18n()
 const dataStore = useDashboardDataStore()
 
-const title = '提货及时率'
+const title = computed(() => t('dashboard.onTime.title'))
 const props = defineProps<{
   fromWarehouse?: string[]
   toProvince?: string[]
@@ -56,7 +58,7 @@ const fetchData = async () => {
       rateValue.value = '0%'
     }
   } catch (error) {
-    console.error('获取提货及时率失败:', error)
+    console.error(t('dashboard.onTime.messages.fetchError'), error)
     rateValue.value = '0%'
   } finally {
     loading.value = false

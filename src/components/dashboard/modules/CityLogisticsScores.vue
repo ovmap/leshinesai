@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch, h, nextTick } from 'vue';
+import { useI18n } from 'vue-i18n';
 import dayjs, { type Dayjs } from 'dayjs';
 import { message } from 'ant-design-vue';
 import { useSelectOptionsStore } from '../../../stores/selectOptionsStore';
 import { useDashboardDataStore } from '../../../stores/dashboardDataStore';
 import { queryDeliveryKpiSummary, exportDeliveryLogisticKpiScoreSummary, exportDeliveryLogisticKpiScoreDetail } from '../../../services/transportApi';
+
+const { t } = useI18n();
 
 const props = defineProps<{
   fromWarehouse?: string[]
@@ -44,7 +47,7 @@ const filteredLogisticProviderOptions = computed(() => {
       option.name.toLowerCase().includes(searchLower)
     );
   }
-  return [{ code: '__reset__', name: '重置' }, ...filtered];
+  return [{ code: '__reset__', name: t('dashboard.cityLogistics.filters.reset') }, ...filtered];
 });
 
 const filteredCdcWarehouseOptions = computed(() => {
@@ -57,7 +60,7 @@ const filteredCdcWarehouseOptions = computed(() => {
       option.name.toLowerCase().includes(searchLower)
     );
   }
-  return [{ code: '__reset__', name: '重置' }, ...filtered];
+  return [{ code: '__reset__', name: t('dashboard.cityLogistics.filters.reset') }, ...filtered];
 });
 
 const isLogisticProviderOpen = ref(false);
@@ -153,7 +156,7 @@ const createKpiDetailColumn = (
       title: child.title,
       key: child.key,
       dataIndex: child.key,
-      width: child.title.includes('得分') ? 120 : (child.title.length > 10 ? 160 : 140),
+      width: child.dataKey === 'score' ? 120 : (child.title.length > 10 ? 160 : 140),
       align: 'center' as const,
       customRender: ({ record }: { record: any }) => {
         const kpi = record.kpiData?.find((k: any) => k.kpiType === kpiType);
@@ -212,32 +215,33 @@ const createSimpleSatisfactColumn = (title: string, key: string, kpiType: number
 };
 
 const tableColumns = computed(() => {
+  const p = 'dashboard.cityLogistics.tableColumns.';
   const baseColumns = [
     {
-      title: '年月',
+      title: t(p + 'yearMonth'),
       key: 'yearMonth',
       dataIndex: 'yearMonth',
       width: 100,
       align: 'center' as const,
       customRender: ({ text }: { text: string | undefined }) => {
-        if (!text || text === '汇总') return text || '-';
+        if (!text || text === t(p + 'summary')) return text || '-';
         const textStr = text || '';
         const parts = textStr.split('-');
         if (parts.length === 2 && parts[0] && parts[1]) {
-          return `${parts[0]}年${parseInt(parts[1])}月`;
+          return t(p + 'yearMonthFormat', { year: parts[0], month: parseInt(parts[1]) });
         }
         return text || '-';
       },
     },
     {
-      title: '物流商',
+      title: t(p + 'logisticProvider'),
       key: 'logistic',
       dataIndex: 'logistic',
       width: 120,
       align: 'center' as const,
     },
     {
-      title: 'CDC仓库',
+      title: t(p + 'cdcWarehouse'),
       key: 'cdcWarehouse',
       dataIndex: 'cdcWarehouse',
       width: 120,
@@ -247,7 +251,7 @@ const tableColumns = computed(() => {
 
   if (showDetails.value) {
     baseColumns.push({
-      title: '得分合计',
+      title: t(p + 'totalScore'),
       key: 'totalScore',
       dataIndex: 'totalScore',
       width: 100,
@@ -260,97 +264,97 @@ const tableColumns = computed(() => {
 
   if (showDetails.value) {
     const firstGroupKpiColumns = [
-      createKpiDetailColumn('SEC入库周期达标率', 12, [
-        { title: '准时完成入库的配送单票数', key: 'sec_numerator', dataKey: 'numerator' },
-        { title: '所有入库的配送单票数', key: 'sec_denominator', dataKey: 'denominator' },
-        { title: 'SEC入库周期达标率', key: 'sec_rate', dataKey: 'rate' },
-        { title: '得分(满分10分)', key: 'sec_score', dataKey: 'score', maxScore: 15 },
+      createKpiDetailColumn(t(p + 'secInboundCycleComplianceRate'), 12, [
+        { title: t(p + 'secNumerator'), key: 'sec_numerator', dataKey: 'numerator' },
+        { title: t(p + 'secDenominator'), key: 'sec_denominator', dataKey: 'denominator' },
+        { title: t(p + 'secRate'), key: 'sec_rate', dataKey: 'rate' },
+        { title: t(p + 'scoreLabel', { max: 15 }), key: 'sec_score', dataKey: 'score', maxScore: 15 },
       ]),
-      createKpiDetailColumn('发货及时率', 1, [
-        { title: '准时完成发货的行项目数', key: 'delivery_numerator', dataKey: 'numerator' },
-        { title: '所有发货的行项目数', key: 'delivery_denominator', dataKey: 'denominator' },
-        { title: '发货及时率', key: 'delivery_rate', dataKey: 'rate' },
-        { title: '得分(满分5分)', key: 'delivery_score', dataKey: 'score', maxScore: 5 },
+      createKpiDetailColumn(t(p + 'deliveryOnTimeRate'), 1, [
+        { title: t(p + 'deliveryNumerator'), key: 'delivery_numerator', dataKey: 'numerator' },
+        { title: t(p + 'deliveryDenominator'), key: 'delivery_denominator', dataKey: 'denominator' },
+        { title: t(p + 'deliveryRate'), key: 'delivery_rate', dataKey: 'rate' },
+        { title: t(p + 'scoreLabel', { max: 5 }), key: 'delivery_score', dataKey: 'score', maxScore: 5 },
       ]),
-      createKpiDetailColumn('库存准确率', 4, [
-        { title: '达标数量', key: 'inventory_numerator', dataKey: 'numerator' },
-        { title: '月末库存总量', key: 'inventory_denominator', dataKey: 'denominator' },
-        { title: '库存准确率', key: 'inventory_rate', dataKey: 'rate' },
-        { title: '得分(满分5分)', key: 'inventory_score', dataKey: 'score', maxScore: 5 },
+      createKpiDetailColumn(t(p + 'inventoryAccuracyRate'), 4, [
+        { title: t(p + 'inventoryNumerator'), key: 'inventory_numerator', dataKey: 'numerator' },
+        { title: t(p + 'inventoryDenominator'), key: 'inventory_denominator', dataKey: 'denominator' },
+        { title: t(p + 'inventoryRate'), key: 'inventory_rate', dataKey: 'rate' },
+        { title: t(p + 'scoreLabel', { max: 5 }), key: 'inventory_score', dataKey: 'score', maxScore: 5 },
       ]),
-      createKpiDetailColumn('准时交货率', 13, [
-        { title: '准时配送单数量', key: 'ontime_numerator', dataKey: 'numerator' },
-        { title: '总配送单数量', key: 'ontime_denominator', dataKey: 'denominator' },
-        { title: '准时交货率', key: 'ontime_rate', dataKey: 'rate' },
-        { title: '得分(满分35分)', key: 'ontime_score', dataKey: 'score', maxScore: 30 },
+      createKpiDetailColumn(t(p + 'onTimeDeliveryRate'), 13, [
+        { title: t(p + 'ontimeNumerator'), key: 'ontime_numerator', dataKey: 'numerator' },
+        { title: t(p + 'ontimeDenominator'), key: 'ontime_denominator', dataKey: 'denominator' },
+        { title: t(p + 'ontimeRate'), key: 'ontime_rate', dataKey: 'rate' },
+        { title: t(p + 'scoreLabel', { max: 30 }), key: 'ontime_score', dataKey: 'score', maxScore: 30 },
       ]),
-      createKpiDetailColumn('货损率', 14, [
-        { title: '发生货损货丢的发货单数量', key: 'damage_numerator', dataKey: 'numerator' },
-        { title: '总发货单数量', key: 'damage_denominator', dataKey: 'denominator' },
-        { title: '货损率', key: 'damage_rate', dataKey: 'rate', decimalPlaces: 3 },
-        { title: '得分(满分5分)', key: 'damage_score', dataKey: 'score', maxScore: 5 },
+      createKpiDetailColumn(t(p + 'cargoDamageRate'), 14, [
+        { title: t(p + 'damageNumerator'), key: 'damage_numerator', dataKey: 'numerator' },
+        { title: t(p + 'damageDenominator'), key: 'damage_denominator', dataKey: 'denominator' },
+        { title: t(p + 'damageRate'), key: 'damage_rate', dataKey: 'rate', decimalPlaces: 3 },
+        { title: t(p + 'scoreLabel', { max: 5 }), key: 'damage_score', dataKey: 'score', maxScore: 5 },
       ]),
     ];
 
     const secondGroupKpiColumns = [
-      createKpiDetailColumn('异常解决及时率', 15, [
-        { title: '异常周期内解决的单数', key: 'abnormal_numerator', dataKey: 'numerator' },
-        { title: '总异常单数', key: 'abnormal_denominator', dataKey: 'denominator' },
-        { title: '异常解决及时率', key: 'abnormal_rate', dataKey: 'rate' },
-        { title: '得分(满分5分)', key: 'abnormal_score', dataKey: 'score', maxScore: 5 },
+      createKpiDetailColumn(t(p + 'abnormalResolutionRate'), 15, [
+        { title: t(p + 'abnormalNumerator'), key: 'abnormal_numerator', dataKey: 'numerator' },
+        { title: t(p + 'abnormalDenominator'), key: 'abnormal_denominator', dataKey: 'denominator' },
+        { title: t(p + 'abnormalRate'), key: 'abnormal_rate', dataKey: 'rate' },
+        { title: t(p + 'scoreLabel', { max: 5 }), key: 'abnormal_score', dataKey: 'score', maxScore: 5 },
       ]),
-      createKpiDetailColumn('SEC APP签收率', 43, [
-        { title: 'APP签收发货单', key: 'sec_app_numerator', dataKey: 'numerator' },
-        { title: '总发货单数', key: 'sec_app_denominator', dataKey: 'denominator' },
-        { title: 'APP签收率', key: 'sec_app_rate', dataKey: 'rate' },
-        { title: '得分(满分2.5分)', key: 'sec_app_score', dataKey: 'score', maxScore: 5 },
+      createKpiDetailColumn(t(p + 'secAppSignOffRate'), 43, [
+        { title: t(p + 'secAppNumerator'), key: 'sec_app_numerator', dataKey: 'numerator' },
+        { title: t(p + 'secAppDenominator'), key: 'sec_app_denominator', dataKey: 'denominator' },
+        { title: t(p + 'secAppRate'), key: 'sec_app_rate', dataKey: 'rate' },
+        { title: t(p + 'scoreLabel', { max: 5 }), key: 'sec_app_score', dataKey: 'score', maxScore: 5 },
       ]),
-      createKpiDetailColumn('TMS APP签收率', 16, [
-        { title: 'APP签收发货单', key: 'tms_app_numerator', dataKey: 'numerator' },
-        { title: '总发货单数', key: 'tms_app_denominator', dataKey: 'denominator' },
-        { title: 'APP签收率', key: 'tms_app_rate', dataKey: 'rate' },
-        { title: '得分(满分2.5分)', key: 'tms_app_score', dataKey: 'score', maxScore: 5 },
+      createKpiDetailColumn(t(p + 'tmsAppSignOffRate'), 16, [
+        { title: t(p + 'tmsAppNumerator'), key: 'tms_app_numerator', dataKey: 'numerator' },
+        { title: t(p + 'tmsAppDenominator'), key: 'tms_app_denominator', dataKey: 'denominator' },
+        { title: t(p + 'tmsAppRate'), key: 'tms_app_rate', dataKey: 'rate' },
+        { title: t(p + 'scoreLabel', { max: 5 }), key: 'tms_app_score', dataKey: 'score', maxScore: 5 },
       ]),
-      createKpiDetailColumn('信息签收及时性', 17, [
-        { title: '及时签收发货单数量', key: 'tms_numerator', dataKey: 'numerator' },
-        { title: '发货单总数量', key: 'tms_denominator', dataKey: 'denominator' },
-        { title: '信息签收及时性', key: 'tms_rate', dataKey: 'rate' },
-        { title: '得分(满分5分)', key: 'tms_score', dataKey: 'score', maxScore: 10 },
+      createKpiDetailColumn(t(p + 'tmsInfoSignOffTimeliness'), 17, [
+        { title: t(p + 'tmsNumerator'), key: 'tms_numerator', dataKey: 'numerator' },
+        { title: t(p + 'tmsDenominator'), key: 'tms_denominator', dataKey: 'denominator' },
+        { title: t(p + 'tmsRate'), key: 'tms_rate', dataKey: 'rate' },
+        { title: t(p + 'scoreLabel', { max: 10 }), key: 'tms_score', dataKey: 'score', maxScore: 10 },
       ]),
-      createKpiDetailColumn('返单及时率', 11, [
-        { title: '及时返单数量', key: 'return_numerator', dataKey: 'numerator' },
-        { title: '所有返单数量', key: 'return_denominator', dataKey: 'denominator' },
-        { title: '返单及时率', key: 'return_rate', dataKey: 'rate' },
-        { title: '得分(满分10分)', key: 'return_score', dataKey: 'score', maxScore: 10 },
+      createKpiDetailColumn(t(p + 'returnOrderTimelinessRate'), 11, [
+        { title: t(p + 'returnNumerator'), key: 'return_numerator', dataKey: 'numerator' },
+        { title: t(p + 'returnDenominator'), key: 'return_denominator', dataKey: 'denominator' },
+        { title: t(p + 'returnRate'), key: 'return_rate', dataKey: 'rate' },
+        { title: t(p + 'scoreLabel', { max: 10 }), key: 'return_score', dataKey: 'score', maxScore: 10 },
       ]),
-      createKpiDetailColumn('运作准确率', 5, [
-        { title: '运作准确率', key: 'operation_rate', dataKey: 'rate' },
-        { title: '得分(满分5分)', key: 'operation_score', dataKey: 'score', maxScore: 5 },
+      createKpiDetailColumn(t(p + 'operationAccuracyRate'), 5, [
+        { title: t(p + 'operationRate'), key: 'operation_rate', dataKey: 'rate' },
+        { title: t(p + 'scoreLabel', { max: 5 }), key: 'operation_score', dataKey: 'score', maxScore: 5 },
       ]),
-      createKpiDetailColumn('客户满意度', 18, [
-        { title: '客户评分', key: 'customer_rate', dataKey: 'satisfact' },
-        { title: '得分(满分10分)', key: 'customer_score', dataKey: 'score', maxScore: 5 },
+      createKpiDetailColumn(t(p + 'customerSatisfaction'), 18, [
+        { title: t(p + 'customerRating'), key: 'customer_rate', dataKey: 'satisfact' },
+        { title: t(p + 'scoreLabel', { max: 10 }), key: 'customer_score', dataKey: 'score', maxScore: 5 },
       ]),
     ];
 
     return [...baseColumns, ...firstGroupKpiColumns, ...secondGroupKpiColumns];
   } else {
     const firstGroupKpiColumns = [
-      createSimpleKpiColumn('SEC入库周期达标率', 'secInboundCycleComplianceRate', 12, 160),
-      createSimpleKpiColumn('发货及时率', 'deliveryOnTimeRate', 1, 120),
-      createSimpleKpiColumn('库存准确率', 'inventoryAccuracyRate', 4, 120),
-      createSimpleKpiColumn('准时交货率', 'onTimeDeliveryRate', 13, 120),
-      createSimpleKpiColumn('货损率', 'cargoDamageRate', 14, 120, 3),
+      createSimpleKpiColumn(t(p + 'secInboundCycleComplianceRate'), 'secInboundCycleComplianceRate', 12, 160),
+      createSimpleKpiColumn(t(p + 'deliveryOnTimeRate'), 'deliveryOnTimeRate', 1, 120),
+      createSimpleKpiColumn(t(p + 'inventoryAccuracyRate'), 'inventoryAccuracyRate', 4, 120),
+      createSimpleKpiColumn(t(p + 'onTimeDeliveryRate'), 'onTimeDeliveryRate', 13, 120),
+      createSimpleKpiColumn(t(p + 'cargoDamageRate'), 'cargoDamageRate', 14, 120, 3),
     ];
 
     const secondGroupKpiColumns = [
-      createSimpleKpiColumn('异常解决及时率', 'abnormalResolutionRate', 15, 140),
-      createSimpleKpiColumn('SEC APP签收率', 'secAppSignOffRate', 43, 140),
-      createSimpleKpiColumn('TMS APP签收率', 'tmsAppSignOffRate', 16, 140),
-      createSimpleKpiColumn('信息签收及时性', 'tmsInfoSignOffTimeliness', 17, 160),
-      createSimpleKpiColumn('返单及时率', 'returnOrderTimelinessRate', 11, 120),
-      createSimpleKpiColumn('运作准确率', 'operationAccuracyRate', 5, 120),
-      createSimpleSatisfactColumn('客户满意度', 'customerSatisfaction', 18, 120),
+      createSimpleKpiColumn(t(p + 'abnormalResolutionRate'), 'abnormalResolutionRate', 15, 140),
+      createSimpleKpiColumn(t(p + 'secAppSignOffRate'), 'secAppSignOffRate', 43, 140),
+      createSimpleKpiColumn(t(p + 'tmsAppSignOffRate'), 'tmsAppSignOffRate', 16, 140),
+      createSimpleKpiColumn(t(p + 'tmsInfoSignOffTimeliness'), 'tmsInfoSignOffTimeliness', 17, 160),
+      createSimpleKpiColumn(t(p + 'returnOrderTimelinessRate'), 'returnOrderTimelinessRate', 11, 120),
+      createSimpleKpiColumn(t(p + 'operationAccuracyRate'), 'operationAccuracyRate', 5, 120),
+      createSimpleSatisfactColumn(t(p + 'customerSatisfaction'), 'customerSatisfaction', 18, 120),
     ];
 
     return [...baseColumns, ...firstGroupKpiColumns, ...secondGroupKpiColumns];
@@ -358,7 +362,7 @@ const tableColumns = computed(() => {
 });
 
 const selectedLogisticProviderText = computed(() => {
-  if (selectedLogisticProvider.value.length === 0) return '物流商';
+  if (selectedLogisticProvider.value.length === 0) return t('dashboard.cityLogistics.filters.logisticProvider');
   const names = selectedLogisticProvider.value.map(code => {
     const option = logisticProviderOptions.value.find(item => item.code === code);
     return option ? option.name : code;
@@ -367,7 +371,7 @@ const selectedLogisticProviderText = computed(() => {
 });
 
 const selectedCdcWarehouseText = computed(() => {
-  if (selectedCdcWarehouse.value.length === 0) return 'CDC仓库';
+  if (selectedCdcWarehouse.value.length === 0) return t('dashboard.cityLogistics.filters.cdcWarehouse');
   const names = selectedCdcWarehouse.value.map(code => {
     const option = cdcWarehouseOptions.value.find(item => item.code === code);
     return option ? option.name : code;
@@ -482,12 +486,12 @@ const fetchData = async () => {
         tableData.value = [];
       }
     } else {
-      message.error(result?.msg || '获取数据失败');
+      message.error(result?.msg || t('dashboard.cityLogistics.messages.fetchDataFailed'));
       tableData.value = [];
     }
   } catch (error) {
     console.error('获取数据失败:', error);
-    message.error('获取数据失败');
+    message.error(t('dashboard.cityLogistics.messages.fetchDataFailed'));
     tableData.value = [];
   } finally {
     loading.value = false;
@@ -556,11 +560,11 @@ onMounted(async () => {
 
 const handleExportSummary = async () => {
   if (!dateRange.value || !dateRange.value[0] || !dateRange.value[1]) {
-    message.warning('请选择日期范围');
+    message.warning(t('dashboard.cityLogistics.messages.selectDateRange'));
     return;
   }
   if (!tableData.value || tableData.value.length === 0) {
-    message.warning('没有数据可以导出');
+    message.warning(t('dashboard.cityLogistics.messages.noDataToExport'));
     return;
   }
   try {
@@ -578,23 +582,23 @@ const handleExportSummary = async () => {
         const link = document.createElement('a');
         link.href = result.data;
         const xlsxMatch = result.data.match(/([^/]+\.xlsx)$/);
-        const downloadFilename = xlsxMatch ? xlsxMatch[1] : `城配物流商KPI评分汇总_${dateRange.value[0].format('YYYY-MM')}_${dateRange.value[1].format('YYYY-MM')}.xlsx`;
+        const downloadFilename = xlsxMatch ? xlsxMatch[1] : t('dashboard.cityLogistics.messages.exportSummaryFilename', [dateRange.value[0].format('YYYY-MM'), dateRange.value[1].format('YYYY-MM')]);
         link.download = downloadFilename;
         link.target = '_blank';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        message.success('导出汇总成功');
+        message.success(t('dashboard.cityLogistics.messages.exportSummarySuccess'));
       }
     } else {
-      message.error(result?.message || '导出汇总失败');
+      message.error(result?.message || t('dashboard.cityLogistics.messages.exportSummaryFailed'));
     }
   } catch (error: any) {
     const errCode = error?.code || error?.response?.status;
     if (errCode === 409 || errCode === 504 || errCode === 505) {
-      message.error(error.msg || '导出数据量过大，请缩小查询范围');
+      message.error(error.msg || t('dashboard.cityLogistics.messages.exportDataTooLarge'));
     } else {
-      message.error(error.msg || '导出汇总失败');
+      message.error(error.msg || t('dashboard.cityLogistics.messages.exportSummaryFailed'));
     }
   } finally {
     exportSummaryLoading.value = false;
@@ -603,11 +607,11 @@ const handleExportSummary = async () => {
 
 const handleExportDetail = async () => {
   if (!dateRange.value || !dateRange.value[0] || !dateRange.value[1]) {
-    message.warning('请选择日期范围');
+    message.warning(t('dashboard.cityLogistics.messages.selectDateRange'));
     return;
   }
   if (!tableData.value || tableData.value.length === 0) {
-    message.warning('没有数据可以导出');
+    message.warning(t('dashboard.cityLogistics.messages.noDataToExport'));
     return;
   }
   try {
@@ -625,23 +629,23 @@ const handleExportDetail = async () => {
         const link = document.createElement('a');
         link.href = result.data;
         const xlsxMatch = result.data.match(/([^/]+\.xlsx)$/);
-        const downloadFilename = xlsxMatch ? xlsxMatch[1] : `城配物流商KPI评分明细_${dateRange.value[0].format('YYYY-MM')}_${dateRange.value[1].format('YYYY-MM')}.xlsx`;
+        const downloadFilename = xlsxMatch ? xlsxMatch[1] : t('dashboard.cityLogistics.messages.exportDetailFilename', [dateRange.value[0].format('YYYY-MM'), dateRange.value[1].format('YYYY-MM')]);
         link.download = downloadFilename;
         link.target = '_blank';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        message.success('导出明细成功');
+        message.success(t('dashboard.cityLogistics.messages.exportDetailSuccess'));
       }
     } else {
-      message.error(result?.message || '导出明细失败');
+      message.error(result?.message || t('dashboard.cityLogistics.messages.exportDetailFailed'));
     }
   } catch (error: any) {
     const errCode = error?.code || error?.response?.status;
     if (errCode === 409 || errCode === 504 || errCode === 505) {
-      message.error(error.msg || '导出数据量过大，请缩小查询范围');
+      message.error(error.msg || t('dashboard.cityLogistics.messages.exportDataTooLarge'));
     } else {
-      message.error(error.msg || '导出明细失败');
+      message.error(error.msg || t('dashboard.cityLogistics.messages.exportDetailFailed'));
     }
   } finally {
     exportDetailLoading.value = false;
@@ -660,7 +664,7 @@ onUnmounted(() => {
 <template>
   <div class="rank-container">
     <div class="header-bar">
-      <h2 class="header-title">城配物流商KPI评分</h2>
+      <h2 class="header-title">{{ t('dashboard.cityLogistics.title') }}</h2>
     </div>
     <div class="control-panel">
       <div class="filter-group">
@@ -669,8 +673,8 @@ onUnmounted(() => {
             v-model:value="dateRange"
             picker="month"
             format="YYYY-MM"
-            separator="至"
-            :placeholder="['开始月份', '结束月份']"
+            :separator="t('dashboard.cityLogistics.filters.separator')"
+            :placeholder="[t('dashboard.cityLogistics.filters.startMonth'), t('dashboard.cityLogistics.filters.endMonth')]"
             class="date-range-picker"
           />
         </div>
@@ -685,7 +689,7 @@ onUnmounted(() => {
               <input 
                 v-model="logisticProviderSearch" 
                 type="text" 
-                placeholder="搜索物流商..." 
+                :placeholder="t('dashboard.cityLogistics.placeholders.searchLogisticProvider')" 
                 class="search-input"
                 @click.stop 
               />
@@ -705,7 +709,7 @@ onUnmounted(() => {
                 {{ option.name }}
               </div>
               <div v-if="filteredLogisticProviderOptions.length === 1 && logisticProviderSearch" class="no-results">
-                暂无搜索结果
+                {{ t('dashboard.cityLogistics.placeholders.noSearchResults') }}
               </div>
             </div>
           </div>
@@ -721,7 +725,7 @@ onUnmounted(() => {
               <input 
                 v-model="cdcWarehouseSearch" 
                 type="text" 
-                placeholder="搜索CDC仓库..." 
+                :placeholder="t('dashboard.cityLogistics.placeholders.searchCdcWarehouse')" 
                 class="search-input"
                 @click.stop 
               />
@@ -741,14 +745,14 @@ onUnmounted(() => {
                 {{ option.name }}
               </div>
               <div v-if="filteredCdcWarehouseOptions.length === 1 && cdcWarehouseSearch" class="no-results">
-                暂无搜索结果
+                {{ t('dashboard.cityLogistics.placeholders.noSearchResults') }}
               </div>
             </div>
           </div>
         </div>
 
         <div class="switch-item">
-          <span class="switch-label">显示详情</span>
+          <span class="switch-label">{{ t('dashboard.cityLogistics.filters.showDetails') }}</span>
           <a-switch v-model:checked="showDetails" />
         </div>
 
@@ -756,10 +760,10 @@ onUnmounted(() => {
       
       <div class="action-buttons">
         <a-button @click="handleExportSummary" class="action-btn" :loading="exportSummaryLoading">
-          导出汇总
+          {{ t('dashboard.cityLogistics.buttons.exportSummary') }}
         </a-button>
         <a-button @click="handleExportDetail" class="action-btn" :loading="exportDetailLoading">
-          导出明细
+          {{ t('dashboard.cityLogistics.buttons.exportDetail') }}
         </a-button>
       </div>
     </div>

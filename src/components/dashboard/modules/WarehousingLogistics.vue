@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed, nextTick, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import {
   queryOnTimeDeliveryRate,
   exportOnTimeDeliveryRateItem,
@@ -8,6 +9,8 @@ import {
 import { useSelectOptionsStore } from '../../../stores/selectOptionsStore'
 import { useDashboardDataStore } from '../../../stores/dashboardDataStore'
 import dayjs, { type Dayjs } from 'dayjs'
+
+const { t } = useI18n()
 
 // 接口数据类型定义
 interface WarehouseItem {
@@ -74,10 +77,10 @@ const selectOptionsStore = useSelectOptionsStore()
 const dataStore = useDashboardDataStore()
 
 // 下拉框选项
-const timeDimensionOptions = ref<Array<{ code: string; name: string }>>([
-  { code: 'FICAL_YEAR', name: '财年' },
-  { code: 'CALENDAR_YEAR', name: '自然年' },
-  { code: 'MONTH', name: '月' },
+const timeDimensionOptions = computed(() => [
+  { code: 'FICAL_YEAR', name: t('dashboard.warehousingLogistics.timeDimension.fiscalYear') },
+  { code: 'CALENDAR_YEAR', name: t('dashboard.warehousingLogistics.timeDimension.calendarYear') },
+  { code: 'MONTH', name: t('dashboard.warehousingLogistics.timeDimension.month') },
 ])
 const dataSourceOptions = computed(() => selectOptionsStore.dataSourceOptions || [])
 const logisticProviderOptions = computed(() => selectOptionsStore.deliveryProviderOptions)
@@ -110,10 +113,10 @@ const filteredCustomerOptions = computed(() => {
 })
 
 // 运输模式选项（固定选项）
-const transModeOptions = ref<Array<{ code: string; name: string; value: number }>>([
-  { code: '1', name: '干线', value: 1 },
-  { code: '2', name: '配送', value: 2 },
-  { code: '3', name: '端到端', value: 3 },
+const transModeOptions = computed(() => [
+  { code: '1', name: t('dashboard.warehousingLogistics.transMode.trunkLine'), value: 1 },
+  { code: '2', name: t('dashboard.warehousingLogistics.transMode.delivery'), value: 2 },
+  { code: '3', name: t('dashboard.warehousingLogistics.transMode.endToEnd'), value: 3 },
 ])
 
 // 下拉框状态
@@ -381,7 +384,7 @@ const loadTableData = async () => {
       timeColumns.value = []
     }
   } catch (error) {
-    console.error('获取数据失败:', error)
+    console.error(t('dashboard.warehousingLogistics.messages.fetchDataFailed'), error)
     tableData.value = []
   } finally {
     loading.value = false
@@ -622,7 +625,7 @@ const selectCustomer = (option: { code: string; name: string }) => {
 // 显示文本
 const displayDataSource = computed(() => {
   if (filterForm.value.dataSource.length === 0) {
-    return '数据源'
+    return t('dashboard.warehousingLogistics.filters.dataSource')
   }
   const names = filterForm.value.dataSource.map((code) => {
     const option = dataSourceOptions.value.find((item) => item.code === code)
@@ -633,18 +636,18 @@ const displayDataSource = computed(() => {
 
 const displayTimeDimension = computed(() => {
   const option = timeDimensionOptions.value.find((item) => item.code === filterForm.value.timeDimension)
-  return option ? option.name : '财年'
+  return option ? option.name : t('dashboard.warehousingLogistics.timeDimension.fiscalYear')
 })
 
 const displayTransMode = computed(() => {
-  if (!filterForm.value.transMode) return '运输模式'
+  if (!filterForm.value.transMode) return t('dashboard.warehousingLogistics.filters.transMode')
   const option = transModeOptions.value.find((item) => item.code === filterForm.value.transMode)
-  return option ? option.name : '运输模式'
+  return option ? option.name : t('dashboard.warehousingLogistics.filters.transMode')
 })
 
 const displayLogisticProvider = computed(() => {
   if (filterForm.value.logisticProvider.length === 0) {
-    return '物流商'
+    return t('dashboard.warehousingLogistics.filters.logisticProvider')
   }
   const names = filterForm.value.logisticProvider.map((code) => {
     const option = logisticProviderOptions.value.find((item) => item.code === code)
@@ -655,7 +658,7 @@ const displayLogisticProvider = computed(() => {
 
 const displayCustomer = computed(() => {
   if (filterForm.value.customer.length === 0) {
-    return '客户'
+    return t('dashboard.warehousingLogistics.filters.customer')
   }
   const names = filterForm.value.customer.map((code) => {
     const option = customerOptions.value.find((item) => item.code === code)
@@ -702,7 +705,7 @@ const handleExport = async () => {
     // 检查返回状态码
     if (result.code === 409 || result.code === 504 || result.code === 505) {
       // 导出数量超过限制
-      alert(result.msg || '导出数据量过大，请缩小查询范围')
+      alert(result.msg || t('dashboard.warehousingLogistics.messages.exportDataTooLarge'))
       return
     }
 
@@ -718,7 +721,7 @@ const handleExport = async () => {
       const xlsxMatch = url.match(/([^/]+\.xlsx)$/)
       const downloadFilename = xlsxMatch
         ? xlsxMatch[1]
-        : `端到端准时交付率_${dayjs().format('YYYYMMDD_HHmmss')}.xlsx`
+        : `${t('dashboard.warehousingLogistics.messages.exportDetailFileName')}_${dayjs().format('YYYYMMDD_HHmmss')}.xlsx`
       link.download = downloadFilename
       link.target = '_blank'
       document.body.appendChild(link)
@@ -726,12 +729,12 @@ const handleExport = async () => {
       document.body.removeChild(link)
     }
   } catch (error: any) {
-    console.error('导出失败:', error)
+    console.error(t('dashboard.warehousingLogistics.messages.exportFailed'), error)
 
     // 检查是否是409或504状态码
     const errCode = error?.code || error?.response?.status
     if (errCode === 409 || errCode === 504 || errCode === 505) {
-      alert(error.msg || '导出数据量过大，请缩小查询范围')
+      alert(error.msg || t('dashboard.warehousingLogistics.messages.exportDataTooLarge'))
     }
   } finally {
     exportLoading.value = false
@@ -763,7 +766,7 @@ const handleExportTable = async () => {
     // 检查返回状态码
     if (result.code === 409 || result.code === 504 || result.code === 505) {
       // 导出数量超过限制
-      alert(result.msg || '导出数据量过大，请缩小查询范围')
+      alert(result.msg || t('dashboard.warehousingLogistics.messages.exportDataTooLarge'))
       return
     }
 
@@ -779,7 +782,7 @@ const handleExportTable = async () => {
       const xlsxMatch = url.match(/([^/]+\.xlsx)$/)
       const downloadFilename = xlsxMatch
         ? xlsxMatch[1]
-        : `准时交付率表格_${dayjs().format('YYYYMMDD_HHmmss')}.xlsx`
+        : `${t('dashboard.warehousingLogistics.messages.exportTableFileName')}_${dayjs().format('YYYYMMDD_HHmmss')}.xlsx`
       link.download = downloadFilename
       link.target = '_blank'
       document.body.appendChild(link)
@@ -787,12 +790,12 @@ const handleExportTable = async () => {
       document.body.removeChild(link)
     }
   } catch (error: any) {
-    console.error('导出表格失败:', error)
+    console.error(t('dashboard.warehousingLogistics.messages.exportTableFailed'), error)
 
     // 检查是否是409或504状态码
     const errCode = error?.code || error?.response?.status
     if (errCode === 409 || errCode === 504 || errCode === 505) {
-      alert(error.msg || '导出数据量过大，请缩小查询范围')
+      alert(error.msg || t('dashboard.warehousingLogistics.messages.exportDataTooLarge'))
     }
   } finally {
     exportTableLoading.value = false
@@ -888,19 +891,19 @@ onUnmounted(() => {
 <template>
   <div class="warehousing-logistics-container">
     <div class="header-bar">
-      <h2 class="header-title">准时交付率(仓+物流)</h2>
+      <h2 class="header-title">{{ t('dashboard.warehousingLogistics.title') }}</h2>
     </div>
     <!-- Tab页签 -->
     <div class="tabs-container">
       <div class="tab-item" :class="{ active: activeTab === 'ON_TIME_RATE' }" @click="switchTab('ON_TIME_RATE')">
-        准时交付率
+        {{ t('dashboard.warehousingLogistics.tabs.onTimeRate') }}
       </div>
       <div
         class="tab-item"
         :class="{ active: activeTab === 'TOTAL_ORDERS' }"
         @click="switchTab('TOTAL_ORDERS')"
       >
-        总单数+不达标单数+准时交付率
+        {{ t('dashboard.warehousingLogistics.tabs.totalOrders') }}
       </div>
     </div>
 
@@ -913,8 +916,8 @@ onUnmounted(() => {
             <a-range-picker
               :value="[filterForm.dateRange[0], filterForm.dateRange[1]]"
               format="YYYY-MM-DD"
-              separator="至"
-              :placeholder="['开始...', '结束...']"
+              :separator="t('dashboard.warehousingLogistics.dateRange.separator')"
+              :placeholder="[t('dashboard.warehousingLogistics.dateRange.start'), t('dashboard.warehousingLogistics.dateRange.end')]"
               class="date-range-picker"
               :show-time="false"
               @change="handleDateRangePickerChange"
@@ -1017,7 +1020,7 @@ onUnmounted(() => {
                 <input
                   v-model="logisticProviderSearch"
                   type="text"
-                  placeholder="搜索物流商..."
+                  :placeholder="t('dashboard.warehousingLogistics.placeholders.searchLogisticProvider')"
                   class="search-input"
                   @click.stop
                 />
@@ -1034,7 +1037,7 @@ onUnmounted(() => {
                   {{ option.name }}
                 </div>
                 <div v-if="filteredLogisticProviderOptions.length === 0 && logisticProviderSearch" class="no-results">
-                  暂无搜索结果
+                  {{ t('dashboard.warehousingLogistics.messages.noSearchResults') }}
                 </div>
               </div>
             </div>
@@ -1053,7 +1056,7 @@ onUnmounted(() => {
             </svg>
             <div class="dropdown-content" v-show="isCustomerOpen" @click.stop>
               <div class="search-box">
-                <input v-model="customerSearch" type="text" placeholder="搜索客户..." class="search-input" @click.stop />
+                <input v-model="customerSearch" type="text" :placeholder="t('dashboard.warehousingLogistics.placeholders.searchCustomer')" class="search-input" @click.stop />
               </div>
               <div class="options-list">
                 <div
@@ -1066,19 +1069,19 @@ onUnmounted(() => {
                   <span class="checkmark" v-if="filterForm.customer.includes(option.code)">✓</span>
                   {{ option.name }}
                 </div>
-                <div v-if="filteredCustomerOptions.length === 0 && customerSearch" class="no-results">暂无搜索结果</div>
+                <div v-if="filteredCustomerOptions.length === 0 && customerSearch" class="no-results">{{ t('dashboard.warehousingLogistics.messages.noSearchResults') }}</div>
               </div>
             </div>
           </div>
 
           <!-- 操作按钮 -->
           <div class="filter-actions">
-            <button class="action-btn" @click="handleReset">重置</button>
+            <button class="action-btn" @click="handleReset">{{ t('dashboard.warehousingLogistics.buttons.reset') }}</button>
             <button class="action-btn" @click="handleExport" :disabled="exportLoading">
-              {{ exportLoading ? '导出中...' : '导出明细' }}
+              {{ exportLoading ? t('dashboard.warehousingLogistics.buttons.exporting') : t('dashboard.warehousingLogistics.buttons.exportDetail') }}
             </button>
             <button class="action-btn" @click="handleExportTable" :disabled="exportTableLoading">
-              {{ exportTableLoading ? '导出中...' : '导出表格' }}
+              {{ exportTableLoading ? t('dashboard.warehousingLogistics.buttons.exporting') : t('dashboard.warehousingLogistics.buttons.exportTable') }}
             </button>
           </div>
         </div>
@@ -1087,15 +1090,15 @@ onUnmounted(() => {
 
     <!-- 表格区域 -->
     <div class="table-section" ref="tableSectionRef">
-      <div v-if="loading" class="loading-overlay">加载中...</div>
+      <div v-if="loading" class="loading-overlay">{{ t('dashboard.warehousingLogistics.messages.loading') }}</div>
       <table class="data-table">
         <thead>
           <tr>
-            <th class="fixed-col origin-col">始发仓</th>
+            <th class="fixed-col origin-col">{{ t('dashboard.warehousingLogistics.tableColumns.originWarehouse') }}</th>
             <th class="fixed-col dest-col" :colspan="activeTab === 'ON_TIME_RATE' ? 1 : 1">
-              {{ activeTab === 'ON_TIME_RATE' ? '目的仓' : '目的仓' }}
+              {{ t('dashboard.warehousingLogistics.tableColumns.destinationWarehouse') }}
             </th>
-            <th v-if="activeTab === 'ON_TIME_RATE'" class="fixed-col logistic-col">物流商</th>
+            <th v-if="activeTab === 'ON_TIME_RATE'" class="fixed-col logistic-col">{{ t('dashboard.warehousingLogistics.tableColumns.logisticProvider') }}</th>
             <template v-if="activeTab === 'ON_TIME_RATE'">
               <th v-for="col in timeColumns" :key="col" class="time-col">{{ col }}</th>
             </template>
@@ -1109,9 +1112,9 @@ onUnmounted(() => {
             <th class="fixed-col origin-col"></th>
             <th class="fixed-col dest-col"></th>
             <template v-for="col in timeColumns" :key="col + '_sub'">
-              <th class="sub-col">总单数</th>
-              <th class="sub-col">不达标</th>
-              <th class="sub-col">准时率</th>
+              <th class="sub-col">{{ t('dashboard.warehousingLogistics.tableColumns.totalOrders') }}</th>
+              <th class="sub-col">{{ t('dashboard.warehousingLogistics.tableColumns.nonCompliance') }}</th>
+              <th class="sub-col">{{ t('dashboard.warehousingLogistics.tableColumns.onTimeRate') }}</th>
             </template>
           </tr>
         </thead>
@@ -1133,7 +1136,7 @@ onUnmounted(() => {
             </td>
             <td class="fixed-col dest-col">
               <template v-if="row.level === 0">
-                <span class="subtotal-text">小计</span>
+                <span class="subtotal-text">{{ t('dashboard.warehousingLogistics.tableColumns.subtotal') }}</span>
               </template>
               <template v-else>
                 <span class="cell-content">
@@ -1172,7 +1175,7 @@ onUnmounted(() => {
           </tr>
           <tr v-if="tableData.length === 0 && !loading">
             <td :colspan="activeTab === 'ON_TIME_RATE' ? 3 + timeColumns.length : 3 + timeColumns.length * 3" class="empty-cell">
-              暂无数据
+              {{ t('dashboard.warehousingLogistics.messages.noData') }}
             </td>
           </tr>
         </tbody>

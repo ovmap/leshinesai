@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import dayjs, { type Dayjs } from 'dayjs'
 import { message } from 'ant-design-vue'
 import { queryLogisticList, queryDeliveryNotConfirmStat, exportDeliveryNotConfirmStat } from '../../../services/transportApi'
@@ -8,6 +9,7 @@ import { useDashboardDataStore } from '../../../stores/dashboardDataStore'
 
 const globalFilterStore = useGlobalFilterStore()
 const dataStore = useDashboardDataStore()
+const { t } = useI18n()
 
 // Tab页签
 const activeTab = ref('signReceive')
@@ -40,24 +42,31 @@ const logisticSearch = ref('')
 // 超期区间相关
 const selectedOverduePeriod = ref('')
 const isOverduePeriodOpen = ref(false)
-const overduePeriodOptions = ref([
-  { value: '', label: '全部' },
-  { value: '1', label: '30天内' },
-  { value: '2', label: '30-60天' },
-  { value: '3', label: '60天以上' },
+const overduePeriodOptions = computed(() => [
+  { value: '', label: t('dashboard.udReorderProgress.overduePeriod.all') },
+  { value: '1', label: t('dashboard.udReorderProgress.overduePeriod.within30d') },
+  { value: '2', label: t('dashboard.udReorderProgress.overduePeriod.30to60d') },
+  { value: '3', label: t('dashboard.udReorderProgress.overduePeriod.over60d') },
 ])
 
 // 表格数据
-const tableHeaders = ref<string[]>(['仓库', '物流商', '单据类型', '年份', '月份', '未返单数量'])
+const tableHeaders = computed(() => [
+  t('dashboard.udReorderProgress.tableHeaders.warehouse'),
+  t('dashboard.udReorderProgress.tableHeaders.logisticName'),
+  t('dashboard.udReorderProgress.tableHeaders.billType'),
+  t('dashboard.udReorderProgress.tableHeaders.year'),
+  t('dashboard.udReorderProgress.tableHeaders.month'),
+  t('dashboard.udReorderProgress.tableHeaders.count')
+])
 const tableData = ref<any[][]>([])
 const tableLoading = ref(false)
 const exportLoading = ref(false)
 
 // 单据类型映射
-const billTypeMap: Record<string, string> = {
-  '1': '发票',
-  '2': '运单'
-}
+const billTypeMap = computed<Record<string, string>>(() => ({
+  '1': t('dashboard.udReorderProgress.billTypes.invoice'),
+  '2': t('dashboard.udReorderProgress.billTypes.waybill')
+}))
 
 // 过滤后的物流商选项
 const filteredLogisticOptions = computed(() => {
@@ -65,12 +74,12 @@ const filteredLogisticOptions = computed(() => {
     option.label.toLowerCase().includes(logisticSearch.value.toLowerCase()),
   )
   // 在列表开头添加重置选项
-  return [{ value: '__reset__', label: '重置' }, ...filtered]
+  return [{ value: '__reset__', label: t('dashboard.udReorderProgress.logistic.reset') }, ...filtered]
 })
 
 // 显示文本
 const selectedLogisticText = computed(() => {
-  if (!selectedLogistic.value || selectedLogistic.value.length === 0) return '物流商'
+  if (!selectedLogistic.value || selectedLogistic.value.length === 0) return t('dashboard.udReorderProgress.logistic.label')
 
   const selectedLabels = selectedLogistic.value
     .map(value => {
@@ -79,14 +88,14 @@ const selectedLogisticText = computed(() => {
     })
     .filter(label => label)
 
-  if (selectedLabels.length === 0) return '物流商'
+  if (selectedLabels.length === 0) return t('dashboard.udReorderProgress.logistic.label')
   if (selectedLabels.length === 1) return selectedLabels[0]
-  return `已选择${selectedLabels.length}个`
+  return t('dashboard.udReorderProgress.logistic.selectedCount', [selectedLabels.length])
 })
 
 const selectedOverduePeriodText = computed(() => {
   const option = overduePeriodOptions.value?.find(item => item.value === selectedOverduePeriod.value)
-  return option ? option.label : '超期区间'
+  return option ? option.label : t('dashboard.udReorderProgress.overduePeriod.label')
 })
 
 // 下拉框开关方法
@@ -219,7 +228,7 @@ const fetchTableData = async () => {
           return [
             item.warehouse || '',           // 仓库
             item.logisticName || '',        // 物流商
-            billTypeMap[item.billType] || item.billType || '', // 单据类型（转换为文本）
+            billTypeMap.value[item.billType] || item.billType || '', // 单据类型（转换为文本）
             item.year || '',                // 年
             item.month || '',               // 月
             item.count || 0                 // 未返单数量
@@ -277,7 +286,7 @@ const handleExport = async () => {
     // 检查返回状态码
     if (result.code === 409 || result.code === 504 || result.code === 505) {
       // 导出数量超过限制
-      message.error(result.msg || '导出数量超过限制')
+      message.error(result.msg || t('dashboard.udReorderProgress.messages.exportLimitExceeded'))
       return
     }
 
@@ -290,7 +299,7 @@ const handleExport = async () => {
       const link = document.createElement('a')
       link.href = url
       const dateStr = new Date().toISOString().slice(0, 10)
-      link.download = `未返单明细_${dateStr}.xlsx`
+      link.download = t('dashboard.udReorderProgress.messages.exportFileName', [dateStr])
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)
@@ -302,9 +311,9 @@ const handleExport = async () => {
     // 检查是否是409或504状态码
     const errCode = error?.code || error?.response?.status
     if (errCode === 409 || errCode === 504 || errCode === 505) {
-      message.error(error.msg || '导出数量超过限制')
+      message.error(error.msg || t('dashboard.udReorderProgress.messages.exportLimitExceeded'))
     } else {
-      message.error(error.msg || '导出失败')
+      message.error(error.msg || t('dashboard.udReorderProgress.messages.exportFailed'))
     }
   } finally {
     exportLoading.value = false
@@ -377,16 +386,16 @@ onUnmounted(() => {
   <div class="ud-reorder-progress-container">
     <!-- 标题栏 -->
     <div class="header-bar">
-      <h2 class="header-title">未返单明细</h2>
+      <h2 class="header-title">{{ t('dashboard.udReorderProgress.title') }}</h2>
     </div>
 
     <!-- 顶部导航标签页 -->
     <div class="tabs-container">
       <div class="tab-item" :class="{ active: activeTab === 'signReceive' }" @click="activeTab = 'signReceive'">
-        签收&配时间
+        {{ t('dashboard.udReorderProgress.tabs.signReceive') }}
       </div>
       <div class="tab-item" :class="{ active: activeTab === 'confirmTime' }" @click="activeTab = 'confirmTime'">
-        发货确认时间
+        {{ t('dashboard.udReorderProgress.tabs.confirmTime') }}
       </div>
     </div>
 
@@ -398,7 +407,7 @@ onUnmounted(() => {
           <a-range-picker
             v-model:value="dateRange"
             format="YYYY-MM-DD"
-            separator="至"
+            :separator="t('dashboard.udReorderProgress.dateRange.separator')"
             class="date-range-picker"
             :show-time="false"
           />
@@ -412,7 +421,7 @@ onUnmounted(() => {
           </svg>
           <div class="dropdown-content" v-show="isLogisticOpen && logisticOptions?.length" @click.stop>
             <div class="search-box">
-              <input v-model="logisticSearch" type="text" placeholder="搜索物流商..." class="search-input"
+              <input v-model="logisticSearch" type="text" :placeholder="t('dashboard.udReorderProgress.logistic.searchPlaceholder')" class="search-input"
                 @click.stop />
             </div>
             <div class="options-list">
@@ -422,7 +431,7 @@ onUnmounted(() => {
                 {{ option.label }}
               </div>
               <div v-if="filteredLogisticOptions.length === 1 && logisticSearch" class="no-results">
-                无搜索结果
+                {{ t('dashboard.udReorderProgress.messages.noSearchResults') }}
               </div>
             </div>
           </div>
@@ -449,11 +458,11 @@ onUnmounted(() => {
       <!-- 搜索、重置和导出按钮 -->
       <div class="export-container">
         <button class="export-btn search-btn" :disabled="tableLoading" @click="fetchTableData">
-          {{ tableLoading ? '搜索中...' : '搜索' }}
+          {{ tableLoading ? t('dashboard.udReorderProgress.messages.searching') : t('dashboard.udReorderProgress.buttons.search') }}
         </button>
-        <button class="export-btn" @click="handleReset">重置</button>
+        <button class="export-btn" @click="handleReset">{{ t('dashboard.udReorderProgress.buttons.reset') }}</button>
         <button class="export-btn" :disabled="exportLoading" @click="handleExport">
-          {{ exportLoading ? '导出中...' : '导出' }}
+          {{ exportLoading ? t('dashboard.udReorderProgress.messages.exporting') : t('dashboard.udReorderProgress.buttons.export') }}
         </button>
       </div>
     </div>
@@ -482,8 +491,8 @@ onUnmounted(() => {
 
       <!-- 无数据时显示提示信息 -->
       <div v-else class="no-data-container">
-        <div class="no-data-text">暂无数据</div>
-        <div class="no-data-desc">请调整筛选条件后重试</div>
+        <div class="no-data-text">{{ t('dashboard.udReorderProgress.messages.noData') }}</div>
+        <div class="no-data-desc">{{ t('dashboard.udReorderProgress.messages.noDataDesc') }}</div>
       </div>
     </div>
   </div>

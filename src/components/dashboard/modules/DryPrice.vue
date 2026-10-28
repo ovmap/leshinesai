@@ -1,13 +1,15 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import dayjs from 'dayjs'
 import { queryDeliveryPrice } from '../../../services/transportApi'
 import { useDashboardDataStore } from '../../../stores/dashboardDataStore'
 
+const { t } = useI18n()
 const dataStore = useDashboardDataStore()
 
-const title = '配单价(m³)'
-const unit = '元'
+const title = computed(() => t('dashboard.dryPrice.title'))
+const unit = computed(() => t('dashboard.dryPrice.unit'))
 const value = ref('0')
 
 const fetchData = async () => {
@@ -20,7 +22,7 @@ const fetchData = async () => {
       value.value = parseFloat(result.data.deliveryPrice ?? '0').toFixed(2)
     }
   } catch (error) {
-    console.error('获取配单价数据失败:', error)
+    console.error(t('dashboard.dryPrice.messages.fetchError'), error)
   }
 }
 

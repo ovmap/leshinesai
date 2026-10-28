@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { Swiper, SwiperSlide } from 'swiper/vue'
 import 'swiper/css'
 import 'swiper/css/pagination'
@@ -7,6 +8,7 @@ import { Pagination, Autoplay } from 'swiper/modules'
 import { queryEnergyPrice } from '../../../services/transportApi'
 import { useDashboardDataStore } from '../../../stores/dashboardDataStore'
 
+const { t } = useI18n()
 const dataStore = useDashboardDataStore()
 
 interface EnergyPriceData {
@@ -22,27 +24,27 @@ interface EnergyPriceData {
 const energyPriceData = ref<EnergyPriceData[]>([
   {
     id: 1,
-    title: '汽油',
+    title: t('dashboard.energyPricesCard.fuelTypes.gasoline'),
     value: '--',
-    unit: '元/吨',
+    unit: t('dashboard.energyPricesCard.units.pricePerTon'),
     yoy: '--',
     mom: '--',
     priceIsUp: true,
   },
   {
     id: 2,
-    title: '柴油',
+    title: t('dashboard.energyPricesCard.fuelTypes.diesel'),
     value: '--',
-    unit: '元/吨',
+    unit: t('dashboard.energyPricesCard.units.pricePerTon'),
     yoy: '--',
     mom: '--',
     priceIsUp: true,
   },
   {
     id: 3,
-    title: '航空燃油',
+    title: t('dashboard.energyPricesCard.fuelTypes.aircraftFuel'),
     value: '--',
-    unit: '元/吨',
+    unit: t('dashboard.energyPricesCard.units.pricePerTon'),
     yoy: '--',
     mom: '--',
     priceIsUp: false,
@@ -65,29 +67,29 @@ const fetchEnergyPrice = async () => {
       energyPriceData.value = [
         {
           id: 1,
-          title: '汽油',
+          title: t('dashboard.energyPricesCard.fuelTypes.gasoline'),
           value: data.gasoline ?? '--',
-          unit: '元/吨',
+          unit: t('dashboard.energyPricesCard.units.pricePerTon'),
           priceIsUp: data.gasolinePriceIsUp ?? true,
         },
         {
           id: 2,
-          title: '柴油',
+          title: t('dashboard.energyPricesCard.fuelTypes.diesel'),
           value: data.diesel ?? '--',
-          unit: '元/吨',
+          unit: t('dashboard.energyPricesCard.units.pricePerTon'),
           priceIsUp: data.dieselPriceIsUp ?? true,
         },
         {
           id: 3,
-          title: '航空燃油',
+          title: t('dashboard.energyPricesCard.fuelTypes.aircraftFuel'),
           value: data.aircraftFuel ?? '--',
-          unit: '元/吨',
+          unit: t('dashboard.energyPricesCard.units.pricePerTon'),
           priceIsUp: data.aircraftFuelPriceIsUp ?? false,
         },
       ]
     }
   } catch (error) {
-    console.error('获取能源价格数据失败:', error)
+    console.error(t('dashboard.energyPricesCard.messages.fetchError'), error)
   }
 }
 

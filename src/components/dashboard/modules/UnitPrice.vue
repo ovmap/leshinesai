@@ -1,13 +1,15 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import dayjs from 'dayjs'
 import { queryTrunkLinePrice } from '../../../services/transportApi'
 import { useDashboardDataStore } from '../../../stores/dashboardDataStore'
 
+const { t } = useI18n()
 const dataStore = useDashboardDataStore()
 
-const title = '干单价(m³)'
-const unit = '元/公里'
+const title = computed(() => t('dashboard.unitPrice.title'))
+const unit = computed(() => t('dashboard.unitPrice.units.yuanPerKm'))
 const value = ref('0')
 
 const fetchData = async () => {
@@ -20,7 +22,7 @@ const fetchData = async () => {
       value.value = parseFloat(result.data.trunkLinePrice ?? '0').toFixed(2)
     }
   } catch (error) {
-    console.error('获取干单价数据失败:', error)
+    console.error(t('dashboard.unitPrice.messages.fetchError'), error)
   }
 }
 

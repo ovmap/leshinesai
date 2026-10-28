@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, nextTick, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import * as echarts from 'echarts'
 import type { EChartsType } from 'echarts'
 import {
@@ -13,6 +14,8 @@ import {
   queryWarehouseList,
 } from '../../../../services/transportApi'
 import chinaGeo from './china.json'
+
+const { t } = useI18n()
 
 // 类型定义
 interface MapDataItem {
@@ -103,7 +106,7 @@ const loadTop3Data = async () => {
       top3Data.value = result.data
     }
   } catch (error) {
-    console.error('加载TOP3热门线路数据失败:', error)
+    console.error(t('dashboard.cargoMap.messages.loadTop3Failed'), error)
   }
 }
 
@@ -134,13 +137,22 @@ const loadUnsignedPackagesData = async () => {
       statisticsData.value.unsignedPackages = result.data.notSignCount || 0
     }
   } catch (error) {
-    console.error('加载未签收数据失败:', error)
+    console.error(t('dashboard.cargoMap.messages.loadUnsignedFailed'), error)
   }
 }
 
 // 自定义弹窗状态
 const showModal = ref(false)
 const modalData = ref<any>(null)
+
+// 弹窗标题
+const modalTitle = computed(() => {
+  if (!modalData.value) return ''
+  if (modalData.value.fromWarehouse) return t('dashboard.cargoMap.modal.titles.route')
+  if (modalData.value.licenseNumber) return t('dashboard.cargoMap.modal.titles.vehicle')
+  if (modalData.value.warehouseType) return t('dashboard.cargoMap.modal.titles.warehouse')
+  return t('dashboard.cargoMap.modal.titles.customer')
+})
 
 // 异常车辆水波纹效果
 interface RippleItem {
@@ -238,7 +250,7 @@ const updateRipplePositions = (abnormalTrucks: any[]) => {
 
       rippleItems.value = mergedPositions
     } catch (error) {
-      console.error('更新水波纹位置失败:', error)
+      console.error(t('dashboard.cargoMap.messages.updateRippleFailed'), error)
       rippleItems.value = []
     }
   })
@@ -495,7 +507,7 @@ const loadTruckData = async () => {
       calculateVehicleStatistics()
     }
   } catch (error) {
-    console.error('加载在途车辆数据失败:', error)
+    console.error(t('dashboard.cargoMap.messages.loadTruckDataFailed'), error)
   }
 }
 
@@ -524,7 +536,7 @@ const loadCustomerData = async () => {
       updateMapWithCustomers()
     }
   } catch (error) {
-    console.error('加载关键客户数据失败:', error)
+    console.error(t('dashboard.cargoMap.messages.loadCustomerDataFailed'), error)
   }
 }
 
@@ -545,7 +557,7 @@ const loadWarehouseData = async () => {
       updateMapWithWarehouses()
     }
   } catch (error) {
-    console.error('加载仓库数据失败:', error)
+    console.error(t('dashboard.cargoMap.messages.loadWarehouseDataFailed'), error)
   }
 }
 
@@ -560,7 +572,7 @@ const loadMigrationData = async () => {
       updateMapWithMigration()
     }
   } catch (error) {
-    console.error('加载迁移路线数据失败:', error)
+    console.error(t('dashboard.cargoMap.messages.loadMigrationFailed'), error)
   }
 }
 
@@ -929,9 +941,9 @@ const updateMapWithCustomers = (animated = true) => {
               return Number(c.longitude) === params.value[0] && Number(c.latitude) === params.value[1]
             })
 
-            if (!customer) return '客户信息未知'
+            if (!customer) return t('dashboard.cargoMap.tooltip.customerInfoUnknown')
 
-            return `客户名称: ${customer.custName || customer.customerName || '未知'}`
+            return t('dashboard.cargoMap.tooltip.customerNameLabel', { name: customer.custName || customer.customerName || t('dashboard.cargoMap.messages.unknownWarehouse') })
           },
         },
       }
@@ -1437,7 +1449,7 @@ const initMap = () => {
               try {
                 chartInstance.value?.resize()
               } catch (error) {
-                console.warn('地图ResizeObserver resize失败:', error)
+                console.warn(t('dashboard.cargoMap.messages.resizeObserverFailed'), error)
               }
             }, 100)
           }
@@ -1541,11 +1553,11 @@ const getChartOption = () => {
           const value = params.value || 0
 
           if (value === 0 && params.data?.itemStyle?.areaColor === '#ffffff') {
-            return `${params.name}<br/>暂无数据`
+            return `${params.name}<br/>${t('dashboard.cargoMap.tooltip.noData')}`
           }
 
           const formattedValue = value.toFixed(2)
-          return `${params.name}<br/>货量 ${formattedValue}m³`
+          return `${params.name}<br/>${t('dashboard.cargoMap.tooltip.volumeLabel', { value: formattedValue })}`
         }
         return `${params.name}`
       },
@@ -1580,7 +1592,7 @@ const getChartOption = () => {
           min: 0,
           max: 0,
           color: '#ffffff',
-          label: '暂无数据',
+          label: t('dashboard.cargoMap.tooltip.noData'),
         },
       ],
       textStyle: {
@@ -1673,14 +1685,14 @@ const handleResize: DebounceFunction = () => {
     try {
       chartInstance.value?.resize()
     } catch (error) {
-      console.warn('地图resize失败:', error)
+      console.warn(t('dashboard.cargoMap.messages.resizeFailed'), error)
     }
   }, 100)
 }
 
 // 导出异常车辆
 const handleExportAbnormalTruck = () => {
-  if (!confirm('确定要导出异常车辆数据吗？')) {
+  if (!confirm(t('dashboard.cargoMap.transport.exportConfirm'))) {
     return
   }
 
@@ -1690,34 +1702,34 @@ const handleExportAbnormalTruck = () => {
       const result = await exportAbnormalTruck({})
 
       if (result.code === 409 || result.code === 504 || result.code === 505) {
-        alert(result.msg || '导出数据量过大，请缩小查询范围')
+        alert(result.msg || t('dashboard.cargoMap.transport.exportTooLarge'))
         return
       }
 
       if (result && result.data && result.data.downloadUrl) {
         window.open(result.data.downloadUrl, '_blank')
-        alert('导出成功')
+        alert(t('dashboard.cargoMap.transport.exportSuccess'))
       } else if (result && result.data) {
         const url = result.data
         const link = document.createElement('a')
         link.href = url
-        link.download = `异常车辆_${new Date().getTime()}.xlsx`
+        link.download = `${t('dashboard.cargoMap.transport.exportFileNamePrefix')}_${new Date().getTime()}.xlsx`
         link.target = '_blank'
         document.body.appendChild(link)
         link.click()
         document.body.removeChild(link)
-        alert('导出成功')
+        alert(t('dashboard.cargoMap.transport.exportSuccess'))
       } else {
-        alert(result?.msg || '导出失败')
+        alert(result?.msg || t('dashboard.cargoMap.transport.exportFailed'))
       }
     } catch (error: any) {
-      console.error('导出异常车辆失败:', error)
+      console.error(t('dashboard.cargoMap.messages.loadTruckDataFailed'), error)
 
       const errCode = error?.code || error?.response?.status
       if (errCode === 409 || errCode === 504 || errCode === 505) {
-        alert(error.msg || '导出数据量过大，请缩小查询范围')
+        alert(error.msg || t('dashboard.cargoMap.transport.exportTooLarge'))
       } else {
-        alert(error.msg || '导出失败')
+        alert(error.msg || t('dashboard.cargoMap.transport.exportFailed'))
       }
     } finally {
       exportAbnormalLoading.value = false
@@ -1772,7 +1784,7 @@ onMounted(() => {
       }, 100)
     })
   } catch (error) {
-    console.error('地图初始化失败:', error)
+    console.error(t('dashboard.cargoMap.messages.initMapFailed'), error)
   }
 })
 
@@ -1806,7 +1818,7 @@ onUnmounted(() => {
 
     stopCdcCarousel()
   } catch (error) {
-    console.error('组件清理失败:', error)
+    console.error(t('dashboard.cargoMap.messages.cleanupFailed'), error)
   }
 })
 </script>
@@ -1815,19 +1827,19 @@ onUnmounted(() => {
   <div class="china-map">
     <!-- 时间切换按钮 -->
     <div class="time-switch">
-      <div class="time-label">时间选择</div>
+      <div class="time-label">{{ t('dashboard.cargoMap.timeSwitch.label') }}</div>
       <div class="radio-group">
         <div class="radio-option" @click="switchTimeMode('current')">
           <div class="radio-circle" :class="{ active: timeMode === 'current' }">
             <div v-if="timeMode === 'current'" class="radio-inner"></div>
           </div>
-          <span class="radio-text">当月</span>
+          <span class="radio-text">{{ t('dashboard.cargoMap.timeSwitch.currentMonth') }}</span>
         </div>
         <div class="radio-option ml-10" @click="switchTimeMode('recent30')">
           <div class="radio-circle" :class="{ active: timeMode === 'recent30' }">
             <div v-if="timeMode === 'recent30'" class="radio-inner"></div>
           </div>
-          <span class="radio-text">近30天</span>
+          <span class="radio-text">{{ t('dashboard.cargoMap.timeSwitch.recent30Days') }}</span>
         </div>
       </div>
     </div>
@@ -1839,12 +1851,12 @@ onUnmounted(() => {
           <img src="/dashboard/images/vehicle.png" alt="正常在途车辆" />
         </div>
         <div class="stat-content">
-          <div class="stat-label">正常在途车辆</div>
+          <div class="stat-label">{{ t('dashboard.cargoMap.statistics.normalVehicles') }}</div>
           <div class="stat-value">
             <span class="stat-digits">
               <span v-for="(digit, index) in String(statisticsData.normalVehicles)" :key="index" class="digit">{{ digit }}</span>
             </span>
-            <span class="stat-unit">辆</span>
+            <span class="stat-unit">{{ t('dashboard.cargoMap.statistics.unitVehicle') }}</span>
           </div>
         </div>
       </div>
@@ -1854,12 +1866,12 @@ onUnmounted(() => {
           <img src="/dashboard/images/abnormal-vehicle.png" alt="异常在途车辆" />
         </div>
         <div class="stat-content">
-          <div class="stat-label">异常在途车辆</div>
+          <div class="stat-label">{{ t('dashboard.cargoMap.statistics.abnormalVehicles') }}</div>
           <div class="stat-value">
             <span class="stat-digits">
               <span v-for="(digit, index) in String(statisticsData.abnormalVehicles)" :key="index" class="digit red-color">{{ digit }}</span>
             </span>
-            <span class="stat-unit">辆</span>
+            <span class="stat-unit">{{ t('dashboard.cargoMap.statistics.unitVehicle') }}</span>
           </div>
         </div>
         <div class="stat-action">
@@ -1867,7 +1879,7 @@ onUnmounted(() => {
             class="export-btn"
             @click="handleExportAbnormalTruck"
             :disabled="exportAbnormalLoading"
-            title="导出异常车辆"
+            :title="t('dashboard.cargoMap.statistics.exportAbnormal')"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -1883,12 +1895,12 @@ onUnmounted(() => {
           <img src="/dashboard/images/package.png" alt="未签收包裹" />
         </div>
         <div class="stat-content">
-          <div class="stat-label">未签收包裹</div>
+          <div class="stat-label">{{ t('dashboard.cargoMap.statistics.unsignedPackages') }}</div>
           <div class="stat-value">
             <span class="stat-digits">
               <span v-for="(digit, index) in String(statisticsData.unsignedPackages)" :key="index" class="digit orange-color">{{ digit }}</span>
             </span>
-            <span class="stat-unit">件</span>
+            <span class="stat-unit">{{ t('dashboard.cargoMap.statistics.unitPackage') }}</span>
           </div>
         </div>
       </div>
@@ -1897,16 +1909,16 @@ onUnmounted(() => {
     <!-- TOP3热门线路 -->
     <div class="top3-panel">
       <div class="top3-header">
-        <h3>TOP3 热门线路</h3>
+        <h3>{{ t('dashboard.cargoMap.top3.title') }}</h3>
       </div>
       <div class="top3-table">
         <table>
           <thead>
             <tr>
-              <th>排名</th>
-              <th>始发仓</th>
-              <th>目的省</th>
-              <th>货量</th>
+              <th>{{ t('dashboard.cargoMap.top3.rank') }}</th>
+              <th>{{ t('dashboard.cargoMap.top3.fromWarehouse') }}</th>
+              <th>{{ t('dashboard.cargoMap.top3.toProvince') }}</th>
+              <th>{{ t('dashboard.cargoMap.top3.volume') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -1916,9 +1928,9 @@ onUnmounted(() => {
                   NO.{{ index + 1 }}
                 </div>
               </td>
-              <td>{{ item.fromWarehouse || '未知' }}</td>
-              <td>{{ item.toProvince || '未知' }}</td>
-              <td>{{ ((item.totalVolume || 0) / 10000).toFixed(2) }}万m³</td>
+              <td>{{ item.fromWarehouse || t('dashboard.cargoMap.top3.unknown') }}</td>
+              <td>{{ item.toProvince || t('dashboard.cargoMap.top3.unknown') }}</td>
+              <td>{{ ((item.totalVolume || 0) / 10000).toFixed(2) }}{{ t('dashboard.cargoMap.top3.volumeUnit') }}</td>
             </tr>
           </tbody>
         </table>
@@ -1949,7 +1961,7 @@ onUnmounted(() => {
       <div class="layer-control-panel">
         <div class="layer-item">
           <div class="layer-icon cdc-icon"></div>
-          <span class="layer-text">CDC仓库</span>
+          <span class="layer-text">{{ t('dashboard.cargoMap.layers.cdcWarehouse') }}</span>
           <label class="checkboxouter">
             <input type="checkbox" :checked="layerVisibility.cdcWarehouse" @change="toggleLayer('cdcWarehouse')" />
             <div class="checkbox"></div>
@@ -1958,7 +1970,7 @@ onUnmounted(() => {
 
         <div class="layer-item">
           <div class="layer-icon rdc-icon"></div>
-          <span class="layer-text">RDC仓库</span>
+          <span class="layer-text">{{ t('dashboard.cargoMap.layers.rdcWarehouse') }}</span>
           <label class="checkboxouter">
             <input type="checkbox" :checked="layerVisibility.rdcWarehouse" @change="toggleLayer('rdcWarehouse')" />
             <div class="checkbox"></div>
@@ -1967,7 +1979,7 @@ onUnmounted(() => {
 
         <div class="layer-item">
           <div class="layer-icon trunk-vehicle-icon"></div>
-          <span class="layer-text">干线车辆</span>
+          <span class="layer-text">{{ t('dashboard.cargoMap.layers.trunkVehicles') }}</span>
           <label class="checkboxouter">
             <input type="checkbox" :checked="layerVisibility.trunkVehicles" @change="toggleLayer('trunkVehicles')" />
             <div class="checkbox"></div>
@@ -1976,7 +1988,7 @@ onUnmounted(() => {
 
         <div class="layer-item">
           <div class="layer-icon delivery-vehicle-icon"></div>
-          <span class="layer-text">配送车辆</span>
+          <span class="layer-text">{{ t('dashboard.cargoMap.layers.deliveryVehicles') }}</span>
           <label class="checkboxouter">
             <input type="checkbox" :checked="layerVisibility.deliveryVehicles" @change="toggleLayer('deliveryVehicles')" />
             <div class="checkbox"></div>
@@ -1985,7 +1997,7 @@ onUnmounted(() => {
 
         <div class="layer-item">
           <div class="layer-icon customer-icon"></div>
-          <span class="layer-text">重点客户</span>
+          <span class="layer-text">{{ t('dashboard.cargoMap.layers.keyCustomers') }}</span>
           <label class="checkboxouter">
             <input type="checkbox" :checked="layerVisibility.keyCustomers" @change="toggleLayer('keyCustomers')" />
             <div class="checkbox"></div>
@@ -1994,7 +2006,7 @@ onUnmounted(() => {
 
         <div class="layer-item">
           <div class="layer-icon route-icon"></div>
-          <span class="layer-text">运输路线</span>
+          <span class="layer-text">{{ t('dashboard.cargoMap.layers.transportRoutes') }}</span>
           <label class="checkboxouter">
             <input type="checkbox" :checked="layerVisibility.transportRoutes" @change="toggleLayer('transportRoutes')" />
             <div class="checkbox"></div>
@@ -2007,136 +2019,132 @@ onUnmounted(() => {
         <div class="custom-modal" @click.stop>
           <div class="modal-header">
             <div class="modal-title">
-              <span class="title-text">{{
-                modalData?.fromWarehouse ? '线路信息' :
-                modalData?.licenseNumber ? '车辆信息' :
-                modalData?.warehouseType ? '仓库信息' : '客户信息'
-              }}</span>
+              <span class="title-text">{{ modalTitle }}</span>
             </div>
           </div>
           <div class="modal-body">
             <!-- 线路信息 -->
             <template v-if="modalData?.fromWarehouse">
               <div class="warehouse-info-item">
-                <span class="value">{{ modalData?.fromWarehouse || '未知' }} → {{ modalData?.toProvince || '未知' }}</span>
+                <span class="value">{{ modalData?.fromWarehouse || t('dashboard.cargoMap.modal.unknown') }} → {{ modalData?.toProvince || t('dashboard.cargoMap.modal.unknown') }}</span>
               </div>
               <div class="warehouse-info-item">
-                <span class="label">货量</span>
-                <span class="value">{{ modalData?.totalVolume || 0 }}m³</span>
+                <span class="label">{{ t('dashboard.cargoMap.modal.route.volume') }}</span>
+                <span class="value">{{ modalData?.totalVolume || 0 }}{{ t('dashboard.cargoMap.modal.route.unit') }}</span>
               </div>
             </template>
 
             <!-- 仓库信息 -->
             <template v-else-if="modalData?.warehouseType">
               <div class="warehouse-info-item">
-                <span class="label">仓库名称</span>
-                <span class="value">{{ modalData?.warehouseName || '未知' }}</span>
+                <span class="label">{{ t('dashboard.cargoMap.modal.warehouse.name') }}</span>
+                <span class="value">{{ modalData?.warehouseName || t('dashboard.cargoMap.modal.unknown') }}</span>
               </div>
               <div class="warehouse-info-item">
-                <span class="label">所在省份</span>
-                <span class="value">{{ modalData?.provinceName || '未知' }}</span>
+                <span class="label">{{ t('dashboard.cargoMap.modal.warehouse.province') }}</span>
+                <span class="value">{{ modalData?.provinceName || t('dashboard.cargoMap.modal.unknown') }}</span>
               </div>
               <div class="warehouse-info-item">
-                <span class="label">车辆数量</span>
+                <span class="label">{{ t('dashboard.cargoMap.modal.warehouse.truckCount') }}</span>
                 <span class="value">{{ modalData?.truckCount || 0 }}</span>
               </div>
               <div class="warehouse-info-item">
-                <span class="label">员工数量</span>
+                <span class="label">{{ t('dashboard.cargoMap.modal.warehouse.staffCount') }}</span>
                 <span class="value">{{ modalData?.staffCount || 0 }}</span>
               </div>
               <div class="warehouse-info-item">
-                <span class="label">仓库面积</span>
+                <span class="label">{{ t('dashboard.cargoMap.modal.warehouse.area') }}</span>
                 <span class="value">{{ modalData?.warehouseArea || 0 }}m²</span>
               </div>
               <div class="warehouse-info-item">
-                <span class="label">仓库类型</span>
-                <span class="value">{{ modalData?.warehouseType === 1 ? 'CDC' : 'RDC' }}</span>
+                <span class="label">{{ t('dashboard.cargoMap.modal.warehouse.type') }}</span>
+                <span class="value">{{ modalData?.warehouseType === 1 ? t('dashboard.cargoMap.modal.warehouse.typeCdc') : t('dashboard.cargoMap.modal.warehouse.typeRdc') }}</span>
               </div>
             </template>
 
             <!-- 车辆信息 -->
             <template v-else-if="modalData?.licenseNumber">
               <div class="warehouse-info-item">
-                <span class="label">车牌号</span>
-                <span class="value">{{ modalData?.licenseNumber || '未知' }}</span>
+                <span class="label">{{ t('dashboard.cargoMap.modal.vehicle.licenseNumber') }}</span>
+                <span class="value">{{ modalData?.licenseNumber || t('dashboard.cargoMap.modal.unknown') }}</span>
               </div>
               <div class="warehouse-info-item">
-                <span class="label">司机</span>
-                <span class="value">{{ modalData?.driverName || '未知' }}</span>
+                <span class="label">{{ t('dashboard.cargoMap.modal.vehicle.driver') }}</span>
+                <span class="value">{{ modalData?.driverName || t('dashboard.cargoMap.modal.unknown') }}</span>
               </div>
               <div class="warehouse-info-item">
-                <span class="label">电话</span>
-                <span class="value">{{ modalData?.phone || '未知' }}</span>
+                <span class="label">{{ t('dashboard.cargoMap.modal.vehicle.phone') }}</span>
+                <span class="value">{{ modalData?.phone || t('dashboard.cargoMap.modal.unknown') }}</span>
               </div>
               <div class="warehouse-info-item">
-                <span class="label">车型</span>
-                <span class="value">{{ modalData?.truckType || '未设置' }}</span>
+                <span class="label">{{ t('dashboard.cargoMap.modal.vehicle.truckType') }}</span>
+                <span class="value">{{ modalData?.truckType || t('dashboard.cargoMap.modal.vehicle.notSet') }}</span>
               </div>
               <div class="warehouse-info-item">
-                <span class="label">当前位置</span>
-                <span class="value">{{ modalData?.location || '未知' }}</span>
+                <span class="label">{{ t('dashboard.cargoMap.modal.vehicle.location') }}</span>
+                <span class="value">{{ modalData?.location || t('dashboard.cargoMap.modal.unknown') }}</span>
               </div>
               <div class="warehouse-info-item">
-                <span class="label">订单数</span>
+                <span class="label">{{ t('dashboard.cargoMap.modal.vehicle.orderCount') }}</span>
                 <span class="value">{{ modalData?.orderCount || 0 }}</span>
               </div>
               <div class="warehouse-info-item">
-                <span class="label">始发地</span>
-                <span class="value">{{ modalData?.fromPlace || '未知' }}</span>
+                <span class="label">{{ t('dashboard.cargoMap.modal.vehicle.fromPlace') }}</span>
+                <span class="value">{{ modalData?.fromPlace || t('dashboard.cargoMap.modal.unknown') }}</span>
               </div>
               <div class="warehouse-info-item">
-                <span class="label">目的地</span>
-                <span class="value">{{ modalData?.toPlace || '未知' }}</span>
+                <span class="label">{{ t('dashboard.cargoMap.modal.vehicle.toPlace') }}</span>
+                <span class="value">{{ modalData?.toPlace || t('dashboard.cargoMap.modal.unknown') }}</span>
               </div>
               <div class="warehouse-info-item">
-                <span class="label">归属类型</span>
-                <span class="value">{{ modalData?.belongType || '未知' }}</span>
+                <span class="label">{{ t('dashboard.cargoMap.modal.vehicle.belongType') }}</span>
+                <span class="value">{{ modalData?.belongType || t('dashboard.cargoMap.modal.unknown') }}</span>
               </div>
               <div class="warehouse-info-item">
-                <span class="label">归属供应商</span>
-                <span class="value">{{ modalData?.belongSupplier || '未知' }}</span>
+                <span class="label">{{ t('dashboard.cargoMap.modal.vehicle.belongSupplier') }}</span>
+                <span class="value">{{ modalData?.belongSupplier || t('dashboard.cargoMap.modal.unknown') }}</span>
               </div>
               <div class="warehouse-info-item">
-                <span class="label">下单客户</span>
-                <span class="value">{{ modalData?.orderCustomer || '未知' }}</span>
+                <span class="label">{{ t('dashboard.cargoMap.modal.vehicle.orderCustomer') }}</span>
+                <span class="value">{{ modalData?.orderCustomer || t('dashboard.cargoMap.modal.unknown') }}</span>
               </div>
               <div class="warehouse-info-item">
-                <span class="label">货物件数</span>
+                <span class="label">{{ t('dashboard.cargoMap.modal.vehicle.goodsCount') }}</span>
                 <span class="value">{{ modalData?.goodsCount || 0 }}</span>
               </div>
               <div class="warehouse-info-item">
-                <span class="label">体积</span>
+                <span class="label">{{ t('dashboard.cargoMap.modal.vehicle.volume') }}</span>
                 <span class="value">{{ modalData?.volume ? modalData.volume + 'm³' : '0m³' }}</span>
               </div>
               <div v-if="modalData?.logisticsStatus === 0" class="vehicle-alert-info">
-                该车辆存在异常，请及时关注！
+                {{ t('dashboard.cargoMap.modal.vehicle.alert') }}
               </div>
             </template>
 
             <!-- 客户信息 -->
             <template v-else>
               <div class="warehouse-info-item">
-                <span class="label">客户名称</span>
-                <span class="value">{{ modalData?.custName || modalData?.customerName || '未知' }}</span>
+                <span class="label">{{ t('dashboard.cargoMap.modal.customer.name') }}</span>
+                <span class="value">{{ modalData?.custName || modalData?.customerName || t('dashboard.cargoMap.modal.unknown') }}</span>
               </div>
               <div class="warehouse-info-item">
-                <span class="label">地址</span>
-                <span class="value">{{ modalData?.address || '未设置' }}</span>
+                <span class="label">{{ t('dashboard.cargoMap.modal.customer.address') }}</span>
+                <span class="value">{{ modalData?.address || t('dashboard.cargoMap.modal.vehicle.notSet') }}</span>
               </div>
               <div class="warehouse-info-item">
-                <span class="label">联系人</span>
-                <span class="value">{{ modalData?.contactPerson || '未设置' }}</span>
+                <span class="label">{{ t('dashboard.cargoMap.modal.customer.contactPerson') }}</span>
+                <span class="value">{{ modalData?.contactPerson || t('dashboard.cargoMap.modal.vehicle.notSet') }}</span>
               </div>
               <div class="warehouse-info-item">
-                <span class="label">联系电话</span>
-                <span class="value">{{ modalData?.contactPhone || '未设置' }}</span>
+                <span class="label">{{ t('dashboard.cargoMap.modal.customer.contactPhone') }}</span>
+                <span class="value">{{ modalData?.contactPhone || t('dashboard.cargoMap.modal.vehicle.notSet') }}</span>
               </div>
               <div class="warehouse-info-item">
-                <span class="label">客户类型</span>
-                <span class="value">{{ modalData?.customerType || '未设置' }}</span>
+                <span class="label">{{ t('dashboard.cargoMap.modal.customer.customerType') }}</span>
+                <span class="value">{{ modalData?.customerType || t('dashboard.cargoMap.modal.vehicle.notSet') }}</span>
               </div>
               <div class="warehouse-info-item">
-                <span class="label">位置</span>
+                <span class="label">{{ t('dashboard.cargoMap.modal.customer.location') }}</span>
                 <span class="value">{{ Number(modalData?.longitude || 0).toFixed(4) }}, {{ Number(modalData?.latitude || 0).toFixed(4) }}</span>
               </div>
             </template>
@@ -2148,55 +2156,55 @@ onUnmounted(() => {
       <div class="map-legend">
         <div class="legend-item" @mouseenter="handleLegendHover(6000, Infinity)" @mouseleave="handleLegendLeave">
           <div class="legend-color" style="background-color: #1e3a8a;"></div>
-          <span class="legend-text">6000以上</span>
+          <span class="legend-text">{{ t('dashboard.cargoMap.legend.volumeRanges.over6000') }}</span>
         </div>
         <div class="legend-item" @mouseenter="handleLegendHover(4000, 5999.99)" @mouseleave="handleLegendLeave">
           <div class="legend-color" style="background-color: #2563eb;"></div>
-          <span class="legend-text">4000-6000</span>
+          <span class="legend-text">{{ t('dashboard.cargoMap.legend.volumeRanges.4000to6000') }}</span>
         </div>
         <div class="legend-item" @mouseenter="handleLegendHover(3000, 3999.99)" @mouseleave="handleLegendLeave">
           <div class="legend-color" style="background-color: #3b82f6;"></div>
-          <span class="legend-text">3000-4000</span>
+          <span class="legend-text">{{ t('dashboard.cargoMap.legend.volumeRanges.3000to4000') }}</span>
         </div>
         <div class="legend-item" @mouseenter="handleLegendHover(2000, 2999.99)" @mouseleave="handleLegendLeave">
           <div class="legend-color" style="background-color: #60a5fa;"></div>
-          <span class="legend-text">2000-3000</span>
+          <span class="legend-text">{{ t('dashboard.cargoMap.legend.volumeRanges.2000to3000') }}</span>
         </div>
         <div class="legend-item" @mouseenter="handleLegendHover(1000, 1999.99)" @mouseleave="handleLegendLeave">
           <div class="legend-color" style="background-color: #93c5fd;"></div>
-          <span class="legend-text">1000-2000</span>
+          <span class="legend-text">{{ t('dashboard.cargoMap.legend.volumeRanges.1000to2000') }}</span>
         </div>
         <div class="legend-item" @mouseenter="handleLegendHover(500, 999.99)" @mouseleave="handleLegendLeave">
           <div class="legend-color" style="background-color: #bfdbfe;"></div>
-          <span class="legend-text">500-1000</span>
+          <span class="legend-text">{{ t('dashboard.cargoMap.legend.volumeRanges.500to1000') }}</span>
         </div>
         <div class="legend-item" @mouseenter="handleLegendHover(200, 499.99)" @mouseleave="handleLegendLeave">
           <div class="legend-color" style="background-color: #dbeafe;"></div>
-          <span class="legend-text">200-500</span>
+          <span class="legend-text">{{ t('dashboard.cargoMap.legend.volumeRanges.200to500') }}</span>
         </div>
         <div class="legend-item" @mouseenter="handleLegendHover(0.01, 199.99)" @mouseleave="handleLegendLeave">
           <div class="legend-color" style="background-color: #f0f9ff;"></div>
-          <span class="legend-text">200以下</span>
+          <span class="legend-text">{{ t('dashboard.cargoMap.legend.volumeRanges.under200') }}</span>
         </div>
       </div>
 
       <!-- 车辆和客户图例 -->
       <div class="map-legend-items">
         <div class="legend-item">
-          <img src="/dashboard/images/map-car1.png" alt="干线车辆" class="legend-icon" />
-          <span class="legend-text">干线车辆</span>
+          <img src="/dashboard/images/map-car1.png" :alt="t('dashboard.cargoMap.legend.trunkVehicles')" class="legend-icon" />
+          <span class="legend-text">{{ t('dashboard.cargoMap.legend.trunkVehicles') }}</span>
         </div>
         <div class="legend-item">
-          <img src="/dashboard/images/customer1.png" alt="重点客户" class="legend-icon" />
-          <span class="legend-text">重点客户</span>
+          <img src="/dashboard/images/customer1.png" :alt="t('dashboard.cargoMap.legend.keyCustomers')" class="legend-icon" />
+          <span class="legend-text">{{ t('dashboard.cargoMap.legend.keyCustomers') }}</span>
         </div>
         <div class="legend-item">
-          <img src="/dashboard/images/CDC1.png" alt="CDC仓库" class="legend-icon" />
-          <span class="legend-text">CDC仓库</span>
+          <img src="/dashboard/images/CDC1.png" :alt="t('dashboard.cargoMap.legend.cdcWarehouse')" class="legend-icon" />
+          <span class="legend-text">{{ t('dashboard.cargoMap.legend.cdcWarehouse') }}</span>
         </div>
         <div class="legend-item">
-          <img src="/dashboard/images/RDC1.png" alt="RDC仓库" class="legend-icon" />
-          <span class="legend-text">RDC仓库</span>
+          <img src="/dashboard/images/RDC1.png" :alt="t('dashboard.cargoMap.legend.rdcWarehouse')" class="legend-icon" />
+          <span class="legend-text">{{ t('dashboard.cargoMap.legend.rdcWarehouse') }}</span>
         </div>
       </div>
 
@@ -2204,19 +2212,19 @@ onUnmounted(() => {
       <div class="map-legend-routes">
         <div class="legend-item">
           <div class="legend-line" style="background-color: #4a9eff;"></div>
-          <span class="legend-text">运输路线</span>
+          <span class="legend-text">{{ t('dashboard.cargoMap.legend.transportRoutes') }}</span>
         </div>
         <div class="legend-item">
           <div class="legend-route-type">✈</div>
-          <span class="legend-text">航空路线</span>
+          <span class="legend-text">{{ t('dashboard.cargoMap.legend.airRoute') }}</span>
         </div>
         <div class="legend-item">
           <div class="legend-route-type">●</div>
-          <span class="legend-text">铁路路线</span>
+          <span class="legend-text">{{ t('dashboard.cargoMap.legend.railRoute') }}</span>
         </div>
         <div class="legend-item">
           <div class="legend-route-type">▲</div>
-          <span class="legend-text">公路路线</span>
+          <span class="legend-text">{{ t('dashboard.cargoMap.legend.roadRoute') }}</span>
         </div>
       </div>
     </div>
@@ -2224,16 +2232,16 @@ onUnmounted(() => {
     <!-- 运输方式图例 -->
     <div class="map-legend-transport">
       <div class="legend-item">
-        <div class="legend-transport-icon"><img src="/dashboard/images/exp1.png" alt="航空"></div>
-        <span class="legend-text">航空</span>
+        <div class="legend-transport-icon"><img src="/dashboard/images/exp1.png" :alt="t('dashboard.cargoMap.legend.air')"></div>
+        <span class="legend-text">{{ t('dashboard.cargoMap.legend.air') }}</span>
       </div>
       <div class="legend-item">
-        <div class="legend-transport-icon"><img src="/dashboard/images/exp2.png" alt="铁路"></div>
-        <span class="legend-text">铁路</span>
+        <div class="legend-transport-icon"><img src="/dashboard/images/exp2.png" :alt="t('dashboard.cargoMap.legend.rail')"></div>
+        <span class="legend-text">{{ t('dashboard.cargoMap.legend.rail') }}</span>
       </div>
       <div class="legend-item">
-        <div class="legend-transport-icon"><img src="/dashboard/images/exp3.png" alt="公路"></div>
-        <span class="legend-text">公路</span>
+        <div class="legend-transport-icon"><img src="/dashboard/images/exp3.png" :alt="t('dashboard.cargoMap.legend.road')"></div>
+        <span class="legend-text">{{ t('dashboard.cargoMap.legend.road') }}</span>
       </div>
     </div>
   </div>

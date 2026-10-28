@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import * as echarts from 'echarts'
 import dayjs, { type Dayjs } from 'dayjs'
 import { message } from 'ant-design-vue'
@@ -7,6 +8,9 @@ import { queryVolumeBarRate, queryVolumeStatType } from '../../../services/trans
 import { useSelectOptionsStore } from '../../../stores/selectOptionsStore'
 import { useGlobalFilterStore } from '../../../stores/globalFilterStore'
 import { useDashboardDataStore } from '../../../stores/dashboardDataStore'
+
+// i18n
+const { t } = useI18n()
 
 // 使用公共 store
 const selectOptionsStore = useSelectOptionsStore()
@@ -75,13 +79,13 @@ const truncateText = (items: string[], maxLength: number) => {
 
 // 显示文本
 const displayStatType = computed(() => {
-  if (!selectedStatType.value) return '统计方式'
+  if (!selectedStatType.value) return t('dashboard.barPercentage.placeholders.statType')
   const option = statTypeOptions.value.find(item => Number(item.code) === selectedStatType.value)
   return option ? option.name : String(selectedStatType.value)
 })
 
 const displayDataSource = computed(() => {
-  if (selectedDataSource.value.length === 0) return '数据源'
+  if (selectedDataSource.value.length === 0) return t('dashboard.barPercentage.placeholders.dataSource')
   // 将代码转换为名称
   const names = selectedDataSource.value.map(code => {
     const option = dataSourceOptions.value.find(item => item.code === code)
@@ -91,7 +95,7 @@ const displayDataSource = computed(() => {
 })
 
 const displayVolumeAgg = computed(() => {
-  if (!selectedVolumeAgg.value) return '体积'
+  if (!selectedVolumeAgg.value) return t('dashboard.barPercentage.placeholders.volume')
   // 将代码转换为名称
   const options = volumeAggOptions.value || []
   const option = options.find((item: { code: string; name: string }) => item.code === selectedVolumeAgg.value)
@@ -177,7 +181,7 @@ const loadDropdownOptions = async () => {
       statTypeOptions.value = Array.isArray(response.data) ? response.data : []
     }
   } catch (error) {
-    console.error('加载统计方式选项失败:', error)
+    console.error(t('dashboard.barPercentage.messages.loadStatTypeFailed'), error)
   }
 }
 
@@ -238,8 +242,8 @@ const fetchChartData = async () => {
       updateChart()
     }
   } catch (error) {
-    console.error('获取货量占比数据失败:', error)
-    message.error('获取货量占比数据失败')
+    console.error(t('dashboard.barPercentage.messages.fetchDataFailed'), error)
+    message.error(t('dashboard.barPercentage.messages.fetchDataFailed'))
     chartData.value = []
     updateChart()
   } finally {
@@ -305,7 +309,7 @@ const updateChart = () => {
           formattedValue = data.value.toLocaleString()
         }
 
-        return `${param.name}<br/>数值: ${formattedValue}<br/>占比: ${data.percentage.toFixed(2)}%`
+        return `${param.name}<br/>${t('dashboard.barPercentage.tooltip.valueLabel')}: ${formattedValue}<br/>${t('dashboard.barPercentage.tooltip.percentageLabel')}: ${data.percentage.toFixed(2)}%`
       },
       backgroundColor: 'rgba(0, 0, 0, 0.8)',
       borderColor: '#4a9eff',
@@ -398,7 +402,7 @@ const updateChart = () => {
     },
     series: [
       {
-        name: '货量占比',
+        name: t('dashboard.barPercentage.chart.seriesName'),
         type: 'bar',
         data: chartData.value.map(item => ({
           value: item.value,
@@ -600,7 +604,7 @@ onUnmounted(() => {
   <div class="bar-percentage-container">
     <!-- 标题栏 -->
     <div class="header-bar">
-      <h2 class="header-title">货量占比</h2>
+      <h2 class="header-title">{{ t('dashboard.barPercentage.title') }}</h2>
     </div>
 
     <!-- 控制面板 -->
@@ -610,7 +614,7 @@ onUnmounted(() => {
         <a-range-picker
           v-model:value="dateRange"
           format="YYYY-MM-DD"
-          separator="至"
+          :separator="t('dashboard.dateRange.separator')"
           class="date-range-picker"
           :show-time="false"
         />

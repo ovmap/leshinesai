@@ -1,0 +1,2207 @@
+{
+  "cardTitles": {
+    "riskOrderOver7Days": "超7天异常预警",
+    "cddAlert": "CDD 达成率预警",
+    "vehicleSafety": "车辆安全监控",
+    "isgAlert": "ISG 电子标签预警"
+  },
+  "modalTitles": {
+    "riskOrderDetail": "异常预警详情",
+    "cddAlertDetail": "CDD预警详情",
+    "isgAlertDetail": "ISG电子标签预警详情"
+  },
+  "categories": {
+    "highPriority": "重点关注",
+    "normalPriority": "一般关注"
+  },
+  "tableColumns": {
+    "dataSource": "数据源",
+    "customer": "客户",
+    "transMode": "运输模式",
+    "custOrderNo": "客户订单号",
+    "invoiceNo": "发货单号",
+    "fromWarehouse": "始发仓库",
+    "toRdc": "目的RDC",
+    "carrierName": "承运商",
+    "deliveryName": "配送商",
+    "abnormalCode": "异常代码",
+    "abnormalTime": "异常发生时间",
+    "abnormalDesc": "异常描述",
+    "abnormalCount": "异常数量",
+    "productNo": "商品编号",
+    "productName": "商品名称",
+    "actionAdvice": "行动建议",
+    "dataCheckTime": "数据检查时间",
+    "location": "在途位置",
+    "predictArriveTime": "预计到达客户时间",
+    "riskInfo": "风险",
+    "reason": "异常原因",
+    "measure": "处理措施",
+    "etagSn": "电子标签序列号",
+    "consigneeAddress": "收货地址",
+    "abnormalType": "异常类型",
+    "lenovoOrderNo": "联想订单号",
+    "logisticName": "物流商",
+    "transType": "运输方式",
+    "onDemandTime": "按需达时间",
+    "toProvince": "目的省份",
+    "toCity": "目的市",
+    "abnormalInfo": "异常情况",
+    "transNo": "运单号",
+    "modeType": "运输模式",
+    "eteOnTime": "ETE是否准时",
+    "mainLineOnTime": "干线端是否准时",
+    "deliveryOnTime": "配送端是否准时",
+    "lastAbnormalCode": "最后一个异常代码",
+    "shipConfirmTime": "发货确认时间",
+    "signTime": "签收时间",
+    "category": "类别"
+  },
+  "isgTabs": {
+    "delay": "ISG客户迟到风险订单",
+    "inTransit": "ISG客户订单在途异常",
+    "delivery": "按需达客户交付异常订单"
+  },
+  "buttons": {
+    "search": "搜索",
+    "reset": "重置",
+    "export": "导出",
+    "confirm": "确定",
+    "cancel": "取消"
+  },
+  "placeholders": {
+    "invoiceNo": "发货单号",
+    "email": "邮箱",
+    "nonComplianceType": "不达标类型"
+  },
+  "messages": {
+    "currentLocation": "当前在途位置：",
+    "exportDataTooMuch": "导出数据过多",
+    "exportFileName": "异常预警订单数据.xlsx",
+    "vehicleIcon": "车辆图标"
+  },
+  "dateRange": {
+    "separator": "至"
+  },
+  "pagination": {
+    "pageInfo": "第 {0}-{1} 条/共 {2} 条 (共 {3} 页)"
+  },
+  "udReorderProgress": {
+    "title": "未返单明细",
+    "tabs": {
+      "signReceive": "签收&到配时间",
+      "confirmTime": "发货确认时间"
+    },
+    "overduePeriod": {
+      "all": "全部",
+      "within30d": "30天以内",
+      "30to60d": "30-60天",
+      "over60d": "60天以上",
+      "label": "超期区间"
+    },
+    "logistic": {
+      "label": "物流商",
+      "reset": "重置",
+      "searchPlaceholder": "搜索物流商...",
+      "selectedCount": "已选{0}项"
+    },
+    "billTypes": {
+      "invoice": "发货单",
+      "waybill": "运单"
+    },
+    "tableHeaders": {
+      "warehouse": "仓库",
+      "logisticName": "物流商",
+      "billType": "单据类型",
+      "year": "年",
+      "month": "月",
+      "count": "未返单数量"
+    },
+    "dateRange": {
+      "separator": "至"
+    },
+    "buttons": {
+      "search": "搜索",
+      "reset": "重置",
+      "export": "导出"
+    },
+    "messages": {
+      "fetchLogisticListFailed": "获取物流商列表失败：",
+      "fetchTableDataFailed": "获取表格数据失败：",
+      "exportLimitExceeded": "导出数量不能超过100000,请缩小查询范围后重试",
+      "exportFailed": "导出失败，请稍后重试",
+      "resetFailed": "重置失败：",
+      "noData": "暂无数据",
+      "noDataDesc": "请选择筛选条件后查看数据",
+      "noSearchResults": "无搜索结果",
+      "searching": "搜索中...",
+      "exporting": "导出中...",
+      "exportFileName": "未返单统计_{0}.xlsx"
+    }
+  },
+  "reorderProgress": {
+    "title": "返单进展",
+    "filters": {
+      "customer": "客户"
+    },
+    "placeholders": {
+      "searchCustomer": "搜索客户..."
+    },
+    "buttons": {
+      "reset": "重置",
+      "confirm": "确定",
+      "cancel": "取消"
+    },
+    "legend": {
+      "confirmed": "已返",
+      "notConfirmed": "未返",
+      "within30d": "30天内",
+      "30to60d": "30-60天",
+      "over60d": "60天以上"
+    },
+    "chart": {
+      "seriesName": "返单进度",
+      "innerSeriesName": "内圈时间分布"
+    },
+    "tooltip": {
+      "unit": "单"
+    },
+    "modal": {
+      "exporting": "导出中",
+      "exportingData": "正在导出数据...",
+      "elapsedTime": "已等待 {seconds} 秒",
+      "confirmExport": "确认导出",
+      "confirmExportContent": "确定要导出「{title}」的数据吗？"
+    },
+    "messages": {
+      "loadCustomerOptionsFailed": "加载客户选项失败:",
+      "serverError": "服务器错误",
+      "exportSuccess": "导出成功",
+      "exportFailed": "导出失败",
+      "queryExportProgressFailed": "查询导出进度失败:",
+      "serverErrorRetry": "服务器错误，请重试",
+      "exportTimeout": "导出超时",
+      "exportFailedRetry": "导出失败，请重试",
+      "noSearchResults": "无搜索结果"
+    }
+  },
+  "abnormalTransportation": {
+    "title": "运输异常",
+    "modalTitle": "异常订单详情",
+    "modalTitles": {
+      "detail": "运输异常详情"
+    },
+    "loading": "加载中...",
+    "noData": "暂无数据",
+    "filters": {
+      "dataSource": "数据源",
+      "fromWarehouse": "始发仓库",
+      "toRdc": "目的RDC",
+      "abnormalType": "异常分类",
+      "carrierName": "承运商",
+      "deliveryName": "配送商"
+    },
+    "placeholders": {
+      "searchWarehouse": "搜索仓库...",
+      "searchRdc": "搜索RDC...",
+      "searchCarrier": "搜索承运商...",
+      "searchDelivery": "搜索配送商..."
+    },
+    "buttons": {
+      "viewDetail": "查看详情",
+      "query": "查询",
+      "reset": "重置",
+      "export": "导出",
+      "exporting": "导出中..."
+    },
+    "tableColumns": {
+      "dataSource": "数据源",
+      "abnormalTypeName": "异常分类",
+      "abnormalDays": "异常天数",
+      "formWarehouse": "始发仓库",
+      "carrierName": "承运商",
+      "deliveryName": "配送商",
+      "transNo": "运单号",
+      "invoiceNo": "发票号",
+      "toRdc": "目的RDC",
+      "toProvince": "目的省份",
+      "status": "状态",
+      "waybill": "运单",
+      "invoice": "发货单",
+      "transType": "运输方式",
+      "modetype": "运输模式",
+      "toWarehouse": "目的仓库",
+      "toCounty": "目的区县",
+      "consignee": "送达方",
+      "channel": "通路",
+      "shipConfirmTime": "发货确认时间",
+      "predictArriveRdcTime": "预计到达RDC时间",
+      "arriveRdcTime": "到达RDC时间",
+      "productCount": "商品数量",
+      "volume": "体积",
+      "abnormalOccurTime": "异常代码发生时间",
+      "abnormalDesc": "异常代码描述",
+      "lastAbnormalCode": "最后一个异常代码"
+    },
+    "tooltip": {
+      "abnormalType": "异常类型",
+      "timeRange": "时间范围",
+      "count": "数量",
+      "categoryRate": "分类占比",
+      "overallRate": "整体占比",
+      "classifyRate": "分类占比"
+    },
+    "pagination": {
+      "total": "共 {0} 条",
+      "prev": "上一页",
+      "next": "下一页"
+    },
+    "chart": {
+      "rootName": "运输异常",
+      "tooltip": {
+        "abnormalType": "异常类型",
+        "timeRange": "时间范围",
+        "count": "数量",
+        "classifyRate": "分类占比",
+        "overallRate": "总体占比"
+      }
+    },
+    "messages": {
+      "fetchDataSourceListFailed": "获取数据源列表失败:",
+      "fetchAbnormalTypeListFailed": "获取异常分类列表失败:",
+      "fetchCarrierListFailed": "获取承运商列表失败:",
+      "fetchWarehouseListFailed": "获取仓库列表失败:",
+      "fetchRdcListFailed": "获取RDC列表失败:",
+      "fetchDataFailed": "获取运输异常数据失败:",
+      "fetchModalDataFailed": "获取弹窗数据失败:",
+      "exportFailed": "导出失败:",
+      "noSearchResults": "无搜索结果"
+    }
+  },
+  "audit": {
+    "tabs": {
+      "todo": "我的待办",
+      "initiated": "我发起的",
+      "today": "当日审批"
+    },
+    "tasks": {
+      "dryDistribution": {
+        "title": "干配交接",
+        "description": "从中心仓到区域仓的大批量运输,请注意XXX"
+      },
+      "customerSign": {
+        "title": "客户签收确认",
+        "description": "客户签收确认流程"
+      },
+      "warehouseDry": {
+        "title": "仓干交接确认",
+        "description": "仓库干线交接确认"
+      },
+      "abnormalHandling": {
+        "title": "异常处理",
+        "description": "处理运输过程中的异常情况"
+      }
+    }
+  },
+  "capacityPool": {
+    "title": "运力池",
+    "loading": "加载中...",
+    "noData": "暂无数据",
+    "noSearchResults": "暂无搜索结果",
+    "modalTitles": {
+      "detail": "车辆详情",
+      "vehicleDetail": "运力池车辆详情"
+    },
+    "filters": {
+      "fromCity": "始发城市",
+      "toCity": "目的城市",
+      "logisticName": "物流商",
+      "licenseNumber": "请输入车牌号",
+      "selectedCount": "已选{count}项"
+    },
+    "placeholders": {
+      "searchFromCity": "搜索始发城市...",
+      "searchToCity": "搜索目的城市...",
+      "searchLogistic": "搜索物流商...",
+      "licenseNumber": "请输入车牌号"
+    },
+    "buttons": {
+      "view": "查看",
+      "query": "查询",
+      "reset": "重置"
+    },
+    "tableHeaders": {
+      "thirdParty": "3PL",
+      "route": "线路",
+      "vehicleCount": "车辆数量",
+      "vehicleType": "车辆类型",
+      "action": "操作"
+    },
+    "tableColumns": {
+      "route": "线路",
+      "licenseNumber": "车牌号",
+      "vehicleType": "车辆类型",
+      "belongType": "车辆所属",
+      "logisticName": "物流商",
+      "driverName": "司机姓名",
+      "phone": "联系方式",
+      "vehicleCount": "车辆数量",
+      "action": "操作"
+    },
+    "pagination": {
+      "info": "第 {start}-{end} 条/共 {total} 条",
+      "prev": "上一页",
+      "next": "下一页"
+    },
+    "messages": {
+      "loadDataFailed": "加载运力池数据失败:",
+      "loadDropdownOptionsFailed": "加载下拉选项数据失败:",
+      "fetchModalDataFailed": "获取弹窗数据失败:",
+      "selectedCount": "已选{count}项",
+      "noSearchResults": "无搜索结果"
+    }
+  },
+  "cargoMap": {
+    "timeSwitch": {
+      "label": "时间选择",
+      "currentMonth": "当月",
+      "recent30Days": "近30天"
+    },
+    "statistics": {
+      "normalVehicles": "正常在途车辆",
+      "abnormalVehicles": "异常在途车辆",
+      "unsignedPackages": "未签收包裹",
+      "unitVehicle": "辆",
+      "unitPackage": "件",
+      "exportAbnormal": "导出异常车辆"
+    },
+    "top3": {
+      "title": "TOP3 热门线路",
+      "rank": "排名",
+      "fromWarehouse": "始发仓",
+      "toProvince": "目的省",
+      "volume": "货量",
+      "unknown": "未知",
+      "volumeUnit": "万m³"
+    },
+    "layers": {
+      "cdcWarehouse": "CDC仓库",
+      "rdcWarehouse": "RDC仓库",
+      "trunkVehicles": "干线车辆",
+      "deliveryVehicles": "配送车辆",
+      "keyCustomers": "重点客户",
+      "transportRoutes": "运输路线"
+    },
+    "modal": {
+      "titles": {
+        "route": "线路信息",
+        "vehicle": "车辆信息",
+        "warehouse": "仓库信息",
+        "customer": "客户信息"
+      },
+      "route": {
+        "volume": "货量",
+        "unit": "m³"
+      },
+      "warehouse": {
+        "name": "仓库名称",
+        "province": "所在省份",
+        "truckCount": "车辆数量",
+        "staffCount": "员工数量",
+        "area": "仓库面积",
+        "type": "仓库类型",
+        "typeCdc": "CDC",
+        "typeRdc": "RDC"
+      },
+      "vehicle": {
+        "licenseNumber": "车牌号",
+        "driver": "司机",
+        "phone": "电话",
+        "truckType": "车型",
+        "location": "当前位置",
+        "orderCount": "订单数",
+        "fromPlace": "始发地",
+        "toPlace": "目的地",
+        "belongType": "归属类型",
+        "belongSupplier": "归属供应商",
+        "orderCustomer": "下单客户",
+        "goodsCount": "货物件数",
+        "volume": "体积",
+        "alert": "该车辆存在异常，请及时关注！",
+        "notSet": "未设置"
+      },
+      "customer": {
+        "name": "客户名称",
+        "address": "地址",
+        "contactPerson": "联系人",
+        "contactPhone": "联系电话",
+        "customerType": "客户类型",
+        "location": "位置"
+      },
+      "unknown": "未知",
+      "notSet": "未设置"
+    },
+    "legend": {
+      "volumeRanges": {
+        "over6000": "6000以上",
+        "4000to6000": "4000-6000",
+        "3000to4000": "3000-4000",
+        "2000to3000": "2000-3000",
+        "1000to2000": "1000-2000",
+        "500to1000": "500-1000",
+        "200to500": "200-500",
+        "under200": "200以下"
+      },
+      "trunkVehicles": "干线车辆",
+      "keyCustomers": "重点客户",
+      "cdcWarehouse": "CDC仓库",
+      "rdcWarehouse": "RDC仓库",
+      "transportRoutes": "运输路线",
+      "airRoute": "航空路线",
+      "railRoute": "铁路路线",
+      "roadRoute": "公路路线",
+      "air": "航空",
+      "rail": "铁路",
+      "road": "公路"
+    },
+    "tooltip": {
+      "noData": "暂无数据",
+      "volumeLabel": "货量 {value}m³",
+      "customerInfoUnknown": "客户信息未知",
+      "customerNameLabel": "客户名称: {name}"
+    },
+    "transport": {
+      "exportConfirm": "确定要导出异常车辆数据吗？",
+      "exportSuccess": "导出成功",
+      "exportFailed": "导出失败",
+      "exportTooLarge": "导出数据量过大，请缩小查询范围",
+      "exportFileNamePrefix": "异常车辆"
+    },
+    "messages": {
+      "loadTop3Failed": "加载TOP3热门线路数据失败:",
+      "loadUnsignedFailed": "加载未签收数据失败:",
+      "updateRippleFailed": "更新水波纹位置失败:",
+      "loadTruckDataFailed": "加载在途车辆数据失败:",
+      "loadCustomerDataFailed": "加载关键客户数据失败:",
+      "loadWarehouseDataFailed": "加载仓库数据失败:",
+      "loadMigrationFailed": "加载迁移路线数据失败:",
+      "initMapFailed": "地图初始化失败:",
+      "cleanupFailed": "组件清理失败:",
+      "resizeObserverFailed": "地图ResizeObserver resize失败:",
+      "resizeFailed": "地图resize失败:",
+      "unknownWarehouse": "未知仓库",
+      "unknownProvince": "未知省份",
+      "trunkVehicles": "干线车辆",
+      "deliveryVehicles": "配送车辆",
+      "keyCustomers": "重点客户",
+      "warehouseData": "仓库数据",
+      "volumeData": "货量数据",
+      "customer": "客户"
+    }
+  },
+  "cargoTrend": {
+    "title": "货量趋势",
+    "timePresets": {
+      "thisMonth": "本月",
+      "lastMonth": "上月",
+      "recent3Months": "近3个月",
+      "thisYear": "今年",
+      "lastYear": "去年"
+    },
+    "timeTypes": {
+      "calendarYear": "自然年"
+    },
+    "dataSource": {
+      "all": "全部数据源"
+    },
+    "metrics": {
+      "volume": "订单数量",
+      "weight": "重量",
+      "volumeSize": "体积"
+    },
+    "placeholders": {
+      "startDate": "开始日期",
+      "endDate": "结束日期"
+    },
+    "options": {
+      "reset": "重置",
+      "customer": "客户",
+      "bizType": "业务类型",
+      "mot": "MOT",
+      "cityLevel": "城市级别",
+      "productType": "商品类型",
+      "other": "其他可选"
+    },
+    "defaults": {
+      "calendarYear": "自然年",
+      "dataSource": "数据源",
+      "orderQuantity": "订单数量",
+      "customer": "客户",
+      "bizType": "业务类型",
+      "mot": "MOT",
+      "cityLevel": "城市级别",
+      "productType": "商品类型"
+    },
+    "sidePanel": {
+      "selectCustomer": "选择客户",
+      "selectBizType": "选择业务类型",
+      "selectMot": "选择MOT",
+      "selectCityLevel": "选择城市级别",
+      "selectProductType": "选择商品类型"
+    },
+    "datePicker": {
+      "startDate": "开始日期",
+      "endDate": "结束日期",
+      "separator": "至"
+    },
+    "series": {
+      "mom": "环比",
+      "yoy": "同比"
+    },
+    "messages": {
+      "serverError": "服务器错误",
+      "fetchError": "获取货量趋势数据失败:",
+      "loadOptionsError": "加载选项数据失败:",
+      "notSet": "未设置",
+      "getTimeTypeListFailed": "获取时间类型列表失败，服务器内部错误",
+      "getDataSourceListFailed": "获取数据源列表失败，服务器内部错误",
+      "getVolumeAggListFailed": "获取货量聚合列表失败，服务器内部错误",
+      "getCustomerListFailed": "获取客户列表失败，服务器内部错误",
+      "getBizTypeListFailed": "获取业务类型列表失败，服务器内部错误",
+      "getCityLevelListFailed": "获取城市级别列表失败，服务器内部错误",
+      "getMotListFailed": "获取MOT列表失败，服务器内部错误",
+      "getProductTypeListFailed": "获取商品类型列表失败，服务器内部错误",
+      "updateChartDataFailed": "更新图表数据失败：",
+      "callQueryVolumeFailed": "调用 queryVolume 接口失败：",
+      "queryVolumeDataFormatError": "queryVolume 接口返回数据格式错误：",
+      "chartContainerNotFound": "图表容器未找到",
+      "componentInitFailed": "cargoTrend组件初始化失败：",
+      "chartInstanceNotFound": "图表实例不存在或数据格式错误"
+    }
+  },
+  "cargoVolume": {
+    "titles": {
+      "yearlyVolume": "年累计货量(m³)",
+      "monthlyVolume": "月累计货量(m³)",
+      "dailyVolume": "日累计货量(m³)"
+    },
+    "tooltip": {
+      "increase": "增长",
+      "decrease": "减少",
+      "add": "增加",
+      "drop": "下降",
+      "yoy": "同比",
+      "mom": "环比",
+      "vs": "对比",
+      "value": "数值：",
+      "compare": "较"
+    },
+    "messages": {
+      "fetchError": "获取货量数据失败:",
+      "fetchVolumeDataFailed": "获取货量数据失败：",
+      "yearlyDataFormatError": "年累计数据格式不正确：",
+      "monthlyDataFormatError": "月累计数据格式不正确：",
+      "dailyDataFormatError": "日累计数据格式不正确：",
+      "swiperContainerNotFound": "找不到Swiper容器元素 .carousel-swiper",
+      "noDataToDisplay": "没有数据可以显示，跳过Swiper初始化",
+      "swiperReinitFailed": "Swiper重新初始化失败：",
+      "swiperInitFailed": "Swiper初始化失败："
+    }
+  },
+  "dryPrice": {
+    "title": "配单价(m³)",
+    "unit": "元",
+    "messages": {
+      "fetchError": "获取配单价数据失败:",
+      "fetchDeliveryPriceFailed": "获取配单价失败："
+    }
+  },
+  "endToEnd": {
+    "title": "准时交付率",
+    "messages": {
+      "dataFormatError": "端对端准时交付率数据格式不正确：",
+      "fetchDataFailed": "获取端对端准时交付率数据失败："
+    }
+  },
+  "energyPrices": {
+    "title": "能源价格趋势",
+    "tabs": {
+      "domestic": "国内",
+      "international": "国际"
+    },
+    "fuelTypes": {
+      "gasoline": "汽油",
+      "diesel": "柴油",
+      "aircraftFuel": "航空燃油"
+    },
+    "units": {
+      "gallon": "加仑",
+      "cnyPerTon": "￥/吨",
+      "usdPerBarrel": "$/桶",
+      "yuanPerTon": "￥/吨",
+      "dollarPerBarrel": "$/桶"
+    },
+    "keyEvent": "关键事件",
+    "monthSuffix": "月",
+    "tooltip": {
+      "keyEvent": "关键事件:"
+    },
+    "month": "月",
+    "messages": {
+      "fetchError": "获取能源价格数据失败:",
+      "loadDataFailed": "加载能源价格数据失败：",
+      "fetchDataFailed": "获取能源价格数据失败："
+    }
+  },
+  "energyPricesCard": {
+    "fuelTypes": {
+      "gasoline": "汽油",
+      "diesel": "柴油",
+      "aircraftFuel": "航空燃油"
+    },
+    "units": {
+      "pricePerTon": "元/吨"
+    },
+    "defaults": {
+      "gasoline": "汽油",
+      "diesel": "柴油",
+      "aircraftFuel": "航空燃油",
+      "unit": "￥/吨"
+    },
+    "trend": {
+      "priceUp": "价格上涨",
+      "priceDown": "价格下跌"
+    },
+    "messages": {
+      "fetchError": "获取能源价格数据失败:",
+      "swiperContainerNotFound": "找不到Swiper容器元素 .energy-price-swiper",
+      "noDataToDisplay": "没有数据可以显示，跳过Swiper初始化",
+      "swiperReinitFailedOnTab": "Tab切换时Swiper重新初始化失败：",
+      "swiperReinitFailed": "Swiper重新初始化失败：",
+      "swiperInitFailed": "Swiper初始化失败："
+    }
+  },
+  "majorEvents": {
+    "title": "重大活动&极端天气影响",
+    "tableHeaders": {
+      "roadSection": "路段/区域",
+      "impact": "影响",
+      "orderCount": "订单数",
+      "affectedOrders": "影响运单"
+    },
+    "tableColumns": {
+      "fromWarehouse": "始发仓库",
+      "toWarehouse": "目的仓库",
+      "logisticName": "物流商",
+      "invoiceNo": "发货单号",
+      "deliverTime": "发货时间",
+      "predictArriveTime": "预计到达时间",
+      "transType": "运输方式",
+      "dataSource": "数据源"
+    },
+    "filters": {
+      "fromWarehouse": "始发仓库",
+      "selectedCount": "已选{count}项",
+      "reset": "重置"
+    },
+    "placeholders": {
+      "searchWarehouse": "搜索仓库...",
+      "invoiceNo": "发货单号",
+      "startDate": "开始日期",
+      "endDate": "结束日期"
+    },
+    "dateRange": {
+      "separator": "至"
+    },
+    "modal": {
+      "title": "影响运单详情"
+    },
+    "buttons": {
+      "view": "查看",
+      "query": "查询",
+      "reset": "重置",
+      "export": "导出",
+      "exporting": "导出中..."
+    },
+    "pagination": {
+      "total": "共 {total} 条",
+      "prev": "上一页",
+      "next": "下一页"
+    },
+    "messages": {
+      "noData": "暂无重大活动",
+      "loading": "加载中...",
+      "empty": "暂无数据",
+      "fetchTrafficInfoFailed": "获取重大活动数据失败:",
+      "fetchUnsignedDetailsFailed": "获取影响运单数据失败:",
+      "exportTooLarge": "导出数据量过大",
+      "exportFailed": "导出失败"
+    }
+  },
+  "onTime": {
+    "title": "提货及时率",
+    "messages": {
+      "fetchError": "获取提货及时率失败:"
+    }
+  },
+  "pickupRate": {
+    "toolbar": {
+      "separator": "至",
+      "query": "查询",
+      "showDetail": "显示明细"
+    },
+    "loading": "加载中...",
+    "noData": "暂无数据",
+    "tableColumns": {
+      "fromWarehouse": "始发仓库",
+      "customer": "客户",
+      "standardCount": "达标单数",
+      "totalCount": "总单数",
+      "pickupRate": "揽收及时率"
+    },
+    "messages": {
+      "fetchDataFailed": "获取揽收及时率数据失败:"
+    }
+  },
+  "signingInformation": {
+    "title": "签收信息",
+    "cards": {
+      "todaySigned": "今日已签收",
+      "todayPending": "今日待签收"
+    },
+    "signingData": {
+      "todaySigned": "今日已签收",
+      "todayPending": "今日待签收"
+    },
+    "modal": {
+      "title": "未签明细",
+      "detailTitle": "未签收明细"
+    },
+    "filters": {
+      "fromWarehouse": "始发仓",
+      "toProvince": "目的省",
+      "toRdc": "目的RDC",
+      "modeType": "配送模式"
+    },
+    "modeTypeOptions": {
+      "zoneDelivery": "区配",
+      "directDelivery": "直送"
+    },
+    "placeholders": {
+      "fromWarehouse": "始发仓库",
+      "toProvince": "目的省份",
+      "toRdc": "目的RDC",
+      "modeType": "运输模式",
+      "searchWarehouse": "搜索仓库...",
+      "searchProvince": "搜索省份...",
+      "searchRdc": "搜索RDC..."
+    },
+    "buttons": {
+      "reset": "重置",
+      "search": "搜索",
+      "query": "查询",
+      "export": "导出"
+    },
+    "tableColumns": {
+      "fromWarehouse": "始发仓库",
+      "dataSource": "数据源",
+      "carrierName": "承运商",
+      "deliveryName": "配送商",
+      "transNo": "运单",
+      "invoiceNo": "发货单",
+      "orderStatus": "订单状态",
+      "transType": "运输方式",
+      "modeType": "运输模式",
+      "toWarehouse": "目的仓库",
+      "toProvince": "目的省份",
+      "toCity": "目的城市",
+      "toCounty": "目的区县",
+      "deliveryParty": "送达方",
+      "channelName": "通路",
+      "deliverTime": "发货确认时间",
+      "arrivalRdcTime": "到达RDC时间",
+      "predictArrivalCustomerTime": "预计到达客户时间",
+      "goodsNum": "商品数量",
+      "volume": "体积"
+    },
+    "chart": {
+      "seriesName": "签收信息",
+      "tooltipFormatter": "{b}: {c}单",
+      "labelFormatter": "{value}单",
+      "unit": "单",
+      "status": {
+        "signed": "已签收"
+      }
+    },
+    "pagination": {
+      "pageInfo": "第 {0}-{1} 条/共 {2} 条 (共 {3} 页)",
+      "showTotal": "共 {total} 条"
+    },
+    "messages": {
+      "exportFailed": "导出失败：",
+      "exportDataTooMuch": "导出数据过多",
+      "noSearchResults": "无搜索结果",
+      "exportSuccess": "导出成功",
+      "exportFailedMsg": "导出失败",
+      "fetchModalDataFailed": "获取未签收明细失败"
+    }
+  },
+  "signUp": {
+    "title": "应签未签",
+    "tabs": {
+      "terminal": "末端配送异常",
+      "trunk": "干线到仓异常"
+    },
+    "rdcOptions": {
+      "rdcDelivery": "RDC&配送商",
+      "cdcCarrier": "CDC&承运商",
+      "rdcAbnormalCode": "RDC&异常代码",
+      "cdcAbnormalCode": "CDC&异常代码"
+    },
+    "placeholders": {
+      "region": "大区",
+      "category": "异常分类",
+      "dataSource": "数据源"
+    },
+    "buttons": {
+      "reset": "重置",
+      "export": "导出",
+      "exporting": "导出中..."
+    },
+    "messages": {
+      "fetchRegionListFailed": "获取大区列表失败:",
+      "fetchAbnormalReasonListFailed": "获取异常分类列表失败:",
+      "fetchDataSourceListFailed": "获取数据源列表失败:",
+      "fetchAbnormalOrderDataFailed": "获取应签未签数据失败:",
+      "queryTooMuch": "查询数据量过大，请缩小查询范围",
+      "exportLimitExceeded": "导出数量超过限制",
+      "exportFailed": "导出失败",
+      "exportSuccess": "导出成功",
+      "resetFailed": "重置失败："
+    },
+    "noData": {
+      "text": "暂无数据",
+      "description": "请调整筛选条件后重试"
+    }
+  },
+  "signUpDetail": {
+    "title": "应签未签明细",
+    "tabs": {
+      "terminal": "末端配送异常",
+      "trunk": "干线到仓异常"
+    },
+    "rdcOptions": {
+      "rdcDelivery": "RDC&配送商",
+      "cdcCarrier": "CDC&承运商"
+    },
+    "placeholders": {
+      "region": "大区",
+      "category": "异常分类",
+      "dataSource": "数据源"
+    },
+    "buttons": {
+      "reset": "重置",
+      "export": "导出",
+      "exporting": "导出中..."
+    },
+    "tableColumns": {
+      "rdc": "RDC",
+      "cdc": "CDC",
+      "deliveryProvider": "配送商",
+      "carrier": "承运商",
+      "abnormalCategory": "异常分类",
+      "abnormalCode": "异常代码",
+      "abnormalDesc": "异常描述",
+      "unsignedQuantity": "应签未签数量"
+    },
+    "messages": {
+      "fetchRegionListFailed": "获取大区列表失败",
+      "fetchAbnormalReasonListFailed": "获取异常分类列表失败",
+      "fetchDataSourceListFailed": "获取数据源列表失败",
+      "fetchAbnormalOrderDataFailed": "获取应签未签明细失败",
+      "queryDataTooMuch": "查询数据量过大，请缩小查询范围",
+      "exportLimitExceeded": "导出数量超过限制",
+      "exportFailed": "导出失败"
+    },
+    "noData": {
+      "text": "暂无数据",
+      "description": "请调整筛选条件后重试"
+    }
+  },
+  "task": {
+    "loading": "加载中...",
+    "unknownType": "未知类型",
+    "description": {
+      "pendingOrderCount": "挂起订单数：",
+      "pendingType": "挂起类型：",
+      "clickToView": "，点击查看详情。"
+    },
+    "messages": {
+      "fetchTaskListFailed": "获取任务列表失败："
+    }
+  },
+  "unitPrice": {
+    "title": "干单价(m³)",
+    "units": {
+      "yuanPerKm": "元/公里"
+    },
+    "unit": "元/公里",
+    "messages": {
+      "fetchError": "获取干单价数据失败:",
+      "fetchTrunkLinePriceFailed": "获取干单价失败："
+    }
+  },
+  "warehousingLogistics": {
+    "title": "准时交付率(仓+物流)",
+    "tabs": {
+      "onTimeRate": "准时交付率",
+      "totalOrders": "总单数+不达标单数+准时交付率"
+    },
+    "filters": {
+      "dataSource": "数据源",
+      "transMode": "运输模式",
+      "logisticProvider": "物流商",
+      "customer": "客户"
+    },
+    "timeDimension": {
+      "fiscalYear": "财年",
+      "calendarYear": "自然年",
+      "month": "月"
+    },
+    "transMode": {
+      "trunkLine": "干线",
+      "delivery": "配送",
+      "endToEnd": "端到端"
+    },
+    "dateRange": {
+      "separator": "至",
+      "start": "开始...",
+      "end": "结束..."
+    },
+    "placeholders": {
+      "searchLogisticProvider": "搜索物流商...",
+      "searchCustomer": "搜索客户..."
+    },
+    "buttons": {
+      "reset": "重置",
+      "exportDetail": "导出明细",
+      "exportTable": "导出表格",
+      "exporting": "导出中..."
+    },
+    "tableColumns": {
+      "originWarehouse": "始发仓",
+      "destinationWarehouse": "目的仓",
+      "logisticProvider": "物流商",
+      "totalOrders": "总单数",
+      "nonCompliance": "不达标",
+      "onTimeRate": "准时率",
+      "subtotal": "小计"
+    },
+    "messages": {
+      "loading": "加载中...",
+      "noData": "暂无数据",
+      "noSearchResults": "暂无搜索结果",
+      "fetchDataFailed": "获取数据失败:",
+      "exportFailed": "导出失败:",
+      "exportTableFailed": "导出表格失败:",
+      "exportDataTooLarge": "导出数据量过大，请缩小查询范围",
+      "exportDetailFileName": "端到端准时交付率",
+      "exportTableFileName": "准时交付率表格"
+    }
+  },
+  "urgentCustomer": {
+    "title": "加急&重点客户风险",
+    "modalTitles": {
+      "detail": "加急&重点客户风险详情"
+    },
+    "filters": {
+      "signStatus": "签收状态",
+      "notSigned": "未签收",
+      "signed": "已签收",
+      "destWarehouse": "目的仓库",
+      "selectedCount": "已选{count}项",
+      "orderStatus": "订单状态",
+      "riskType": "风险类型",
+      "reset": "重置",
+      "startDate": "开始日期",
+      "endDate": "结束日期",
+      "to": "至",
+      "customerOrderNo": "客户订单号",
+      "searchWarehouse": "搜索仓库...",
+      "searchStatus": "搜索状态...",
+      "searchRisk": "搜索风险..."
+    },
+    "transTypes": {
+      "road": "公路",
+      "air": "航空",
+      "rail": "铁路",
+      "express": "快递"
+    },
+    "buttons": {
+      "viewDetail": "查看详情",
+      "reset": "重置",
+      "query": "查询",
+      "export": "导出",
+      "exporting": "导出中..."
+    },
+    "tableColumns": {
+      "dataSource": "数据源",
+      "orderStatus": "订单状态",
+      "riskType": "风险类型",
+      "riskInfo": "风险信息",
+      "transType": "运输方式",
+      "location": "在途位置",
+      "actualTransNo": "运单号",
+      "customerOrderNo": "客户订单号",
+      "invoiceNo": "发货单号",
+      "onTime": "是否准时",
+      "yes": "是",
+      "no": "否",
+      "predictArriveTime": "预计到达时间",
+      "fromWarehouse": "始发仓库",
+      "toWarehouse": "目的仓库",
+      "destProvince": "目的省市",
+      "carrierName": "承运商",
+      "deliveryName": "配送商",
+      "consignee": "收件人",
+      "consigneeAddress": "收件地址",
+      "goodsCode": "物料号",
+      "goodsName": "物料名称",
+      "goodsCount": "产品数量",
+      "arrivalSignTime": "签收时间",
+      "lastAbnormalCode": "最近异常代码",
+      "cost": "运费"
+    },
+    "pagination": {
+      "total": "共 {total} 条",
+      "prev": "上一页",
+      "next": "下一页"
+    },
+    "messages": {
+      "fetchError": "获取加急客户风险数据失败:",
+      "exportTooLarge": "导出数据量过大",
+      "exportFailed": "导出失败",
+      "noData": "暂无加急订单",
+      "hasRisk": "有风险",
+      "normal": "正常",
+      "loading": "加载中...",
+      "empty": "暂无数据"
+    }
+  },
+  "header": {
+    "placeholders": {
+      "fromWarehouse": "始发仓库",
+      "toProvince": "目的省份",
+      "toRdc": "目的仓库",
+      "searchWarehouse": "搜索仓库...",
+      "searchProvince": "搜索省份...",
+      "searchRdc": "搜索仓库...",
+      "invoiceNo": "发货单号"
+    },
+    "buttons": {
+      "reset": "重置",
+      "done": "完成",
+      "logout": "退出"
+    },
+    "messages": {
+      "noSearchResults": "无搜索结果",
+      "fetchMockSwitchConfigFailed": "获取Mock开关配置失败：",
+      "updateMockSwitchFailed": "更新Mock开关失败",
+      "mockConfigUpdated": "Mock配置已{0}，页面即将刷新...",
+      "mockConfigEnabled": "开启",
+      "mockConfigDisabled": "关闭"
+    },
+    "mock": {
+      "enabled": "Mock:开",
+      "disabled": "Mock:关",
+      "titleEnabled": "Mock配置已开启，点击关闭",
+      "titleDisabled": "Mock配置已关闭，点击开启"
+    },
+    "weather": {
+      "loading": "天气加载中...",
+      "error": "天气获取失败"
+    },
+    "user": {
+      "defaultName": "用户",
+      "avatarAlt": "用户头像"
+    }
+  },
+  "barPercentage": {
+    "title": "货量占比",
+    "placeholders": {
+      "statType": "统计方式",
+      "customer": "客户",
+      "dataSource": "数据源",
+      "volume": "体积"
+    },
+    "chart": {
+      "seriesName": "货量占比",
+      "value": "数值",
+      "percentage": "占比"
+    },
+    "tooltip": {
+      "valueLabel": "数值",
+      "percentageLabel": "占比"
+    },
+    "messages": {
+      "loadOptionsFailed": "加载选项失败",
+      "loadStatTypeFailed": "加载统计方式选项失败",
+      "fetchDataFailed": "获取货量占比数据失败",
+      "noSearchResults": "无搜索结果"
+    }
+  },
+  "tablePercentage": {
+    "title": "货量(表格占比)",
+    "dateRange": {
+      "separator": "至"
+    },
+    "statDimension": {
+      "warehouseProvince": "始发仓&目的省份",
+      "city": "目的城市"
+    },
+    "placeholders": {
+      "statDimension": "统计维度",
+      "toProvince": "目的省份",
+      "dataSource": "数据源",
+      "dataSourceCount": "数据源({count})",
+      "volume": "体积"
+    },
+    "tableColumns": {
+      "rank": "排行",
+      "fromWarehouse": "始发仓",
+      "toProvince": "目的省份",
+      "toCity": "目的城市",
+      "volume": "体积",
+      "percentage": "占比"
+    },
+    "messages": {
+      "loadOptionsFailed": "加载下拉框选项失败",
+      "fetchDataFailed": "获取表格数据失败"
+    }
+  },
+  "lenovoCustomer": {
+    "title": "交付率(联想客户)",
+    "dateRange": {
+      "separator": "至"
+    },
+    "filters": {
+      "productType": "产品类型",
+      "bizType": "业务类型"
+    },
+    "tableColumns": {
+      "reasonOne": "原因大类",
+      "reasonTwoName": "原因分析",
+      "soCount": "销售订单数量",
+      "goodsCount": "商品数量",
+      "deliveryRate": "交付率"
+    },
+    "buttons": {
+      "search": "查询",
+      "reset": "重置"
+    },
+    "messages": {
+      "loadOptionsFailed": "加载选项失败",
+      "fetchDataFailed": "获取数据失败"
+    }
+  },
+  "orderRate": {
+    "title": "返单及时率",
+    "dateRange": {
+      "separator": "至"
+    },
+    "filters": {
+      "logisticName": "物流商",
+      "selectedCount": "已选择{count}个"
+    },
+    "placeholders": {
+      "searchLogistic": "搜索物流商..."
+    },
+    "tableColumns": {
+      "warehouse": "仓库",
+      "logisticName": "物流商",
+      "year": "年",
+      "month": "月",
+      "confirmTotal": "返单总数",
+      "nonCompliantOrderCount": "不及时订单数",
+      "confirmInTimeRate": "返单及时率"
+    },
+    "buttons": {
+      "search": "搜索",
+      "searching": "搜索中...",
+      "export": "导出",
+      "exporting": "导出中...",
+      "reset": "重置"
+    },
+    "messages": {
+      "noData": "暂无数据",
+      "noDataDesc": "请调整筛选条件后重试",
+      "noSearchResults": "无搜索结果",
+      "selectDateRange": "请选择日期范围",
+      "exportSuccess": "导出汇总成功",
+      "exportFailed": "导出汇总失败",
+      "exportDataTooLarge": "导出数据量过大，请缩小查询范围",
+      "exportFileName": "返单及时率导出汇总_{start}_{end}.xlsx"
+    }
+  },
+  "timeDimension": {
+    "title": "准时交付率(时间维度)",
+    "dataSource": "数据源",
+    "timeDimension": "时间维度",
+    "transMode": "运输模式",
+    "logisticProvider": "物流商",
+    "customer": "客户",
+    "fiscalYear": "财年",
+    "calendarYear": "自然年",
+    "month": "月",
+    "transModeTrunk": "干线",
+    "transModeDelivery": "配送",
+    "transModeEndToEnd": "端到端",
+    "reset": "重置",
+    "separator": "至",
+    "startDate": "开始...",
+    "endDate": "结束...",
+    "export": "导出",
+    "searchLogisticProvider": "搜索物流商...",
+    "searchCustomer": "搜索客户...",
+    "noSearchResults": "暂无搜索结果",
+    "noData": "暂无数据",
+    "loadDataFailed": "加载数据失败:",
+    "exportSuccess": "导出成功",
+    "exportFailed": "导出失败",
+    "exportFailedNoData": "导出失败：未返回文件数据",
+    "exportDataTooLarge": "导出数据量过大，请缩小查询范围",
+    "exportFilename": "准时交付率-纯时间维度"
+  },
+  "nonLenovoCustomer": {
+    "title": "准时交付率(非联想客户)",
+    "dateRange": {
+      "separator": "至"
+    },
+    "timeDimensionOptions": {
+      "fiscalYear": "财年",
+      "calendarYear": "自然年",
+      "month": "月"
+    },
+    "filters": {
+      "deliveryProvider": "配送商",
+      "customer": "客户",
+      "reset": "重置"
+    },
+    "placeholders": {
+      "searchDeliveryProvider": "搜索配送商...",
+      "searchCustomer": "搜索客户..."
+    },
+    "tableColumns": {
+      "customerName": "客户名称",
+      "fromProvince": "始发省份",
+      "toProvince": "目的省份",
+      "deliveryProvider": "配送商",
+      "subtotal": "小计"
+    },
+    "buttons": {
+      "export": "导出"
+    },
+    "messages": {
+      "fetchDataFailed": "获取数据失败",
+      "exportSuccess": "导出成功",
+      "exportFailed": "导出失败",
+      "exportDataTooLarge": "导出数据量过大，请缩小查询范围",
+      "exportFileName": "端到端准时交付率",
+      "noSearchResults": "暂无搜索结果"
+    }
+  },
+  "transportationLogisticsRank": {
+    "title": "运输物流商KPI排名",
+    "modalTitle": "PFP-运输-物流商KPI排名详情",
+    "separator": "至",
+    "startMonth": "开始月份",
+    "endMonth": "结束月份",
+    "reset": "重置",
+    "logisticProvider": "物流商",
+    "cdcWarehouse": "CDC仓库",
+    "transType": "运输方式",
+    "warehouse": "仓库",
+    "rank": "排名",
+    "totalScore": "总成绩",
+    "hasReward": "是否进行奖励",
+    "redLineMajorSerious": "红线/重大/严重问题",
+    "yes": "是",
+    "no": "否",
+    "yearMonth": "年月",
+    "summary": "汇总",
+    "monthFormat": "YYYY年M月",
+    "monthFormat00": "0000年00月",
+    "viewDetails": "查看详情",
+    "export": "导出",
+    "searchLogisticProvider": "搜索物流商...",
+    "searchCdcWarehouse": "搜索CDC仓库...",
+    "searchTransType": "搜索运输方式...",
+    "noSearchResults": "暂无搜索结果",
+    "scoreDetail": "得分详情",
+    "rewardDetail": "奖惩详情",
+    "fetchDataFailed": "获取数据失败",
+    "fetchTransTypeListFailed": "获取运输方式列表失败",
+    "fetchScoreDetailFailed": "获取得分详情数据失败",
+    "fetchRewardDetailFailed": "获取奖惩详情数据失败",
+    "fetchDetailFailed": "获取详情数据失败",
+    "selectDateRangeFirst": "请先选择日期范围",
+    "exportSuccess": "导出成功",
+    "exportFailed": "导出失败",
+    "trunkLineOnTimeScore": "干线准时交货率得分(满分: 50)",
+    "pickupTimelinessScore": "提货及时率(满分: 10)",
+    "trunkLineDamageScore": "干线破损率得分(满分: 10)",
+    "abnormalOrderProcessingScore": "7天异常订单处理及时率得分(满分: 10)",
+    "infoFeedbackTimelinessScore": "信息反馈及时率得分(满分: 5)",
+    "returnOrderTimelinessScore": "返单及时率得分(满分: 10)",
+    "operationAccuracyScore": "运作准确率得分(满分: 5)",
+    "scoreSummary": "得分汇总",
+    "redLineIssue": "红线问题",
+    "majorIssue": "重大问题",
+    "seriousIssue": "严重问题",
+    "minorIssue": "一般问题",
+    "issueDescription": "问题描述",
+    "bonusDeductionTotal": "加分/扣分合计",
+    "redLineIssueYuan": "红线问题(元)",
+    "majorIssueYuan": "重大问题(元)",
+    "seriousIssueYuan": "严重问题(元)",
+    "minorIssueYuan": "一般问题(元)",
+    "breachHandling": "违约处理(元)",
+    "totalPenalty": "总罚款金额(元)",
+    "rewardAmount": "奖励金额(元)",
+    "remarkReason": "备注原因",
+    "avgMonthlyShipVolume": "月均发货体积(m³)",
+    "standardBreachAmount": "标准违约金(元)",
+    "breachCoefficient": "违约系数",
+    "isReward": "是否奖励"
+  },
+  "tobWarehousingRank": {
+    "title": "ToB物流商KPI排名",
+    "common": {
+      "yes": "是",
+      "no": "否"
+    },
+    "modalTitles": {
+      "detail": "PFP-仓库-ToB物流商KPI排名详情"
+    },
+    "tabs": {
+      "scoreDetail": "得分详情",
+      "rewardDetail": "奖惩详情"
+    },
+    "filters": {
+      "logisticProvider": "物流商",
+      "cdcWarehouse": "CDC仓库",
+      "reset": "重置"
+    },
+    "placeholders": {
+      "searchLogistic": "搜索物流商...",
+      "searchCdcWarehouse": "搜索CDC仓库..."
+    },
+    "dateRange": {
+      "separator": "至",
+      "startMonth": "开始月份",
+      "endMonth": "结束月份",
+      "yearMonth": "{year}年{month}月",
+      "invalidMonth": "0000年00月",
+      "summary": "汇总"
+    },
+    "buttons": {
+      "viewDetail": "查看详情",
+      "export": "导出",
+      "reset": "重置",
+      "query": "查询"
+    },
+    "tableColumns": {
+      "logistic": "物流商",
+      "warehouse": "仓库",
+      "rank": "排名",
+      "totalScore": "总成绩",
+      "hasReward": "是否进行奖励",
+      "redLineMajorSerious": "红线/重大/严重问题",
+      "yearMonth": "年月"
+    },
+    "scoreTableColumns": {
+      "deliveryOnTimeScore": "发货及时率得分(满分: 50)",
+      "inboundOnTimeScore": "入库及时率得分(满分: 20)",
+      "stdComplianceScore": "仓储STD达标率得分(满分: 10)",
+      "inventoryAccuracyScore": "库存准确率得分(满分: 10)",
+      "operationAccuracyScore": "运作准确率得分(满分: 10)",
+      "scoreSummary": "得分汇总",
+      "redLineIssue": "红线问题",
+      "majorIssue": "重大问题",
+      "seriousIssue": "严重问题",
+      "minorIssue": "一般问题",
+      "issueDescription": "问题描述",
+      "bonusDeductionTotal": "加分/扣分合计"
+    },
+    "rewardTableColumns": {
+      "redLineIssue": "红线问题(元)",
+      "majorIssue": "重大问题(元)",
+      "seriousIssue": "严重问题(元)",
+      "minorIssue": "一般问题(元)",
+      "breachHandling": "违约处理(元)",
+      "totalPenalty": "总罚款金额(元)",
+      "rewardAmount": "奖励金额(元)",
+      "remarkReason": "备注原因",
+      "avgMonthlyShipVolume": "月均发货体积(单位:m³)",
+      "standardBreachAmount": "标准违约金(元)",
+      "breachCoefficient": "违约系数",
+      "hasReward": "考核结果是否奖励"
+    },
+    "messages": {
+      "fetchDataFailed": "获取数据失败",
+      "fetchScoreDetailFailed": "获取得分详情数据失败",
+      "fetchRewardDetailFailed": "获取奖惩详情数据失败",
+      "fetchDetailFailed": "获取详情数据失败",
+      "selectDateRange": "请选择日期范围",
+      "exportSuccess": "导出成功",
+      "exportFailed": "导出失败",
+      "exportDataTooLarge": "导出数据量过大，请缩小查询范围",
+      "noSearchResults": "暂无搜索结果",
+      "exportFileName": "ToB物流商KPI排名",
+      "exportScoreDetailFileName": "ToB物流商KPI排名得分详情",
+      "exportRewardDetailFileName": "ToB物流商KPI排名奖惩详情"
+    }
+  },
+  "tobWarehousing": {
+    "title": "ToB物流商KPI评分",
+    "reset": "重置",
+    "logisticProvider": "物流商",
+    "cdcWarehouse": "CDC仓库",
+    "showDetails": "显示详情",
+    "noSearchResults": "暂无搜索结果",
+    "dateRange": {
+      "separator": "至",
+      "startMonth": "开始月份",
+      "endMonth": "结束月份"
+    },
+    "placeholders": {
+      "searchLogisticProvider": "搜索物流商...",
+      "searchCdcWarehouse": "搜索CDC仓库..."
+    },
+    "buttons": {
+      "exportSummary": "导出汇总",
+      "exportDetail": "导出明细"
+    },
+    "tableColumns": {
+      "month": "年月",
+      "logisticProvider": "物流商",
+      "cdcWarehouse": "CDC仓库",
+      "totalScore": "得分合计",
+      "deliveryOnTimeRate": "发货及时率",
+      "standardDeliveryVolume": "达标发货体积",
+      "totalDeliveryVolume": "当期总发货体积",
+      "deliveryScore": "得分 (满分50分)",
+      "warehousingOnTimeRate": "入库及时率",
+      "warehousingStandardCount": "入库达标单数",
+      "totalShipmentCount": "总发货单数",
+      "warehousingScore": "得分 (满分10分)",
+      "storageStdRate": "仓储STD (24小时) 达标率",
+      "storageStandardCount": "达标单数",
+      "storageTotalShipmentCount": "总发货单数",
+      "storageScore": "得分 (满分20分)",
+      "inventoryAccuracyRate": "库存准确率",
+      "inventoryStandardQuantity": "达标数量",
+      "monthEndInventoryTotal": "月末库存总量",
+      "inventoryScore": "得分 (满分10分)",
+      "operationAccuracyRate": "运作准确率",
+      "operationScore": "得分 (满分10分)"
+    },
+    "messages": {
+      "fetchDataFailed": "获取数据失败",
+      "fetchTableDataFailed": "获取表格数据失败:",
+      "selectDateRange": "请选择日期范围",
+      "noDataToExport": "没有数据可以导出",
+      "exportSummarySuccess": "导出汇总成功",
+      "exportSummaryFailed": "导出汇总失败",
+      "exportDetailSuccess": "导出明细成功",
+      "exportDetailFailed": "导出明细失败",
+      "exportDataTooLarge": "导出数据量过大，请缩小查询范围",
+      "exportSummaryFileName": "ToB物流商KPI评分汇总_{0}_{1}.xlsx",
+      "exportDetailFileName": "ToB物流商KPI评分明细_{0}_{1}.xlsx"
+    }
+  },
+  "transportationLogistics": {
+    "title": "运输物流商KPI评分",
+    "reset": "重置",
+    "yearMonth": "年月",
+    "year": "年",
+    "month": "月",
+    "transType": "运输方式",
+    "logisticProvider": "物流商",
+    "cdcWarehouse": "CDC仓库",
+    "totalScore": "得分合计",
+    "dateSeparator": "至",
+    "startMonth": "开始月份",
+    "endMonth": "结束月份",
+    "searchLogisticProvider": "搜索物流商...",
+    "searchCdcWarehouse": "搜索CDC仓库...",
+    "searchTransType": "搜索运输方式...",
+    "noSearchResults": "暂无搜索结果",
+    "showDetails": "显示详情",
+    "exportSummary": "导出汇总",
+    "exportDetail": "导出明细",
+    "selectDateRange": "请选择日期范围",
+    "noDataToExport": "没有数据可以导出",
+    "exportSummarySuccess": "导出汇总成功",
+    "exportSummaryFailed": "导出汇总失败",
+    "exportDetailSuccess": "导出明细成功",
+    "exportDetailFailed": "导出明细失败",
+    "exportDataTooLarge": "导出数据量过大，请缩小查询范围",
+    "exportSummaryFilename": "运输物流商KPI评分汇总",
+    "exportDetailFilename": "运输物流商KPI评分明细",
+    "fetchDataFailed": "获取数据失败",
+    "fetchTransTypeFailed": "获取运输方式列表失败",
+    "trunkOnTimeDeliveryRate": "干线准时交货率",
+    "deliveryOrderCount": "交货单数量",
+    "totalDeliveryOrderCount": "总交货单数量",
+    "scoreFull50": "得分(满分50分)",
+    "pickupTimelinessRate": "提货及时率",
+    "onTimeShipmentCount": "准时发货单数量",
+    "totalShipmentCount": "总发货单数量",
+    "scoreFull10": "得分(满分10分)",
+    "trunkDamageRate": "干线破损率",
+    "damagedShipmentCount": "发生货损货丢的发货单数量",
+    "abnormal7dRate": "7天异常订单处理及时率",
+    "resolvedOrderCount": "异常周期内解决的订单数",
+    "totalAbnormalCount": "总异常单数量",
+    "scoreFull5": "得分(满分5分)",
+    "infoFeedbackRate": "信息反馈及时率",
+    "timelyFeedbackCount": "及时反馈发货单数量",
+    "returnOrderTimelinessRate": "返单及时率",
+    "timelyReturnCount": "及时返单数量",
+    "operationAccuracyRate": "运作准确率"
+  },
+  "tclWarehousing": {
+    "title": "华星物流商KPI评分",
+    "reset": "重置",
+    "showDetails": "显示详情",
+    "noSearchResults": "暂无搜索结果",
+    "dateRange": {
+      "separator": "至",
+      "startMonth": "开始月份",
+      "endMonth": "结束月份"
+    },
+    "placeholders": {
+      "searchLogisticProvider": "搜索物流商...",
+      "searchCdcWarehouse": "搜索发货平台..."
+    },
+    "buttons": {
+      "exportSummary": "导出汇总",
+      "exportDetail": "导出明细"
+    },
+    "tableColumns": {
+      "month": "年月",
+      "logisticProvider": "物流商",
+      "transType": "运输方式",
+      "cdcWarehouse": "发货平台",
+      "totalScore": "总成绩",
+      "scoreSummary": "得分汇总"
+    },
+    "kpiColumns": {
+      "pickupTimelinessRate": "提货及时率",
+      "deliveryTimelinessRate": "送货及时率",
+      "returnTimelinessRate": "返单及时率",
+      "numerator": "达标数量",
+      "denominator": "总数量",
+      "rate": "达标率",
+      "scoreFull10": "得分(满分10分)",
+      "scoreFull20": "得分(满分20分)"
+    },
+    "deductionColumns": {
+      "title": "扣分项",
+      "quality": "质量（默认满分30）",
+      "service": "服务（默认满分15）",
+      "safety": "安全（默认满分15）",
+      "other": "其他扣分项",
+      "description": "扣分说明"
+    },
+    "bonusColumns": {
+      "title": "加分项",
+      "other": "其他加分项",
+      "description": "加分说明"
+    },
+    "messages": {
+      "fetchDataFailed": "获取数据失败",
+      "fetchTableDataFailed": "获取表格数据失败:",
+      "selectDateRange": "请选择日期范围",
+      "noDataToExport": "没有数据可以导出",
+      "exportSummarySuccess": "导出汇总成功",
+      "exportSummaryFailed": "导出汇总失败",
+      "exportDetailSuccess": "导出明细成功",
+      "exportDetailFailed": "导出明细失败",
+      "exportDataTooLarge": "导出数据量过大，请缩小查询范围",
+      "exportSummaryFileName": "华星物流商KPI评分汇总_{0}_{1}.xlsx",
+      "exportDetailFileName": "华星物流商KPI评分明细_{0}_{1}.xlsx"
+    }
+  },
+  "tocWarehousing": {
+    "title": "ToC物流商KPI评分",
+    "reset": "重置",
+    "logisticProvider": "物流商",
+    "cdcWarehouse": "仓库",
+    "showDetails": "显示详情",
+    "noSearchResults": "暂无搜索结果",
+    "dateRange": {
+      "startMonth": "开始月份",
+      "endMonth": "结束月份"
+    },
+    "placeholders": {
+      "searchLogisticProvider": "搜索物流商...",
+      "searchCdcWarehouse": "搜索仓库..."
+    },
+    "buttons": {
+      "exportSummary": "导出汇总",
+      "exportDetail": "导出明细"
+    },
+    "tableColumns": {
+      "month": "年月",
+      "logisticProvider": "物流商",
+      "cdcWarehouse": "仓库",
+      "totalScore": "总成绩",
+      "onTimeReceivedItemsCount": "及时收货上架的商品数量",
+      "actualGoodsCountReceived": "实际收货上架总商品数量",
+      "inventoryOnTimeRate": "入库及时率",
+      "inventoryScore": "得分 (满分30分)",
+      "outboundOnTimeCount": "及时出库订单量",
+      "outboundOrderTotalCount": "实际应出库总订单量",
+      "outboundOnTimeRate": "出库及时率",
+      "deliveryScore": "得分 (满分50分)",
+      "operationErrorCount": "运作差错（次数）",
+      "operationErrorTimes": "次数",
+      "operationErrorScore": "得分 (满分10分)",
+      "customerSatisfaction": "客户满意度",
+      "customerRating": "客户评分",
+      "customerSatisfactionScore": "得分 (满分10分)",
+      "scoreSummary": "得分汇总",
+      "totalDeduction": "扣分项",
+      "deductionDesc": "扣分说明",
+      "totalBonus": "加分项",
+      "bonusDescription": "加分说明"
+    },
+    "messages": {
+      "fetchDataFailed": "获取数据失败",
+      "fetchTableDataFailed": "获取表格数据失败:",
+      "selectDateRange": "请选择日期范围",
+      "exportSummarySuccess": "导出汇总成功",
+      "exportSummaryFailed": "导出汇总失败",
+      "exportDetailSuccess": "导出明细成功",
+      "exportDetailFailed": "导出明细失败",
+      "exportDataTooLarge": "导出数据量过大，请缩小查询范围",
+      "exportSummaryFileName": "ToC物流商KPI评分汇总_{0}_{1}.xlsx",
+      "exportDetailFileName": "ToC物流商KPI评分明细_{0}_{1}.xlsx",
+      "unknownError": "未知错误",
+      "noData": "暂无数据"
+    },
+    "monthFormat": "{year}年{month}月"
+  },
+  "transportationOpen": {
+    "title": "运输开放业务KPI评分",
+    "reset": "重置",
+    "startMonth": "开始月份",
+    "endMonth": "结束月份",
+    "monthFormat": "{0}年{1}月",
+    "logisticProvider": "物流商",
+    "customer": "客户",
+    "showDetails": "显示详情",
+    "exportSummary": "导出汇总",
+    "noSearchResults": "暂无搜索结果",
+    "searchLogisticProvider": "搜索物流商...",
+    "searchCustomer": "搜索客户...",
+    "colMonth": "年月",
+    "deliveryOnTimeRate": "准时交货率",
+    "pickupAccuracyRate": "送货准确率",
+    "cargoDamageRate": "货物破损率",
+    "returnTimelinessRate": "返单及时率",
+    "complianceCount": "达标数量",
+    "totalCount": "总数量",
+    "scoreFull30": "得分(满分30分)",
+    "scoreFull10": "得分(满分10分)",
+    "totalScore": "总成绩",
+    "scoreSummary": "得分汇总",
+    "deductionItem": "扣分项",
+    "deductionDesc": "扣分说明",
+    "bonusItem": "加分项",
+    "bonusDesc": "加分说明",
+    "msgDataFormatInvalid": "接口返回数据格式不正确:",
+    "msgFetchDataFailed": "获取数据失败",
+    "msgFetchTableDataFailed": "获取表格数据失败:",
+    "msgSelectDateRange": "请选择日期范围",
+    "exportSummaryFilename": "运输开放业务KPI评分汇总_{0}_{1}.xlsx",
+    "msgExportSuccess": "导出汇总成功",
+    "msgExportSummaryFailed": "导出汇总失败",
+    "msgUnknownError": "未知错误",
+    "msgExportDataTooLarge": "导出数据量过大，请缩小查询范围"
+  },
+  "transStorageKpi": {
+    "title": "运输仓储多业务KPI评分",
+    "reset": "重置",
+    "bizType": "业务分类",
+    "assessUnit": "考核单元",
+    "logistic": "物流商",
+    "assessProject": "考核项目",
+    "weight": "权重",
+    "projectScore": "项目得分",
+    "finalScore": "最终得分",
+    "colMonth": "年月",
+    "yearMonthFormat": "{0}年{1}月",
+    "customerOptionStorage": "仓储运输多业务-仓储",
+    "customerOptionTransport": "仓储运输多业务-运输",
+    "selectMonth": "请选择月份",
+    "searchBizType": "搜索业务分类...",
+    "searchAssessUnit": "搜索考核单元...",
+    "noSearchResults": "暂无搜索结果",
+    "export": "导出",
+    "selectMonthFirst": "请先选择月份",
+    "noDataToExport": "没有数据可以导出",
+    "exportSuccess": "导出成功",
+    "exportFailed": "导出失败",
+    "fetchDataFailed": "获取数据失败",
+    "fetchAssessUnitFailed": "获取考核单元列表失败"
+  },
+  "cityLogistics": {
+    "title": "城配物流商KPI评分",
+    "filters": {
+      "logisticProvider": "物流商",
+      "cdcWarehouse": "CDC仓库",
+      "reset": "重置",
+      "showDetails": "显示详情",
+      "separator": "至",
+      "startMonth": "开始月份",
+      "endMonth": "结束月份"
+    },
+    "placeholders": {
+      "searchLogisticProvider": "搜索物流商...",
+      "searchCdcWarehouse": "搜索CDC仓库...",
+      "noSearchResults": "暂无搜索结果"
+    },
+    "buttons": {
+      "exportSummary": "导出汇总",
+      "exportDetail": "导出明细"
+    },
+    "tableColumns": {
+      "yearMonth": "年月",
+      "logisticProvider": "物流商",
+      "cdcWarehouse": "CDC仓库",
+      "totalScore": "得分合计",
+      "summary": "汇总",
+      "yearMonthFormat": "{year}年{month}月",
+      "secInboundCycleComplianceRate": "SEC入库周期达标率",
+      "secNumerator": "准时完成入库的配送单票数",
+      "secDenominator": "所有入库的配送单票数",
+      "secRate": "SEC入库周期达标率",
+      "deliveryOnTimeRate": "发货及时率",
+      "deliveryNumerator": "准时完成发货的行项目数",
+      "deliveryDenominator": "所有发货的行项目数",
+      "deliveryRate": "发货及时率",
+      "inventoryAccuracyRate": "库存准确率",
+      "inventoryNumerator": "达标数量",
+      "inventoryDenominator": "月末库存总量",
+      "inventoryRate": "库存准确率",
+      "onTimeDeliveryRate": "准时交货率",
+      "ontimeNumerator": "准时配送单数量",
+      "ontimeDenominator": "总配送单数量",
+      "ontimeRate": "准时交货率",
+      "cargoDamageRate": "货损率",
+      "damageNumerator": "发生货损货丢的发货单数量",
+      "damageDenominator": "总发货单数量",
+      "damageRate": "货损率",
+      "abnormalResolutionRate": "异常解决及时率",
+      "abnormalNumerator": "异常周期内解决的单数",
+      "abnormalDenominator": "总异常单数",
+      "abnormalRate": "异常解决及时率",
+      "secAppSignOffRate": "SEC APP签收率",
+      "secAppNumerator": "APP签收发货单",
+      "secAppDenominator": "总发货单数",
+      "secAppRate": "APP签收率",
+      "tmsAppSignOffRate": "TMS APP签收率",
+      "tmsAppNumerator": "APP签收发货单",
+      "tmsAppDenominator": "总发货单数",
+      "tmsAppRate": "APP签收率",
+      "tmsInfoSignOffTimeliness": "信息签收及时性",
+      "tmsNumerator": "及时签收发货单数量",
+      "tmsDenominator": "发货单总数量",
+      "tmsRate": "信息签收及时性",
+      "returnOrderTimelinessRate": "返单及时率",
+      "returnNumerator": "及时返单数量",
+      "returnDenominator": "所有返单数量",
+      "returnRate": "返单及时率",
+      "operationAccuracyRate": "运作准确率",
+      "operationRate": "运作准确率",
+      "customerSatisfaction": "客户满意度",
+      "customerRating": "客户评分",
+      "scoreLabel": "得分(满分{max}分)"
+    },
+    "messages": {
+      "fetchDataFailed": "获取数据失败",
+      "selectDateRange": "请选择日期范围",
+      "noDataToExport": "没有数据可以导出",
+      "exportSummarySuccess": "导出汇总成功",
+      "exportSummaryFailed": "导出汇总失败",
+      "exportDetailSuccess": "导出明细成功",
+      "exportDetailFailed": "导出明细失败",
+      "exportDataTooLarge": "导出数据量过大，请缩小查询范围",
+      "exportSummaryFilename": "城配物流商KPI评分汇总_{0}_{1}.xlsx",
+      "exportDetailFilename": "城配物流商KPI评分明细_{0}_{1}.xlsx"
+    }
+  },
+  "cityLogisticsRank": {
+    "title": "城配物流商KPI排名",
+    "modalTitle": "城配物流商KPI排名详情",
+    "separator": "至",
+    "startMonth": "开始月份",
+    "endMonth": "结束月份",
+    "reset": "重置",
+    "query": "查询",
+    "logisticProvider": "物流商",
+    "cdcWarehouse": "CDC仓库",
+    "warehouse": "仓库",
+    "rank": "排名",
+    "totalScore": "总成绩",
+    "hasReward": "是否进行奖励",
+    "redLineMajorSerious": "红线/重大/严重问题",
+    "yes": "是",
+    "no": "否",
+    "yearMonth": "年月",
+    "summary": "汇总",
+    "monthFormat": "YYYY年M月",
+    "monthFormat00": "0000年00月",
+    "viewDetails": "查看详情",
+    "export": "导出",
+    "searchLogisticProvider": "搜索物流商...",
+    "searchCdcWarehouse": "搜索CDC仓库...",
+    "noSearchResults": "暂无搜索结果",
+    "scoreDetail": "得分详情",
+    "rewardDetail": "奖惩详情",
+    "fetchDataFailed": "获取数据失败",
+    "fetchScoreDetailFailed": "获取得分详情数据失败",
+    "fetchRewardDetailFailed": "获取奖惩详情数据失败",
+    "fetchDetailFailed": "获取详情数据失败",
+    "selectDateRangeFirst": "请先选择日期范围",
+    "exportSuccess": "导出成功",
+    "exportFailed": "导出失败",
+    "secInboundCycleScore": "SEC入库周期达标率(满分: 15)",
+    "deliveryOnTimeScore": "发货及时率(满分: 5)",
+    "inventoryAccuracyScore": "库存准确率(满分: 5)",
+    "onTimeDeliveryScore": "准时交货率(满分: 30)",
+    "cargoDamageScore": "货损率(满分: 5)",
+    "abnormalResolutionScore": "异常解决及时率(满分: 5)",
+    "tmsSecAppScore": "TMS&SEC APP签收率(满分: 5)",
+    "tmsInfoSignScore": "TMS信息签收及时性(满分: 10)",
+    "returnOrderScore": "返单及时率得分(满分: 10)",
+    "operationAccuracyScore": "运作准确率得分(满分: 5)",
+    "customerSatisfactionScore": "客户满意度得分(满分: 5)",
+    "scoreSummary": "得分汇总",
+    "redLineIssue": "红线问题",
+    "majorIssue": "重大问题",
+    "seriousIssue": "严重问题",
+    "minorIssue": "一般问题",
+    "issueDescription": "问题描述",
+    "bonusDeductionTotal": "加分/扣分合计",
+    "redLineIssueYuan": "红线问题(元)",
+    "majorIssueYuan": "重大问题(元)",
+    "seriousIssueYuan": "严重问题(元)",
+    "minorIssueYuan": "一般问题(元)",
+    "breachHandling": "违约处理(元)",
+    "totalPenalty": "总罚款金额(元)",
+    "rewardAmount": "奖励金额(元)",
+    "remarkReason": "备注原因",
+    "avgMonthlyShipVolume": "月均发货体积(单位:m³)",
+    "standardBreachAmount": "标准违约金(元)",
+    "breachCoefficient": "违约系数",
+    "isReward": "考核结果是否奖励",
+    "yearMonthFormat": "YYYY年M月"
+  },
+  "transportationExpress": {
+    "title": "运输快递KPI评分",
+    "reset": "重置",
+    "showDetails": "显示详情",
+    "logisticProvider": "物流商",
+    "cdcWarehouse": "仓库",
+    "noSearchResults": "暂无搜索结果",
+    "dateRange": {
+      "startMonth": "开始月份",
+      "endMonth": "结束月份"
+    },
+    "placeholders": {
+      "searchLogisticProvider": "搜索物流商...",
+      "searchCdcWarehouse": "搜索仓库..."
+    },
+    "buttons": {
+      "exportSummary": "导出汇总",
+      "exportDetail": "导出明细"
+    },
+    "tableColumns": {
+      "yearMonth": "年月",
+      "yearMonthFormat": "{0}年{1}月",
+      "logisticProvider": "物流商",
+      "cdcWarehouse": "仓库",
+      "totalScore": "总成绩",
+      "onTimeDeliveryRate": "正向订单准时交货率",
+      "expressDeliverRate": "正向发货及时率",
+      "damageRate": "破损率",
+      "lossRate": "遗失率",
+      "customerSatisfaction": "客户满意度",
+      "scoreSummary": "得分汇总",
+      "deductionItem": "扣分项",
+      "deductionDesc": "扣分说明",
+      "bonusItem": "加分项",
+      "bonusDescription": "加分说明"
+    },
+    "kpiDetail": {
+      "onTimeDeliveryRate": "正向订单准时交货率",
+      "onTimeDeliveryNumerator": "正向准时交货的发货单数量",
+      "totalDeliveryOrders": "总发货单数量",
+      "scoreFull50": "得分(满分50分)",
+      "expressDeliverRate": "正向发货及时率",
+      "expressDeliverNumerator": "及时发货的订单数量",
+      "totalExpressOrders": "总发货订单量",
+      "scoreFull20": "得分(满分20分)",
+      "damageRate": "破损率",
+      "damageNumerator": "发生货破货损货物件数",
+      "totalCargoPieces": "总发货货物件数",
+      "scoreFull10": "得分(满分10分)",
+      "lossRate": "遗失率",
+      "lossNumerator": "发生遗失货物件数",
+      "customerSatisfaction": "客户满意度",
+      "customerRating": "客户评分"
+    },
+    "messages": {
+      "fetchDataFailed": "获取数据失败",
+      "fetchTableDataFailed": "获取表格数据失败:",
+      "selectDateRange": "请选择日期范围",
+      "unknownError": "未知错误",
+      "exportDataTooLarge": "导出数据量过大，请缩小查询范围",
+      "exportSummarySuccess": "导出汇总成功",
+      "exportSummaryFailed": "导出汇总失败",
+      "exportSummaryFilename": "运输快递物流商KPI评分汇总",
+      "exportDetailSuccess": "导出明细成功",
+      "exportDetailFailed": "导出明细失败",
+      "exportDetailFilename": "运输快递物流商KPI评分明细"
+    }
+  },
+  "transportationDoa": {
+    "title": "运输DOA KPI评分",
+    "reset": "重置",
+    "logisticProvider": "物流商",
+    "cdcWarehouse": "提货DC",
+    "transType": "运输方式",
+    "showDetails": "显示详情",
+    "noSearchResults": "暂无搜索结果",
+    "dateRange": {
+      "startMonth": "开始月份",
+      "endMonth": "结束月份"
+    },
+    "placeholders": {
+      "searchLogisticProvider": "搜索物流商...",
+      "searchCdcWarehouse": "搜索提货DC...",
+      "searchTransType": "搜索运输方式..."
+    },
+    "buttons": {
+      "exportSummary": "导出汇总",
+      "exportDetail": "导出明细"
+    },
+    "tableColumns": {
+      "yearMonth": "年月",
+      "logistic": "物流商",
+      "totalScore": "总成绩",
+      "cdcWarehouse": "提货DC",
+      "scoreSummary": "得分汇总",
+      "totalDeduction": "扣分项",
+      "deductionDesc": "扣分说明",
+      "totalBonus": "加分项",
+      "bonusDescription": "加分说明",
+      "yearMonthFormat": "{year}年{month}月"
+    },
+    "kpiColumns": {
+      "doaOnTimeRate": "DOA准时交货率",
+      "doaPickupTimelinessRate": "DOA提货准时率",
+      "doaDamageDppm": "DOA货损DPPM",
+      "doaCustomerSatisfaction": "DOA客户满意度"
+    },
+    "detailColumns": {
+      "doaOntimeNumerator": "准时交货的反向提货清单数量",
+      "doaOntimeDenominator": "反向总提货清单数量",
+      "doaPickupNumerator": "准时提货的反向提货清单数量",
+      "doaPickupDenominator": "反向总提货清单数量",
+      "customerRating": "客户评分",
+      "scoreFull50": "得分(满分50分)",
+      "scoreFull30": "得分(满分30分)",
+      "scoreFull10": "得分(满分10分)"
+    },
+    "messages": {
+      "fetchDataFailed": "获取数据失败",
+      "fetchTransTypeListFailed": "获取运输方式列表失败",
+      "selectDateRange": "请选择日期范围",
+      "exportDataTooLarge": "导出数据量过大，请缩小查询范围",
+      "exportSummarySuccess": "导出汇总成功",
+      "exportSummaryFailed": "导出汇总失败",
+      "exportDetailSuccess": "导出明细成功",
+      "exportDetailFailed": "导出明细失败",
+      "exportSummaryFilename": "运输-DOA KPI评分汇总_{start}_{end}.xlsx",
+      "exportDetailFilename": "运输物流商KPI评分明细_{start}_{end}.xlsx"
+    }
+  },
+  "globalFilterBar": {
+    "placeholders": {
+      "searchWarehouse": "搜索始发仓",
+      "searchProvince": "搜索目的省",
+      "searchRdc": "搜索目的RDC",
+      "noResults": "无搜索结果"
+    },
+    "buttons": {
+      "done": "完成"
+    },
+    "labels": {
+      "all": "全部",
+      "fromWarehouse": "始发仓",
+      "toProvince": "目的省",
+      "toRdc": "目的RDC"
+    }
+  },
+  "dashboardView": {
+    "title": "联晟智达鲲鹏运输智能体",
+    "buttons": {
+      "refresh": "刷新",
+      "fullscreen": "全屏",
+      "exitFullscreen": "退出全屏",
+      "close": "关闭"
+    },
+    "status": {
+      "layout": "布局",
+      "currentPage": "当前页面",
+      "pageModules": "页面模块",
+      "displayModules": "显示模块",
+      "none": "无"
+    }
+  },
+  "cargoBanner": {
+    "cardTitles": {
+      "cddAlert": "当月CDD预警",
+      "vehicleSafety": "车辆安全监控",
+      "isgAlert": "ISG电子标签预警",
+      "riskOrder7Days": "超7天异常预警",
+      "riskOrderOver7Days": "异常预警大于7天未解决"
+    },
+    "modalTitles": {
+      "riskOrderDetail": "异常预警订单详情",
+      "cddAlertDetail": "CDD预警详情",
+      "isgAlertDetail": "ISG电子标签预警详情"
+    },
+    "categories": {
+      "highPriority": "重点关注",
+      "normalPriority": "一般关注"
+    },
+    "filters": {
+      "fromWarehouse": "始发仓",
+      "toProvince": "目的省",
+      "toRdc": "目的RDC",
+      "dataSource": "数据源",
+      "customer": "客户",
+      "transMode": "运输模式",
+      "nonComplianceType": "不达标类型",
+      "reset": "重置"
+    },
+    "placeholders": {
+      "searchWarehouse": "搜索始发仓",
+      "searchProvince": "搜索目的省",
+      "searchRdc": "搜索目的RDC",
+      "invoiceNo": "发货单号",
+      "noResults": "未找到匹配结果"
+    },
+    "buttons": {
+      "search": "搜索",
+      "reset": "重置",
+      "export": "导出",
+      "expand": "放大查看"
+    },
+    "isgTabs": {
+      "delay": "ISG客户迟到风险",
+      "inTransit": "ISG在途异常",
+      "delivery": "按需达交付异常"
+    },
+    "tableColumns": {
+      "dataSource": "数据源",
+      "customer": "客户",
+      "custOrderNo": "客户订单号",
+      "invoiceNo": "发货单号",
+      "fromWarehouse": "始发仓",
+      "toRdc": "目的RDC",
+      "carrierName": "承运商",
+      "deliveryName": "配送商",
+      "abnormalCode": "异常代码",
+      "abnormalTime": "异常时间",
+      "abnormalDesc": "异常描述",
+      "abnormalCount": "异常次数",
+      "productNo": "产品编号",
+      "productName": "产品名称",
+      "actionAdvice": "处理建议",
+      "dataCheckTime": "数据校验时间",
+      "location": "位置",
+      "predictArriveTime": "预计到达时间",
+      "riskInfo": "风险信息",
+      "reason": "原因",
+      "measure": "处理措施",
+      "etagSn": "电子标签SN",
+      "consigneeAddress": "收货地址",
+      "abnormalType": "异常类型",
+      "lenovoOrderNo": "联想订单号",
+      "logisticName": "物流商",
+      "transType": "运输模式",
+      "onDemandTime": "按需达时间",
+      "toProvince": "目的省",
+      "toCity": "目的市",
+      "abnormalInfo": "异常情况",
+      "transNo": "运输单号",
+      "eteOnTime": "端到端准时",
+      "mainLineOnTime": "干线准时",
+      "deliveryOnTime": "配送准时",
+      "lastAbnormalCode": "最后异常代码",
+      "shipConfirmTime": "发运确认时间",
+      "signTime": "签收时间",
+      "category": "分类"
+    },
+    "isgDeliveryAbnormalInfo": {
+      "1": "按需达时间、签收时间不在同一天",
+      "2": "电子标签与货物未解绑，但是订单签收",
+      "3": "货物到达客户处又离开且电子标签未解绑"
+    },
+    "cddOptions": {
+      "customers": {
+        "fenxiao": "分销外包",
+        "huazhi": "华致酒行",
+        "lenovo": "联想成品业务",
+        "laiku": "来酷科技",
+        "youdao": "有道"
+      },
+      "modeTypes": {
+        "direct": "直送",
+        "zone": "区配"
+      },
+      "nonComplianceTypes": {
+        "ete": "端到端迟到",
+        "trunkline": "干线迟到",
+        "distribution": "配送迟到"
+      }
+    },
+    "messages": {
+      "loadFilterOptionsFailed": "加载筛选选项失败",
+      "requestTimeout": "请求超时，可能是网络较慢或服务器响应慢",
+      "fetchModalDataFailed": "获取弹窗数据失败",
+      "fetchCddDataFailed": "获取CDD数据失败",
+      "fetchIsgDataFailed": "获取ISG数据失败",
+      "exportCddFailed": "导出CDD失败",
+      "exportFailed": "导出失败",
+      "exportDataTooLarge": "导出数据量过大，请缩小范围",
+      "exportFilename": "导出文件.xlsx",
+      "noData": "暂无数据",
+      "currentLocation": "当前位置："
+    },
+    "pagination": {
+      "showTotal": "第 {start}-{end} 条/共 {total} 条 (共 {pages} 页)"
+    },
+    "altText": {
+      "vehicleIcon": "车辆图标",
+      "emptyImage": "暂无数据"
+    }
+  }
+}

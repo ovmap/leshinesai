@@ -5,6 +5,9 @@ import { message } from 'ant-design-vue';
 import { queryDoaKpiSummary, queryTransTypeList, exportDoaLogisticKpiScoreSummary, exportDoaLogisticKpiScoreDetail } from '../../../services/transportApi';
 import { useSelectOptionsStore } from '../../../stores/selectOptionsStore';
 import { useDashboardDataStore } from '../../../stores/dashboardDataStore';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const props = defineProps<{
   fromWarehouse?: string[]
@@ -57,7 +60,7 @@ const filteredLogisticProviderOptions = computed(() => {
   }
   
   // 在列表开头添加重置选项
-  return [{ code: '__reset__', name: '重置' }, ...filtered];
+  return [{ code: '__reset__', name: t('dashboard.transportationDoa.reset') }, ...filtered];
 });
 
 // 过滤后的CDC仓库选项（包含重置选项）
@@ -74,7 +77,7 @@ const filteredCdcWarehouseOptions = computed(() => {
   }
   
   // 在列表开头添加重置选项
-  return [{ code: '__reset__', name: '重置' }, ...filtered];
+  return [{ code: '__reset__', name: t('dashboard.transportationDoa.reset') }, ...filtered];
 });
 
 // 过滤后的运输方式选项（包含重置选项）
@@ -91,7 +94,7 @@ const filteredTransTypeOptions = computed(() => {
   }
   
   // 在列表开头添加重置选项
-  return [{ code: '__reset__', name: '重置' }, ...filtered];
+  return [{ code: '__reset__', name: t('dashboard.transportationDoa.reset') }, ...filtered];
 });
 
 // 下拉框开关状态
@@ -110,7 +113,7 @@ const tableScrollY = ref<number | string>('100%');
 
 // 显示文本（多选）
 const selectedLogisticProviderText = computed(() => {
-  if (selectedLogisticProvider.value.length === 0) return '物流商';
+  if (selectedLogisticProvider.value.length === 0) return t('dashboard.transportationDoa.logisticProvider');
   const names = selectedLogisticProvider.value.map(code => {
     const option = logisticProviderOptions.value.find(item => item.code === code);
     return option ? option.name : code;
@@ -119,7 +122,7 @@ const selectedLogisticProviderText = computed(() => {
 });
 
 const selectedCdcWarehouseText = computed(() => {
-  if (selectedCdcWarehouse.value.length === 0) return '提货DC';
+  if (selectedCdcWarehouse.value.length === 0) return t('dashboard.transportationDoa.cdcWarehouse');
   const names = selectedCdcWarehouse.value.map(code => {
     const option = cdcWarehouseOptions.value.find(item => item.code === code);
     return option ? option.name : code;
@@ -128,7 +131,7 @@ const selectedCdcWarehouseText = computed(() => {
 });
 
 const selectedTransTypeText = computed(() => {
-  if (selectedTransType.value.length === 0) return '运输方式';
+  if (selectedTransType.value.length === 0) return t('dashboard.transportationDoa.transType');
   const names = selectedTransType.value.map(code => {
     const option = transTypeOptions.value.find(item => item.code === code);
     return option ? option.name : code;
@@ -329,7 +332,7 @@ const createKpiDetailColumn = (
       title: child.title,
       key: child.key,
       dataIndex: child.key,
-      width: child.title.includes('得分') ? 140 : (child.title.length > 12 ? 180 : 160),
+      width: child.maxScore ? 140 : (child.title.length > 12 ? 180 : 160),
       align: 'center' as const,
       customRender: ({ record }: { record: any }) => {
         const kpi = record.kpiData?.find((k: any) => k.kpiType === kpiType);
@@ -360,31 +363,30 @@ const createKpiDetailColumn = (
 const tableColumns = computed(() => {
   const baseColumns = [
     {
-      title: '年月',
+      title: t('dashboard.transportationDoa.tableColumns.yearMonth'),
       key: 'yearMonth',
       dataIndex: 'yearMonth',
       width: 100,
       align: 'center' as const,
       customRender: ({ text }: { text: string | undefined }) => {
         if (!text || text === '汇总') return text || '-';
-        // 格式化年月：2025-11 -> 2025年11月
         const textStr = text || '';
         const parts = textStr.split('-');
         if (parts.length === 2 && parts[0] && parts[1]) {
-          return `${parts[0]}年${parseInt(parts[1])}月`;
+          return t('dashboard.transportationDoa.tableColumns.yearMonthFormat', { year: parts[0], month: parseInt(parts[1]) });
         }
         return text || '-';
       },
     },
     {
-      title: '物流商',
+      title: t('dashboard.transportationDoa.tableColumns.logistic'),
       key: 'logistic',
       dataIndex: 'logistic',
       width: 120,
       align: 'center' as const,
     },
     {
-      title: '总成绩',
+      title: t('dashboard.transportationDoa.tableColumns.totalScore'),
       key: 'totalScore',
       dataIndex: 'totalScore',
       width: 120,
@@ -394,7 +396,7 @@ const tableColumns = computed(() => {
       },
     },
     {
-      title: '提货DC',
+      title: t('dashboard.transportationDoa.tableColumns.cdcWarehouse'),
       key: 'cdcWarehouse',
       dataIndex: 'cdcWarehouse',
       width: 120,
@@ -406,62 +408,58 @@ const tableColumns = computed(() => {
   if (showDetails.value) {
     // 显示详情时的表头（带子列）
     const kpiColumns = [
-      // DOA准时交货率 (kpiType: 19)
-      createKpiDetailColumn('DOA准时交货率', 19, [
-        { title: '准时交货的反向提货清单数量', key: 'doa_ontime_numerator', dataKey: 'numerator' },
-        { title: '反向总提货清单数量', key: 'doa_ontime_denominator', dataKey: 'denominator' },
-        { title: 'DOA准时交货率', key: 'doa_ontime_rate', dataKey: 'rate' },
-        { title: '得分(满分50分)', key: 'doa_ontime_score', dataKey: 'score', maxScore: 50 },
+      createKpiDetailColumn(t('dashboard.transportationDoa.kpiColumns.doaOnTimeRate'), 19, [
+        { title: t('dashboard.transportationDoa.detailColumns.doaOntimeNumerator'), key: 'doa_ontime_numerator', dataKey: 'numerator' },
+        { title: t('dashboard.transportationDoa.detailColumns.doaOntimeDenominator'), key: 'doa_ontime_denominator', dataKey: 'denominator' },
+        { title: t('dashboard.transportationDoa.kpiColumns.doaOnTimeRate'), key: 'doa_ontime_rate', dataKey: 'rate' },
+        { title: t('dashboard.transportationDoa.detailColumns.scoreFull50'), key: 'doa_ontime_score', dataKey: 'score', maxScore: 50 },
       ]),
-      // DOA提货准时率 (kpiType: 20)
-      createKpiDetailColumn('DOA提货准时率', 20, [
-        { title: '准时提货的反向提货清单数量', key: 'doa_pickup_numerator', dataKey: 'numerator' },
-        { title: '反向总提货清单数量', key: 'doa_pickup_denominator', dataKey: 'denominator' },
-        { title: 'DOA提货准时率', key: 'doa_pickup_rate', dataKey: 'rate' },
-        { title: '得分(满分30分)', key: 'doa_pickup_score', dataKey: 'score', maxScore: 30 },
+      createKpiDetailColumn(t('dashboard.transportationDoa.kpiColumns.doaPickupTimelinessRate'), 20, [
+        { title: t('dashboard.transportationDoa.detailColumns.doaPickupNumerator'), key: 'doa_pickup_numerator', dataKey: 'numerator' },
+        { title: t('dashboard.transportationDoa.detailColumns.doaPickupDenominator'), key: 'doa_pickup_denominator', dataKey: 'denominator' },
+        { title: t('dashboard.transportationDoa.kpiColumns.doaPickupTimelinessRate'), key: 'doa_pickup_rate', dataKey: 'rate' },
+        { title: t('dashboard.transportationDoa.detailColumns.scoreFull30'), key: 'doa_pickup_score', dataKey: 'score', maxScore: 30 },
       ]),
-      // DOA货损DPPM (kpiType: 21)
-      createKpiDetailColumn('DOA货损DPPM', 21, [
+      createKpiDetailColumn(t('dashboard.transportationDoa.kpiColumns.doaDamageDppm'), 21, [
         { title: 'DPPM', key: 'doa_damage_rate', dataKey: 'satisfact' },
-        { title: '得分(满分10分)', key: 'doa_damage_score', dataKey: 'score', maxScore: 10 },
+        { title: t('dashboard.transportationDoa.detailColumns.scoreFull10'), key: 'doa_damage_score', dataKey: 'score', maxScore: 10 },
       ]),
-      // DOA客户满意度 (kpiType: 22)
-      createKpiDetailColumn('DOA客户满意度', 22, [
-        { title: '客户评分', key: 'doa_satisfaction_rate', dataKey: 'satisfact' },
-        { title: '得分(满分10分)', key: 'doa_satisfaction_score', dataKey: 'score', maxScore: 10 },
+      createKpiDetailColumn(t('dashboard.transportationDoa.kpiColumns.doaCustomerSatisfaction'), 22, [
+        { title: t('dashboard.transportationDoa.detailColumns.customerRating'), key: 'doa_satisfaction_rate', dataKey: 'satisfact' },
+        { title: t('dashboard.transportationDoa.detailColumns.scoreFull10'), key: 'doa_satisfaction_score', dataKey: 'score', maxScore: 10 },
       ]),
     ];
     const footColumns = [
       {
-        title: '得分汇总',
+        title: t('dashboard.transportationDoa.tableColumns.scoreSummary'),
         key: 'scoreSummary',
         dataIndex: 'scoreSummary',
         width: 120,
         align: 'center' as const,
       },
       {
-        title: '扣分项',
+        title: t('dashboard.transportationDoa.tableColumns.totalDeduction'),
         key: 'totalDeduction',
         dataIndex: 'totalDeduction',
         width: 120,
         align: 'center' as const,
       },
       {
-        title: '扣分说明',
+        title: t('dashboard.transportationDoa.tableColumns.deductionDesc'),
         key: 'deductionDesc',
         dataIndex: 'deductionDesc',
         width: 120,
         align: 'center' as const,
       },
       {
-        title: '加分项',
+        title: t('dashboard.transportationDoa.tableColumns.totalBonus'),
         key: 'totalBonus',
         dataIndex: 'totalBonus',
         width: 120,
         align: 'center' as const,
       },
       {
-        title: '加分说明',
+        title: t('dashboard.transportationDoa.tableColumns.bonusDescription'),
         key: 'bonusDescription',
         dataIndex: 'bonusDescription',
         width: 120,
@@ -473,7 +471,7 @@ const tableColumns = computed(() => {
     // 不显示详情时的简化表头（只显示比率，带 trend 和颜色）
     const kpiColumns = [
       {
-        title: 'DOA准时交货率',
+        title: t('dashboard.transportationDoa.kpiColumns.doaOnTimeRate'),
         key: 'doaOnTimeRate',
         dataIndex: 'doaOnTimeRate',
         width: 150,
@@ -486,7 +484,7 @@ const tableColumns = computed(() => {
         },
       },
       {
-        title: 'DOA提货准时率',
+        title: t('dashboard.transportationDoa.kpiColumns.doaPickupTimelinessRate'),
         key: 'doaPickupTimelinessRate',
         dataIndex: 'doaPickupTimelinessRate',
         width: 150,
@@ -499,7 +497,7 @@ const tableColumns = computed(() => {
         },
       },
       {
-        title: 'DOA货损DPPM',
+        title: t('dashboard.transportationDoa.kpiColumns.doaDamageDppm'),
         key: 'doaDamageRate',
         dataIndex: 'doaDamageRate',
         width: 150,
@@ -512,7 +510,7 @@ const tableColumns = computed(() => {
         },
       },
       {
-        title: 'DOA客户满意度',
+        title: t('dashboard.transportationDoa.kpiColumns.doaCustomerSatisfaction'),
         key: 'doaCustomerSatisfactionRate',
         dataIndex: 'doaCustomerSatisfactionRate',
         width: 200,
@@ -576,12 +574,12 @@ const fetchData = async () => {
         tableData.value = [];
       }
     } else {
-      message.error(result?.msg || '获取数据失败');
+      message.error(result?.msg || t('dashboard.transportationDoa.messages.fetchDataFailed'));
       tableData.value = [];
     }
   } catch (error) {
-    console.error('获取数据失败:', error);
-    message.error('获取数据失败');
+    console.error('fetchData error:', error);
+    message.error(t('dashboard.transportationDoa.messages.fetchDataFailed'));
     tableData.value = [];
   } finally {
     loading.value = false;
@@ -639,8 +637,8 @@ const fetchTransTypeList = async () => {
         .filter((option: { code: string; name: string }) => option.code && option.name);
     }
   } catch (error) {
-    console.error('获取运输方式列表失败:', error);
-    message.error('获取运输方式列表失败');
+    console.error('fetchTransTypeList error:', error);
+    message.error(t('dashboard.transportationDoa.messages.fetchTransTypeListFailed'));
   }
 };
 
@@ -674,7 +672,7 @@ onMounted(async () => {
 // 导出汇总
 const handleExportSummary = async () => {
   if (!dateRange.value || !dateRange.value[0] || !dateRange.value[1]) {
-    message.warning('请选择日期范围');
+    message.warning(t('dashboard.transportationDoa.messages.selectDateRange'));
     return;
   }
 
@@ -700,28 +698,28 @@ const handleExportSummary = async () => {
         const link = document.createElement('a');
         link.href = result.data;
         const xlsxMatch = result.data.match(/([^/]+\.xlsx)$/);
-        const downloadFilename = xlsxMatch ? xlsxMatch[1]! : `运输-DOA KPI评分汇总_${dateRange.value[0].format('YYYY-MM')}_${dateRange.value[1].format('YYYY-MM')}.xlsx`;
+        const downloadFilename = xlsxMatch ? xlsxMatch[1]! : t('dashboard.transportationDoa.messages.exportSummaryFilename', { start: dateRange.value[0].format('YYYY-MM'), end: dateRange.value[1].format('YYYY-MM') });
         
         link.download = downloadFilename;
         link.target = '_blank';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        message.success('导出汇总成功');
+        message.success(t('dashboard.transportationDoa.messages.exportSummarySuccess'));
       }
     } else {
-      console.error('导出汇总失败:', result?.message || '未知错误');
-      message.error(result?.message || '导出汇总失败');
+      console.error('exportSummary error:', result?.message || 'unknown');
+      message.error(result?.message || t('dashboard.transportationDoa.messages.exportSummaryFailed'));
     }
   } catch (error: any) {
-    console.error('导出汇总失败:', error);
+    console.error('exportSummary error:', error);
     
     // 检查是否是409或504状态码
     const errCode = error?.code || error?.response?.status;
     if (errCode === 409 || errCode === 504 || errCode === 505) {
-      message.error(error.msg || '导出数据量过大，请缩小查询范围');
+      message.error(error.msg || t('dashboard.transportationDoa.messages.exportDataTooLarge'));
     } else {
-      message.error(error.msg || '导出汇总失败');
+      message.error(error.msg || t('dashboard.transportationDoa.messages.exportSummaryFailed'));
     }
   } finally {
     exportLoading.value = false;
@@ -731,7 +729,7 @@ const handleExportSummary = async () => {
 // 导出明细
 const handleExportDetail = async () => {
   if (!dateRange.value || !dateRange.value[0] || !dateRange.value[1]) {
-    message.warning('请选择日期范围');
+    message.warning(t('dashboard.transportationDoa.messages.selectDateRange'));
     return;
   }
 
@@ -756,28 +754,28 @@ const handleExportDetail = async () => {
         const link = document.createElement('a');
         link.href = result.data;
         const xlsxMatch = result.data.match(/([^/]+\.xlsx)$/);
-        const downloadFilename = xlsxMatch ? xlsxMatch[1]! : `运输物流商KPI评分明细_${dateRange.value[0].format('YYYY-MM')}_${dateRange.value[1].format('YYYY-MM')}.xlsx`;
+        const downloadFilename = xlsxMatch ? xlsxMatch[1]! : t('dashboard.transportationDoa.messages.exportDetailFilename', { start: dateRange.value[0].format('YYYY-MM'), end: dateRange.value[1].format('YYYY-MM') });
         
         link.download = downloadFilename;
         link.target = '_blank';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        message.success('导出明细成功');
+        message.success(t('dashboard.transportationDoa.messages.exportDetailSuccess'));
       }
     } else {
-      console.error('导出明细失败:', result?.message || '未知错误');
-      message.error(result?.message || '导出明细失败');
+      console.error('exportDetail error:', result?.message || 'unknown');
+      message.error(result?.message || t('dashboard.transportationDoa.messages.exportDetailFailed'));
     }
   } catch (error: any) {
-    console.error('导出明细失败:', error);
+    console.error('exportDetail error:', error);
     
     // 检查是否是409或504状态码
     const errCode = error?.code || error?.response?.status;
     if (errCode === 409 || errCode === 504 || errCode === 505) {
-      message.error(error.msg || '导出数据量过大，请缩小查询范围');
+      message.error(error.msg || t('dashboard.transportationDoa.messages.exportDataTooLarge'));
     } else {
-      message.error(error.msg || '导出明细失败');
+      message.error(error.msg || t('dashboard.transportationDoa.messages.exportDetailFailed'));
     }
   } finally {
     exportLoading.value = false;
@@ -799,7 +797,7 @@ onUnmounted(() => {
 <template>
   <div class="doa-score-container">
     <div class="header-bar">
-      <h2 class="header-title">运输DOA KPI评分</h2>
+      <h2 class="header-title">{{ t('dashboard.transportationDoa.title') }}</h2>
     </div>
     <!-- 控制面板 -->
     <div class="control-panel">
@@ -811,7 +809,7 @@ onUnmounted(() => {
             picker="month"
             format="YYYY-MM"
             :separator="'~'"
-            :placeholder="['开始月份', '结束月份']"
+            :placeholder="[t('dashboard.transportationDoa.dateRange.startMonth'), t('dashboard.transportationDoa.dateRange.endMonth')]"
             class="date-range-picker"
           />
         </div>
@@ -827,7 +825,7 @@ onUnmounted(() => {
               <input 
                 v-model="logisticProviderSearch" 
                 type="text" 
-                placeholder="搜索物流商..." 
+                :placeholder="t('dashboard.transportationDoa.placeholders.searchLogisticProvider')" 
                 class="search-input"
                 @click.stop 
               />
@@ -847,7 +845,7 @@ onUnmounted(() => {
                 {{ option.name }}
               </div>
               <div v-if="filteredLogisticProviderOptions.length === 1 && logisticProviderSearch" class="no-results">
-                暂无搜索结果
+                {{ t('dashboard.transportationDoa.noSearchResults') }}
               </div>
             </div>
           </div>
@@ -864,7 +862,7 @@ onUnmounted(() => {
               <input 
                 v-model="cdcWarehouseSearch" 
                 type="text" 
-                placeholder="搜索提货DC..." 
+                :placeholder="t('dashboard.transportationDoa.placeholders.searchCdcWarehouse')" 
                 class="search-input"
                 @click.stop 
               />
@@ -884,7 +882,7 @@ onUnmounted(() => {
                 {{ option.name }}
               </div>
               <div v-if="filteredCdcWarehouseOptions.length === 1 && cdcWarehouseSearch" class="no-results">
-                暂无搜索结果
+                {{ t('dashboard.transportationDoa.noSearchResults') }}
               </div>
             </div>
           </div>
@@ -901,7 +899,7 @@ onUnmounted(() => {
               <input 
                 v-model="transTypeSearch" 
                 type="text" 
-                placeholder="搜索运输方式..." 
+                :placeholder="t('dashboard.transportationDoa.placeholders.searchTransType')" 
                 class="search-input"
                 @click.stop 
               />
@@ -921,7 +919,7 @@ onUnmounted(() => {
                 {{ option.name }}
               </div>
               <div v-if="filteredTransTypeOptions.length === 1 && transTypeSearch" class="no-results">
-                暂无搜索结果
+                {{ t('dashboard.transportationDoa.noSearchResults') }}
               </div>
             </div>
           </div>
@@ -929,7 +927,7 @@ onUnmounted(() => {
 
         <!-- 显示详情开关 -->
         <div class="switch-item">
-          <span class="switch-label">显示详情</span>
+          <span class="switch-label">{{ t('dashboard.transportationDoa.showDetails') }}</span>
           <a-switch v-model:checked="showDetails" />
         </div>
 
@@ -938,10 +936,10 @@ onUnmounted(() => {
       <!-- 操作按钮组 -->
       <div class="action-buttons">
         <a-button @click="handleExportSummary" class="action-btn" :loading="exportLoading">
-          导出汇总
+          {{ t('dashboard.transportationDoa.buttons.exportSummary') }}
         </a-button>
         <a-button @click="handleExportDetail" class="action-btn" :loading="exportLoading">
-          导出明细
+          {{ t('dashboard.transportationDoa.buttons.exportDetail') }}
         </a-button>
       </div>
     </div>

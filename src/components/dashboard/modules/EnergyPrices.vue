@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
+import { useI18n } from 'vue-i18n'
 import * as echarts from 'echarts'
 import { queryEnergyPrice } from '../../../services/transportApi'
 import { useDashboardDataStore } from '../../../stores/dashboardDataStore'
 
+const { t } = useI18n()
 const dataStore = useDashboardDataStore()
 
 // Tab切换状态
@@ -54,7 +56,7 @@ const loadData = async (isInternational: boolean) => {
       })
     }
   } catch (error) {
-    console.error('获取能源价格数据失败:', error)
+    console.error(t('dashboard.energyPrices.messages.fetchError'), error)
   } finally {
     loading.value = false
   }
@@ -93,7 +95,7 @@ const updateChart = () => {
   const currentData = activeTab.value === 'domestic' ? energyPriceData.value.domestic : energyPriceData.value.international
   if (!currentData?.items) return
 
-  const months = currentData.items.map((item: any) => `${item.month}月`)
+  const months = currentData.items.map((item: any) => `${item.month}${t('dashboard.energyPrices.monthSuffix')}`)
   const gasolineData = currentData.items.map((item: any) => ({ value: parseFloat(item.gasoline), event: item.event }))
   const dieselData = currentData.items.map((item: any) => ({ value: item.diesel, event: item.event }))
   const aircraftFuelData = currentData.items.map((item: any) => ({ value: item.aircraftFuel, event: item.event }))
@@ -102,7 +104,7 @@ const updateChart = () => {
 
   const series = [
     {
-      name: '汽油',
+      name: t('dashboard.energyPrices.fuelTypes.gasoline'),
       type: 'line',
       data: gasolineData,
       itemStyle: { color: '#F5A623' },
@@ -127,7 +129,7 @@ const updateChart = () => {
       }
     },
     {
-      name: '柴油',
+      name: t('dashboard.energyPrices.fuelTypes.diesel'),
       type: isDomestic ? 'line' : 'bar',
       data: dieselData,
       itemStyle: isDomestic ? { color: '#00D4AA' } : {
@@ -167,7 +169,7 @@ const updateChart = () => {
       } : undefined
     },
     {
-      name: '航空燃油',
+      name: t('dashboard.energyPrices.fuelTypes.aircraftFuel'),
       type: isDomestic ? 'line' : 'bar',
       data: aircraftFuelData,
       itemStyle: isDomestic ? { color: '#9C88FF' } : {
@@ -235,15 +237,15 @@ const chartOptions = computed(() => {
         let result = `${params[0].axisValue}<br/>`
         params.forEach((item: any) => {
           if (isDomestic) {
-            result += `${item.marker}${item.seriesName}: ${item.value}￥/吨<br/>`
+            result += `${item.marker}${item.seriesName}: ${item.value}${t('dashboard.energyPrices.units.cnyPerTon')}<br/>`
           } else {
-            const unit = item.seriesName === '汽油' ? '加仑' : '$/桶'
+            const unit = item.seriesName === t('dashboard.energyPrices.fuelTypes.gasoline') ? t('dashboard.energyPrices.units.gallon') : t('dashboard.energyPrices.units.usdPerBarrel')
             result += `${item.marker}${item.seriesName}: ${item.value}${unit}<br/>`
           }
         })
         const firstParam = params[0]
         if (firstParam?.data?.event) {
-          result += `关键事件: ${firstParam.data.event}`
+          result += `${t('dashboard.energyPrices.keyEvent')}: ${firstParam.data.event}`
         }
         return result
       }
@@ -275,7 +277,7 @@ const chartOptions = computed(() => {
     yAxis: [
       {
         type: 'value',
-        name: isDomestic ? '￥/吨' : '$/桶',
+        name: isDomestic ? t('dashboard.energyPrices.units.cnyPerTon') : t('dashboard.energyPrices.units.usdPerBarrel'),
         nameTextStyle: { color: '#FFFFFF', fontSize: 10 },
         axisLine: { lineStyle: { color: 'rgba(255, 255, 255, 0.3)' } },
         axisLabel: { color: '#FFFFFF', fontSize: 11, formatter: '{value}' },
@@ -285,7 +287,7 @@ const chartOptions = computed(() => {
       },
       ...(!isDomestic ? [{
         type: 'value',
-        name: '加仑',
+        name: t('dashboard.energyPrices.units.gallon'),
         nameTextStyle: { color: '#FFFFFF', fontSize: 10 },
         axisLine: { lineStyle: { color: 'rgba(255, 255, 255, 0.3)' } },
         axisLabel: { color: '#FFFFFF', fontSize: 11, formatter: '{value}' },
@@ -321,7 +323,7 @@ onUnmounted(() => {
 <template>
   <div class="energy-prices-wrapper">
     <div class="header-bar">
-      <h2 class="header-title">能源价格趋势</h2>
+      <h2 class="header-title">{{ t('dashboard.energyPrices.title') }}</h2>
     </div>
     <div class="energy-prices-container">
       <!-- Tab切换 -->
@@ -331,12 +333,12 @@ onUnmounted(() => {
             class="tab-button"
             :class="{ active: activeTab === 'domestic' }"
             @click="switchTab('domestic')"
-          >国内</button>
+          >{{ t('dashboard.energyPrices.tabs.domestic') }}</button>
           <button
             class="tab-button"
             :class="{ active: activeTab === 'international' }"
             @click="switchTab('international')"
-          >国际</button>
+          >{{ t('dashboard.energyPrices.tabs.international') }}</button>
         </div>
       </div>
 

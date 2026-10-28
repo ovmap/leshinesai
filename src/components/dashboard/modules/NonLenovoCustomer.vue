@@ -5,6 +5,7 @@ import { useSelectOptionsStore } from '../../../stores/selectOptionsStore'
 import { useDashboardDataStore } from '../../../stores/dashboardDataStore'
 import dayjs, { type Dayjs } from 'dayjs'
 import { message } from 'ant-design-vue'
+import { useI18n } from 'vue-i18n'
 
 // 接口数据类型定义
 interface CustomerItem {
@@ -56,12 +57,13 @@ const filterForm = ref({
 // 获取 selectOptions store
 const selectOptionsStore = useSelectOptionsStore()
 const dataStore = useDashboardDataStore()
+const { t } = useI18n()
 
 // 下拉框选项
-const timeDimensionOptions = ref<Array<{ code: string; name: string }>>([
-  { code: 'FICAL_YEAR', name: '财年' },
-  { code: 'CALENDAR_YEAR', name: '自然年' },
-  { code: 'MONTH', name: '月' }
+const timeDimensionOptions = computed(() => [
+  { code: 'FICAL_YEAR', name: t('dashboard.nonLenovoCustomer.timeDimensionOptions.fiscalYear') },
+  { code: 'CALENDAR_YEAR', name: t('dashboard.nonLenovoCustomer.timeDimensionOptions.calendarYear') },
+  { code: 'MONTH', name: t('dashboard.nonLenovoCustomer.timeDimensionOptions.month') }
 ])
 const deliveryProviderOptions = computed(() => selectOptionsStore.deliveryProviderOptions)
 const customerOptions = computed(() => selectOptionsStore.customerOptions)
@@ -84,7 +86,7 @@ const filteredDeliveryProviderOptions = computed(() => {
   }
   
   // 在列表开头添加重置选项
-  return [{ code: '__reset__', name: '重置' }, ...filtered]
+  return [{ code: '__reset__', name: t('dashboard.nonLenovoCustomer.filters.reset') }, ...filtered]
 })
 
 // 过滤后的客户选项（包含重置选项）
@@ -101,7 +103,7 @@ const filteredCustomerOptions = computed(() => {
   }
   
   // 在列表开头添加重置选项
-  return [{ code: '__reset__', name: '重置' }, ...filtered]
+  return [{ code: '__reset__', name: t('dashboard.nonLenovoCustomer.filters.reset') }, ...filtered]
 })
 
 // 下拉框状态
@@ -112,6 +114,68 @@ const isCustomerOpen = ref(false)
 // 表格数据
 const tableData = ref<TableRow[]>([])
 const loading = ref(false)
+// 表格列定义
+const tableColumns = computed(() => [
+  {
+    title: t('dashboard.nonLenovoCustomer.tableColumns.customerName'),
+    dataIndex: 'customerName',
+    key: 'customerName',
+    width: 150,
+  },
+  {
+    title: t('dashboard.nonLenovoCustomer.tableColumns.fromProvince'),
+    dataIndex: 'fromProvince',
+    key: 'fromProvince',
+    width: 120,
+    align: 'center' as const,
+    customCell: (record: any) => {
+      if (record.level === 0) {
+        return { colspan: 3, rowspan: 1 }
+      }
+      return {}
+    }
+  },
+  {
+    title: t('dashboard.nonLenovoCustomer.tableColumns.toProvince'),
+    dataIndex: 'toProvince',
+    key: 'toProvince',
+    width: 120,
+    align: 'center' as const,
+    customCell: (record: any) => {
+      if (record.level === 0) {
+        return { colspan: 0, rowspan: 0 }
+      }
+      if (record.level === 1) {
+        return { colspan: 2, rowspan: 1 }
+      }
+      return {}
+    }
+  },
+  {
+    title: t('dashboard.nonLenovoCustomer.tableColumns.deliveryProvider'),
+    dataIndex: 'deliveryProvider',
+    key: 'deliveryProvider',
+    width: 120,
+    align: 'center' as const,
+    customCell: (record: any) => {
+      if (record.level === 0) {
+        return { colspan: 0, rowspan: 0 }
+      }
+      if (record.level === 1) {
+        return { colspan: 0, rowspan: 0 }
+      }
+      return {}
+    }
+  },
+  ...timeColumns.value.map(col => ({
+    title: col,
+    dataIndex: col,
+    key: col,
+    width: 120,
+    align: 'center' as const
+  }))
+])
+
 // 导出加载状态
 const exportLoading = ref(false)
 
@@ -328,9 +392,9 @@ const loadTableData = async () => {
       timeColumns.value = []
     }
   } catch (error) {
-    console.error('获取数据失败:', error)
+    console.error(t('dashboard.nonLenovoCustomer.messages.fetchDataFailed'), error)
     tableData.value = []
-    message.error('获取数据失败')
+    message.error(t('dashboard.nonLenovoCustomer.messages.fetchDataFailed'))
   } finally {
     loading.value = false
   }
@@ -517,12 +581,12 @@ const selectCustomer = (option: { code: string; name: string }) => {
 // 显示文本
 const displayTimeDimension = computed(() => {
   const option = timeDimensionOptions.value.find(item => item.code === filterForm.value.timeDimension)
-  return option ? option.name : '财年'
+  return option ? option.name : t('dashboard.nonLenovoCustomer.timeDimensionOptions.fiscalYear')
 })
 
 const displayDeliveryProvider = computed(() => {
   if (filterForm.value.deliveryProvider.length === 0) {
-    return '配送商'
+    return t('dashboard.nonLenovoCustomer.filters.deliveryProvider')
   }
   const names = filterForm.value.deliveryProvider.map(code => {
     const option = deliveryProviderOptions.value.find(item => item.code === code)
@@ -533,7 +597,7 @@ const displayDeliveryProvider = computed(() => {
 
 const displayCustomer = computed(() => {
   if (filterForm.value.customer.length === 0) {
-    return '客户'
+    return t('dashboard.nonLenovoCustomer.filters.customer')
   }
   const names = filterForm.value.customer.map(code => {
     const option = customerOptions.value.find(item => item.code === code)
@@ -563,14 +627,14 @@ const handleExport = async () => {
     // 检查返回状态码
     if (result.code === 409 || result.code === 504 || result.code === 505) {
       // 导出数量超过限制
-      message.error(result.msg || '导出数据量过大，请缩小查询范围')
+      message.error(result.msg || t('dashboard.nonLenovoCustomer.messages.exportDataTooLarge'))
       return
     }
     
     // 如果接口返回文件下载链接，可以触发下载
     if (result && result.data && result.data.downloadUrl) {
       window.open(result.data.downloadUrl, '_blank')
-      message.success('导出成功')
+      message.success(t('dashboard.nonLenovoCustomer.messages.exportSuccess'))
     } else if (result && result.data) {
       // 如果返回的是文件URL，创建下载链接
       const url = result.data
@@ -578,25 +642,25 @@ const handleExport = async () => {
       link.href = url
       // 从URL中提取文件名，如果没有则使用默认名称
       const xlsxMatch = url.match(/([^/]+\.xlsx)$/)
-      const downloadFilename = xlsxMatch ? xlsxMatch[1] : `端到端准时交付率_${dayjs().format('YYYYMMDD_HHmmss')}.xlsx`
+      const downloadFilename = xlsxMatch ? xlsxMatch[1] : `${t('dashboard.nonLenovoCustomer.messages.exportFileName')}_${dayjs().format('YYYYMMDD_HHmmss')}.xlsx`
       link.download = downloadFilename
       link.target = '_blank'
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)
-      message.success('导出成功')
+      message.success(t('dashboard.nonLenovoCustomer.messages.exportSuccess'))
     } else {
-      message.error(result?.msg || '导出失败')
+      message.error(result?.msg || t('dashboard.nonLenovoCustomer.messages.exportFailed'))
     }
   } catch (error: any) {
-    console.error('导出失败:', error)
+    console.error(t('dashboard.nonLenovoCustomer.messages.exportFailed'), error)
     
     // 检查是否是409或504状态码
     const errCode = error?.code || error?.response?.status
     if (errCode === 409 || errCode === 504 || errCode === 505) {
-      message.error(error.msg || '导出数据量过大，请缩小查询范围')
+      message.error(error.msg || t('dashboard.nonLenovoCustomer.messages.exportDataTooLarge'))
     } else {
-      message.error(error.msg || '导出失败')
+      message.error(error.msg || t('dashboard.nonLenovoCustomer.messages.exportFailed'))
     }
   } finally {
     exportLoading.value = false
@@ -676,7 +740,7 @@ onUnmounted(() => {
 <template>
   <div class="non-lenovo-customer-container">
     <div class="header-bar">
-      <h2 class="header-title">准时交付率(非联想客户)</h2>
+      <h2 class="header-title">{{ t('dashboard.nonLenovoCustomer.title') }}</h2>
     </div>
     <!-- 筛选区域 -->
     <div class="filter-section">
@@ -686,7 +750,7 @@ onUnmounted(() => {
           <a-range-picker
             v-model:value="filterForm.dateRange"
             format="YYYY-MM-DD"
-            separator="至"
+            :separator="t('dashboard.nonLenovoCustomer.dateRange.separator')"
             class="date-range-picker"
             :show-time="false"
             @change="handleDateRangeChange"
@@ -724,7 +788,7 @@ onUnmounted(() => {
                 <input 
                   v-model="deliveryProviderSearch" 
                   type="text" 
-                  placeholder="搜索配送商..." 
+                  :placeholder="t('dashboard.nonLenovoCustomer.placeholders.searchDeliveryProvider')"
                   class="search-input"
                   @click.stop 
                 />
@@ -744,7 +808,7 @@ onUnmounted(() => {
                   {{ option.name }}
                 </div>
                 <div v-if="filteredDeliveryProviderOptions.length === 1 && deliveryProviderSearch" class="no-results">
-                  暂无搜索结果
+                  {{ t('dashboard.nonLenovoCustomer.messages.noSearchResults') }}
                 </div>
               </div>
             </div>
@@ -761,7 +825,7 @@ onUnmounted(() => {
                 <input 
                   v-model="customerSearch" 
                   type="text" 
-                  placeholder="搜索客户..." 
+                  :placeholder="t('dashboard.nonLenovoCustomer.placeholders.searchCustomer')" 
                   class="search-input"
                   @click.stop 
                 />
@@ -781,7 +845,7 @@ onUnmounted(() => {
                   {{ option.name }}
                 </div>
                 <div v-if="filteredCustomerOptions.length === 1 && customerSearch" class="no-results">
-                  暂无搜索结果
+                  {{ t('dashboard.nonLenovoCustomer.messages.noSearchResults') }}
                 </div>
               </div>
             </div>
@@ -789,7 +853,7 @@ onUnmounted(() => {
 
           <!-- 操作按钮 -->
           <div class="filter-actions">
-            <a-button @click="handleExport" :loading="exportLoading">导出</a-button>
+            <a-button @click="handleExport" :loading="exportLoading">{{ t('dashboard.nonLenovoCustomer.buttons.export') }}</a-button>
           </div>
         </div>
       </div>
@@ -799,71 +863,7 @@ onUnmounted(() => {
     <div class="table-section" ref="tableSectionRef">
       <a-spin :spinning="loading">
         <a-table
-          :columns="[
-            {
-              title: '客户名称',
-              dataIndex: 'customerName',
-              key: 'customerName',
-              width: 150,
-            },
-            {
-              title: '始发省份',
-              dataIndex: 'fromProvince',
-              key: 'fromProvince',
-              width: 120,
-              align: 'center',
-              customCell: (record: any) => {
-                // 第一级：合并三列（始发省份、目的省份、配送商）
-                if (record.level === 0) {
-                  return { colspan: 3, rowspan: 1 }
-                }
-                return {}
-              }
-            },
-            {
-              title: '目的省份',
-              dataIndex: 'toProvince',
-              key: 'toProvince',
-              width: 120,
-              align: 'center',
-              customCell: (record: any) => {
-                // 第一级：不显示（被始发省份合并）
-                if (record.level === 0) {
-                  return { colspan: 0, rowspan: 0 }
-                }
-                // 第二级：合并两列（目的省份、配送商）
-                if (record.level === 1) {
-                  return { colspan: 2, rowspan: 1 }
-                }
-                return {}
-              }
-            },
-            {
-              title: '配送商',
-              dataIndex: 'deliveryProvider',
-              key: 'deliveryProvider',
-              width: 120,
-              align: 'center',
-              customCell: (record: any) => {
-                // 第一级：不显示（被始发省份合并）
-                if (record.level === 0) {
-                  return { colspan: 0, rowspan: 0 }
-                }
-                // 第二级：不显示（被目的省份合并）
-                if (record.level === 1) {
-                  return { colspan: 0, rowspan: 0 }
-                }
-                return {}
-              }
-            },
-            ...timeColumns.map(col => ({
-              title: col,
-              dataIndex: col,
-              key: col,
-              width: 120,
-              align: 'center'
-            }))
-          ]"
+          :columns="tableColumns"
           :data-source="tableData"
           :pagination="false"
           size="small"
@@ -887,7 +887,7 @@ onUnmounted(() => {
             </template>
             <template v-else-if="column.key === 'fromProvince'">
               <!-- 第一级：显示"小计"（合并三列） -->
-              <span v-if="record.level === 0" class="subtotal-text">小计</span>
+              <span v-if="record.level === 0" class="subtotal-text">{{ t('dashboard.nonLenovoCustomer.tableColumns.subtotal') }}</span>
               <!-- 其他级别：显示始发省份 -->
               <span v-else class="parent-row">
                 <span 
@@ -904,7 +904,7 @@ onUnmounted(() => {
             </template>
             <template v-else-if="column.key === 'toProvince'">
               <!-- 第二级：显示"小计"（合并两列） -->
-              <span v-if="record.level === 1" class="subtotal-text">小计</span>
+              <span v-if="record.level === 1" class="subtotal-text">{{ t('dashboard.nonLenovoCustomer.tableColumns.subtotal') }}</span>
               <!-- 其他级别：显示目的省份 -->
               <span v-else class="parent-row">
                 <span 
@@ -921,7 +921,7 @@ onUnmounted(() => {
             </template>
             <template v-else-if="column.key === 'deliveryProvider'">
               <!-- 第三级：显示"小计" -->
-              <span v-if="record.level === 2" class="subtotal-text">小计</span>
+              <span v-if="record.level === 2" class="subtotal-text">{{ t('dashboard.nonLenovoCustomer.tableColumns.subtotal') }}</span>
               <!-- 其他级别：显示配送商 -->
               <span v-else>{{ record.deliveryProvider || '' }}</span>
             </template>

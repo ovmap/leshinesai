@@ -10,28 +10,28 @@
       <div class="header-filter-container">
         <GlobalFilterBar />
       </div>
-      <h1 class="dashboard-title">联晟智达鲲鹏运输智能体</h1>
+      <h1 class="dashboard-title">{{ t('dashboard.dashboardView.title') }}</h1>
       <div class="dashboard-actions">
-        <button @click="refresh" class="action-btn" title="刷新">
+        <button @click="refresh" class="action-btn" :title="t('dashboard.dashboardView.buttons.refresh')">
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
           </svg>
-          刷新
+          {{ t('dashboard.dashboardView.buttons.refresh') }}
         </button>
-        <button @click="toggleFullscreen" class="action-btn" title="全屏">
+        <button @click="toggleFullscreen" class="action-btn" :title="t('dashboard.dashboardView.buttons.fullscreen')">
           <svg v-if="!isFullscreen" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
           </svg>
           <svg v-else class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 9V4.5M9 9H4.5M9 9L3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5l5.25 5.25" />
           </svg>
-          {{ isFullscreen ? '退出全屏' : '全屏' }}
+          {{ isFullscreen ? t('dashboard.dashboardView.buttons.exitFullscreen') : t('dashboard.dashboardView.buttons.fullscreen') }}
         </button>
-        <button @click="close" class="action-btn" title="关闭">
+        <button @click="close" class="action-btn" :title="t('dashboard.dashboardView.buttons.close')">
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
-          关闭
+          {{ t('dashboard.dashboardView.buttons.close') }}
         </button>
       </div>
     </div>
@@ -77,6 +77,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
+import { useI18n } from 'vue-i18n'
 import ModulesRender from './dashboard/ModulesRender.vue'
 import QuickBar from './dashboard/QuickBar.vue'
 import GlobalFilterBar from './dashboard/GlobalFilterBar.vue'
@@ -89,6 +90,7 @@ import { useGlobalFilterStore } from '../stores/globalFilterStore'
 import { useSelectOptionsStore } from '../stores/selectOptionsStore'
 import { getHelpInfo } from '../utils/dashboard/commands/help'
 
+const { t } = useI18n()
 const controlStore = useDashboardControlStore()
 const dataStore = useDashboardDataStore()
 const globalFilterStore = useGlobalFilterStore()
@@ -345,27 +347,27 @@ function getStatusInfo(): string {
   const currentPage = controlStore.currentPage
   const activeModules = controlStore.activeModules
 
-  let status = `## 看板当前状态\n\n`
-  status += `- **布局**: ${layout}\n`
+  let status = `## Dashboard Status\n\n`
+  status += `- **${t('dashboard.dashboardView.status.layout')}**: ${layout}\n`
 
   if (layout === 'scroll' && currentPage) {
     const pageInfo = getPageByName(currentPage)
-    status += `- **当前页面**: ${pageInfo?.title || currentPage}\n`
+    status += `- **${t('dashboard.dashboardView.status.currentPage')}**: ${pageInfo?.title || currentPage}\n`
     // scroll 布局显示当前页面的模块
     if (pageInfo?.components) {
       const moduleNames = pageInfo.components.map(c => moduleTitleMap[c.name] || c.name)
-      status += `- **页面模块**: ${moduleNames.join('、')}\n`
+      status += `- **${t('dashboard.dashboardView.status.pageModules')}**: ${moduleNames.join('、')}\n`
     }
   } else if (activeModules.length > 0) {
     // 非 scroll 布局显示 activeModules
     const moduleNames = activeModules.map(m => moduleTitleMap[m] || m)
     if (layout === 'single') {
-      status += `- **显示模块**: ${moduleNames[0] || '无'}\n`
+      status += `- **${t('dashboard.dashboardView.status.displayModules')}**: ${moduleNames[0] || t('dashboard.dashboardView.status.none')}\n`
     } else {
-      status += `- **显示模块**: ${moduleNames.join('、')}\n`
+      status += `- **${t('dashboard.dashboardView.status.displayModules')}**: ${moduleNames.join('、')}\n`
     }
   } else {
-    status += `- **显示模块**: 无\n`
+    status += `- **${t('dashboard.dashboardView.status.displayModules')}**: ${t('dashboard.dashboardView.status.none')}\n`
   }
 
   return status

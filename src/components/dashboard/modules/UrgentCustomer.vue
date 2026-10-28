@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch, Teleport, nextTick } from 'vue'
+import { useI18n } from 'vue-i18n'
 import {
   queryUrgentOrdersByPage,
   queryUrgentOrdersItemByPage,
@@ -10,6 +11,7 @@ import {
 } from '../../../services/transportApi'
 import { useDashboardDataStore } from '../../../stores/dashboardDataStore'
 
+const { t } = useI18n()
 const dataStore = useDashboardDataStore()
 
 const props = defineProps<{
@@ -35,7 +37,7 @@ const tableData = ref<UrgentOrderData[]>([])
 
 // 弹窗相关状态
 const modalVisible = ref(false)
-const modalTitle = ref('加急&重点客户风险详情')
+const modalTitle = computed(() => t('dashboard.urgentCustomer.modalTitles.detail'))
 const modalData = ref<any[]>([])
 const modalLoading = ref(false)
 const exportLoading = ref(false)
@@ -66,9 +68,9 @@ interface OptionItem {
   value: string
 }
 
-const notSignedOptions = ref<OptionItem[]>([
-  { label: '未签收', value: '1' },
-  { label: '已签收', value: '0' },
+const notSignedOptions = computed(() => [
+  { label: t('dashboard.urgentCustomer.filters.notSigned'), value: '1' },
+  { label: t('dashboard.urgentCustomer.filters.signed'), value: '0' },
 ])
 
 const toWarehouseOptions = ref<string[]>([])
@@ -189,31 +191,31 @@ const selectRisk = (value: string) => {
 // 显示文本
 const selectedNotSignedText = computed(() => {
   if (filterForm.value.notSigned === '') {
-    return '签收状态'
+    return t('dashboard.urgentCustomer.filters.signStatus')
   }
   const option = notSignedOptions.value.find(item => item.value === filterForm.value.notSigned)
-  return option ? option.label : '签收状态'
+  return option ? option.label : t('dashboard.urgentCustomer.filters.signStatus')
 })
 
 const selectedToWarehouseText = computed(() => {
-  if (filterForm.value.toWarehouse.length === 0) return '目的仓库'
+  if (filterForm.value.toWarehouse.length === 0) return t('dashboard.urgentCustomer.filters.destWarehouse')
   if (filterForm.value.toWarehouse.length === 1) return filterForm.value.toWarehouse[0]
-  return `已选${filterForm.value.toWarehouse.length}项`
+  return t('dashboard.urgentCustomer.filters.selectedCount', { count: filterForm.value.toWarehouse.length })
 })
 
 const selectedOrderStatusText = computed(() => {
-  if (!filterForm.value.orderStatus) return '订单状态'
+  if (!filterForm.value.orderStatus) return t('dashboard.urgentCustomer.filters.orderStatus')
   const option = orderStatusOptions.value.find(item => item.value === filterForm.value.orderStatus)
-  return option ? option.label : '订单状态'
+  return option ? option.label : t('dashboard.urgentCustomer.filters.orderStatus')
 })
 
 const selectedRiskText = computed(() => {
-  if (filterForm.value.risk.length === 0) return '风险类型'
+  if (filterForm.value.risk.length === 0) return t('dashboard.urgentCustomer.filters.riskType')
   if (filterForm.value.risk.length === 1) {
     const option = riskOptions.value.find(item => item.value === filterForm.value.risk[0])
     return option ? option.label : filterForm.value.risk[0]
   }
-  return `已选${filterForm.value.risk.length}项`
+  return t('dashboard.urgentCustomer.filters.selectedCount', { count: filterForm.value.risk.length })
 })
 
 // 过滤后的选项
@@ -224,7 +226,7 @@ const filteredToWarehouseOptions = computed(() => {
       option.toLowerCase().includes(toWarehouseSearch.value.toLowerCase()),
     )
   }
-  return [{ value: '__reset__', label: '重置' }, ...filtered.map(o => ({ value: o, label: o }))]
+  return [{ value: '__reset__', label: t('dashboard.urgentCustomer.filters.reset') }, ...filtered.map(o => ({ value: o, label: o }))]
 })
 
 const filteredOrderStatusOptions = computed(() => {
@@ -234,7 +236,7 @@ const filteredOrderStatusOptions = computed(() => {
       option.label.toLowerCase().includes(orderStatusSearch.value.toLowerCase()),
     )
   }
-  return [{ value: '__reset__', label: '重置' }, ...filtered]
+  return [{ value: '__reset__', label: t('dashboard.urgentCustomer.filters.reset') }, ...filtered]
 })
 
 const filteredRiskOptions = computed(() => {
@@ -244,7 +246,7 @@ const filteredRiskOptions = computed(() => {
       option.label.toLowerCase().includes(riskSearch.value.toLowerCase()),
     )
   }
-  return [{ value: '__reset__', label: '重置' }, ...filtered]
+  return [{ value: '__reset__', label: t('dashboard.urgentCustomer.filters.reset') }, ...filtered]
 })
 
 // 分离风险行和普通行
@@ -260,10 +262,10 @@ const normalRows = computed(() => {
 const getTransTypeName = (transType: number | string | undefined): string => {
   if (transType === undefined || transType === null) return ''
   const typeMap: { [key: number | string]: string } = {
-    1: '公路',
-    2: '航空',
-    3: '铁路',
-    4: '快递',
+    1: t('dashboard.urgentCustomer.transTypes.road'),
+    2: t('dashboard.urgentCustomer.transTypes.air'),
+    3: t('dashboard.urgentCustomer.transTypes.rail'),
+    4: t('dashboard.urgentCustomer.transTypes.express'),
   }
   return typeMap[transType] || String(transType)
 }
@@ -449,7 +451,7 @@ const loadData = async () => {
       console.log('[UrgentCustomer] Store updated, total:', result.total || tableData.value.length)
     }
   } catch (error) {
-    console.error('获取加急客户风险数据失败:', error)
+    console.error(t('dashboard.urgentCustomer.messages.fetchError'), error)
   }
 }
 
@@ -574,7 +576,6 @@ const fetchModalData = async (currentPageNum: number = currentPage.value) => {
 // 打开详情弹窗
 const showDetailModal = () => {
   modalVisible.value = true
-  modalTitle.value = '加急&重点客户风险详情'
   currentPage.value = 1
   total.value = 0
 
@@ -660,7 +661,7 @@ const handleExport = async () => {
     const result = await exportUrgentOrdersItem(params)
 
     if (result.code === 409 || result.code === 504 || result.code === 505) {
-      alert(result.msg || '导出数据量过大')
+      alert(result.msg || t('dashboard.urgentCustomer.messages.exportTooLarge'))
       return
     }
 
@@ -677,7 +678,7 @@ const handleExport = async () => {
     }
   } catch (error: any) {
     console.error('导出失败:', error)
-    alert(error.msg || '导出失败')
+    alert(error.msg || t('dashboard.urgentCustomer.messages.exportFailed'))
   } finally {
     exportLoading.value = false
   }
@@ -695,31 +696,31 @@ const calculateModalTableScrollY = () => {
 }
 
 // 表格列配置
-const tableColumns = [
-  { title: '数据源', dataIndex: 'dataSource', key: 'dataSource', width: 120 },
-  { title: '订单状态', dataIndex: 'orderStatus', key: 'orderStatus', width: 120 },
-  { title: '风险类型', dataIndex: 'riskType', key: 'riskType', width: 150 },
-  { title: '风险信息', dataIndex: 'riskInfo', key: 'riskInfo', width: 150 },
-  { title: '运输方式', dataIndex: 'transTypeName', key: 'transTypeName', width: 120 },
-  { title: '在途位置', dataIndex: 'location', key: 'location', width: 150 },
-  { title: '运单号', dataIndex: 'actualTransNo', key: 'actualTransNo', width: 240 },
-  { title: '客户订单号', dataIndex: 'customerOrderNo', key: 'customerOrderNo', width: 150 },
-  { title: '发货单号', dataIndex: 'invoiceNo', key: 'invoiceNo', width: 150 },
-  { title: '是否准时', dataIndex: 'onTime', key: 'onTime', width: 100 },
-  { title: '预计到达时间', dataIndex: 'predictArriveTime', key: 'predictArriveTime', width: 180 },
-  { title: '始发仓库', dataIndex: 'fromWarehouse', key: 'fromWarehouse', width: 150 },
-  { title: '目的仓库', dataIndex: 'toWarehouse', key: 'toWarehouse', width: 150 },
-  { title: '承运商', dataIndex: 'carrierName', key: 'carrierName', width: 150 },
-  { title: '配送商', dataIndex: 'deliveryName', key: 'deliveryName', width: 150 },
-  { title: '收件人', dataIndex: 'consignee', key: 'consignee', width: 150 },
-  { title: '收件地址', dataIndex: 'consigneeAddress', key: 'consigneeAddress', width: 200 },
-  { title: '物料号', dataIndex: 'goodsCode', key: 'goodsCode', width: 150 },
-  { title: '物料名称', dataIndex: 'goodsName', key: 'goodsName', width: 200 },
-  { title: '产品数量', dataIndex: 'goodsCount', key: 'goodsCount', width: 120 },
-  { title: '签收时间', dataIndex: 'arrivalSignTime', key: 'arrivalSignTime', width: 180 },
-  { title: '最近异常代码', dataIndex: 'lastAbnormalCode', key: 'lastAbnormalCode', width: 200 },
-  { title: '运费', dataIndex: 'cost', key: 'cost', width: 120 },
-]
+const tableColumns = computed(() => [
+  { title: t('dashboard.urgentCustomer.tableColumns.dataSource'), dataIndex: 'dataSource', key: 'dataSource', width: 120 },
+  { title: t('dashboard.urgentCustomer.tableColumns.orderStatus'), dataIndex: 'orderStatus', key: 'orderStatus', width: 120 },
+  { title: t('dashboard.urgentCustomer.tableColumns.riskType'), dataIndex: 'riskType', key: 'riskType', width: 150 },
+  { title: t('dashboard.urgentCustomer.tableColumns.riskInfo'), dataIndex: 'riskInfo', key: 'riskInfo', width: 150 },
+  { title: t('dashboard.urgentCustomer.tableColumns.transType'), dataIndex: 'transTypeName', key: 'transTypeName', width: 120 },
+  { title: t('dashboard.urgentCustomer.tableColumns.location'), dataIndex: 'location', key: 'location', width: 150 },
+  { title: t('dashboard.urgentCustomer.tableColumns.actualTransNo'), dataIndex: 'actualTransNo', key: 'actualTransNo', width: 240 },
+  { title: t('dashboard.urgentCustomer.tableColumns.customerOrderNo'), dataIndex: 'customerOrderNo', key: 'customerOrderNo', width: 150 },
+  { title: t('dashboard.urgentCustomer.tableColumns.invoiceNo'), dataIndex: 'invoiceNo', key: 'invoiceNo', width: 150 },
+  { title: t('dashboard.urgentCustomer.tableColumns.onTime'), dataIndex: 'onTime', key: 'onTime', width: 100 },
+  { title: t('dashboard.urgentCustomer.tableColumns.predictArriveTime'), dataIndex: 'predictArriveTime', key: 'predictArriveTime', width: 180 },
+  { title: t('dashboard.urgentCustomer.tableColumns.fromWarehouse'), dataIndex: 'fromWarehouse', key: 'fromWarehouse', width: 150 },
+  { title: t('dashboard.urgentCustomer.tableColumns.toWarehouse'), dataIndex: 'toWarehouse', key: 'toWarehouse', width: 150 },
+  { title: t('dashboard.urgentCustomer.tableColumns.carrierName'), dataIndex: 'carrierName', key: 'carrierName', width: 150 },
+  { title: t('dashboard.urgentCustomer.tableColumns.deliveryName'), dataIndex: 'deliveryName', key: 'deliveryName', width: 150 },
+  { title: t('dashboard.urgentCustomer.tableColumns.consignee'), dataIndex: 'consignee', key: 'consignee', width: 150 },
+  { title: t('dashboard.urgentCustomer.tableColumns.consigneeAddress'), dataIndex: 'consigneeAddress', key: 'consigneeAddress', width: 200 },
+  { title: t('dashboard.urgentCustomer.tableColumns.goodsCode'), dataIndex: 'goodsCode', key: 'goodsCode', width: 150 },
+  { title: t('dashboard.urgentCustomer.tableColumns.goodsName'), dataIndex: 'goodsName', key: 'goodsName', width: 200 },
+  { title: t('dashboard.urgentCustomer.tableColumns.goodsCount'), dataIndex: 'goodsCount', key: 'goodsCount', width: 120 },
+  { title: t('dashboard.urgentCustomer.tableColumns.arrivalSignTime'), dataIndex: 'arrivalSignTime', key: 'arrivalSignTime', width: 180 },
+  { title: t('dashboard.urgentCustomer.tableColumns.lastAbnormalCode'), dataIndex: 'lastAbnormalCode', key: 'lastAbnormalCode', width: 200 },
+  { title: t('dashboard.urgentCustomer.tableColumns.cost'), dataIndex: 'cost', key: 'cost', width: 120 },
+])
 
 onMounted(() => {
   loadData()
@@ -740,13 +741,13 @@ onUnmounted(() => {
 <template>
   <div class="urgent-customer-wrapper">
     <div class="header-bar">
-      <h2 class="header-title">加急&重点客户风险</h2>
+      <h2 class="header-title">{{ t('dashboard.urgentCustomer.title') }}</h2>
     </div>
     <div class="urgent-customer-container">
       <!-- 查看详情按钮 -->
       <div class="view-detail-button-wrapper">
         <button @click="showDetailModal" class="view-detail-btn">
-          查看详情
+          {{ t('dashboard.urgentCustomer.buttons.viewDetail') }}
         </button>
       </div>
 
@@ -757,12 +758,12 @@ onUnmounted(() => {
           <table class="data-table urgent-table">
             <thead>
               <tr>
-                <th>发货单号</th>
-                <th>运输方式</th>
-                <th>在途位置</th>
-                <th>目的省市</th>
-                <th>预计到达时间</th>
-                <th>风险信息</th>
+                <th>{{ t('dashboard.urgentCustomer.tableColumns.invoiceNo') }}</th>
+                <th>{{ t('dashboard.urgentCustomer.tableColumns.transType') }}</th>
+                <th>{{ t('dashboard.urgentCustomer.tableColumns.location') }}</th>
+                <th>{{ t('dashboard.urgentCustomer.tableColumns.destProvince') }}</th>
+                <th>{{ t('dashboard.urgentCustomer.tableColumns.predictArriveTime') }}</th>
+                <th>{{ t('dashboard.urgentCustomer.tableColumns.riskInfo') }}</th>
               </tr>
             </thead>
           </table>
@@ -775,7 +776,7 @@ onUnmounted(() => {
             <table class="data-table urgent-table">
               <tbody>
                 <tr v-if="urgentRows.length === 0 && normalRows.length === 0">
-                  <td colspan="6" class="no-data">暂无加急订单</td>
+                  <td colspan="6" class="no-data">{{ t('dashboard.urgentCustomer.messages.noData') }}</td>
                 </tr>
                 <tr v-for="(row, index) in urgentRows" :key="`urgent-${index}`" class="urgent-row" v-else>
                   <td class="order-number" :title="`▲ ${row.invoiceNo}`">
@@ -785,8 +786,8 @@ onUnmounted(() => {
                   <td class="location-cell" :title="row.location">{{ row.location }}</td>
                   <td class="province-cell" :title="row.toProvince">{{ row.toProvince }}</td>
                   <td class="time-cell" :title="row.predictArriveTime">{{ row.predictArriveTime }}</td>
-                  <td class="risk-cell" :title="`⚠ ${row.riskType || '有风险'}`">
-                    ⚠ {{ row.riskType || '有风险' }}
+                  <td class="risk-cell" :title="`⚠ ${row.riskType || t('dashboard.urgentCustomer.messages.hasRisk')}`">
+                    ⚠ {{ row.riskType || t('dashboard.urgentCustomer.messages.hasRisk') }}
                   </td>
                 </tr>
               </tbody>
@@ -804,7 +805,7 @@ onUnmounted(() => {
           <table class="data-table">
             <tbody>
               <tr v-if="urgentRows.length === 0 && normalRows.length === 0">
-                <td colspan="6" class="no-data">暂无加急订单</td>
+                <td colspan="6" class="no-data">{{ t('dashboard.urgentCustomer.messages.noData') }}</td>
               </tr>
               <tr v-for="(row, index) in normalRows" :key="`normal-${index}`" v-else>
                 <td class="order-number" :title="row.invoiceNo">{{ row.invoiceNo }}</td>
@@ -812,7 +813,7 @@ onUnmounted(() => {
                 <td class="location-cell" :title="row.location">{{ row.location }}</td>
                 <td class="province-cell" :title="row.toProvince">{{ row.toProvince }}</td>
                 <td class="time-cell" :title="row.predictArriveTime">{{ row.predictArriveTime }}</td>
-                <td class="risk-cell" :title="row.riskType || '正常'">{{ row.riskType || '正常' }}</td>
+                <td class="risk-cell" :title="row.riskType || t('dashboard.urgentCustomer.messages.normal')">{{ row.riskType || t('dashboard.urgentCustomer.messages.normal') }}</td>
               </tr>
             </tbody>
           </table>
@@ -840,14 +841,14 @@ onUnmounted(() => {
                       v-model="filterForm.startDate"
                       type="date"
                       class="date-input"
-                      placeholder="开始日期"
+                      :placeholder="t('dashboard.urgentCustomer.filters.startDate')"
                     />
-                    <span class="date-separator">至</span>
+                    <span class="date-separator">{{ t('dashboard.urgentCustomer.filters.to') }}</span>
                     <input
                       v-model="filterForm.endDate"
                       type="date"
                       class="date-input"
-                      placeholder="结束日期"
+                      :placeholder="t('dashboard.urgentCustomer.filters.endDate')"
                     />
                   </div>
 
@@ -880,7 +881,7 @@ onUnmounted(() => {
                     <input
                       v-model="filterForm.customerOrderNo"
                       type="text"
-                      placeholder="客户订单号"
+                      :placeholder="t('dashboard.urgentCustomer.filters.customerOrderNo')"
                       class="customer-order-input"
                     />
                   </div>
@@ -897,7 +898,7 @@ onUnmounted(() => {
                           <input
                             v-model="toWarehouseSearch"
                             type="text"
-                            placeholder="搜索仓库..."
+                            :placeholder="t('dashboard.urgentCustomer.filters.searchWarehouse')"
                             class="search-input"
                             @click.stop
                           />
@@ -930,7 +931,7 @@ onUnmounted(() => {
                           <input
                             v-model="orderStatusSearch"
                             type="text"
-                            placeholder="搜索状态..."
+                            :placeholder="t('dashboard.urgentCustomer.filters.searchStatus')"
                             class="search-input"
                             @click.stop
                           />
@@ -963,7 +964,7 @@ onUnmounted(() => {
                           <input
                             v-model="riskSearch"
                             type="text"
-                            placeholder="搜索风险..."
+                            :placeholder="t('dashboard.urgentCustomer.filters.searchRisk')"
                             class="search-input"
                             @click.stop
                           />
@@ -986,10 +987,10 @@ onUnmounted(() => {
 
                   <!-- 操作按钮 -->
                   <div class="filter-actions">
-                    <button @click="handleReset" class="action-btn">重置</button>
-                    <button @click="handleQuery" class="action-btn primary">查询</button>
+                    <button @click="handleReset" class="action-btn">{{ t('dashboard.urgentCustomer.buttons.reset') }}</button>
+                    <button @click="handleQuery" class="action-btn primary">{{ t('dashboard.urgentCustomer.buttons.query') }}</button>
                     <button @click="handleExport" class="action-btn" :disabled="exportLoading">
-                      {{ exportLoading ? '导出中...' : '导出' }}
+                      {{ exportLoading ? t('dashboard.urgentCustomer.buttons.exporting') : t('dashboard.urgentCustomer.buttons.export') }}
                     </button>
                   </div>
                 </div>
@@ -997,7 +998,7 @@ onUnmounted(() => {
 
               <!-- 表格区域 -->
               <div class="table-section" ref="modalTableSectionRef">
-                <div v-if="modalLoading" class="loading-mask">加载中...</div>
+                <div v-if="modalLoading" class="loading-mask">{{ t('dashboard.urgentCustomer.messages.loading') }}</div>
                 <table class="modal-table">
                   <thead>
                     <tr>
@@ -1010,7 +1011,7 @@ onUnmounted(() => {
                     <tr v-for="row in modalData" :key="row.id || row.invoiceNo">
                       <td v-for="col in tableColumns" :key="col.key">
                         <template v-if="col.dataIndex === 'onTime'">
-                          {{ row[col.dataIndex] === true ? '是' : row[col.dataIndex] === false ? '否' : '-' }}
+                          {{ row[col.dataIndex] === true ? t('dashboard.urgentCustomer.tableColumns.yes') : row[col.dataIndex] === false ? t('dashboard.urgentCustomer.tableColumns.no') : '-' }}
                         </template>
                         <template v-else>
                           {{ row[col.dataIndex] || '-' }}
@@ -1018,26 +1019,26 @@ onUnmounted(() => {
                       </td>
                     </tr>
                     <tr v-if="modalData.length === 0 && !modalLoading">
-                      <td :colspan="tableColumns.length" class="empty-cell">暂无数据</td>
+                      <td :colspan="tableColumns.length" class="empty-cell">{{ t('dashboard.urgentCustomer.messages.empty') }}</td>
                     </tr>
                   </tbody>
                 </table>
 
                 <!-- 分页 -->
                 <div v-if="total > 0" class="pagination">
-                  <span class="pagination-info">共 {{ total }} 条</span>
+                  <span class="pagination-info">{{ t('dashboard.urgentCustomer.pagination.total', { total }) }}</span>
                   <div class="pagination-controls">
                     <button
                       class="page-btn"
                       :disabled="currentPage <= 1"
                       @click="handleTableChange({ current: currentPage - 1, pageSize })"
-                    >上一页</button>
+                    >{{ t('dashboard.urgentCustomer.pagination.prev') }}</button>
                     <span class="page-number">{{ currentPage }} / {{ Math.ceil(total / pageSize) }}</span>
                     <button
                       class="page-btn"
                       :disabled="currentPage >= Math.ceil(total / pageSize)"
                       @click="handleTableChange({ current: currentPage + 1, pageSize })"
-                    >下一页</button>
+                    >{{ t('dashboard.urgentCustomer.pagination.next') }}</button>
                   </div>
                 </div>
               </div>

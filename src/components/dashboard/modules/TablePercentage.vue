@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import dayjs, { type Dayjs } from 'dayjs'
 import { message } from 'ant-design-vue'
 import { queryVolumeTableRate } from '../../../services/transportApi'
 import { useSelectOptionsStore } from '../../../stores/selectOptionsStore'
 import { useGlobalFilterStore } from '../../../stores/globalFilterStore'
 import { useDashboardDataStore } from '../../../stores/dashboardDataStore'
+
+const { t } = useI18n()
 
 // 使用公共 store
 const selectOptionsStore = useSelectOptionsStore()
@@ -16,8 +19,8 @@ const volumeAggOptions = computed(() => selectOptionsStore.volumeAggOptions)
 
 // 统计维度选项（固定两个选项）
 const statDimensionOptions = computed(() => [
-  { code: '1', name: '始发仓&目的省份' },
-  { code: '2', name: '目的城市' }
+  { code: '1', name: t('dashboard.tablePercentage.statDimension.warehouseProvince') },
+  { code: '2', name: t('dashboard.tablePercentage.statDimension.city') }
 ])
 
 // 选中的值
@@ -50,10 +53,10 @@ const tableScrollY = ref<number>(300)
 // 获取当前选中的体积选项名称，用于动态设置表头
 const currentVolumeAggName = computed(() => {
   if (!selectedVolumeAgg.value) {
-    return '体积'
+    return t('dashboard.tablePercentage.placeholders.volume')
   }
   const option = volumeAggOptions.value.find(opt => opt.code === selectedVolumeAgg.value)
-  return option?.name || '体积'
+  return option?.name || t('dashboard.tablePercentage.placeholders.volume')
 })
 
 // 表格列（根据统计维度动态变化）
@@ -62,7 +65,7 @@ const tableColumns = computed(() => {
     // 始发仓&目的省份
     return [
       {
-        title: '排名',
+        title: t('dashboard.tablePercentage.tableColumns.rank'),
         key: 'rank',
         dataIndex: 'rank',
         width: 80,
@@ -73,14 +76,14 @@ const tableColumns = computed(() => {
         }
       },
       {
-        title: '始发仓',
+        title: t('dashboard.tablePercentage.tableColumns.fromWarehouse'),
         key: 'fromWarehouse',
         dataIndex: 'fromWarehouse',
         width: 150,
         align: 'center' as const
       },
       {
-        title: '目的省份',
+        title: t('dashboard.tablePercentage.tableColumns.toProvince'),
         key: 'toProvince',
         dataIndex: 'toProvince',
         width: 200,
@@ -111,7 +114,7 @@ const tableColumns = computed(() => {
         }
       },
       {
-        title: '占比',
+        title: t('dashboard.tablePercentage.tableColumns.percentage'),
         key: 'percentage',
         dataIndex: 'percentage',
         width: 150,
@@ -125,7 +128,7 @@ const tableColumns = computed(() => {
     // 目的城市
     return [
       {
-        title: '排名',
+        title: t('dashboard.tablePercentage.tableColumns.rank'),
         key: 'rank',
         dataIndex: 'rank',
         width: 80,
@@ -136,7 +139,7 @@ const tableColumns = computed(() => {
         }
       },
       {
-        title: '目的城市',
+        title: t('dashboard.tablePercentage.tableColumns.toCity'),
         key: 'toCity',
         dataIndex: 'toCity',
         width: 250,
@@ -167,7 +170,7 @@ const tableColumns = computed(() => {
         }
       },
       {
-        title: '占比',
+        title: t('dashboard.tablePercentage.tableColumns.percentage'),
         key: 'percentage',
         dataIndex: 'percentage',
         width: 150,
@@ -183,26 +186,26 @@ const tableColumns = computed(() => {
 // 显示文本
 const displayStatDimension = computed(() => {
   const option = statDimensionOptions.value.find(opt => opt.code === selectedStatDimension.value)
-  return option?.name || '统计维度'
+  return option?.name || t('dashboard.tablePercentage.placeholders.statDimension')
 })
 
 const displayDataSource = computed(() => {
   if (selectedDataSource.value.length === 0) {
-    return '数据源'
+    return t('dashboard.tablePercentage.placeholders.dataSource')
   }
   if (selectedDataSource.value.length === dataSourceOptions.value.length) {
-    return '数据源'
+    return t('dashboard.tablePercentage.placeholders.dataSource')
   }
   if (selectedDataSource.value.length === 1) {
     const option = dataSourceOptions.value.find(opt => opt.code === selectedDataSource.value[0])
     return option?.name || selectedDataSource.value[0]
   }
-  return `数据源(${selectedDataSource.value.length})`
+  return t('dashboard.tablePercentage.placeholders.dataSourceCount', { count: selectedDataSource.value.length })
 })
 
 const displayVolumeAgg = computed(() => {
   const option = volumeAggOptions.value.find(opt => opt.code === selectedVolumeAgg.value)
-  return option?.name || '体积'
+  return option?.name || t('dashboard.tablePercentage.placeholders.volume')
 })
 
 // 下拉框切换
@@ -267,8 +270,8 @@ const loadDropdownOptions = async () => {
     // 确保公共数据已加载
     await selectOptionsStore.ensureDataLoaded()
   } catch (error) {
-    console.error('加载下拉框选项失败:', error)
-    message.error('加载下拉框选项失败')
+    console.error('loadDropdownOptions failed:', error)
+    message.error(t('dashboard.tablePercentage.messages.loadOptionsFailed'))
   }
 }
 
@@ -334,8 +337,8 @@ const fetchTableData = async () => {
       tableData.value = []
     }
   } catch (error) {
-    console.error('获取表格数据失败:', error)
-    message.error('获取表格数据失败')
+    console.error('fetchTableData failed:', error)
+    message.error(t('dashboard.tablePercentage.messages.fetchDataFailed'))
     tableData.value = []
   } finally {
     loading.value = false
@@ -476,7 +479,7 @@ const calculateTableScrollY = () => {
   <div class="table-percentage-container">
     <!-- 标题栏 -->
     <div class="header-bar">
-      <h2 class="header-title">货量(表格占比)</h2>
+      <h2 class="header-title">{{ t('dashboard.tablePercentage.title') }}</h2>
     </div>
 
     <!-- 控制面板 -->
@@ -486,7 +489,7 @@ const calculateTableScrollY = () => {
         <a-range-picker
           v-model:value="dateRange"
           format="YYYY-MM-DD"
-          separator="至"
+          :separator="t('dashboard.tablePercentage.dateRange.separator')"
           class="date-range-picker"
           :show-time="false"
         />

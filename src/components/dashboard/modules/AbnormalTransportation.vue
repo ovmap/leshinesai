@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed, nextTick, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import * as echarts from 'echarts'
 import {
   statNotSignOrder,
@@ -13,6 +14,7 @@ import {
 } from '../../../services/transportApi'
 import { useDashboardDataStore } from '../../../stores/dashboardDataStore'
 
+const { t } = useI18n()
 const dataStore = useDashboardDataStore()
 
 const props = defineProps<{
@@ -66,19 +68,19 @@ const fromWarehouseOptions = ref<string[]>([])
 const rdcOptions = ref<string[]>([])
 
 // 表格列配置
-const tableColumns = [
-  { title: '数据源', dataIndex: 'dataSource', key: 'dataSource', width: 100 },
-  { title: '异常分类', dataIndex: 'abnormalTypeName', key: 'abnormalTypeName', width: 100 },
-  { title: '异常天数', dataIndex: 'abnormalDays', key: 'abnormalDays', width: 100 },
-  { title: '始发仓库', dataIndex: 'formWarehouse', key: 'formWarehouse', width: 120 },
-  { title: '承运商', dataIndex: 'carrierName', key: 'carrierName', width: 100 },
-  { title: '配送商', dataIndex: 'deliveryName', key: 'deliveryName', width: 100 },
-  { title: '运单号', dataIndex: 'transNo', key: 'transNo', width: 200 },
-  { title: '发票号', dataIndex: 'invoiceNo', key: 'invoiceNo', width: 200 },
-  { title: '目的RDC', dataIndex: 'toRdc', key: 'toRdc', width: 120 },
-  { title: '目的省份', dataIndex: 'toProvince', key: 'toProvince', width: 100 },
-  { title: '状态', dataIndex: 'status', key: 'status', width: 100 },
-]
+const tableColumns = computed(() => [
+  { title: t('dashboard.abnormalTransportation.tableColumns.dataSource'), dataIndex: 'dataSource', key: 'dataSource', width: 100 },
+  { title: t('dashboard.abnormalTransportation.tableColumns.abnormalTypeName'), dataIndex: 'abnormalTypeName', key: 'abnormalTypeName', width: 100 },
+  { title: t('dashboard.abnormalTransportation.tableColumns.abnormalDays'), dataIndex: 'abnormalDays', key: 'abnormalDays', width: 100 },
+  { title: t('dashboard.abnormalTransportation.tableColumns.formWarehouse'), dataIndex: 'formWarehouse', key: 'formWarehouse', width: 120 },
+  { title: t('dashboard.abnormalTransportation.tableColumns.carrierName'), dataIndex: 'carrierName', key: 'carrierName', width: 100 },
+  { title: t('dashboard.abnormalTransportation.tableColumns.deliveryName'), dataIndex: 'deliveryName', key: 'deliveryName', width: 100 },
+  { title: t('dashboard.abnormalTransportation.tableColumns.transNo'), dataIndex: 'transNo', key: 'transNo', width: 200 },
+  { title: t('dashboard.abnormalTransportation.tableColumns.invoiceNo'), dataIndex: 'invoiceNo', key: 'invoiceNo', width: 200 },
+  { title: t('dashboard.abnormalTransportation.tableColumns.toRdc'), dataIndex: 'toRdc', key: 'toRdc', width: 120 },
+  { title: t('dashboard.abnormalTransportation.tableColumns.toProvince'), dataIndex: 'toProvince', key: 'toProvince', width: 100 },
+  { title: t('dashboard.abnormalTransportation.tableColumns.status'), dataIndex: 'status', key: 'status', width: 100 },
+])
 
 // 获取数据源列表
 const fetchDataSourceList = async () => {
@@ -93,7 +95,7 @@ const fetchDataSourceList = async () => {
       filterForm.value.dataSource = result.data.map((item: any) => item.code)
     }
   } catch (error) {
-    console.error('获取数据源列表失败:', error)
+    console.error(t('dashboard.abnormalTransportation.messages.fetchDataSourceListFailed'), error)
   }
 }
 
@@ -108,7 +110,7 @@ const fetchAbnormalTypeList = async () => {
       }))
     }
   } catch (error) {
-    console.error('获取异常分类列表失败:', error)
+    console.error(t('dashboard.abnormalTransportation.messages.fetchAbnormalTypeListFailed'), error)
   }
 }
 
@@ -123,7 +125,7 @@ const fetchCarrierList = async () => {
       }))
     }
   } catch (error) {
-    console.error('获取承运商列表失败:', error)
+    console.error(t('dashboard.abnormalTransportation.messages.fetchCarrierListFailed'), error)
   }
 }
 
@@ -135,7 +137,7 @@ const fetchWarehouseList = async () => {
       fromWarehouseOptions.value = result.data
     }
   } catch (error) {
-    console.error('获取仓库列表失败:', error)
+    console.error(t('dashboard.abnormalTransportation.messages.fetchWarehouseListFailed'), error)
   }
 }
 
@@ -147,7 +149,7 @@ const fetchRdcList = async () => {
       rdcOptions.value = result.data
     }
   } catch (error) {
-    console.error('获取RDC列表失败:', error)
+    console.error(t('dashboard.abnormalTransportation.messages.fetchRdcListFailed'), error)
   }
 }
 
@@ -187,7 +189,7 @@ const processApiData = (apiData: any) => {
     }
   })
 
-  return { name: '运输异常', children }
+  return { name: t('dashboard.abnormalTransportation.title'), children }
 }
 
 // 初始化图表
@@ -213,9 +215,9 @@ const initChart = (apiData?: any) => {
       textStyle: { color: '#fff' },
       formatter: (params: any) => {
         if (params.data.classifyRate !== undefined) {
-          return `异常类型: ${params.data.abnormalTypeName}<br/>时间范围: ${params.name}<br/>数量: ${params.value}<br/>分类占比: ${(params.data.classifyRate * 100).toFixed(2)}%<br/>整体占比: ${(params.data.overallRate * 100).toFixed(2)}%`
+          return `${t('dashboard.abnormalTransportation.tooltip.abnormalType')}: ${params.data.abnormalTypeName}<br/>${t('dashboard.abnormalTransportation.tooltip.timeRange')}: ${params.name}<br/>${t('dashboard.abnormalTransportation.tooltip.count')}: ${params.value}<br/>${t('dashboard.abnormalTransportation.tooltip.categoryRate')}: ${(params.data.classifyRate * 100).toFixed(2)}%<br/>${t('dashboard.abnormalTransportation.tooltip.overallRate')}: ${(params.data.overallRate * 100).toFixed(2)}%`
         }
-        return `${params.name}<br/>数量: ${params.value}`
+        return `${params.name}<br/>${t('dashboard.abnormalTransportation.tooltip.count')}: ${params.value}`
       },
     },
     series: [
@@ -295,7 +297,7 @@ const fetchData = async () => {
       },
     })
   } catch (error) {
-    console.error('获取运输异常数据失败:', error)
+    console.error(t('dashboard.abnormalTransportation.messages.fetchDataFailed'), error)
   }
 }
 
@@ -334,7 +336,7 @@ const fetchModalData = async (page: number = currentPage.value) => {
       total.value = 0
     }
   } catch (error) {
-    console.error('获取弹窗数据失败:', error)
+    console.error(t('dashboard.abnormalTransportation.messages.fetchModalDataFailed'), error)
     modalData.value = []
     total.value = 0
   } finally {
@@ -392,7 +394,7 @@ const handleExport = async () => {
       document.body.removeChild(link)
     }
   } catch (error) {
-    console.error('导出失败:', error)
+    console.error(t('dashboard.abnormalTransportation.messages.exportFailed'), error)
   } finally {
     exportLoading.value = false
   }
@@ -447,11 +449,11 @@ onUnmounted(() => {
 <template>
   <div class="chart-container">
     <div class="header-bar">
-      <h2 class="header-title">运输异常</h2>
+      <h2 class="header-title">{{ t('dashboard.abnormalTransportation.title') }}</h2>
     </div>
     <div class="chart-content-wrapper">
       <div ref="chartRef" class="chart-content"></div>
-      <button class="detail-button" @click="showDetailModal">查看详情</button>
+      <button class="detail-button" @click="showDetailModal">{{ t('dashboard.abnormalTransportation.buttons.viewDetail') }}</button>
     </div>
 
     <!-- 详情弹窗 -->
@@ -460,7 +462,7 @@ onUnmounted(() => {
         <div class="modal">
           <!-- 弹窗头部 -->
           <div class="modal-header">
-            <h3 class="modal-title">运输异常详情</h3>
+            <h3 class="modal-title">{{ t('dashboard.abnormalTransportation.modalTitles.detail') }}</h3>
             <button class="close-btn" @click="handleModalClose">×</button>
           </div>
 
@@ -471,15 +473,15 @@ onUnmounted(() => {
               <div class="filter-form">
                 <div class="filter-item">
                   <select v-model="filterForm.abnormalType" class="filter-select">
-                    <option value="">异常分类</option>
+                    <option value="">{{ t('dashboard.abnormalTransportation.filters.abnormalType') }}</option>
                     <option v-for="opt in abnormalTypeOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
                   </select>
                 </div>
                 <div class="filter-actions">
-                  <button class="action-btn primary" @click="handleQuery">查询</button>
-                  <button class="action-btn" @click="handleReset">重置</button>
+                  <button class="action-btn primary" @click="handleQuery">{{ t('dashboard.abnormalTransportation.buttons.query') }}</button>
+                  <button class="action-btn" @click="handleReset">{{ t('dashboard.abnormalTransportation.buttons.reset') }}</button>
                   <button class="action-btn" @click="handleExport" :disabled="exportLoading">
-                    {{ exportLoading ? '导出中...' : '导出' }}
+                    {{ exportLoading ? t('dashboard.abnormalTransportation.buttons.exporting') : t('dashboard.abnormalTransportation.buttons.export') }}
                   </button>
                 </div>
               </div>
@@ -487,7 +489,7 @@ onUnmounted(() => {
 
             <!-- 表格区域 -->
             <div class="table-section">
-              <div v-if="modalLoading" class="loading-mask">加载中...</div>
+              <div v-if="modalLoading" class="loading-mask">{{ t('dashboard.abnormalTransportation.loading') }}</div>
               <table class="data-table">
                 <thead>
                   <tr>
@@ -501,26 +503,26 @@ onUnmounted(() => {
                     <td v-for="col in tableColumns" :key="col.key">{{ row[col.dataIndex] || '-' }}</td>
                   </tr>
                   <tr v-if="modalData.length === 0 && !modalLoading">
-                    <td :colspan="tableColumns.length" class="empty-cell">暂无数据</td>
+                    <td :colspan="tableColumns.length" class="empty-cell">{{ t('dashboard.abnormalTransportation.noData') }}</td>
                   </tr>
                 </tbody>
               </table>
 
               <!-- 分页 -->
               <div v-if="total > 0" class="pagination">
-                <span class="pagination-info">共 {{ total }} 条</span>
+                <span class="pagination-info">{{ t('dashboard.abnormalTransportation.pagination.total', [total]) }}</span>
                 <div class="pagination-controls">
                   <button
                     class="page-btn"
                     :disabled="currentPage <= 1"
                     @click="handlePageChange(currentPage - 1)"
-                  >上一页</button>
+                  >{{ t('dashboard.abnormalTransportation.pagination.prev') }}</button>
                   <span class="page-number">{{ currentPage }} / {{ Math.ceil(total / pageSize) }}</span>
                   <button
                     class="page-btn"
                     :disabled="currentPage >= Math.ceil(total / pageSize)"
                     @click="handlePageChange(currentPage + 1)"
-                  >下一页</button>
+                  >{{ t('dashboard.abnormalTransportation.pagination.next') }}</button>
                 </div>
               </div>
             </div>

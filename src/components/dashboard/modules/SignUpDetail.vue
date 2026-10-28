@@ -5,7 +5,9 @@ import { queryAbnormalOrderItem, exportAbnormalOrderItem, queryRegionList, query
 import { useSelectOptionsStore } from '../../../stores/selectOptionsStore'
 import { useGlobalFilterStore } from '../../../stores/globalFilterStore'
 import { useDashboardDataStore } from '../../../stores/dashboardDataStore'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const selectOptionsStore = useSelectOptionsStore()
 const globalFilterStore = useGlobalFilterStore()
 const dataStore = useDashboardDataStore()
@@ -29,14 +31,14 @@ const isCategoryOpen = ref(false)
 const isDataSourceOpen = ref(false)
 
 // RDC 选项（末端）
-const rdcOptions = ref([
-  { value: 'RDC&配送商', label: 'RDC&配送商' },
-  { value: 'CDC&承运商', label: 'CDC&承运商' },
+const rdcOptions = computed(() => [
+  { value: 'RDC&配送商', label: t('dashboard.signUpDetail.rdcOptions.rdcDelivery') },
+  { value: 'CDC&承运商', label: t('dashboard.signUpDetail.rdcOptions.cdcCarrier') },
 ])
 
 // RDC 选项（干线）
-const trunkRdcOptions = ref([
-  { value: 'CDC&承运商', label: 'CDC&承运商' },
+const trunkRdcOptions = computed(() => [
+  { value: 'CDC&承运商', label: t('dashboard.signUpDetail.rdcOptions.cdcCarrier') },
 ])
 
 // 大区选项
@@ -61,30 +63,44 @@ const currentRdcOptions = computed(() => {
 // 显示文本
 const selectedRdcText = computed(() => {
   const option = currentRdcOptions.value?.find(item => item.value === selectedRdc.value)
-  return option ? option.label : (activeTab.value === 'terminal' ? 'RDC&配送商' : 'CDC&承运商')
+  return option ? option.label : (activeTab.value === 'terminal' ? t('dashboard.signUpDetail.rdcOptions.rdcDelivery') : t('dashboard.signUpDetail.rdcOptions.cdcCarrier'))
 })
 
 const selectedRegionText = computed(() => {
   const option = regionOptions.value?.find(item => item.value === selectedRegion.value)
-  return option ? option.label : '大区'
+  return option ? option.label : t('dashboard.signUpDetail.placeholders.region')
 })
 
 const selectedCategoryText = computed(() => {
   const option = categoryOptions.value?.find(item => item.value === selectedCategory.value)
-  return option ? option.label : '异常分类'
+  return option ? option.label : t('dashboard.signUpDetail.placeholders.category')
 })
 
 const selectedDataSourceText = computed(() => {
   const option = dataSourceOptions.value?.find(item => item.value === selectedDataSource.value)
-  return option ? option.label : '数据源'
+  return option ? option.label : t('dashboard.signUpDetail.placeholders.dataSource')
 })
 
 // 表格表头（根据 tab 动态切换）
 const tableHeaders = computed(() => {
   if (activeTab.value === 'terminal') {
-    return ['RDC', '配送商', '异常分类', '异常代码', '异常描述', '应签未签数量']
+    return [
+      t('dashboard.signUpDetail.tableColumns.rdc'),
+      t('dashboard.signUpDetail.tableColumns.deliveryProvider'),
+      t('dashboard.signUpDetail.tableColumns.abnormalCategory'),
+      t('dashboard.signUpDetail.tableColumns.abnormalCode'),
+      t('dashboard.signUpDetail.tableColumns.abnormalDesc'),
+      t('dashboard.signUpDetail.tableColumns.unsignedQuantity'),
+    ]
   } else {
-    return ['CDC', '承运商', '异常分类', '异常代码', '异常描述', '应签未签数量']
+    return [
+      t('dashboard.signUpDetail.tableColumns.cdc'),
+      t('dashboard.signUpDetail.tableColumns.carrier'),
+      t('dashboard.signUpDetail.tableColumns.abnormalCategory'),
+      t('dashboard.signUpDetail.tableColumns.abnormalCode'),
+      t('dashboard.signUpDetail.tableColumns.abnormalDesc'),
+      t('dashboard.signUpDetail.tableColumns.unsignedQuantity'),
+    ]
   }
 })
 
@@ -107,7 +123,7 @@ const fetchRegionList = async () => {
         .map((item: any) => ({ value: item.code, label: item.name }))
     }
   } catch (error) {
-    console.error('获取大区列表失败:', error)
+    console.error(t('dashboard.signUpDetail.messages.fetchRegionListFailed'), error)
   }
 }
 
@@ -121,7 +137,7 @@ const fetchAbnormalReasonList = async () => {
         .map((item: any) => ({ value: item.code, label: item.name }))
     }
   } catch (error) {
-    console.error('获取异常分类列表失败:', error)
+    console.error(t('dashboard.signUpDetail.messages.fetchAbnormalReasonListFailed'), error)
   }
 }
 
@@ -130,7 +146,7 @@ const fetchDataSourceList = async () => {
   try {
     await selectOptionsStore.ensureDataLoaded()
   } catch (error) {
-    console.error('获取数据源列表失败:', error)
+    console.error(t('dashboard.signUpDetail.messages.fetchDataSourceListFailed'), error)
   }
 }
 
@@ -170,12 +186,12 @@ const fetchAbnormalOrderData = async () => {
       tableContainerRef.value.scrollTop = scrollTop
     }
   } catch (error: any) {
-    console.error('获取应签未签明细失败:', error)
+    console.error(t('dashboard.signUpDetail.messages.fetchAbnormalOrderDataFailed'), error)
     const errCode = error?.code
     if (errCode === 409 || errCode === 504 || errCode === 505) {
-      message.error(error.msg || '查询数据量过大，请缩小查询范围')
+      message.error(error.msg || t('dashboard.signUpDetail.messages.queryDataTooMuch'))
     } else {
-      message.error(error.msg || '获取应签未签明细失败')
+      message.error(error.msg || t('dashboard.signUpDetail.messages.fetchAbnormalOrderDataFailed'))
     }
   }
 }
@@ -281,7 +297,7 @@ const handleExport = async () => {
     const result = await exportAbnormalOrderItem(params)
 
     if (result.code === 409 || result.code === 504 || result.code === 505) {
-      message.error(result.msg || '导出数量超过限制')
+      message.error(result.msg || t('dashboard.signUpDetail.messages.exportLimitExceeded'))
       return
     }
 
@@ -292,19 +308,19 @@ const handleExport = async () => {
       const link = document.createElement('a')
       link.href = url
       const dateStr = new Date().toISOString().slice(0, 10)
-      link.download = `应签未签明细_${dateStr}.xlsx`
+      link.download = `${t('dashboard.signUpDetail.title')}_${dateStr}.xlsx`
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)
       window.URL.revokeObjectURL(url)
     }
   } catch (error: any) {
-    console.error('导出失败:', error)
+    console.error(t('dashboard.signUpDetail.messages.exportFailed'), error)
     const errCode = error?.code || error?.response?.status
     if (errCode === 409 || errCode === 504 || errCode === 505) {
-      message.error(error.msg || '导出数量超过限制')
+      message.error(error.msg || t('dashboard.signUpDetail.messages.exportLimitExceeded'))
     } else {
-      message.error(error.msg || '导出失败')
+      message.error(error.msg || t('dashboard.signUpDetail.messages.exportFailed'))
     }
   } finally {
     exportLoading.value = false
@@ -353,13 +369,13 @@ onUnmounted(() => {
   <div class="signup-detail-container">
     <!-- 标题栏 -->
     <div class="header-bar">
-      <h2 class="header-title">应签未签明细</h2>
+      <h2 class="header-title">{{ t('dashboard.signUpDetail.title') }}</h2>
     </div>
 
     <!-- 顶部标签页 -->
     <div class="tabs-container">
-      <div class="tab-item" :class="{ active: activeTab === 'terminal' }" @click="activeTab = 'terminal'">末端配送异常</div>
-      <div class="tab-item" :class="{ active: activeTab === 'trunk' }" @click="activeTab = 'trunk'">干线到仓异常</div>
+      <div class="tab-item" :class="{ active: activeTab === 'terminal' }" @click="activeTab = 'terminal'">{{ t('dashboard.signUpDetail.tabs.terminal') }}</div>
+      <div class="tab-item" :class="{ active: activeTab === 'trunk' }" @click="activeTab = 'trunk'">{{ t('dashboard.signUpDetail.tabs.trunk') }}</div>
     </div>
 
     <!-- 筛选器 + 导出按钮 -->
@@ -436,9 +452,9 @@ onUnmounted(() => {
 
       <!-- 重置 + 导出 -->
       <div class="export-container">
-        <button class="action-btn reset-btn" @click="handleReset">重置</button>
+        <button class="action-btn reset-btn" @click="handleReset">{{ t('dashboard.signUpDetail.buttons.reset') }}</button>
         <button class="action-btn export-btn" :disabled="exportLoading" @click="handleExport">
-          {{ exportLoading ? '导出中...' : '导出' }}
+          {{ exportLoading ? t('dashboard.signUpDetail.buttons.exporting') : t('dashboard.signUpDetail.buttons.export') }}
         </button>
       </div>
     </div>
@@ -464,8 +480,8 @@ onUnmounted(() => {
       </table>
 
       <div v-else class="no-data-container">
-        <div class="no-data-text">暂无数据</div>
-        <div class="no-data-desc">请调整筛选条件后重试</div>
+        <div class="no-data-text">{{ t('dashboard.signUpDetail.noData.text') }}</div>
+        <div class="no-data-desc">{{ t('dashboard.signUpDetail.noData.description') }}</div>
       </div>
     </div>
   </div>
@@ -708,7 +724,7 @@ onUnmounted(() => {
   background: rgba(74, 158, 255, 0.1);
 }
 .data-table thead th {
-  padding: 0.75rem 0.5rem;
+  padding: 0.5rem 0.5rem;
   text-align: center;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.9);
@@ -758,7 +774,8 @@ onUnmounted(() => {
 }
 .data-table thead th:nth-child(5),
 .data-table tbody td:nth-child(5) {
-  max-width: 200px;
+  max-width: 250px;
+  min-width: 160px;
   white-space: normal;
   word-break: break-all;
   line-height: 1.4;

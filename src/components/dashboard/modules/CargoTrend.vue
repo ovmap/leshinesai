@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
+import { useI18n } from 'vue-i18n'
 import * as echarts from 'echarts'
 import dayjs from 'dayjs'
 import { message } from 'ant-design-vue'
@@ -14,6 +15,7 @@ import {
 import { useDashboardControlStore } from '../../../stores/dashboardControlStore'
 import { useDashboardDataStore } from '../../../stores/dashboardDataStore'
 
+const { t } = useI18n()
 const controlStore = useDashboardControlStore()
 const dataStore = useDashboardDataStore()
 
@@ -47,16 +49,16 @@ const isMetricOpen = ref(false)
 // 选项数据
 const yearOptions = ref<{ code: string; name: string }[]>([])
 const dataSourceOptions = ref<{ code: string; name: string }[]>([])
-const metricOptions = ref<{ code: string; name: string }[]>([
-  { code: 'VOLUME', name: '订单数量' },
-  { code: 'WEIGHT', name: '重量' },
-  { code: 'VOLUME_SIZE', name: '体积' },
+const metricOptions = computed(() => [
+  { code: 'VOLUME', name: t('dashboard.cargoTrend.metrics.volume') },
+  { code: 'WEIGHT', name: t('dashboard.cargoTrend.metrics.weight') },
+  { code: 'VOLUME_SIZE', name: t('dashboard.cargoTrend.metrics.volumeSize') },
 ])
 
 // 时间预设
-const timePresets = [
+const timePresets = computed(() => [
   {
-    label: '本月',
+    label: t('dashboard.cargoTrend.timePresets.thisMonth'),
     value: () => {
       const now = new Date()
       const start = new Date(now.getFullYear(), now.getMonth(), 1)
@@ -65,7 +67,7 @@ const timePresets = [
     },
   },
   {
-    label: '上月',
+    label: t('dashboard.cargoTrend.timePresets.lastMonth'),
     value: () => {
       const now = new Date()
       const start = new Date(now.getFullYear(), now.getMonth() - 1, 1)
@@ -74,7 +76,7 @@ const timePresets = [
     },
   },
   {
-    label: '近3个月',
+    label: t('dashboard.cargoTrend.timePresets.recent3Months'),
     value: () => {
       const now = new Date()
       const start = new Date(now.getFullYear(), now.getMonth() - 3, 1)
@@ -83,7 +85,7 @@ const timePresets = [
     },
   },
   {
-    label: '今年',
+    label: t('dashboard.cargoTrend.timePresets.thisYear'),
     value: () => {
       const now = new Date()
       const start = new Date(now.getFullYear(), 0, 1)
@@ -92,7 +94,7 @@ const timePresets = [
     },
   },
   {
-    label: '去年',
+    label: t('dashboard.cargoTrend.timePresets.lastYear'),
     value: () => {
       const now = new Date()
       const start = new Date(now.getFullYear() - 1, 0, 1)
@@ -100,7 +102,7 @@ const timePresets = [
       return [dayjs(start), dayjs(end)]
     },
   },
-]
+])
 
 // 根据时间维度计算默认日期范围
 const getDefaultDateRange = (timeType: string) => {
@@ -146,11 +148,11 @@ const formatDateRange = (dateRange: any[] | null) => {
 // 显示文本
 const selectedYearText = computed(() => {
   const option = yearOptions.value.find((item) => item.code === selectedYear.value)
-  return option ? option.name : '自然年'
+  return option ? option.name : t('dashboard.cargoTrend.timeTypes.calendarYear')
 })
 
 const selectedDataSourceText = computed(() => {
-  if (selectedDataSource.value.length === 0) return '全部数据源'
+  if (selectedDataSource.value.length === 0) return t('dashboard.cargoTrend.dataSource.all')
   const names = selectedDataSource.value.map((code) => {
     const option = dataSourceOptions.value.find((item) => item.code === code)
     return option ? option.name : code
@@ -160,7 +162,7 @@ const selectedDataSourceText = computed(() => {
 
 const selectedMetricText = computed(() => {
   const option = metricOptions.value.find((item) => item.code === selectedMetric.value)
-  return option ? option.name : '订单数量'
+  return option ? option.name : t('dashboard.cargoTrend.metrics.volume')
 })
 
 // 下拉框控制
@@ -429,7 +431,7 @@ const updateChartData = (apiData: any[]) => {
       ...(hasMomData
         ? [
             {
-              name: '环比',
+              name: t('dashboard.cargoTrend.series.mom'),
               type: 'line',
               data: momData,
               yAxisIndex: 1,
@@ -458,7 +460,7 @@ const updateChartData = (apiData: any[]) => {
       ...(hasYoyData
         ? [
             {
-              name: '同比',
+              name: t('dashboard.cargoTrend.series.yoy'),
               type: 'line',
               data: yoyData,
               yAxisIndex: 1,
@@ -528,12 +530,12 @@ const updateChartData = (apiData: any[]) => {
           const displayedSeries = new Set()
           params.forEach((param: any) => {
             if (displayedSeries.has(param.seriesName)) return
-            const isDataSource = param.seriesName !== '环比' && param.seriesName !== '同比'
+            const isDataSource = param.seriesName !== t('dashboard.cargoTrend.series.mom') && param.seriesName !== t('dashboard.cargoTrend.series.yoy')
             if (isDataSource && typeof param.value === 'number' && Math.abs(param.value) < 0.001) return
             if (!isDataSource && (param.value === null || param.value === undefined)) return
             displayedSeries.add(param.seriesName)
             let value
-            if (param.seriesName === '环比' || param.seriesName === '同比') {
+            if (param.seriesName === t('dashboard.cargoTrend.series.mom') || param.seriesName === t('dashboard.cargoTrend.series.yoy')) {
               if (param.value === null || param.value === undefined) return
               value = typeof param.value === 'number' ? param.value.toFixed(2) + '%' : param.value
             } else {
@@ -574,7 +576,7 @@ const syncToDataStore = () => {
         dataSource: selectedDataSource.value,
         dateRange: selectedDateTimeRange.value
           ? `${selectedDateTimeRange.value[0]?.format('YYYY-MM-DD')} ~ ${selectedDateTimeRange.value[1]?.format('YYYY-MM-DD')}`
-          : '未设置',
+          : t('dashboard.cargoTrend.messages.notSet'),
         fromWarehouse: props.fromWarehouse?.join(',') || '',
         toProvince: props.toProvince?.join(',') || '',
         toRdc: props.toRdc?.join(',') || '',
@@ -604,7 +606,7 @@ const callQueryVolume = async () => {
     }
     const response = await queryVolume(params)
     if (response && response.code === 500) {
-      message.error(response.message || '服务器错误')
+      message.error(response.message || t('dashboard.cargoTrend.messages.serverError'))
       return
     }
     if (response && response.code === 200 && response.data) {
@@ -614,7 +616,7 @@ const callQueryVolume = async () => {
       syncToDataStore()
     }
   } catch (error) {
-    console.error('获取货量趋势数据失败:', error)
+    console.error(t('dashboard.cargoTrend.messages.fetchError'), error)
   }
 }
 
@@ -638,7 +640,7 @@ const loadOptions = async () => {
       selectedDataSource.value = dsRes.data.filter((i: any) => i?.code).map((i: any) => i.code)
     }
   } catch (error) {
-    console.error('加载选项数据失败:', error)
+    console.error(t('dashboard.cargoTrend.messages.loadOptionsError'), error)
   }
 }
 
@@ -745,7 +747,7 @@ watch(
 <template>
   <div class="cargo-trend-wrapper">
     <div class="header-bar">
-      <h2 class="header-title">货量趋势</h2>
+      <h2 class="header-title">{{ t('dashboard.cargoTrend.title') }}</h2>
     </div>
     <div class="cargo-trend-container">
     <!-- 控制面板 -->
@@ -778,7 +780,7 @@ watch(
           <a-tooltip :title="selectedDateTimeRange ? `${selectedDateTimeRange[0]?.format('YYYY-MM-DD')} ~ ${selectedDateTimeRange[1]?.format('YYYY-MM-DD')}` : ''" :mouseEnterDelay="0.5" placement="bottom">
             <a-range-picker
               v-model:value="selectedDateTimeRange"
-              placeholder="开始日期"
+              :placeholder="[t('dashboard.cargoTrend.placeholders.startDate'), t('dashboard.cargoTrend.placeholders.endDate')]"
               format="YYYY-MM-DD"
               separator="~"
               class="time-picker"

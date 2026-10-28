@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed, nextTick } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { queryEndToEndDeliveryRateReason, queryProductGroupList, queryBtcpIndicateList } from '../../../services/transportApi'
 import dayjs, { type Dayjs } from 'dayjs'
 import { message } from 'ant-design-vue'
 import { useDashboardDataStore } from '../../../stores/dashboardDataStore'
 
+const { t } = useI18n()
 const dataStore = useDashboardDataStore()
 
 // 接口数据类型定义
@@ -89,7 +91,7 @@ const loadOptions = async () => {
       )
     }
   } catch (error) {
-    console.error('加载选项失败:', error)
+    console.error(t('dashboard.lenovoCustomer.messages.loadOptionsFailed'), error)
   }
 }
 
@@ -185,9 +187,9 @@ const loadTableData = async () => {
       tableData.value = []
     }
   } catch (error) {
-    console.error('获取数据失败:', error)
+    console.error(t('dashboard.lenovoCustomer.messages.fetchDataFailed'), error)
     tableData.value = []
-    message.error('获取数据失败')
+    message.error(t('dashboard.lenovoCustomer.messages.fetchDataFailed'))
   } finally {
     loading.value = false
   }
@@ -295,7 +297,7 @@ const selectBizType = (option: { code: string; name: string }) => {
 // 显示文本
 const displayProductType = computed(() => {
   if (filterForm.value.productType.length === 0) {
-    return '产品类型'
+    return t('dashboard.lenovoCustomer.filters.productType')
   }
   const names = filterForm.value.productType.map(code => {
     const option = productTypeOptions.value.find(item => item.code === code)
@@ -306,7 +308,7 @@ const displayProductType = computed(() => {
 
 const displayBizType = computed(() => {
   if (filterForm.value.bizType.length === 0) {
-    return '业务类型'
+    return t('dashboard.lenovoCustomer.filters.bizType')
   }
   const names = filterForm.value.bizType.map(code => {
     const option = bizTypeOptions.value.find(item => item.code === code)
@@ -322,6 +324,44 @@ const handleClickOutside = (event: Event) => {
     closeAllDropdowns()
   }
 }
+
+// 表格列定义
+const tableColumns = computed(() => [
+  {
+    title: t('dashboard.lenovoCustomer.tableColumns.reasonOne'),
+    dataIndex: 'reasonOne',
+    key: 'reasonOne',
+    width: 200,
+  },
+  {
+    title: t('dashboard.lenovoCustomer.tableColumns.reasonTwoName'),
+    dataIndex: 'reasonTwoName',
+    key: 'reasonTwoName',
+    width: 200,
+    align: 'center' as const
+  },
+  {
+    title: t('dashboard.lenovoCustomer.tableColumns.soCount'),
+    dataIndex: 'soCount',
+    key: 'soCount',
+    width: 180,
+    align: 'center' as const
+  },
+  {
+    title: t('dashboard.lenovoCustomer.tableColumns.goodsCount'),
+    dataIndex: 'goodsCount',
+    key: 'goodsCount',
+    width: 180,
+    align: 'center' as const
+  },
+  {
+    title: t('dashboard.lenovoCustomer.tableColumns.deliveryRate'),
+    dataIndex: 'deliveryRate',
+    key: 'deliveryRate',
+    width: 150,
+    align: 'center' as const
+  }
+])
 
 // 计算表格滚动高度
 const calculateTableScrollY = () => {
@@ -375,7 +415,7 @@ onUnmounted(() => {
 <template>
   <div class="lenovo-customer-container">
     <div class="header-bar">
-      <h2 class="header-title">准时交付率(联想客户)</h2>
+      <h2 class="header-title">{{ t('dashboard.lenovoCustomer.title') }}</h2>
     </div>
     <!-- 筛选区域 -->
     <div class="filter-section">
@@ -385,7 +425,7 @@ onUnmounted(() => {
           <a-range-picker
             v-model:value="filterForm.dateRange"
             format="YYYY-MM-DD"
-            separator="至"
+            :separator="t('dashboard.lenovoCustomer.dateRange.separator')"
             class="date-range-picker"
             :show-time="false"
           />
@@ -437,10 +477,10 @@ onUnmounted(() => {
           <!-- 操作按钮 -->
           <div class="filter-actions">
             <a-button @click="handleReset">
-              重置
+              {{ t('dashboard.lenovoCustomer.buttons.reset') }}
             </a-button>
             <a-button type="primary" @click="handleSearch">
-              查询
+              {{ t('dashboard.lenovoCustomer.buttons.search') }}
             </a-button>
           </div>
         </div>
@@ -451,42 +491,7 @@ onUnmounted(() => {
     <div class="table-section" ref="tableSectionRef">
       <a-spin :spinning="loading">
         <a-table
-          :columns="[
-            {
-              title: '原因大类',
-              dataIndex: 'reasonOne',
-              key: 'reasonOne',
-              width: 200,
-            },
-            {
-              title: '原因分析',
-              dataIndex: 'reasonTwoName',
-              key: 'reasonTwoName',
-              width: 200,
-              align: 'center'
-            },
-            {
-              title: '销售订单数量',
-              dataIndex: 'soCount',
-              key: 'soCount',
-              width: 180,
-              align: 'center'
-            },
-            {
-              title: '商品数量',
-              dataIndex: 'goodsCount',
-              key: 'goodsCount',
-              width: 180,
-              align: 'center'
-            },
-            {
-              title: '交付率',
-              dataIndex: 'deliveryRate',
-              key: 'deliveryRate',
-              width: 150,
-              align: 'center'
-            }
-          ]"
+          :columns="tableColumns"
           :data-source="tableData"
           :pagination="false"
           size="small"

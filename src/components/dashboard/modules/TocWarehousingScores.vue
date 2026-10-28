@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch, h, nextTick } from 'vue';
+import { useI18n } from 'vue-i18n';
 import dayjs, { type Dayjs } from 'dayjs';
 import { message } from 'ant-design-vue';
 import { queryToCKpiSummary, exportTocLogisticKpiScoreSummary, exportTocLogisticKpiScoreDetail } from '../../../services/transportApi';
 import { useSelectOptionsStore } from '../../../stores/selectOptionsStore';
 import { useDashboardDataStore } from '../../../stores/dashboardDataStore';
+
+const { t } = useI18n();
 
 // 使用公共 store
 const selectOptionsStore = useSelectOptionsStore();
@@ -49,7 +52,7 @@ const filteredLogisticProviderOptions = computed(() => {
   }
   
   // 在列表开头添加重置选项
-  return [{ code: '__reset__', name: '重置' }, ...filtered];
+  return [{ code: '__reset__', name: t('dashboard.tocWarehousing.reset') }, ...filtered];
 });
 
 // 过滤后的CDC仓库选项（包含重置选项）
@@ -66,7 +69,7 @@ const filteredCdcWarehouseOptions = computed(() => {
   }
   
   // 在列表开头添加重置选项
-  return [{ code: '__reset__', name: '重置' }, ...filtered];
+  return [{ code: '__reset__', name: t('dashboard.tocWarehousing.reset') }, ...filtered];
 });
 
 // 下拉框开关状态
@@ -87,7 +90,7 @@ const tableScrollY = ref<number | undefined>(200); // 默认200，会动态计�
 const tableColumns = computed(() => {
   const baseColumns = [
     {
-      title: '年月',
+      title: t('dashboard.tocWarehousing.tableColumns.month'),
       key: 'month',
       dataIndex: 'month',
       width: 120,
@@ -97,13 +100,13 @@ const tableColumns = computed(() => {
         // 格式化年月：2025-11 -> 2025年11月
         const parts = text.split('-');
         if (parts.length === 2 && parts[0] && parts[1]) {
-          return `${parts[0]}年${parseInt(parts[1])}月`;
+          return t('dashboard.tocWarehousing.monthFormat', { year: parts[0], month: parseInt(parts[1]) });
         }
         return text;
       },
     },
     {
-      title: '物流商',
+      title: t('dashboard.tocWarehousing.tableColumns.logisticProvider'),
       key: 'logisticProvider',
       dataIndex: 'logisticProvider',
       width: 120,
@@ -116,25 +119,25 @@ const tableColumns = computed(() => {
     return [
       ...baseColumns,
       {
-        title: '仓库',
+        title: t('dashboard.tocWarehousing.tableColumns.cdcWarehouse'),
         key: 'cdcWarehouse',
         dataIndex: 'cdcWarehouse',
         width: 120,
         align: 'center' as const,
       },
       {
-        title: '总成绩',
+        title: t('dashboard.tocWarehousing.tableColumns.totalScore'),
         key: 'totalScore',
         dataIndex: 'totalScore',
         width: 120,
         align: 'center' as const,
       },
       {
-        title: '入库及时率',
+        title: t('dashboard.tocWarehousing.tableColumns.inventoryOnTimeRate'),
         key: 'inventoryOnTimeRate',
         children: [
           {
-            title: '及时收货上架的商品数量',
+            title: t('dashboard.tocWarehousing.tableColumns.onTimeReceivedItemsCount'),
             key: 'onTimeReceivedItemsCount',
             dataIndex: 'onTimeReceivedItemsCount',
             width: 150,
@@ -144,7 +147,7 @@ const tableColumns = computed(() => {
             }
           },
           {
-            title: '实际收货上架总商品数量',
+            title: t('dashboard.tocWarehousing.tableColumns.actualGoodsCountReceived'),
             key: 'actualGoodsCountReceived',
             dataIndex: 'actualGoodsCountReceived',
             width: 150,
@@ -154,7 +157,7 @@ const tableColumns = computed(() => {
             }
           },
           {
-            title: '入库及时率',
+            title: t('dashboard.tocWarehousing.tableColumns.inventoryOnTimeRate'),
             key: 'inventoryOnTimeRate',
             dataIndex: 'inventoryOnTimeRate',
             width: 120,
@@ -164,7 +167,7 @@ const tableColumns = computed(() => {
             }
           },
           {
-            title: '得分 (满分30分)',
+            title: t('dashboard.tocWarehousing.tableColumns.inventoryScore'),
             key: 'inventoryScore',
             dataIndex: 'inventoryScore',
             width: 150,
@@ -176,11 +179,11 @@ const tableColumns = computed(() => {
         ]
       },
       {
-        title: '出库及时率',
+        title: t('dashboard.tocWarehousing.tableColumns.outboundOnTimeRate'),
         key: 'outboundOnTimeRate',
         children: [
           {
-            title: '及时出库订单量',
+            title: t('dashboard.tocWarehousing.tableColumns.outboundOnTimeCount'),
             key: 'outboundOnTimeCount',
             dataIndex: 'outboundOnTimeCount',
             width: 150,
@@ -190,7 +193,7 @@ const tableColumns = computed(() => {
             }
           },
           {
-            title: '实际应出库总订单量',
+            title: t('dashboard.tocWarehousing.tableColumns.outboundOrderTotalCount'),
             key: 'outboundOrderTotalCount',
             dataIndex: 'outboundOrderTotalCount',
             width: 150,
@@ -200,7 +203,7 @@ const tableColumns = computed(() => {
             }
           },
           {
-            title: '出库及时率',
+            title: t('dashboard.tocWarehousing.tableColumns.outboundOnTimeRate'),
             key: 'outboundOnTimeRate',
             dataIndex: 'outboundOnTimeRate',
             width: 120,
@@ -210,7 +213,7 @@ const tableColumns = computed(() => {
             }
           },
           {
-            title: '得分 (满分50分)',
+            title: t('dashboard.tocWarehousing.tableColumns.deliveryScore'),
             key: 'deliveryScore',
             dataIndex: 'deliveryScore',
             width: 150,
@@ -222,11 +225,11 @@ const tableColumns = computed(() => {
         ]
       },
       {
-        title: '运作差错（次数）',
+        title: t('dashboard.tocWarehousing.tableColumns.operationErrorCount'),
         key: 'operationErrorCount',
         children: [
           {
-            title: '次数',
+            title: t('dashboard.tocWarehousing.tableColumns.operationErrorTimes'),
             key: 'operationErrorCount',
             dataIndex: 'operationErrorCount',
             width: 150,
@@ -236,7 +239,7 @@ const tableColumns = computed(() => {
             }
           },
           {
-            title: '得分 (满分10分)',
+            title: t('dashboard.tocWarehousing.tableColumns.operationErrorScore'),
             key: 'operationErrorScore',
             dataIndex: 'operationErrorScore',
             width: 150,
@@ -248,11 +251,11 @@ const tableColumns = computed(() => {
         ]
       },
       {
-        title: '客户满意度',
+        title: t('dashboard.tocWarehousing.tableColumns.customerSatisfaction'),
         key: 'CustomerSatisfactionRate',
          children: [
           {
-            title: '客户评分',
+            title: t('dashboard.tocWarehousing.tableColumns.customerRating'),
             key: 'CustomerSatisfactionRate',
             dataIndex: 'CustomerSatisfactionRate',
             width: 150,
@@ -262,7 +265,7 @@ const tableColumns = computed(() => {
             }
           },
           {
-            title: '得分 (满分10分)',
+            title: t('dashboard.tocWarehousing.tableColumns.customerSatisfactionScore'),
             key: 'CustomerSatisfactionScore',
             dataIndex: 'CustomerSatisfactionScore',
             width: 150,
@@ -274,35 +277,35 @@ const tableColumns = computed(() => {
         ]
       },
       {
-        title: '得分汇总',
+        title: t('dashboard.tocWarehousing.tableColumns.scoreSummary'),
         key: 'scoreSummary',
         dataIndex: 'scoreSummary',
         width: 120,
         align: 'center' as const,
       },
       {
-        title: '扣分项',
+        title: t('dashboard.tocWarehousing.tableColumns.totalDeduction'),
         key: 'totalDeduction',
         dataIndex: 'totalDeduction',
         width: 120,
         align: 'center' as const,
       },
       {
-        title: '扣分说明',
+        title: t('dashboard.tocWarehousing.tableColumns.deductionDesc'),
         key: 'deductionDesc',
         dataIndex: 'deductionDesc',
         width: 120,
         align: 'center' as const,
       },
       {
-        title: '加分项',
+        title: t('dashboard.tocWarehousing.tableColumns.totalBonus'),
         key: 'totalBonus',
         dataIndex: 'totalBonus',
         width: 120,
         align: 'center' as const,
       },
       {
-        title: '加分说明',
+        title: t('dashboard.tocWarehousing.tableColumns.bonusDescription'),
         key: 'bonusDescription',
         dataIndex: 'bonusDescription',
         width: 120,
@@ -314,14 +317,14 @@ const tableColumns = computed(() => {
     return [
       ...baseColumns,
       {
-        title: '仓库',
+        title: t('dashboard.tocWarehousing.tableColumns.cdcWarehouse'),
         key: 'cdcWarehouse',
         dataIndex: 'cdcWarehouse',
         width: 120,
         align: 'center' as const,
       },
       {
-        title: '入库及时率',
+        title: t('dashboard.tocWarehousing.tableColumns.inventoryOnTimeRate'),
         key: 'inventoryOnTimeRate',
         dataIndex: 'inventoryOnTimeRate',
         width: 150,
@@ -331,7 +334,7 @@ const tableColumns = computed(() => {
         }
       },
       {
-        title: '出库及时率',
+        title: t('dashboard.tocWarehousing.tableColumns.outboundOnTimeRate'),
         key: 'outboundOnTimeRate',
         dataIndex: 'outboundOnTimeRate',
         width: 150,
@@ -341,7 +344,7 @@ const tableColumns = computed(() => {
         }
       },
       {
-        title: '运作差错（次数）',
+        title: t('dashboard.tocWarehousing.tableColumns.operationErrorCount'),
         key: 'operationErrorCount',
         dataIndex: 'operationErrorCount',
         width: 150,
@@ -351,7 +354,7 @@ const tableColumns = computed(() => {
         }
       },
       {
-        title: '客户满意度',
+        title: t('dashboard.tocWarehousing.tableColumns.customerSatisfaction'),
         key: 'CustomerSatisfactionRate',
         dataIndex: 'CustomerSatisfactionRate',
         width: 200,
@@ -461,7 +464,7 @@ const renderRateCell = (value: number, trend: 'up' | 'same' | 'down' | null, col
 
 // 显示文本（多选）
 const selectedLogisticProviderText = computed(() => {
-  if (selectedLogisticProvider.value.length === 0) return '物流商';
+  if (selectedLogisticProvider.value.length === 0) return t('dashboard.tocWarehousing.logisticProvider');
   const names = selectedLogisticProvider.value.map(code => {
     const option = logisticProviderOptions.value.find(item => item.code === code);
     return option ? option.name : code;
@@ -470,7 +473,7 @@ const selectedLogisticProviderText = computed(() => {
 });
 
 const selectedCdcWarehouseText = computed(() => {
-  if (selectedCdcWarehouse.value.length === 0) return '仓库';
+  if (selectedCdcWarehouse.value.length === 0) return t('dashboard.tocWarehousing.cdcWarehouse');
   const names = selectedCdcWarehouse.value.map(code => {
     const option = cdcWarehouseOptions.value.find(item => item.code === code);
     return option ? option.name : code;
@@ -642,12 +645,12 @@ const fetchTableData = async () => {
         tableData.value = [];
       }
     } else {
-      message.error(result?.msg || '获取数据失败');
+      message.error(result?.msg || t('dashboard.tocWarehousing.messages.fetchDataFailed'));
       tableData.value = [];
     }
   } catch (error) {
-    console.error('获取表格数据失败:', error);
-    message.error('获取数据失败');
+    console.error(t('dashboard.tocWarehousing.messages.fetchTableDataFailed'), error);
+    message.error(t('dashboard.tocWarehousing.messages.fetchDataFailed'));
     tableData.value = [];
   } finally {
     loading.value = false;
@@ -657,7 +660,7 @@ const fetchTableData = async () => {
 // 导出汇总
 const handleExportSummary = async () => {
   if (!dateRange.value || !dateRange.value[0] || !dateRange.value[1]) {
-    message.warning('请选择日期范围');
+    message.warning(t('dashboard.tocWarehousing.messages.selectDateRange'));
     return;
   }
 
@@ -683,28 +686,28 @@ const handleExportSummary = async () => {
         const link = document.createElement('a');
         link.href = result.data;
         const xlsxMatch = result.data.match(/([^/]+\.xlsx)$/);
-        const downloadFilename = xlsxMatch ? xlsxMatch[1]! : `ToC物流商KPI评分汇总_${dateRange.value[0].format('YYYY-MM')}_${dateRange.value[1].format('YYYY-MM')}.xlsx`;
+        const downloadFilename = xlsxMatch ? xlsxMatch[1]! : t('dashboard.tocWarehousing.messages.exportSummaryFileName', { 0: dateRange.value[0].format('YYYY-MM'), 1: dateRange.value[1].format('YYYY-MM') });
         
         link.download = downloadFilename;
         link.target = '_blank';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        message.success('导出汇总成功');
+        message.success(t('dashboard.tocWarehousing.messages.exportSummarySuccess'));
       }
     } else {
-      console.error('导出汇总失败:', result?.message || '未知错误');
-      message.error(result?.message || '导出汇总失败');
+      console.error(t('dashboard.tocWarehousing.messages.exportSummaryFailed') + ':', result?.message || t('dashboard.tocWarehousing.messages.unknownError'));
+      message.error(result?.message || t('dashboard.tocWarehousing.messages.exportSummaryFailed'));
     }
   } catch (error: any) {
-    console.error('导出汇总失败:', error);
+    console.error(t('dashboard.tocWarehousing.messages.exportSummaryFailed') + ':', error);
     
     // 检查是否是409或504状态码
     const errCode = error?.code || error?.response?.status;
     if (errCode === 409 || errCode === 504 || errCode === 505) {
-      message.error(error.msg || '导出数据量过大，请缩小查询范围');
+      message.error(error.msg || t('dashboard.tocWarehousing.messages.exportDataTooLarge'));
     } else {
-      message.error(error.msg || '导出汇总失败');
+      message.error(error.msg || t('dashboard.tocWarehousing.messages.exportSummaryFailed'));
     }
   } finally {
     exportSummaryLoading.value = false;
@@ -714,7 +717,7 @@ const handleExportSummary = async () => {
 // 导出明细
 const handleExportDetail = async () => {
   if (!dateRange.value || !dateRange.value[0] || !dateRange.value[1]) {
-    message.warning('请选择日期范围');
+    message.warning(t('dashboard.tocWarehousing.messages.selectDateRange'));
     return;
   }
 
@@ -740,28 +743,28 @@ const handleExportDetail = async () => {
         const link = document.createElement('a');
         link.href = result.data;
         const xlsxMatch = result.data.match(/([^/]+\.xlsx)$/);
-        const downloadFilename = xlsxMatch ? xlsxMatch[1]! : `ToC物流商KPI评分明细_${dateRange.value[0].format('YYYY-MM')}_${dateRange.value[1].format('YYYY-MM')}.xlsx`;
+        const downloadFilename = xlsxMatch ? xlsxMatch[1]! : t('dashboard.tocWarehousing.messages.exportDetailFileName', { 0: dateRange.value[0].format('YYYY-MM'), 1: dateRange.value[1].format('YYYY-MM') });
         
         link.download = downloadFilename;
         link.target = '_blank';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        message.success('导出明细成功');
+        message.success(t('dashboard.tocWarehousing.messages.exportDetailSuccess'));
       }
     } else {
-      console.error('导出明细失败:', result?.message || '未知错误');
-      message.error(result?.message || '导出明细失败');
+      console.error(t('dashboard.tocWarehousing.messages.exportDetailFailed') + ':', result?.message || t('dashboard.tocWarehousing.messages.unknownError'));
+      message.error(result?.message || t('dashboard.tocWarehousing.messages.exportDetailFailed'));
     }
   } catch (error: any) {
-    console.error('导出明细失败:', error);
+    console.error(t('dashboard.tocWarehousing.messages.exportDetailFailed') + ':', error);
     
     // 检查是否是409或504状态码
     const errCode = error?.code || error?.response?.status;
     if (errCode === 409 || errCode === 504 || errCode === 505) {
-      message.error(error.msg || '导出数据量过大，请缩小查询范围');
+      message.error(error.msg || t('dashboard.tocWarehousing.messages.exportDataTooLarge'));
     } else {
-      message.error(error.msg || '导出明细失败');
+      message.error(error.msg || t('dashboard.tocWarehousing.messages.exportDetailFailed'));
     }
   } finally {
     exportDetailLoading.value = false;
@@ -844,7 +847,7 @@ onUnmounted(() => {
 <template>
   <div class="toc-score-container">
     <div class="header-bar">
-      <h2 class="header-title">ToC物流商KPI评分</h2>
+      <h2 class="header-title">{{ t('dashboard.tocWarehousing.title') }}</h2>
     </div>
     <!-- 控制面板 -->
     <div class="control-panel">
@@ -856,7 +859,7 @@ onUnmounted(() => {
             picker="month"
             format="YYYY-MM"
             :separator="'~'"
-            :placeholder="['开始月份', '结束月份']"
+            :placeholder="[t('dashboard.tocWarehousing.dateRange.startMonth'), t('dashboard.tocWarehousing.dateRange.endMonth')]"
             class="date-range-picker"
           />
         </div>
@@ -872,7 +875,7 @@ onUnmounted(() => {
               <input 
                 v-model="logisticProviderSearch" 
                 type="text" 
-                placeholder="搜索物流商..." 
+                :placeholder="t('dashboard.tocWarehousing.placeholders.searchLogisticProvider')" 
                 class="search-input"
                 @click.stop 
               />
@@ -892,7 +895,7 @@ onUnmounted(() => {
                 {{ option.name }}
               </div>
               <div v-if="filteredLogisticProviderOptions.length === 1 && logisticProviderSearch" class="no-results">
-                暂无搜索结果
+                {{ t('dashboard.tocWarehousing.noSearchResults') }}
               </div>
             </div>
           </div>
@@ -909,7 +912,7 @@ onUnmounted(() => {
               <input 
                 v-model="cdcWarehouseSearch" 
                 type="text" 
-                placeholder="搜索仓库..." 
+                :placeholder="t('dashboard.tocWarehousing.placeholders.searchCdcWarehouse')" 
                 class="search-input"
                 @click.stop 
               />
@@ -929,7 +932,7 @@ onUnmounted(() => {
                 {{ option.name }}
               </div>
               <div v-if="filteredCdcWarehouseOptions.length === 1 && cdcWarehouseSearch" class="no-results">
-                暂无搜索结果
+                {{ t('dashboard.tocWarehousing.noSearchResults') }}
               </div>
             </div>
           </div>
@@ -937,7 +940,7 @@ onUnmounted(() => {
 
         <!-- 显示详情开关 -->
         <div class="switch-item">
-          <span class="switch-label">显示详情</span>
+          <span class="switch-label">{{ t('dashboard.tocWarehousing.showDetails') }}</span>
           <a-switch v-model:checked="showDetails" />
         </div>
       </div>
@@ -949,14 +952,14 @@ onUnmounted(() => {
           @click="handleExportSummary"
           class="action-btn"
         >
-          导出汇总
+          {{ t('dashboard.tocWarehousing.buttons.exportSummary') }}
         </a-button>
         <a-button 
           :loading="exportDetailLoading"
           @click="handleExportDetail"
           class="action-btn"
         >
-          导出明细
+          {{ t('dashboard.tocWarehousing.buttons.exportDetail') }}
         </a-button>
       </div>
     </div>

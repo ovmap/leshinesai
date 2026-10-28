@@ -1,12 +1,14 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, nextTick, computed, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { queryRiskOrderStats, queryRiskOrderByPage, exportRiskOrder, queryCddAlertStats, queryCddAlertDetails, exportCddAlertDataByFilter, queryAbnormalVehicleStats, queryIsgDelayRisk, queryIsgInTransitAbnormal, queryIsgDeliveryAbnormal, queryIsgRiskAlert, queryFromWarehouse, queryToProvince, queryToRdc, queryLatestWeeklyReportContent, queryLatestPfpAssessmentContent } from '../../../services/transportApi'
 import dayjs from 'dayjs'
 import { message } from 'ant-design-vue'
 import { useDashboardControlStore } from '../../../stores/dashboardControlStore'
 import { useDashboardDataStore } from '../../../stores/dashboardDataStore'
 
+const { t } = useI18n()
 const controlStore = useDashboardControlStore()
 const dataStore = useDashboardDataStore()
 
@@ -32,7 +34,7 @@ const loadSelectOptions = async () => {
     if (provRes?.data) provinceOptions.value = Array.isArray(provRes.data) ? provRes.data.map((item: any) => item.name || item) : []
     if (rdcRes?.data) rdcOptions.value = Array.isArray(rdcRes.data) ? rdcRes.data.map((item: any) => item.name || item) : []
   } catch (error) {
-    console.error('加载筛选选项失败:', error)
+    console.error(t('dashboard.cargoBanner.messages.loadFilterOptionsFailed'), error)
   }
 }
 
@@ -62,7 +64,7 @@ let isgAndVehicleRefreshTimer: NodeJS.Timeout | null = null
 
 // 弹窗相关状态
 const modalVisible = ref(false)
-const modalTitle = ref('异常预警订单详情')
+const modalTitle = ref(t('dashboard.cargoBanner.modalTitles.riskOrderDetail'))
 const modalData = ref<any[]>([])
 const modalLoading = ref(false)
 
@@ -193,31 +195,31 @@ const syncGlobalFiltersToCddParams = () => {
 
 // CDD搜索下拉框显示文本
 const cddDisplayWarehouse = computed(() => {
-  if (cddSearchParams.value.fromWarehouse.length === 0) return '始发仓';
+  if (cddSearchParams.value.fromWarehouse.length === 0) return t('dashboard.cargoBanner.filters.fromWarehouse');
   return truncateText(cddSearchParams.value.fromWarehouse, maxDisplayLength);
 });
 
 const cddDisplayProvince = computed(() => {
-  if (cddSearchParams.value.toProvince.length === 0) return '目的省';
+  if (cddSearchParams.value.toProvince.length === 0) return t('dashboard.cargoBanner.filters.toProvince');
   return truncateText(cddSearchParams.value.toProvince, maxDisplayLength);
 });
 
 const cddDisplayRdc = computed(() => {
-  if (cddSearchParams.value.toRdc.length === 0) return '目的RDC';
+  if (cddSearchParams.value.toRdc.length === 0) return t('dashboard.cargoBanner.filters.toRdc');
   return truncateText(cddSearchParams.value.toRdc, maxDisplayLength);
 });
 
 // CDD搜索下拉框完整文本（用于tooltip）
 const cddFullWarehouseText = computed(() =>
-  cddSearchParams.value.fromWarehouse.length > 0 ? cddSearchParams.value.fromWarehouse.join(', ') : '始发仓'
+  cddSearchParams.value.fromWarehouse.length > 0 ? cddSearchParams.value.fromWarehouse.join(', ') : t('dashboard.cargoBanner.filters.fromWarehouse')
 );
 
 const cddFullProvinceText = computed(() =>
-  cddSearchParams.value.toProvince.length > 0 ? cddSearchParams.value.toProvince.join(', ') : '目的省'
+  cddSearchParams.value.toProvince.length > 0 ? cddSearchParams.value.toProvince.join(', ') : t('dashboard.cargoBanner.filters.toProvince')
 );
 
 const cddFullRdcText = computed(() =>
-  cddSearchParams.value.toRdc.length > 0 ? cddSearchParams.value.toRdc.join(', ') : '目的RDC'
+  cddSearchParams.value.toRdc.length > 0 ? cddSearchParams.value.toRdc.join(', ') : t('dashboard.cargoBanner.filters.toRdc')
 );
 
 // 过滤后的选项
@@ -232,7 +234,7 @@ const filteredCddWarehouseOptions = computed(() => {
     option.toLowerCase().includes(cddWarehouseSearch.value.toLowerCase())
   );
   // 在列表开头添加重置选项
-  return ['重置', ...filtered];
+  return [t('dashboard.cargoBanner.filters.reset'), ...filtered];
 });
 
 const filteredCddProvinceOptions = computed(() => {
@@ -246,7 +248,7 @@ const filteredCddProvinceOptions = computed(() => {
     option.toLowerCase().includes(cddProvinceSearch.value.toLowerCase())
   );
   // 在列表开头添加重置选项
-  return ['重置', ...filtered];
+  return [t('dashboard.cargoBanner.filters.reset'), ...filtered];
 });
 
 const filteredCddRdcOptions = computed(() => {
@@ -260,7 +262,7 @@ const filteredCddRdcOptions = computed(() => {
     option.toLowerCase().includes(cddRdcSearch.value.toLowerCase())
   );
   // 在列表开头添加重置选项
-  return ['重置', ...filtered];
+  return [t('dashboard.cargoBanner.filters.reset'), ...filtered];
 });
 
 // 计算弹窗表格滚动高度
@@ -341,7 +343,7 @@ const fetchCddAlertStats = async () => {
         })
         
         if (validHighPriority.length > 0) {
-          content.push('重点关注')
+          content.push(t('dashboard.cargoBanner.categories.highPriority'))
           validHighPriority.forEach((item: string) => {
             content.push(item)
           })
@@ -372,7 +374,7 @@ const fetchCddAlertStats = async () => {
         })
         
         if (validNormalPriority.length > 0) {
-          content.push('一般关注')
+          content.push(t('dashboard.cargoBanner.categories.normalPriority'))
           validNormalPriority.forEach((item: string) => {
             content.push(item)
           })
@@ -537,13 +539,13 @@ const fetchRiskOrderStats = async () => {
       fetchVehicleData(),
       fetchIsgData(),
       queryLatestWeeklyReportContent({
-        startTime: '2026-06-11 00:00:00',
-        endTime: '2026-07-18 15:32:11'
+        startTime: '2026-10-12 00:00:00',
+        endTime: '2026-10-18 23:59:59'
       }),
       queryLatestPfpAssessmentContent({
         startTime: '2026-06-11 00:00:00',
         endTime: '2026-07-18 15:32:11',
-        month: 5
+        month: 8
       })
     ])
     
@@ -560,21 +562,21 @@ const fetchRiskOrderStats = async () => {
     // 更新卡片数据 - 4个卡片：去掉PFP和底部中间的卡片，保留左右两侧
     dataCards.value = [
       {
-        title: '当月CDD预警',
+        title: t('dashboard.cargoBanner.cardTitles.cddAlert'),
         content: Array.isArray(finalCddContent) ? finalCddContent : []
       },
       {
-        title: '车辆安全监控',
+        title: t('dashboard.cargoBanner.cardTitles.vehicleSafety'),
         content: Array.isArray(finalVehicleData.content) ? finalVehicleData.content : [],
         rawData: Array.isArray(finalVehicleData.rawData) ? finalVehicleData.rawData : []
       },
       //ISG预警卡片
       {
-        title: 'ISG电子标签预警',
+        title: t('dashboard.cargoBanner.cardTitles.isgAlert'),
         content: Array.isArray(finalIsgContent) ? finalIsgContent : []
       },
       {
-        title: '超7天异常预警',
+        title: t('dashboard.cargoBanner.cardTitles.riskOrder7Days'),
         content: Array.isArray(finalRiskContent) ? finalRiskContent : []
       }
     ]
@@ -591,21 +593,21 @@ const fetchRiskOrderStats = async () => {
     if (!dataCards.value || dataCards.value.length === 0) {
       dataCards.value = [
         {
-          title: '当月CDD预警',
+          title: t('dashboard.cargoBanner.cardTitles.cddAlert'),
           content: []
         },
         {
-          title: '车辆安全监控',
+          title: t('dashboard.cargoBanner.cardTitles.vehicleSafety'),
           content: [],
           rawData: []
         },
         //ISG预警卡片
         {
-          title: 'ISG电子标签预警',
+          title: t('dashboard.cargoBanner.cardTitles.isgAlert'),
           content: []
         },
         {
-          title: '异常预警大于7天未解决',
+          title: t('dashboard.cargoBanner.cardTitles.riskOrderOver7Days'),
           content: []
         }
       ]
@@ -762,21 +764,21 @@ interface DataCard {
 // 数据卡片配置 - 初始化为默认数据，先显示卡片和标题，后续通过API更新内容
 const dataCards = ref<DataCard[]>([
   {
-    title: '当月CDD预警',
+    title: t('dashboard.cargoBanner.cardTitles.cddAlert'),
     content: []
   },
   {
-    title: '车辆安全监控',
+    title: t('dashboard.cargoBanner.cardTitles.vehicleSafety'),
     content: [],
     rawData: []
   },
   //ISG预警卡片
   {
-    title: 'ISG电子标签预警',
+    title: t('dashboard.cargoBanner.cardTitles.isgAlert'),
     content: []
   },
   {
-    title: '异常预警大于7天未解决',
+    title: t('dashboard.cargoBanner.cardTitles.riskOrderOver7Days'),
     content: []
   }
 ])
@@ -940,16 +942,16 @@ const handleCardClick = (clickedIndex: number) => {
   const cardTitle = clickedCard.title
   
   // "异常预警大于7天未解决"、"ISG电子标签预警"和"当月CDD预警"显示弹窗
-  if (cardTitle === '异常预警大于7天未解决') {
-    modalTitle.value = '异常预警订单详情'
+  if (cardTitle === t('dashboard.cargoBanner.cardTitles.riskOrderOver7Days')) {
+    modalTitle.value = t('dashboard.cargoBanner.modalTitles.riskOrderDetail')
     modalVisible.value = true
     currentPage.value = 1
     total.value = 0
     fetchModalData()
     
     // 计算表格滚动高度
-  } else if (cardTitle === '当月CDD预警') {
-    modalTitle.value = 'CDD预警详情'
+  } else if (cardTitle === t('dashboard.cargoBanner.cardTitles.cddAlert')) {
+    modalTitle.value = t('dashboard.cargoBanner.modalTitles.cddAlertDetail')
     modalVisible.value = true
     currentPage.value = 1
     total.value = 0
@@ -968,8 +970,8 @@ const handleCardClick = (clickedIndex: number) => {
     nextTick(() => {
       calculateModalTableScrollY()
     })
-  } else if (cardTitle === 'ISG电子标签预警') {
-    modalTitle.value = 'ISG电子标签预警详情'
+  } else if (cardTitle === t('dashboard.cargoBanner.cardTitles.isgAlert')) {
+    modalTitle.value = t('dashboard.cargoBanner.modalTitles.isgAlertDetail')
     modalVisible.value = true
     currentPage.value = 1
     total.value = 0
@@ -1005,7 +1007,7 @@ const handleVehicleItemClick = (event: MouseEvent, cardIndex: number, itemIndex:
   event.stopPropagation()
   
   const card = dataCards.value[cardIndex]
-  if (!card || card.title !== '车辆安全监控' || !card.rawData || itemIndex >= card.rawData.length) {
+  if (!card || card.title !== t('dashboard.cargoBanner.cardTitles.vehicleSafety') || !card.rawData || itemIndex >= card.rawData.length) {
     return
   }
   
@@ -1117,9 +1119,9 @@ const fetchModalData = async (currentPageNum: number = currentPage.value) => {
   } catch (error: any) {
     // 超时错误静默处理，其他错误记录日志
     if (error?.code === 'ECONNABORTED' || error?.message?.includes('timeout')) {
-      console.log('请求超时，可能是网络较慢或服务器响应慢')
+      console.log(t('dashboard.cargoBanner.messages.requestTimeout'))
     } else {
-      console.error('获取弹窗数据失败:', error)
+      console.error(t('dashboard.cargoBanner.messages.fetchModalDataFailed'), error)
     }
     modalData.value = []
     total.value = 0
@@ -1157,9 +1159,9 @@ const fetchCddData = async (currentPageNum: number = currentPage.value) => {
     }
   } catch (error: any) {
     if (error?.code === 'ECONNABORTED' || error?.message?.includes('timeout')) {
-      console.log('请求超时，可能是网络较慢或服务器响应慢')
+      console.log(t('dashboard.cargoBanner.messages.requestTimeout'))
     } else {
-      console.error('获取CDD数据失败:', error)
+      console.error(t('dashboard.cargoBanner.messages.fetchCddDataFailed'), error)
     }
     modalData.value = []
     total.value = 0
@@ -1224,9 +1226,9 @@ const fetchISGData = async (currentPageNum: number = currentPage.value) => {
   } catch (error: any) {
     // 超时错误静默处理，其他错误记录日志
     if (error?.code === 'ECONNABORTED' || error?.message?.includes('timeout')) {
-      console.log('请求超时，可能是网络较慢或服务器响应慢')
+      console.log(t('dashboard.cargoBanner.messages.requestTimeout'))
     } else {
-      console.error('获取ISG数据失败:', error)
+      console.error(t('dashboard.cargoBanner.messages.fetchIsgDataFailed'), error)
     }
     modalData.value = []
     total.value = 0
@@ -1279,24 +1281,24 @@ const loadCddDropdownOptions = () => {
   
   // 客户使用固定数据
   cddCustomerOptions.value = [
-    { code: '分销外包', name: '分销外包' },
-    { code: '华致酒行', name: '华致酒行' },
-    { code: '联想成品业务', name: '联想成品业务' },
-    { code: '来酷科技', name: '来酷科技' },
-    { code: '有道', name: '有道' }
+    { code: '分销外包', name: t('dashboard.cargoBanner.cddOptions.customers.fenxiao') },
+    { code: '华致酒行', name: t('dashboard.cargoBanner.cddOptions.customers.huazhi') },
+    { code: '联想成品业务', name: t('dashboard.cargoBanner.cddOptions.customers.lenovo') },
+    { code: '来酷科技', name: t('dashboard.cargoBanner.cddOptions.customers.laiku') },
+    { code: '有道', name: t('dashboard.cargoBanner.cddOptions.customers.youdao') }
   ]
   
   // 运输模式使用固定数据
   cddModeTypeOptions.value = [
-    { code: '直送', name: '直送' },
-    { code: '区配', name: '区配' }
+    { code: '直送', name: t('dashboard.cargoBanner.cddOptions.modeTypes.direct') },
+    { code: '区配', name: t('dashboard.cargoBanner.cddOptions.modeTypes.zone') }
   ]
   
   // 不达标类型使用固定数据
   cddNonComplianceTypeOptions.value = [
-    { code: 'ete', name: '端到端迟到' },
-    { code: 'trunkline', name: '干线迟到' },
-    { code: 'distribution', name: '配送迟到' }
+    { code: 'ete', name: t('dashboard.cargoBanner.cddOptions.nonComplianceTypes.ete') },
+    { code: 'trunkline', name: t('dashboard.cargoBanner.cddOptions.nonComplianceTypes.trunkline') },
+    { code: 'distribution', name: t('dashboard.cargoBanner.cddOptions.nonComplianceTypes.distribution') }
   ]
 }
 
@@ -1438,7 +1440,7 @@ const toggleCddToRdc = () => {
 
 // 选择始发仓选项
 const selectCddFromWarehouse = (option: string) => {
-  if (option === '重置') {
+  if (option === t('dashboard.cargoBanner.filters.reset')) {
     // 重置选择
     cddSearchParams.value.fromWarehouse = [];
     return;
@@ -1475,7 +1477,7 @@ const handleCddDateRangeChange = (dates: any[]) => {
 
 // 选择目的省份选项
 const selectCddToProvince = (option: string) => {
-  if (option === '重置') {
+  if (option === t('dashboard.cargoBanner.filters.reset')) {
     // 重置选择
     cddSearchParams.value.toProvince = [];
     return;
@@ -1494,7 +1496,7 @@ const selectCddToProvince = (option: string) => {
 
 // 选择目的RDC选项
 const selectCddToRdc = (option: string) => {
-  if (option === '重置') {
+  if (option === t('dashboard.cargoBanner.filters.reset')) {
     // 重置选择
     cddSearchParams.value.toRdc = [];
     return;
@@ -1514,7 +1516,7 @@ const selectCddToRdc = (option: string) => {
 // 显示CDD筛选文本
 const displayCddDataSource = computed(() => {
   if (cddSearchParams.value.dataSource.length === 0) {
-    return '数据源'
+    return t('dashboard.cargoBanner.filters.dataSource')
   }
   const names = cddSearchParams.value.dataSource.map(code => {
     const option = cddDataSourceOptions.value.find(item => item.code === code)
@@ -1525,7 +1527,7 @@ const displayCddDataSource = computed(() => {
 
 const displayCddCustomer = computed(() => {
   if (cddSearchParams.value.customer.length === 0) {
-    return '客户'
+    return t('dashboard.cargoBanner.filters.customer')
   }
   const names = cddSearchParams.value.customer.map(code => {
     const option = cddCustomerOptions.value.find(item => item.code === code)
@@ -1536,7 +1538,7 @@ const displayCddCustomer = computed(() => {
 
 const displayCddModeType = computed(() => {
   if (cddSearchParams.value.modeType.length === 0) {
-    return '运输模式'
+    return t('dashboard.cargoBanner.filters.transMode')
   }
   const names = cddSearchParams.value.modeType.map(code => {
     const option = cddModeTypeOptions.value.find(item => item.code === code)
@@ -1547,7 +1549,7 @@ const displayCddModeType = computed(() => {
 
 const displayCddNonComplianceType = computed(() => {
   if (cddSearchParams.value.nonComplianceType.length === 0) {
-    return '不达标类型'
+    return t('dashboard.cargoBanner.filters.nonComplianceType')
   }
   const names = cddSearchParams.value.nonComplianceType.map(code => {
     const option = cddNonComplianceTypeOptions.value.find(item => item.code === code)
@@ -1609,9 +1611,9 @@ const handleTableChange = (pagination: any) => {
   pageSize.value = pagination.pageSize
   
   // 根据当前弹窗类型调用不同的数据获取函数
-  if (modalTitle.value === 'CDD预警详情') {
+  if (modalTitle.value === t('dashboard.cargoBanner.modalTitles.cddAlertDetail')) {
     fetchCddData(pagination.current)
-  } else if (modalTitle.value === 'ISG电子标签预警详情') {
+  } else if (modalTitle.value === t('dashboard.cargoBanner.modalTitles.isgAlertDetail')) {
     fetchISGData(pagination.current)
   } else {
     fetchModalData(pagination.current)
@@ -1642,12 +1644,12 @@ const handleCddExport = async () => {
     }
     
   } catch (error: any) {
-    console.error('导出CDD失败:', error)
+    console.error(t('dashboard.cargoBanner.messages.exportCddFailed'), error)
     const errCode = error?.code;
     if (errCode === 409 || errCode === 504 || errCode === 505) {
-      message.error(error.msg || '导出数据量过大，请缩小范围');
+      message.error(error.msg || t('dashboard.cargoBanner.messages.exportDataTooLarge'));
     } else {
-      message.error(error.msg || '导出失败');
+      message.error(error.msg || t('dashboard.cargoBanner.messages.exportFailed'));
     }
   } finally {
     exportLoading.value = false
@@ -1687,14 +1689,14 @@ const handleExport = async () => {
     }
     
   } catch (error: any) {
-    console.error('导出失败:', error)
+    console.error(t('dashboard.cargoBanner.messages.exportFailed'), error)
     
     // 检查是否是409或504状态码
     const errCode = error?.code;
     if (errCode === 409 || errCode === 504 || errCode === 505) {
-      message.error(error.msg || '导出数据量过大，请缩小范围');
+      message.error(error.msg || t('dashboard.cargoBanner.messages.exportDataTooLarge'));
     } else {
-      message.error(error.msg || '导出失败');
+      message.error(error.msg || t('dashboard.cargoBanner.messages.exportFailed'));
     }
   } finally {
     exportLoading.value = false
@@ -1706,7 +1708,7 @@ const downloadFile = (url: string) => {
   try {
     const link = document.createElement('a')
     link.href = url
-    const downloadFilename = '导出文件.xlsx';
+    const downloadFilename = t('dashboard.cargoBanner.messages.exportFilename');
     
     link.download = downloadFilename
     
@@ -1721,441 +1723,441 @@ const downloadFile = (url: string) => {
 
 
 // 表格列配置
-const tableColumns = [
+const tableColumns = computed(() => [
     {
-      title: '数据源',
+      title: t('dashboard.cargoBanner.tableColumns.dataSource'),
       dataIndex: 'dataSource',
       key: 'dataSource',
       width: 100,
       align: 'center' as const,
     },
   {
-    title: '客户',
+    title: t('dashboard.cargoBanner.tableColumns.customer'),
     dataIndex: 'customer',
     key: 'customer',
     width: 120,
     align: 'center' as const,
   },
   {
-    title: '客户订单号',
+    title: t('dashboard.cargoBanner.tableColumns.custOrderNo'),
     dataIndex: 'custOrderNo',
     key: 'custOrderNo',
     width: 150,
     align: 'center' as const,
   },
   {
-    title: '发货单号',
+    title: t('dashboard.cargoBanner.tableColumns.invoiceNo'),
     dataIndex: 'invoiceNo',
     key: 'invoiceNo',
     width: 200,
     align: 'center' as const,
   },
   {
-    title: '始发仓',
+    title: t('dashboard.cargoBanner.tableColumns.fromWarehouse'),
     dataIndex: 'fromWarehouse',
     key: 'fromWarehouse',
     width: 120,
     align: 'center' as const,
   },
   {
-    title: '目的RDC',
+    title: t('dashboard.cargoBanner.tableColumns.toRdc'),
     dataIndex: 'toRdc',
     key: 'toRdc',
     width: 120,
     align: 'center' as const,
   },
   {
-    title: '承运商',
+    title: t('dashboard.cargoBanner.tableColumns.carrierName'),
     dataIndex: 'carrierName',
     key: 'carrierName',
     width: 100,
     align: 'center' as const,
   },
   {
-    title: '配送商',
+    title: t('dashboard.cargoBanner.tableColumns.deliveryName'),
     dataIndex: 'deliveryName',
     key: 'deliveryName',
     width: 100,
     align: 'center' as const,
   },
   {
-    title: '异常代码',
+    title: t('dashboard.cargoBanner.tableColumns.abnormalCode'),
     dataIndex: 'abnormalCode',
     key: 'abnormalCode',
     width: 120,
     align: 'center' as const,
   },
   {
-    title: '异常时间',
+    title: t('dashboard.cargoBanner.tableColumns.abnormalTime'),
     dataIndex: 'abnormalTime',
     key: 'abnormalTime',
     width: 160,
     align: 'center' as const,
   },
   {
-    title: '异常描述',
+    title: t('dashboard.cargoBanner.tableColumns.abnormalDesc'),
     dataIndex: 'abnormalDesc',
     key: 'abnormalDesc',
     width: 200,
     align: 'center' as const,
   },
   {
-    title: '异常次数',
+    title: t('dashboard.cargoBanner.tableColumns.abnormalCount'),
     dataIndex: 'abnormalCount',
     key: 'abnormalCount',
     width: 100,
     align: 'center' as const,
   },
   {
-    title: '产品编号',
+    title: t('dashboard.cargoBanner.tableColumns.productNo'),
     dataIndex: 'productNo',
     key: 'productNo',
     width: 150,
     align: 'center' as const,
   },
   {
-    title: '产品名称',
+    title: t('dashboard.cargoBanner.tableColumns.productName'),
     dataIndex: 'productName',
     key: 'productName',
     width: 200,
     align: 'center' as const,
   },
   {
-    title: '处理建议',
+    title: t('dashboard.cargoBanner.tableColumns.actionAdvice'),
     dataIndex: 'actionAdvice',
     key: 'actionAdvice',
     width: 180,
     align: 'center' as const,
   },
-];
+]);
 
 // ISG表格列定义 - ISG客户迟到风险订单
-const isgDelayTableColumns = [
+const isgDelayTableColumns = computed(() => [
   {
-    title: '数据校验时间',
+    title: t('dashboard.cargoBanner.tableColumns.dataCheckTime'),
     dataIndex: 'dataCheckTime',
     key: 'dataCheckTime',
     width: 160,
   },
   {
-    title: '发货单号',
+    title: t('dashboard.cargoBanner.tableColumns.invoiceNo'),
     dataIndex: 'invoiceNo',
     key: 'invoiceNo',
     width: 120,
   },
   {
-    title: '位置',
+    title: t('dashboard.cargoBanner.tableColumns.location'),
     dataIndex: 'location',
     key: 'location',
     width: 150,
   },
   {
-    title: '预计到达时间',
+    title: t('dashboard.cargoBanner.tableColumns.predictArriveTime'),
     dataIndex: 'predictArriveTime',
     key: 'predictArriveTime',
     width: 160,
   },
   {
-    title: '风险信息',
+    title: t('dashboard.cargoBanner.tableColumns.riskInfo'),
     dataIndex: 'riskInfo',
     key: 'riskInfo',
     width: 100,
   },
   {
-    title: '原因',
+    title: t('dashboard.cargoBanner.tableColumns.reason'),
     dataIndex: 'reason',
     key: 'reason',
     width: 180,
   },
   {
-    title: '处理措施',
+    title: t('dashboard.cargoBanner.tableColumns.measure'),
     dataIndex: 'measure',
     key: 'measure',
     width: 180,
   },
-];
+]);
 
 // ISG表格列定义 - ISG客户订单在途异常
-const isgInTransitTableColumns = [
+const isgInTransitTableColumns = computed(() => [
   {
-    title: '数据校验时间',
+    title: t('dashboard.cargoBanner.tableColumns.dataCheckTime'),
     dataIndex: 'dataCheckTime',
     key: 'dataCheckTime',
     width: 160,
   },
   {
-    title: '发货单号',
+    title: t('dashboard.cargoBanner.tableColumns.invoiceNo'),
     dataIndex: 'invoiceNo',
     key: 'invoiceNo',
     width: 120,
   },
   {
-    title: '电子标签SN',
+    title: t('dashboard.cargoBanner.tableColumns.etagSn'),
     dataIndex: 'etagSn',
     key: 'etagSn',
     width: 150,
   },
   {
-    title: '收货地址',
+    title: t('dashboard.cargoBanner.tableColumns.consigneeAddress'),
     dataIndex: 'consigneeAddress',
     key: 'consigneeAddress',
     width: 200,
   },
   {
-    title: '异常类型',
+    title: t('dashboard.cargoBanner.tableColumns.abnormalType'),
     dataIndex: 'abnormalType',
     key: 'abnormalType',
     width: 120,
   },
   {
-    title: '异常时间',
+    title: t('dashboard.cargoBanner.tableColumns.abnormalTime'),
     dataIndex: 'abnormalTime',
     key: 'abnormalTime',
     width: 160,
   },
   {
-    title: '原因',
+    title: t('dashboard.cargoBanner.tableColumns.reason'),
     dataIndex: 'reason',
     key: 'reason',
     width: 180,
   },
   {
-    title: '处理措施',
+    title: t('dashboard.cargoBanner.tableColumns.measure'),
     dataIndex: 'measure',
     key: 'measure',
     width: 180,
   },
-];
+]);
 
 // 按需达客户交付异常订单：abnormalInfo（string）枚举展示
-const ISG_DELIVERY_ABNORMAL_INFO_MAP: Record<string, string> = {
-  '1': '按需达时间、签收时间不在同一天',
-  '2': '电子标签与货物未解绑，但是订单签收',
-  '3': '货物到达客户处又离开且电子标签未解绑',
-};
+const ISG_DELIVERY_ABNORMAL_INFO_MAP = computed(() => ({
+  '1': t('dashboard.cargoBanner.isgDeliveryAbnormalInfo.1'),
+  '2': t('dashboard.cargoBanner.isgDeliveryAbnormalInfo.2'),
+  '3': t('dashboard.cargoBanner.isgDeliveryAbnormalInfo.3'),
+}));
 
 const formatIsgDeliveryAbnormalInfo = (text: unknown): string => {
   if (text === null || text === undefined || text === '') return '-';
   const key = String(text).trim();
-  return ISG_DELIVERY_ABNORMAL_INFO_MAP[key] ?? key;
+  return (ISG_DELIVERY_ABNORMAL_INFO_MAP.value as Record<string, string>)[key] ?? key;
 };
 
 // ISG表格列定义 - 按需达客户交付异常订单（不含异常原因、处理措施；运输模式取 transType）
-const isgDeliveryTableColumns = [
+const isgDeliveryTableColumns = computed(() => [
   {
-    title: '数据校验时间',
+    title: t('dashboard.cargoBanner.tableColumns.dataCheckTime'),
     dataIndex: 'dataCheckTime',
     key: 'dataCheckTime',
     width: 160,
   },
   {
-    title: '联想订单号',
+    title: t('dashboard.cargoBanner.tableColumns.lenovoOrderNo'),
     dataIndex: 'lenovoOrderNo',
     key: 'lenovoOrderNo',
     width: 100,
   },
   {
-    title: '发货单号',
+    title: t('dashboard.cargoBanner.tableColumns.invoiceNo'),
     dataIndex: 'invoiceNo',
     key: 'invoiceNo',
     width: 160,
   },
   {
-    title: '物流商',
+    title: t('dashboard.cargoBanner.tableColumns.logisticName'),
     dataIndex: 'logisticName',
     key: 'logisticName',
     width: 100,
   },
   {
-    title: '运输模式',
+    title: t('dashboard.cargoBanner.tableColumns.transType'),
     dataIndex: 'transType',
     key: 'transType',
     width: 120,
   },
   {
-    title: '按需达时间',
+    title: t('dashboard.cargoBanner.tableColumns.onDemandTime'),
     dataIndex: 'onDemandTime',
     key: 'onDemandTime',
     width: 160,
   },
   {
-    title: '始发仓',
+    title: t('dashboard.cargoBanner.tableColumns.fromWarehouse'),
     dataIndex: 'fromWarehouse',
     key: 'fromWarehouse',
     width: 100,
   },
   {
-    title: '目的省',
+    title: t('dashboard.cargoBanner.tableColumns.toProvince'),
     dataIndex: 'toProvince',
     key: 'toProvince',
     width: 100,
   },
   {
-    title: '目的市',
+    title: t('dashboard.cargoBanner.tableColumns.toCity'),
     dataIndex: 'toCity',
     key: 'toCity',
     width: 100,
   },
   {
-    title: '收货地址',
+    title: t('dashboard.cargoBanner.tableColumns.consigneeAddress'),
     dataIndex: 'consigneeAddress',
     key: 'consigneeAddress',
     width: 400,
   },
   {
-    title: '异常情况',
+    title: t('dashboard.cargoBanner.tableColumns.abnormalInfo'),
     dataIndex: 'abnormalInfo',
     key: 'abnormalInfo',
     width: 360,
   },
-];
+]);
 
 // CDD预警表格列定义
-const cddAlertTableColumns = [
+const cddAlertTableColumns = computed(() => [
   {
-    title: '数据源',
+    title: t('dashboard.cargoBanner.tableColumns.dataSource'),
     dataIndex: 'dataSource',
     key: 'dataSource',
     width: 100,
   },
   {
-    title: '客户',
+    title: t('dashboard.cargoBanner.tableColumns.customer'),
     dataIndex: 'customer',
     key: 'customer',
     width: 120,
   },
   {
-    title: '客户订单号',
+    title: t('dashboard.cargoBanner.tableColumns.custOrderNo'),
     dataIndex: 'custOrderNo',
     key: 'custOrderNo',
     width: 150,
   },
   {
-    title: '始发仓',
+    title: t('dashboard.cargoBanner.tableColumns.fromWarehouse'),
     dataIndex: 'fromWarehouse',
     key: 'fromWarehouse',
     width: 120,
   },
   {
-    title: '目的RDC',
+    title: t('dashboard.cargoBanner.tableColumns.toRdc'),
     dataIndex: 'toRdc',
     key: 'toRdc',
     width: 120,
   },
   {
-    title: '目的省',
+    title: t('dashboard.cargoBanner.tableColumns.toProvince'),
     dataIndex: 'toProvince',
     key: 'toProvince',
     width: 100,
   },
   {
-    title: '目的市',
+    title: t('dashboard.cargoBanner.tableColumns.toCity'),
     dataIndex: 'toCity',
     key: 'toCity',
     width: 100,
   },
   {
-    title: '运输单号',
+    title: t('dashboard.cargoBanner.tableColumns.transNo'),
     dataIndex: 'transNo',
     key: 'transNo',
     width: 150,
   },
   {
-    title: '发货单号',
+    title: t('dashboard.cargoBanner.tableColumns.invoiceNo'),
     dataIndex: 'invoiceNo',
     key: 'invoiceNo',
     width: 150,
   },
   {
-    title: '承运商',
+    title: t('dashboard.cargoBanner.tableColumns.carrierName'),
     dataIndex: 'carrierName',
     key: 'carrierName',
     width: 120,
   },
   {
-    title: '配送商',
+    title: t('dashboard.cargoBanner.tableColumns.deliveryName'),
     dataIndex: 'deliveryName',
     key: 'deliveryName',
     width: 120,
   },
   {
-    title: '运输模式',
+    title: t('dashboard.cargoBanner.tableColumns.transType'),
     dataIndex: 'modeType',
     key: 'modeType',
     width: 100,
   },
   {
-    title: '端到端准时',
+    title: t('dashboard.cargoBanner.tableColumns.eteOnTime'),
     dataIndex: 'eteOnTime',
     key: 'eteOnTime',
     width: 100,
   },
   {
-    title: '干线准时',
+    title: t('dashboard.cargoBanner.tableColumns.mainLineOnTime'),
     dataIndex: 'mainLineOnTime',
     key: 'mainLineOnTime',
     width: 120,
   },
   {
-    title: '配送准时',
+    title: t('dashboard.cargoBanner.tableColumns.deliveryOnTime'),
     dataIndex: 'deliveryOnTime',
     key: 'deliveryOnTime',
     width: 120,
   },
   {
-    title: '最后异常代码',
+    title: t('dashboard.cargoBanner.tableColumns.lastAbnormalCode'),
     dataIndex: 'lastAbnormalCode',
     key: 'lastAbnormalCode',
     width: 150,
   },
   {
-    title: '发运确认时间',
+    title: t('dashboard.cargoBanner.tableColumns.shipConfirmTime'),
     dataIndex: 'shipConfirmTime',
     key: 'shipConfirmTime',
     width: 160,
   },
   {
-    title: '签收时间',
+    title: t('dashboard.cargoBanner.tableColumns.signTime'),
     dataIndex: 'signTime',
     key: 'signTime',
     width: 160,
   },
   {
-    title: '分类',
+    title: t('dashboard.cargoBanner.tableColumns.category'),
     dataIndex: 'category',
     key: 'category',
     width: 100,
   },
   {
-    title: '原因',
+    title: t('dashboard.cargoBanner.tableColumns.reason'),
     dataIndex: 'reason',
     key: 'reason',
     width: 200,
   },
   {
-    title: '处理措施',
+    title: t('dashboard.cargoBanner.tableColumns.measure'),
     dataIndex: 'measure',
     key: 'measure',
     width: 200,
   },
-];
+]);
 
 // 根据弹窗类型和当前tab返回不同的表格列
 const currentTableColumns = computed(() => {
-  if (modalTitle.value === 'CDD预警详情') {
-    return cddAlertTableColumns
+  if (modalTitle.value === t('dashboard.cargoBanner.modalTitles.cddAlertDetail')) {
+    return cddAlertTableColumns.value
   }
-  if (modalTitle.value === 'ISG电子标签预警详情') {
+  if (modalTitle.value === t('dashboard.cargoBanner.modalTitles.isgAlertDetail')) {
     if (isgActiveTab.value === 'delay') {
-      return isgDelayTableColumns
+      return isgDelayTableColumns.value
     } else if (isgActiveTab.value === 'inTransit') {
-      return isgInTransitTableColumns
+      return isgInTransitTableColumns.value
     } else if (isgActiveTab.value === 'delivery') {
-      return isgDeliveryTableColumns
+      return isgDeliveryTableColumns.value
     }
-    return isgDelayTableColumns
+    return isgDelayTableColumns.value
   }
-  return tableColumns
+  return tableColumns.value
 })
 
 // 3个卡片的动画（位置1、3、4）
@@ -2951,7 +2953,7 @@ onUnmounted(() => {
           @click="handleCardClick(index)">
           <!-- 车辆图标 -->
           <div class="car-icon-container">
-            <img src="/dashboard/images/banner-car.png" :alt="'车辆图标'" />
+            <img src="/dashboard/images/banner-car.png" :alt="t('dashboard.cargoBanner.altText.vehicleIcon')" />
           </div>
 
           <!-- 连接箭头 -->
@@ -2965,7 +2967,7 @@ onUnmounted(() => {
                 v-if="card.content && card.content.length > 0"
                 class="card-expand-btn" 
                 @click.stop="handleCardExpand(index)"
-                :title="'放大查看'"
+                :title="t('dashboard.cargoBanner.buttons.expand')"
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M8 3H5C3.89543 3 3 3.89543 3 5V8M21 8V5C21 3.89543 20.1046 3 19 3H16M16 21H19C20.1046 21 21 20.1046 21 19V16M3 16V19C3 20.1046 3.89543 21 5 21H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -2976,16 +2978,16 @@ onUnmounted(() => {
               <template v-if="card.content && card.content.length > 0">
                 <p v-for="(item, i) in card.content" :key="i" 
                    :class="{ 
-                     'category-title': item === '重点关注' || item === '一般关注',
-                     'vehicle-item': card.title === '车辆安全监控'
+                     'category-title': item === t('dashboard.cargoBanner.categories.highPriority') || item === t('dashboard.cargoBanner.categories.normalPriority'),
+                     'vehicle-item': card.title === t('dashboard.cargoBanner.cardTitles.vehicleSafety')
                    }"
-                   @click="card.title === '车辆安全监控' ? handleVehicleItemClick($event, index, i) : null">
+                   @click="card.title === t('dashboard.cargoBanner.cardTitles.vehicleSafety') ? handleVehicleItemClick($event, index, i) : null">
                   {{ item }}
                 </p>
               </template>
               <div v-else class="empty-content">
-                <img src="/dashboard/images/image_empty.png" alt="暂无数据" class="empty-image" />
-                <p class="empty-text">暂无数据</p>
+                <img src="/dashboard/images/image_empty.png" :alt="t('dashboard.cargoBanner.altText.emptyImage')" class="empty-image" />
+                <p class="empty-text">{{ t('dashboard.cargoBanner.messages.noData') }}</p>
               </div>
             </div>
           </div>
@@ -3003,7 +3005,7 @@ onUnmounted(() => {
              @click.stop>
           <div class="vehicle-detail-content">
             <div class="vehicle-detail-text">
-              {{ selectedVehicleData.carNo }}，{{ '当前位置：' }}{{ selectedVehicleData.location }}
+              {{ selectedVehicleData.carNo }}，{{ t('dashboard.cargoBanner.messages.currentLocation') }}{{ selectedVehicleData.location }}
             </div>
           </div>
         </div>
@@ -3024,7 +3026,7 @@ onUnmounted(() => {
         <!-- 弹窗内容 -->
         <div class="modal-body">
           <!-- CDD预警搜索区域 -->
-          <div v-if="modalTitle === 'CDD预警详情'" class="cdd-search-section">
+          <div v-if="modalTitle === t('dashboard.cargoBanner.modalTitles.cddAlertDetail')" class="cdd-search-section">
             <div class="search-form">
               <!-- 时间范围 -->
               <div class="time-picker-item">
@@ -3095,7 +3097,7 @@ onUnmounted(() => {
                   </svg>
                   <div class="dropdown-content" v-show="isCddFromWarehouseOpen" @click.stop>
                     <div class="search-box">
-                      <input v-model="cddWarehouseSearch" type="text" :placeholder="'搜索始发仓'" class="search-input" @click.stop />
+                      <input v-model="cddWarehouseSearch" type="text" :placeholder="t('dashboard.cargoBanner.placeholders.searchWarehouse')" class="search-input" @click.stop />
                     </div>
                     <div class="options-list">
                       <div 
@@ -3109,7 +3111,7 @@ onUnmounted(() => {
                         {{ option }}
                       </div>
                       <div v-if="filteredCddWarehouseOptions.length === 0" class="no-results">
-                        {{ '未找到匹配结果' }}
+                        {{ t('dashboard.cargoBanner.placeholders.noResults') }}
                       </div>
                     </div>
                   </div>
@@ -3125,7 +3127,7 @@ onUnmounted(() => {
                   </svg>
                   <div class="dropdown-content" v-show="isCddToProvinceOpen" @click.stop>
                     <div class="search-box">
-                      <input v-model="cddProvinceSearch" type="text" :placeholder="'搜索目的省'" class="search-input" @click.stop />
+                      <input v-model="cddProvinceSearch" type="text" :placeholder="t('dashboard.cargoBanner.placeholders.searchProvince')" class="search-input" @click.stop />
                     </div>
                     <div class="options-list">
                       <div 
@@ -3139,7 +3141,7 @@ onUnmounted(() => {
                         {{ option }}
                       </div>
                       <div v-if="filteredCddProvinceOptions.length === 0" class="no-results">
-                        {{ '未找到匹配结果' }}
+                        {{ t('dashboard.cargoBanner.placeholders.noResults') }}
                       </div>
                     </div>
                   </div>
@@ -3155,7 +3157,7 @@ onUnmounted(() => {
                   </svg>
                   <div class="dropdown-content" v-show="isCddToRdcOpen" @click.stop>
                     <div class="search-box">
-                      <input v-model="cddRdcSearch" type="text" :placeholder="'搜索目的RDC'" class="search-input" @click.stop />
+                      <input v-model="cddRdcSearch" type="text" :placeholder="t('dashboard.cargoBanner.placeholders.searchRdc')" class="search-input" @click.stop />
                     </div>
                     <div class="options-list">
                       <div 
@@ -3169,7 +3171,7 @@ onUnmounted(() => {
                         {{ option }}
                       </div>
                       <div v-if="filteredCddRdcOptions.length === 0" class="no-results">
-                        {{ '未找到匹配结果' }}
+                        {{ t('dashboard.cargoBanner.placeholders.noResults') }}
                       </div>
                     </div>
                   </div>
@@ -3225,15 +3227,15 @@ onUnmounted(() => {
               </div>
 
               <div class="search-buttons">
-                <a-button type="primary" @click="handleCddSearch" class="action-btn">{{ '搜索' }}</a-button>
-                <a-button @click="handleCddReset" class="action-btn">{{ '重置' }}</a-button>
-                <a-button type="primary" class="action-btn" @click="handleCddExport" :disabled="exportLoading" > {{ '导出' }}</a-button>
+                <a-button type="primary" @click="handleCddSearch" class="action-btn">{{ t('dashboard.cargoBanner.buttons.search') }}</a-button>
+                <a-button @click="handleCddReset" class="action-btn">{{ t('dashboard.cargoBanner.buttons.reset') }}</a-button>
+                <a-button type="primary" class="action-btn" @click="handleCddExport" :disabled="exportLoading" > {{ t('dashboard.cargoBanner.buttons.export') }}</a-button>
               </div>
             </div>
           </div>
 
           <!-- ISG搜索区域 -->
-          <div v-if="modalTitle === 'ISG电子标签预警详情'" class="isg-search-section">
+          <div v-if="modalTitle === t('dashboard.cargoBanner.modalTitles.isgAlertDetail')" class="isg-search-section">
             <div class="search-form">
               <div class="time-item" @click.stop>
                 <a-range-picker 
@@ -3261,27 +3263,27 @@ onUnmounted(() => {
                   <input 
                     v-model="isgSearchParams.invoiceNo" 
                     type="text" 
-                    placeholder="发货单号"
+                    :placeholder="t('dashboard.cargoBanner.placeholders.invoiceNo')"
                     class="form-input"
                     @pressEnter="handleIsgSearch"
                   />
                 </div>
               </div>
               <div class="search-buttons">
-                <a-button type="primary" @click="handleIsgSearch" class="action-btn">{{ '搜索' }}</a-button>
-                <a-button @click="handleIsgReset" class="action-btn">{{ '重置' }}</a-button>
+                <a-button type="primary" @click="handleIsgSearch" class="action-btn">{{ t('dashboard.cargoBanner.buttons.search') }}</a-button>
+                <a-button @click="handleIsgReset" class="action-btn">{{ t('dashboard.cargoBanner.buttons.reset') }}</a-button>
               </div>
             </div>
           </div>
           
           <!-- ISG Tab页签 -->
-          <div v-if="modalTitle === 'ISG电子标签预警详情'" class="isg-tabs-section">
+          <div v-if="modalTitle === t('dashboard.cargoBanner.modalTitles.isgAlertDetail')" class="isg-tabs-section">
             <div 
               class="isg-tab-item" 
               :class="{ 'isg-tab-active': isgActiveTab === 'delay' }"
               @click="handleIsgTabChange('delay')"
             >
-              <span>{{ 'ISG客户迟到风险' }}</span>
+              <span>{{ t('dashboard.cargoBanner.isgTabs.delay') }}</span>
               <span class="isg-tab-badge" v-if="isgTabCounts.delay > 0">{{ isgTabCounts.delay }}</span>
             </div>
             <div 
@@ -3289,7 +3291,7 @@ onUnmounted(() => {
               :class="{ 'isg-tab-active': isgActiveTab === 'inTransit' }"
               @click="handleIsgTabChange('inTransit')"
             >
-              <span>{{ 'ISG在途异常' }}</span>
+              <span>{{ t('dashboard.cargoBanner.isgTabs.inTransit') }}</span>
               <span class="isg-tab-badge" v-if="isgTabCounts.inTransit > 0">{{ isgTabCounts.inTransit }}</span>
             </div>
             <div 
@@ -3297,19 +3299,19 @@ onUnmounted(() => {
               :class="{ 'isg-tab-active': isgActiveTab === 'delivery' }"
               @click="handleIsgTabChange('delivery')"
             >
-              <span>{{ '按需达交付异常' }}</span>
+              <span>{{ t('dashboard.cargoBanner.isgTabs.delivery') }}</span>
               <span class="isg-tab-badge" v-if="isgTabCounts.delivery > 0">{{ isgTabCounts.delivery }}</span>
             </div>
           </div>
           
           <!-- 导出按钮区域 - 仅对异常预警详情弹窗显示 -->
-          <div v-if="modalTitle === '异常预警订单详情'" class="export-section">
+          <div v-if="modalTitle === t('dashboard.cargoBanner.modalTitles.riskOrderDetail')" class="export-section">
             <button 
               class="export-btn" 
               @click="handleExport"
               :disabled="exportLoading"
             >
-              {{ '导出' }}
+              {{ t('dashboard.cargoBanner.buttons.export') }}
             </button>
           </div>
           
@@ -3326,7 +3328,7 @@ onUnmounted(() => {
                   showSizeChanger: true,
                   showQuickJumper: true,
                   showTotal:  (total: number, range: [number, number]) => {
-                    return `第 ${range[0]}-${range[1]} 条/共 ${total} 条 (共 ${totalPages} 页)`;
+                    return t('dashboard.cargoBanner.pagination.showTotal', { start: range[0], end: range[1], total, pages: totalPages });
                   },
                   pageSizeOptions: ['10', '20', '50', '100'],
                   sizeChangerPosition: 'start'
@@ -3334,7 +3336,7 @@ onUnmounted(() => {
                 size="small"
                 :scroll="{ x: 'max-content', y: modalTableScrollY }"
                 @change="handleTableChange"
-                :class="['custom-table', modalTitle === 'ISG电子标签预警详情' ? `isg-table-${isgActiveTab}` : '']"
+                :class="['custom-table', modalTitle === t('dashboard.cargoBanner.modalTitles.isgAlertDetail') ? `isg-table-${isgActiveTab}` : '']"
               >
                 <template #bodyCell="{ column, record }">
                   <template v-if="column.key === 'riskInformType'">
@@ -3370,14 +3372,14 @@ onUnmounted(() => {
                 v-for="(item, i) in selectedCardData.content" 
                 :key="i" 
                 :class="{ 
-                  'category-title': item === '重点关注' || item === '一般关注',
-                  'vehicle-item': selectedCardData.title === '车辆安全监控'
+                  'category-title': item === t('dashboard.cargoBanner.categories.highPriority') || item === t('dashboard.cargoBanner.categories.normalPriority'),
+                  'vehicle-item': selectedCardData.title === t('dashboard.cargoBanner.cardTitles.vehicleSafety')
                 }"
               >
                 {{ item }}
               </p>
               <p v-if="!selectedCardData.content || selectedCardData.content.length === 0" class="empty-content">
-                暂无数据
+                {{ t('dashboard.cargoBanner.messages.noData') }}
               </p>
             </div>
           </div>

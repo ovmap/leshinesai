@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { Swiper, SwiperSlide } from 'swiper/vue'
 import 'swiper/css'
 import 'swiper/css/pagination'
 import { Pagination, Autoplay } from 'swiper/modules'
 import { queryTotalVolume } from '../../../services/transportApi'
 import { useDashboardDataStore } from '../../../stores/dashboardDataStore'
+
+const { t } = useI18n()
 
 interface CarouselData {
   title: string
@@ -26,10 +29,10 @@ const props = defineProps<{
 
 const dataStore = useDashboardDataStore()
 
-const carouselData = ref<CarouselData[]>([
-  { title: '日累计货量', value: '0', unit: 'm³', yoy: '0%', mom: '0%', currentDate: '', yoyDate: '', momDate: '' },
-  { title: '月累计货量', value: '0', unit: 'm³', yoy: '0%', mom: '0%', currentDate: '', yoyDate: '', momDate: '' },
-  { title: '年累计货量', value: '0', unit: 'm³', yoy: '0%', mom: '0%', currentDate: '', yoyDate: '', momDate: '' },
+const carouselData = computed(() => [
+  { title: t('dashboard.cargoVolume.titles.dailyVolume'), value: '0', unit: 'm³', yoy: '0%', mom: '0%', currentDate: '', yoyDate: '', momDate: '' },
+  { title: t('dashboard.cargoVolume.titles.monthlyVolume'), value: '0', unit: 'm³', yoy: '0%', mom: '0%', currentDate: '', yoyDate: '', momDate: '' },
+  { title: t('dashboard.cargoVolume.titles.yearlyVolume'), value: '0', unit: 'm³', yoy: '0%', mom: '0%', currentDate: '', yoyDate: '', momDate: '' },
 ])
 
 const formatNumber = (num: number): string => {
@@ -80,7 +83,7 @@ const fetchData = async () => {
       year: yearData?.data || null,
     })
   } catch (error) {
-    console.error('获取货量数据失败:', error)
+    console.error(t('dashboard.cargoVolume.messages.fetchError'), error)
   }
 }
 
@@ -98,13 +101,13 @@ const buildTooltipHtml = (item: CarouselData): string => {
   const lines: string[] = []
   if (item.currentDate && item.yoyDate) {
     const yoyTrend = getTrendArrow(item.yoy)
-    lines.push(`${item.currentDate} 对比 ${item.yoyDate} 同比: ${yoyTrend.arrow} ${item.yoy}`)
+    lines.push(`${item.currentDate} ${t('dashboard.cargoVolume.tooltip.vs')} ${item.yoyDate} ${t('dashboard.cargoVolume.tooltip.yoy')}: ${yoyTrend.arrow} ${item.yoy}`)
   }
   if (item.currentDate && item.momDate) {
     const momTrend = getTrendArrow(item.mom)
-    lines.push(`${item.currentDate} 对比 ${item.momDate} 环比: ${momTrend.arrow} ${item.mom}`)
+    lines.push(`${item.currentDate} ${t('dashboard.cargoVolume.tooltip.vs')} ${item.momDate} ${t('dashboard.cargoVolume.tooltip.mom')}: ${momTrend.arrow} ${item.mom}`)
   }
-  return lines.join('\n') || '暂无详细数据'
+  return lines.join('\n') || t('common.messages.noData')
 }
 
 onMounted(() => {

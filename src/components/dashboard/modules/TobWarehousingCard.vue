@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch, h, nextTick } from 'vue';
+import { useI18n } from 'vue-i18n';
 import dayjs, { type Dayjs } from 'dayjs';
 import { message } from 'ant-design-vue';
 import { useSelectOptionsStore } from '../../../stores/selectOptionsStore';
 import { useDashboardDataStore } from '../../../stores/dashboardDataStore';
 import { queryToBKpiSummary, exportToBLogisticKpiScoreSummary, exportToBLogisticKpiScoreDetail } from '../../../services/transportApi';
+
+const { t } = useI18n();
 
 const props = defineProps<{
   fromWarehouse?: string[]
@@ -44,7 +47,7 @@ const filteredLogisticProviderOptions = computed(() => {
       option.name.toLowerCase().includes(searchLower)
     );
   }
-  return [{ code: '__reset__', name: '重置' }, ...filtered];
+  return [{ code: '__reset__', name: t('dashboard.tobWarehousing.reset') }, ...filtered];
 });
 
 const filteredCdcWarehouseOptions = computed(() => {
@@ -57,7 +60,7 @@ const filteredCdcWarehouseOptions = computed(() => {
       option.name.toLowerCase().includes(searchLower)
     );
   }
-  return [{ code: '__reset__', name: '重置' }, ...filtered];
+  return [{ code: '__reset__', name: t('dashboard.tobWarehousing.reset') }, ...filtered];
 });
 
 const isLogisticProviderOpen = ref(false);
@@ -73,67 +76,67 @@ const tableScrollY = ref<number | undefined>(200);
 
 const tableColumns = computed(() => {
   const baseColumns = [
-    { title: '年月', key: 'month', dataIndex: 'month', width: 120, align: 'center' as const },
-    { title: '物流商', key: 'logisticProvider', dataIndex: 'logisticProvider', width: 120, align: 'center' as const },
-    { title: 'CDC仓库', key: 'cdcWarehouse', dataIndex: 'cdcWarehouse', width: 120, align: 'center' as const },
+    { title: t('dashboard.tobWarehousing.tableColumns.month'), key: 'month', dataIndex: 'month', width: 120, align: 'center' as const },
+    { title: t('dashboard.tobWarehousing.tableColumns.logisticProvider'), key: 'logisticProvider', dataIndex: 'logisticProvider', width: 120, align: 'center' as const },
+    { title: t('dashboard.tobWarehousing.tableColumns.cdcWarehouse'), key: 'cdcWarehouse', dataIndex: 'cdcWarehouse', width: 120, align: 'center' as const },
   ];
 
   if (showDetails.value) {
     return [
       ...baseColumns,
-      { title: '得分合计', key: 'totalScore', dataIndex: 'totalScore', width: 120, align: 'center' as const },
+      { title: t('dashboard.tobWarehousing.tableColumns.totalScore'), key: 'totalScore', dataIndex: 'totalScore', width: 120, align: 'center' as const },
       {
-        title: '发货及时率', key: 'deliveryOnTimeRate',
+        title: t('dashboard.tobWarehousing.tableColumns.deliveryOnTimeRate'), key: 'deliveryOnTimeRate',
         children: [
-          { title: '达标发货体积', key: 'standardDeliveryVolume', dataIndex: 'standardDeliveryVolume', width: 150, align: 'center' as const, customRender: ({ text, record }: any) => renderNumberCell(text, record.deliveryOnTimeRateColor) },
-          { title: '当期总发货体积', key: 'totalDeliveryVolume', dataIndex: 'totalDeliveryVolume', width: 150, align: 'center' as const, customRender: ({ text, record }: any) => renderNumberCell(text, record.deliveryOnTimeRateColor) },
-          { title: '发货及时率', key: 'deliveryOnTimeRate', dataIndex: 'deliveryOnTimeRate', width: 120, align: 'center' as const, customRender: ({ text, record }: any) => renderRateCell(text, record.deliveryOnTimeRateTrend, record.deliveryOnTimeRateColor, true) },
-          { title: '得分 (满分50分)', key: 'deliveryScore', dataIndex: 'deliveryScore', width: 150, align: 'center' as const, customRender: ({ text, record }: any) => renderNumberCell(text, record.deliveryOnTimeRateColor) },
+          { title: t('dashboard.tobWarehousing.tableColumns.standardDeliveryVolume'), key: 'standardDeliveryVolume', dataIndex: 'standardDeliveryVolume', width: 150, align: 'center' as const, customRender: ({ text, record }: any) => renderNumberCell(text, record.deliveryOnTimeRateColor) },
+          { title: t('dashboard.tobWarehousing.tableColumns.totalDeliveryVolume'), key: 'totalDeliveryVolume', dataIndex: 'totalDeliveryVolume', width: 150, align: 'center' as const, customRender: ({ text, record }: any) => renderNumberCell(text, record.deliveryOnTimeRateColor) },
+          { title: t('dashboard.tobWarehousing.tableColumns.deliveryOnTimeRate'), key: 'deliveryOnTimeRate', dataIndex: 'deliveryOnTimeRate', width: 120, align: 'center' as const, customRender: ({ text, record }: any) => renderRateCell(text, record.deliveryOnTimeRateTrend, record.deliveryOnTimeRateColor, true) },
+          { title: t('dashboard.tobWarehousing.tableColumns.deliveryScore'), key: 'deliveryScore', dataIndex: 'deliveryScore', width: 150, align: 'center' as const, customRender: ({ text, record }: any) => renderNumberCell(text, record.deliveryOnTimeRateColor) },
         ]
       },
       {
-        title: '入库及时率', key: 'warehousingOnTimeRate',
+        title: t('dashboard.tobWarehousing.tableColumns.warehousingOnTimeRate'), key: 'warehousingOnTimeRate',
         children: [
-          { title: '入库达标单数', key: 'warehousingStandardCount', dataIndex: 'warehousingStandardCount', width: 150, align: 'center' as const, customRender: ({ text, record }: any) => renderNumberCell(text, record.warehousingOnTimeRateColor) },
-          { title: '总发货单数', key: 'totalShipmentCount', dataIndex: 'totalShipmentCount', width: 150, align: 'center' as const, customRender: ({ text, record }: any) => renderNumberCell(text, record.warehousingOnTimeRateColor) },
-          { title: '入库及时率', key: 'warehousingOnTimeRate', dataIndex: 'warehousingOnTimeRate', width: 120, align: 'center' as const, customRender: ({ text, record }: any) => renderRateCell(text, record.warehousingOnTimeRateTrend, record.warehousingOnTimeRateColor, true) },
-          { title: '得分 (满分10分)', key: 'warehousingScore', dataIndex: 'warehousingScore', width: 150, align: 'center' as const, customRender: ({ text, record }: any) => renderNumberCell(text, record.warehousingOnTimeRateColor) },
+          { title: t('dashboard.tobWarehousing.tableColumns.warehousingStandardCount'), key: 'warehousingStandardCount', dataIndex: 'warehousingStandardCount', width: 150, align: 'center' as const, customRender: ({ text, record }: any) => renderNumberCell(text, record.warehousingOnTimeRateColor) },
+          { title: t('dashboard.tobWarehousing.tableColumns.totalShipmentCount'), key: 'totalShipmentCount', dataIndex: 'totalShipmentCount', width: 150, align: 'center' as const, customRender: ({ text, record }: any) => renderNumberCell(text, record.warehousingOnTimeRateColor) },
+          { title: t('dashboard.tobWarehousing.tableColumns.warehousingOnTimeRate'), key: 'warehousingOnTimeRate', dataIndex: 'warehousingOnTimeRate', width: 120, align: 'center' as const, customRender: ({ text, record }: any) => renderRateCell(text, record.warehousingOnTimeRateTrend, record.warehousingOnTimeRateColor, true) },
+          { title: t('dashboard.tobWarehousing.tableColumns.warehousingScore'), key: 'warehousingScore', dataIndex: 'warehousingScore', width: 150, align: 'center' as const, customRender: ({ text, record }: any) => renderNumberCell(text, record.warehousingOnTimeRateColor) },
         ]
       },
       {
-        title: '仓储STD (24小时) 达标率', key: 'storageStdRate',
+        title: t('dashboard.tobWarehousing.tableColumns.storageStdRate'), key: 'storageStdRate',
         children: [
-          { title: '达标单数', key: 'storageStandardCount', dataIndex: 'storageStandardCount', width: 150, align: 'center' as const, customRender: ({ text, record }: any) => renderNumberCell(text, record.storageStdRateColor) },
-          { title: '总发货单数', key: 'storageTotalShipmentCount', dataIndex: 'storageTotalShipmentCount', width: 150, align: 'center' as const, customRender: ({ text, record }: any) => renderNumberCell(text, record.storageStdRateColor) },
-          { title: '仓储STD (24小时) 达标率', key: 'storageStdRate', dataIndex: 'storageStdRate', width: 180, align: 'center' as const, customRender: ({ text, record }: any) => renderRateCell(text, record.storageStdRateTrend, record.storageStdRateColor, true) },
-          { title: '得分 (满分20分)', key: 'storageScore', dataIndex: 'storageScore', width: 150, align: 'center' as const, customRender: ({ text, record }: any) => renderNumberCell(text, record.storageStdRateColor) },
+          { title: t('dashboard.tobWarehousing.tableColumns.storageStandardCount'), key: 'storageStandardCount', dataIndex: 'storageStandardCount', width: 150, align: 'center' as const, customRender: ({ text, record }: any) => renderNumberCell(text, record.storageStdRateColor) },
+          { title: t('dashboard.tobWarehousing.tableColumns.storageTotalShipmentCount'), key: 'storageTotalShipmentCount', dataIndex: 'storageTotalShipmentCount', width: 150, align: 'center' as const, customRender: ({ text, record }: any) => renderNumberCell(text, record.storageStdRateColor) },
+          { title: t('dashboard.tobWarehousing.tableColumns.storageStdRate'), key: 'storageStdRate', dataIndex: 'storageStdRate', width: 180, align: 'center' as const, customRender: ({ text, record }: any) => renderRateCell(text, record.storageStdRateTrend, record.storageStdRateColor, true) },
+          { title: t('dashboard.tobWarehousing.tableColumns.storageScore'), key: 'storageScore', dataIndex: 'storageScore', width: 150, align: 'center' as const, customRender: ({ text, record }: any) => renderNumberCell(text, record.storageStdRateColor) },
         ]
       },
       {
-        title: '库存准确率', key: 'inventoryAccuracyRate',
+        title: t('dashboard.tobWarehousing.tableColumns.inventoryAccuracyRate'), key: 'inventoryAccuracyRate',
         children: [
-          { title: '达标数量', key: 'inventoryStandardQuantity', dataIndex: 'inventoryStandardQuantity', width: 150, align: 'center' as const, customRender: ({ text, record }: any) => renderNumberCell(text, record.inventoryAccuracyRateColor) },
-          { title: '月末库存总量', key: 'monthEndInventoryTotal', dataIndex: 'monthEndInventoryTotal', width: 150, align: 'center' as const, customRender: ({ text, record }: any) => renderNumberCell(text, record.inventoryAccuracyRateColor) },
-          { title: '库存准确率', key: 'inventoryAccuracyRate', dataIndex: 'inventoryAccuracyRate', width: 120, align: 'center' as const, customRender: ({ text, record }: any) => renderRateCell(text, record.inventoryAccuracyRateTrend, record.inventoryAccuracyRateColor, true) },
-          { title: '得分 (满分10分)', key: 'inventoryScore', dataIndex: 'inventoryScore', width: 150, align: 'center' as const, customRender: ({ text, record }: any) => renderNumberCell(text, record.inventoryAccuracyRateColor) },
+          { title: t('dashboard.tobWarehousing.tableColumns.inventoryStandardQuantity'), key: 'inventoryStandardQuantity', dataIndex: 'inventoryStandardQuantity', width: 150, align: 'center' as const, customRender: ({ text, record }: any) => renderNumberCell(text, record.inventoryAccuracyRateColor) },
+          { title: t('dashboard.tobWarehousing.tableColumns.monthEndInventoryTotal'), key: 'monthEndInventoryTotal', dataIndex: 'monthEndInventoryTotal', width: 150, align: 'center' as const, customRender: ({ text, record }: any) => renderNumberCell(text, record.inventoryAccuracyRateColor) },
+          { title: t('dashboard.tobWarehousing.tableColumns.inventoryAccuracyRate'), key: 'inventoryAccuracyRate', dataIndex: 'inventoryAccuracyRate', width: 120, align: 'center' as const, customRender: ({ text, record }: any) => renderRateCell(text, record.inventoryAccuracyRateTrend, record.inventoryAccuracyRateColor, true) },
+          { title: t('dashboard.tobWarehousing.tableColumns.inventoryScore'), key: 'inventoryScore', dataIndex: 'inventoryScore', width: 150, align: 'center' as const, customRender: ({ text, record }: any) => renderNumberCell(text, record.inventoryAccuracyRateColor) },
         ]
       },
       {
-        title: '运作准确率', key: 'operationAccuracyRate',
+        title: t('dashboard.tobWarehousing.tableColumns.operationAccuracyRate'), key: 'operationAccuracyRate',
         children: [
-          { title: '运作准确率', key: 'operationAccuracyRate', dataIndex: 'operationAccuracyRate', width: 150, align: 'center' as const, customRender: ({ text, record }: any) => renderRateCell(text, record.operationAccuracyRateTrend, record.operationAccuracyRateColor, true) },
-          { title: '得分 (满分10分)', key: 'operationScore', dataIndex: 'operationScore', width: 150, align: 'center' as const, customRender: ({ text, record }: any) => renderNumberCell(text, record.operationAccuracyRateColor) },
+          { title: t('dashboard.tobWarehousing.tableColumns.operationAccuracyRate'), key: 'operationAccuracyRate', dataIndex: 'operationAccuracyRate', width: 150, align: 'center' as const, customRender: ({ text, record }: any) => renderRateCell(text, record.operationAccuracyRateTrend, record.operationAccuracyRateColor, true) },
+          { title: t('dashboard.tobWarehousing.tableColumns.operationScore'), key: 'operationScore', dataIndex: 'operationScore', width: 150, align: 'center' as const, customRender: ({ text, record }: any) => renderNumberCell(text, record.operationAccuracyRateColor) },
         ]
       },
     ];
   } else {
     return [
       ...baseColumns,
-      { title: '发货及时率', key: 'deliveryOnTimeRate', dataIndex: 'deliveryOnTimeRate', width: 150, align: 'center' as const, customRender: ({ text, record }: any) => renderRateCell(text, record.deliveryOnTimeRateTrend, record.deliveryOnTimeRateColor, false) },
-      { title: '入库及时率', key: 'warehousingOnTimeRate', dataIndex: 'warehousingOnTimeRate', width: 150, align: 'center' as const, customRender: ({ text, record }: any) => renderRateCell(text, record.warehousingOnTimeRateTrend, record.warehousingOnTimeRateColor, false) },
-      { title: '仓储STD (24小时) 达标率', key: 'storageStdRate', dataIndex: 'storageStdRate', width: 200, align: 'center' as const, customRender: ({ text, record }: any) => renderRateCell(text, record.storageStdRateTrend, record.storageStdRateColor, false) },
-      { title: '库存准确率', key: 'inventoryAccuracyRate', dataIndex: 'inventoryAccuracyRate', width: 150, align: 'center' as const, customRender: ({ text, record }: any) => renderRateCell(text, record.inventoryAccuracyRateTrend, record.inventoryAccuracyRateColor, false) },
-      { title: '运作准确率', key: 'operationAccuracyRate', dataIndex: 'operationAccuracyRate', width: 150, align: 'center' as const, customRender: ({ text, record }: any) => renderRateCell(text, record.operationAccuracyRateTrend, record.operationAccuracyRateColor, false) },
+      { title: t('dashboard.tobWarehousing.tableColumns.deliveryOnTimeRate'), key: 'deliveryOnTimeRate', dataIndex: 'deliveryOnTimeRate', width: 150, align: 'center' as const, customRender: ({ text, record }: any) => renderRateCell(text, record.deliveryOnTimeRateTrend, record.deliveryOnTimeRateColor, false) },
+      { title: t('dashboard.tobWarehousing.tableColumns.warehousingOnTimeRate'), key: 'warehousingOnTimeRate', dataIndex: 'warehousingOnTimeRate', width: 150, align: 'center' as const, customRender: ({ text, record }: any) => renderRateCell(text, record.warehousingOnTimeRateTrend, record.warehousingOnTimeRateColor, false) },
+      { title: t('dashboard.tobWarehousing.tableColumns.storageStdRate'), key: 'storageStdRate', dataIndex: 'storageStdRate', width: 200, align: 'center' as const, customRender: ({ text, record }: any) => renderRateCell(text, record.storageStdRateTrend, record.storageStdRateColor, false) },
+      { title: t('dashboard.tobWarehousing.tableColumns.inventoryAccuracyRate'), key: 'inventoryAccuracyRate', dataIndex: 'inventoryAccuracyRate', width: 150, align: 'center' as const, customRender: ({ text, record }: any) => renderRateCell(text, record.inventoryAccuracyRateTrend, record.inventoryAccuracyRateColor, false) },
+      { title: t('dashboard.tobWarehousing.tableColumns.operationAccuracyRate'), key: 'operationAccuracyRate', dataIndex: 'operationAccuracyRate', width: 150, align: 'center' as const, customRender: ({ text, record }: any) => renderRateCell(text, record.operationAccuracyRateTrend, record.operationAccuracyRateColor, false) },
     ];
   }
 });
@@ -171,7 +174,7 @@ const renderRateCell = (value: number, trend: 'up' | 'same' | 'down' | null, col
 };
 
 const selectedLogisticProviderText = computed(() => {
-  if (selectedLogisticProvider.value.length === 0) return '物流商';
+  if (selectedLogisticProvider.value.length === 0) return t('dashboard.tobWarehousing.logisticProvider');
   const names = selectedLogisticProvider.value.map(code => {
     const option = logisticProviderOptions.value.find(item => item.code === code);
     return option ? option.name : code;
@@ -180,7 +183,7 @@ const selectedLogisticProviderText = computed(() => {
 });
 
 const selectedCdcWarehouseText = computed(() => {
-  if (selectedCdcWarehouse.value.length === 0) return 'CDC仓库';
+  if (selectedCdcWarehouse.value.length === 0) return t('dashboard.tobWarehousing.cdcWarehouse');
   const names = selectedCdcWarehouse.value.map(code => {
     const option = cdcWarehouseOptions.value.find(item => item.code === code);
     return option ? option.name : code;
@@ -331,12 +334,12 @@ const fetchTableData = async () => {
         tableData.value = [];
       }
     } else {
-      message.error(result?.msg || '获取数据失败');
+      message.error(result?.msg || t('dashboard.tobWarehousing.messages.fetchDataFailed'));
       tableData.value = [];
     }
   } catch (error) {
-    console.error('获取表格数据失败:', error);
-    message.error('获取数据失败');
+    console.error(t('dashboard.tobWarehousing.messages.fetchTableDataFailed'), error);
+    message.error(t('dashboard.tobWarehousing.messages.fetchDataFailed'));
     tableData.value = [];
   } finally {
     loading.value = false;
@@ -345,11 +348,11 @@ const fetchTableData = async () => {
 
 const handleExportSummary = async () => {
   if (!dateRange.value || !dateRange.value[0] || !dateRange.value[1]) {
-    message.warning('请选择日期范围');
+    message.warning(t('dashboard.tobWarehousing.messages.selectDateRange'));
     return;
   }
   if (!tableData.value || tableData.value.length === 0) {
-    message.warning('没有数据可以导出');
+    message.warning(t('dashboard.tobWarehousing.messages.noDataToExport'));
     return;
   }
   try {
@@ -368,23 +371,23 @@ const handleExportSummary = async () => {
         const link = document.createElement('a');
         link.href = result.data;
         const xlsxMatch = result.data.match(/([^/]+\.xlsx)$/);
-        const downloadFilename = xlsxMatch ? xlsxMatch[1] : `ToB物流商KPI评分汇总_${dateRange.value[0].format('YYYY-MM')}_${dateRange.value[1].format('YYYY-MM')}.xlsx`;
+        const downloadFilename = xlsxMatch ? xlsxMatch[1] : t('dashboard.tobWarehousing.messages.exportSummaryFileName', [dateRange.value[0].format('YYYY-MM'), dateRange.value[1].format('YYYY-MM')]);
         link.download = downloadFilename;
         link.target = '_blank';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        message.success('导出汇总成功');
+        message.success(t('dashboard.tobWarehousing.messages.exportSummarySuccess'));
       }
     } else {
-      message.error(result?.message || '导出汇总失败');
+      message.error(result?.message || t('dashboard.tobWarehousing.messages.exportSummaryFailed'));
     }
   } catch (error: any) {
     const errCode = error?.code || error?.response?.status;
     if (errCode === 409 || errCode === 504 || errCode === 505) {
-      message.error(error.msg || '导出数据量过大，请缩小查询范围');
+      message.error(error.msg || t('dashboard.tobWarehousing.messages.exportDataTooLarge'));
     } else {
-      message.error(error.msg || '导出汇总失败');
+      message.error(error.msg || t('dashboard.tobWarehousing.messages.exportSummaryFailed'));
     }
   } finally {
     exportSummaryLoading.value = false;
@@ -393,11 +396,11 @@ const handleExportSummary = async () => {
 
 const handleExportDetail = async () => {
   if (!dateRange.value || !dateRange.value[0] || !dateRange.value[1]) {
-    message.warning('请选择日期范围');
+    message.warning(t('dashboard.tobWarehousing.messages.selectDateRange'));
     return;
   }
   if (!tableData.value || tableData.value.length === 0) {
-    message.warning('没有数据可以导出');
+    message.warning(t('dashboard.tobWarehousing.messages.noDataToExport'));
     return;
   }
   try {
@@ -416,23 +419,23 @@ const handleExportDetail = async () => {
         const link = document.createElement('a');
         link.href = result.data;
         const xlsxMatch = result.data.match(/([^/]+\.xlsx)$/);
-        const downloadFilename = xlsxMatch ? xlsxMatch[1] : `ToB物流商KPI评分明细_${dateRange.value[0].format('YYYY-MM')}_${dateRange.value[1].format('YYYY-MM')}.xlsx`;
+        const downloadFilename = xlsxMatch ? xlsxMatch[1] : t('dashboard.tobWarehousing.messages.exportDetailFileName', [dateRange.value[0].format('YYYY-MM'), dateRange.value[1].format('YYYY-MM')]);
         link.download = downloadFilename;
         link.target = '_blank';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        message.success('导出明细成功');
+        message.success(t('dashboard.tobWarehousing.messages.exportDetailSuccess'));
       }
     } else {
-      message.error(result?.message || '导出明细失败');
+      message.error(result?.message || t('dashboard.tobWarehousing.messages.exportDetailFailed'));
     }
   } catch (error: any) {
     const errCode = error?.code || error?.response?.status;
     if (errCode === 409 || errCode === 504 || errCode === 505) {
-      message.error(error.msg || '导出数据量过大，请缩小查询范围');
+      message.error(error.msg || t('dashboard.tobWarehousing.messages.exportDataTooLarge'));
     } else {
-      message.error(error.msg || '导出明细失败');
+      message.error(error.msg || t('dashboard.tobWarehousing.messages.exportDetailFailed'));
     }
   } finally {
     exportDetailLoading.value = false;
@@ -497,7 +500,7 @@ onUnmounted(() => {
 <template>
   <div class="tob-card-container">
     <div class="header-bar">
-      <h2 class="header-title">ToB物流商KPI评分</h2>
+      <h2 class="header-title">{{ t('dashboard.tobWarehousing.title') }}</h2>
     </div>
     <!-- 控制面板 -->
     <div class="control-panel">
@@ -508,8 +511,8 @@ onUnmounted(() => {
             v-model:value="dateRange"
             picker="month"
             format="YYYY-MM"
-            separator="至"
-            :placeholder="['开始月份', '结束月份']"
+            :separator="t('dashboard.tobWarehousing.dateRange.separator')"
+            :placeholder="[t('dashboard.tobWarehousing.dateRange.startMonth'), t('dashboard.tobWarehousing.dateRange.endMonth')]"
             class="date-range-picker"
           />
         </div>
@@ -521,7 +524,7 @@ onUnmounted(() => {
           </svg>
           <div class="dropdown-content" v-show="isLogisticProviderOpen" @click.stop>
             <div class="search-box">
-              <input v-model="logisticProviderSearch" type="text" placeholder="搜索物流商..." class="search-input" @click.stop />
+              <input v-model="logisticProviderSearch" type="text" :placeholder="t('dashboard.tobWarehousing.placeholders.searchLogisticProvider')" class="search-input" @click.stop />
             </div>
             <div class="options-list">
               <div
@@ -535,7 +538,7 @@ onUnmounted(() => {
                 {{ option.name }}
               </div>
               <div v-if="filteredLogisticProviderOptions.length === 1 && logisticProviderSearch" class="no-results">
-                暂无搜索结果
+                {{ t('dashboard.tobWarehousing.noSearchResults') }}
               </div>
             </div>
           </div>
@@ -548,7 +551,7 @@ onUnmounted(() => {
           </svg>
           <div class="dropdown-content" v-show="isCdcWarehouseOpen" @click.stop>
             <div class="search-box">
-              <input v-model="cdcWarehouseSearch" type="text" placeholder="搜索CDC仓库..." class="search-input" @click.stop />
+              <input v-model="cdcWarehouseSearch" type="text" :placeholder="t('dashboard.tobWarehousing.placeholders.searchCdcWarehouse')" class="search-input" @click.stop />
             </div>
             <div class="options-list">
               <div
@@ -562,21 +565,21 @@ onUnmounted(() => {
                 {{ option.name }}
               </div>
               <div v-if="filteredCdcWarehouseOptions.length === 1 && cdcWarehouseSearch" class="no-results">
-                暂无搜索结果
+                {{ t('dashboard.tobWarehousing.noSearchResults') }}
               </div>
             </div>
           </div>
         </div>
         <!-- 显示详情开关 -->
         <div class="switch-item">
-          <span class="switch-label">显示详情</span>
+          <span class="switch-label">{{ t('dashboard.tobWarehousing.showDetails') }}</span>
           <a-switch v-model:checked="showDetails" />
         </div>
       </div>
       <!-- 导出按钮组 -->
       <div class="export-group">
-        <a-button type="primary" :loading="exportSummaryLoading" @click="handleExportSummary" class="export-btn">导出汇总</a-button>
-        <a-button type="primary" :loading="exportDetailLoading" @click="handleExportDetail" class="export-btn">导出明细</a-button>
+        <a-button type="primary" :loading="exportSummaryLoading" @click="handleExportSummary" class="export-btn">{{ t('dashboard.tobWarehousing.buttons.exportSummary') }}</a-button>
+        <a-button type="primary" :loading="exportDetailLoading" @click="handleExportDetail" class="export-btn">{{ t('dashboard.tobWarehousing.buttons.exportDetail') }}</a-button>
       </div>
     </div>
     <!-- 表格区域 -->

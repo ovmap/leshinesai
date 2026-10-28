@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, Teleport, computed, nextTick, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import {
   queryPowerPool,
   queryPowerPoolItemByPage,
@@ -9,6 +10,7 @@ import {
 } from '../../../services/transportApi';
 import { useDashboardDataStore } from '../../../stores/dashboardDataStore';
 
+const { t } = useI18n();
 const dataStore = useDashboardDataStore();
 
 // 表格数据
@@ -22,7 +24,7 @@ const tableData = ref<Array<{
 
 // 弹窗相关状态
 const modalVisible = ref(false);
-const modalTitle = ref('车辆详情');
+const modalTitle = computed(() => t('dashboard.capacityPool.modalTitles.detail'));
 const modalData = ref<any[]>([]);
 const modalLoading = ref(false);
 
@@ -145,19 +147,19 @@ const selectLogistic = (value: string) => {
 
 // 显示文本
 const selectedFromCityText = computed(() => {
-  if (!filterForm.value.fromCity) return '始发城市';
+  if (!filterForm.value.fromCity) return t('dashboard.capacityPool.filters.fromCity');
   const option = fromCityOptions.value.find(item => item.value === filterForm.value.fromCity);
-  return option ? option.label : '始发城市';
+  return option ? option.label : t('dashboard.capacityPool.filters.fromCity');
 });
 
 const selectedToCityText = computed(() => {
-  if (!filterForm.value.toCity) return '目的城市';
+  if (!filterForm.value.toCity) return t('dashboard.capacityPool.filters.toCity');
   const option = toCityOptions.value.find(item => item.value === filterForm.value.toCity);
-  return option ? option.label : '目的城市';
+  return option ? option.label : t('dashboard.capacityPool.filters.toCity');
 });
 
 const selectedLogisticText = computed(() => {
-  if (!filterForm.value.logisticName || filterForm.value.logisticName.length === 0) return '物流商';
+  if (!filterForm.value.logisticName || filterForm.value.logisticName.length === 0) return t('dashboard.capacityPool.filters.logisticName');
   
   const selectedLabels = filterForm.value.logisticName
     .map(value => {
@@ -166,9 +168,9 @@ const selectedLogisticText = computed(() => {
     })
     .filter(label => label);
   
-  if (selectedLabels.length === 0) return '物流商';
+  if (selectedLabels.length === 0) return t('dashboard.capacityPool.filters.logisticName');
   if (selectedLabels.length === 1) return selectedLabels[0];
-  return `已选${selectedLabels.length}项`;
+  return t('dashboard.capacityPool.filters.selectedCount', { count: selectedLabels.length });
 });
 
 // 过滤后的选项
@@ -179,7 +181,7 @@ const filteredFromCityOptions = computed(() => {
       option.label.toLowerCase().includes(fromCitySearch.value.toLowerCase()),
     );
   }
-  return [{ value: '__reset__', label: '重置' }, ...filtered];
+  return [{ value: '__reset__', label: t('dashboard.capacityPool.buttons.reset') }, ...filtered];
 });
 
 const filteredToCityOptions = computed(() => {
@@ -189,14 +191,14 @@ const filteredToCityOptions = computed(() => {
       option.label.toLowerCase().includes(toCitySearch.value.toLowerCase()),
     );
   }
-  return [{ value: '__reset__', label: '重置' }, ...filtered];
+  return [{ value: '__reset__', label: t('dashboard.capacityPool.buttons.reset') }, ...filtered];
 });
 
 const filteredLogisticOptions = computed(() => {
   const filtered = logisticOptions.value.filter((option) =>
     option.label.toLowerCase().includes(logisticSearch.value.toLowerCase()),
   );
-  return [{ value: '__reset__', label: '重置' }, ...filtered];
+  return [{ value: '__reset__', label: t('dashboard.capacityPool.buttons.reset') }, ...filtered];
 });
 
 // 自动滚动相关
@@ -276,7 +278,6 @@ const handleMouseLeave = () => {
 // 查看详情
 const handleViewDetail = () => {
   modalVisible.value = true;
-  modalTitle.value = '车辆详情';
   currentPage.value = 1;
   total.value = 0;
   
@@ -314,7 +315,7 @@ const loadData = async () => {
       });
     }
   } catch (error) {
-    console.error('加载运力池数据失败:', error);
+    console.error(t('dashboard.capacityPool.messages.loadDataFailed'), error);
   }
 };
 
@@ -345,7 +346,7 @@ const loadDropdownOptions = async () => {
       }));
     }
   } catch (error) {
-    console.error('加载下拉选项数据失败:', error);
+    console.error(t('dashboard.capacityPool.messages.loadDropdownOptionsFailed'), error);
   }
 };
 
@@ -380,7 +381,7 @@ const fetchModalData = async (currentPageNum: number = currentPage.value) => {
       total.value = 0;
     }
   } catch (error) {
-    console.error('获取弹窗数据失败:', error);
+    console.error(t('dashboard.capacityPool.messages.fetchModalDataFailed'), error);
     modalData.value = [];
     total.value = 0;
   } finally {
@@ -407,7 +408,6 @@ const handleModalBodyClick = (event: Event) => {
 // 打开详情弹窗
 const showDetailModal = () => {
   modalVisible.value = true;
-  modalTitle.value = '车辆详情';
   currentPage.value = 1;
   total.value = 0;
   
@@ -468,15 +468,15 @@ const handleReset = () => {
 };
 
 // 表格列配置
-const tableColumns = [
-  { title: '线路', dataIndex: 'route', key: 'route', width: 180 },
-  { title: '车牌号', dataIndex: 'licenseNumber', key: 'licenseNumber', width: 150 },
-  { title: '车辆类型', dataIndex: 'truckType', key: 'truckType', width: 120 },
-  { title: '归属类型', dataIndex: 'belongType', key: 'belongType', width: 120 },
-  { title: '物流商', dataIndex: 'logisticName', key: 'logisticName', width: 150 },
-  { title: '司机姓名', dataIndex: 'driverName', key: 'driverName', width: 100 },
-  { title: '联系电话', dataIndex: 'phone', key: 'phone', width: 120 },
-];
+const tableColumns = computed(() => [
+  { title: t('dashboard.capacityPool.tableColumns.route'), dataIndex: 'route', key: 'route', width: 180 },
+  { title: t('dashboard.capacityPool.tableColumns.licenseNumber'), dataIndex: 'licenseNumber', key: 'licenseNumber', width: 150 },
+  { title: t('dashboard.capacityPool.tableColumns.truckType'), dataIndex: 'truckType', key: 'truckType', width: 120 },
+  { title: t('dashboard.capacityPool.tableColumns.belongType'), dataIndex: 'belongType', key: 'belongType', width: 120 },
+  { title: t('dashboard.capacityPool.tableColumns.logisticName'), dataIndex: 'logisticName', key: 'logisticName', width: 150 },
+  { title: t('dashboard.capacityPool.tableColumns.driverName'), dataIndex: 'driverName', key: 'driverName', width: 100 },
+  { title: t('dashboard.capacityPool.tableColumns.phone'), dataIndex: 'phone', key: 'phone', width: 120 },
+]);
 
 // 计算弹窗表格滚动高度
 const calculateModalTableScrollY = () => {
@@ -534,7 +534,7 @@ onUnmounted(() => {
 <template>
   <div class="capacity-pool-wrapper">
     <div class="header-bar">
-      <h2 class="header-title">运力池</h2>
+      <h2 class="header-title">{{ t('dashboard.capacityPool.title') }}</h2>
     </div>
     <div class="capacity-pool-container">
       <!-- 数据表格 -->
@@ -545,10 +545,10 @@ onUnmounted(() => {
             <thead>
               <tr>
                 <th>3PL</th>
-                <th>线路</th>
-                <th>车辆数量</th>
-                <th>车辆类型</th>
-                <th class="action-header">操作</th>
+                <th>{{ t('dashboard.capacityPool.tableColumns.route') }}</th>
+                <th>{{ t('dashboard.capacityPool.tableColumns.vehicleCount') }}</th>
+                <th>{{ t('dashboard.capacityPool.tableColumns.vehicleType') }}</th>
+                <th class="action-header">{{ t('dashboard.capacityPool.tableColumns.action') }}</th>
               </tr>
             </thead>
           </table>
@@ -565,7 +565,7 @@ onUnmounted(() => {
             <tbody>
               <tr v-if="tableData.length === 0">
                 <td colspan="5" class="no-data">
-                  暂无数据
+                  {{ t('dashboard.capacityPool.noData') }}
                 </td>
               </tr>
               <tr v-else v-for="row in tableData" :key="row.id">
@@ -575,7 +575,7 @@ onUnmounted(() => {
                 <td class="vehicle-type">{{ row.vehicleType }}</td>
                 <td class="action-cell">
                   <button @click="handleViewDetail()" class="view-btn">
-                    查看
+                    {{ t('dashboard.capacityPool.buttons.view') }}
                   </button>
                 </td>
               </tr>
@@ -611,7 +611,7 @@ onUnmounted(() => {
                           <input 
                             v-model="fromCitySearch" 
                             type="text" 
-                            placeholder="搜索始发城市..." 
+                            :placeholder="t('dashboard.capacityPool.placeholders.searchFromCity')" 
                             class="search-input"
                             @click.stop 
                           />
@@ -630,7 +630,7 @@ onUnmounted(() => {
                             {{ option.label }}
                           </div>
                           <div v-if="filteredFromCityOptions.length === 1 && fromCitySearch" class="no-results">
-                            暂无搜索结果
+                            {{ t('dashboard.capacityPool.noSearchResults') }}
                           </div>
                         </div>
                       </div>
@@ -649,7 +649,7 @@ onUnmounted(() => {
                           <input 
                             v-model="toCitySearch" 
                             type="text" 
-                            placeholder="搜索目的城市..." 
+                            :placeholder="t('dashboard.capacityPool.placeholders.searchToCity')" 
                             class="search-input"
                             @click.stop 
                           />
@@ -668,7 +668,7 @@ onUnmounted(() => {
                             {{ option.label }}
                           </div>
                           <div v-if="filteredToCityOptions.length === 1 && toCitySearch" class="no-results">
-                            暂无搜索结果
+                            {{ t('dashboard.capacityPool.noSearchResults') }}
                           </div>
                         </div>
                       </div>
@@ -684,7 +684,7 @@ onUnmounted(() => {
                       </svg>
                       <div class="dropdown-content" v-show="isLogisticOpen && logisticOptions?.length" @click.stop>
                         <div class="search-box">
-                          <input v-model="logisticSearch" type="text" placeholder="搜索物流商..." class="search-input"
+                          <input v-model="logisticSearch" type="text" :placeholder="t('dashboard.capacityPool.placeholders.searchLogistic')" class="search-input"
                             @click.stop />
                         </div>
                         <div class="options-list">
@@ -695,7 +695,7 @@ onUnmounted(() => {
                             {{ option.label }}
                           </div>
                           <div v-if="filteredLogisticOptions.length === 1 && logisticSearch" class="no-results">
-                            暂无搜索结果
+                            {{ t('dashboard.capacityPool.noSearchResults') }}
                           </div>
                         </div>
                       </div>
@@ -707,7 +707,7 @@ onUnmounted(() => {
                     <input 
                       v-model="filterForm.licenseNumber" 
                       type="text" 
-                      placeholder="请输入车牌号" 
+                      :placeholder="t('dashboard.capacityPool.placeholders.licenseNumber')" 
                       class="license-number-input"
                     />
                   </div>
@@ -715,10 +715,10 @@ onUnmounted(() => {
                   <!-- 操作按钮 -->
                   <div class="filter-actions">
                     <button @click="handleQuery" class="action-btn primary">
-                      查询
+                      {{ t('dashboard.capacityPool.buttons.query') }}
                     </button>
                     <button @click="handleReset" class="action-btn">
-                      重置
+                      {{ t('dashboard.capacityPool.buttons.reset') }}
                     </button>
                   </div>
                 </div>
@@ -726,7 +726,7 @@ onUnmounted(() => {
 
               <!-- 表格区域 -->
               <div class="table-section" ref="modalTableSectionRef">
-                <div v-if="modalLoading" class="loading-mask">加载中...</div>
+                <div v-if="modalLoading" class="loading-mask">{{ t('dashboard.capacityPool.loading') }}</div>
                 <table class="modal-table">
                   <thead>
                     <tr>
@@ -740,26 +740,26 @@ onUnmounted(() => {
                       <td v-for="col in tableColumns" :key="col.key">{{ row[col.dataIndex] || '-' }}</td>
                     </tr>
                     <tr v-if="modalData.length === 0 && !modalLoading">
-                      <td :colspan="tableColumns.length" class="empty-cell">暂无数据</td>
+                      <td :colspan="tableColumns.length" class="empty-cell">{{ t('dashboard.capacityPool.noData') }}</td>
                     </tr>
                   </tbody>
                 </table>
 
                 <!-- 分页 -->
                 <div v-if="total > 0" class="pagination">
-                  <span class="pagination-info">第 {{ (currentPage - 1) * pageSize + 1 }}-{{ Math.min(currentPage * pageSize, total) }} 条/共 {{ total }} 条</span>
+                  <span class="pagination-info">{{ t('dashboard.capacityPool.pagination.info', { start: (currentPage - 1) * pageSize + 1, end: Math.min(currentPage * pageSize, total), total: total }) }}</span>
                   <div class="pagination-controls">
                     <button
                       class="page-btn"
                       :disabled="currentPage <= 1"
                       @click="handleTableChange({ current: currentPage - 1, pageSize })"
-                    >上一页</button>
+                    >{{ t('dashboard.capacityPool.pagination.prev') }}</button>
                     <span class="page-number">{{ currentPage }} / {{ totalPages }}</span>
                     <button
                       class="page-btn"
                       :disabled="currentPage >= totalPages"
                       @click="handleTableChange({ current: currentPage + 1, pageSize })"
-                    >下一页</button>
+                    >{{ t('dashboard.capacityPool.pagination.next') }}</button>
                   </div>
                 </div>
               </div>

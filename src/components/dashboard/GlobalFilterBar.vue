@@ -12,7 +12,7 @@
             <input
               v-model="warehouseSearch"
               type="text"
-              placeholder="搜索始发仓"
+              :placeholder="t('dashboard.globalFilterBar.placeholders.searchWarehouse')"
               class="search-input"
               @click.stop
             />
@@ -29,11 +29,11 @@
               {{ option }}
             </div>
             <div v-if="filteredWarehouseOptions.length === 0" class="no-results">
-              无搜索结果
+              {{ t('dashboard.globalFilterBar.placeholders.noResults') }}
             </div>
           </div>
           <div class="dropdown-footer">
-            <button class="done-btn" @click="closeWarehouseDropdown">完成</button>
+            <button class="done-btn" @click="closeWarehouseDropdown">{{ t('dashboard.globalFilterBar.buttons.done') }}</button>
           </div>
         </div>
       </div>
@@ -49,7 +49,7 @@
             <input
               v-model="provinceSearch"
               type="text"
-              placeholder="搜索目的省"
+              :placeholder="t('dashboard.globalFilterBar.placeholders.searchProvince')"
               class="search-input"
               @click.stop
             />
@@ -66,11 +66,11 @@
               {{ option }}
             </div>
             <div v-if="filteredProvinceOptions.length === 0" class="no-results">
-              无搜索结果
+              {{ t('dashboard.globalFilterBar.placeholders.noResults') }}
             </div>
           </div>
           <div class="dropdown-footer">
-            <button class="done-btn" @click="closeProvinceDropdown">完成</button>
+            <button class="done-btn" @click="closeProvinceDropdown">{{ t('dashboard.globalFilterBar.buttons.done') }}</button>
           </div>
         </div>
       </div>
@@ -86,7 +86,7 @@
             <input
               v-model="rdcSearch"
               type="text"
-              placeholder="搜索目的RDC"
+              :placeholder="t('dashboard.globalFilterBar.placeholders.searchRdc')"
               class="search-input"
               @click.stop
             />
@@ -103,11 +103,11 @@
               {{ option }}
             </div>
             <div v-if="filteredRdcOptions.length === 0" class="no-results">
-              无搜索结果
+              {{ t('dashboard.globalFilterBar.placeholders.noResults') }}
             </div>
           </div>
           <div class="dropdown-footer">
-            <button class="done-btn" @click="closeRdcDropdown">完成</button>
+            <button class="done-btn" @click="closeRdcDropdown">{{ t('dashboard.globalFilterBar.buttons.done') }}</button>
           </div>
         </div>
       </div>
@@ -117,9 +117,11 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useGlobalFilterStore } from '../../stores/globalFilterStore'
 import { useSelectOptionsStore } from '../../stores/selectOptionsStore'
 
+const { t } = useI18n()
 const globalFilterStore = useGlobalFilterStore()
 const selectOptionsStore = useSelectOptionsStore()
 
@@ -142,7 +144,7 @@ const selectedRdc = computed(() => globalFilterStore.selectedRdc)
 const maxDisplayLength = 15
 
 const truncateText = (items: string[], maxLength: number) => {
-  if (items.length === 0) return '全部'
+  if (items.length === 0) return t('dashboard.globalFilterBar.labels.all')
   if (items.length === 1) return items[0]
 
   let result = items[0]
@@ -167,17 +169,17 @@ const truncateText = (items: string[], maxLength: number) => {
 
 // 显示文本
 const displayWarehouse = computed(() => {
-  if (selectedWarehouse.value.length === 0) return '始发仓'
+  if (selectedWarehouse.value.length === 0) return t('dashboard.globalFilterBar.labels.fromWarehouse')
   return truncateText(selectedWarehouse.value, maxDisplayLength)
 })
 
 const displayProvince = computed(() => {
-  if (selectedProvince.value.length === 0) return '目的省'
+  if (selectedProvince.value.length === 0) return t('dashboard.globalFilterBar.labels.toProvince')
   return truncateText(selectedProvince.value, maxDisplayLength)
 })
 
 const displayRdc = computed(() => {
-  if (selectedRdc.value.length === 0) return '目的RDC'
+  if (selectedRdc.value.length === 0) return t('dashboard.globalFilterBar.labels.toRdc')
   return truncateText(selectedRdc.value, maxDisplayLength)
 })
 

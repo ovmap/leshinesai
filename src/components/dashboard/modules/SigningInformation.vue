@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, nextTick, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import * as echarts from 'echarts'
 import { message } from 'ant-design-vue'
 import { querySign, queryNotSignItemByPage, exportNotSignItem, queryFromWarehouse, queryToProvince, queryToRdc } from '../../../services/transportApi'
 import { useDashboardControlStore } from '../../../stores/dashboardControlStore'
 import { useDashboardDataStore } from '../../../stores/dashboardDataStore'
 
+const { t } = useI18n()
 const controlStore = useDashboardControlStore()
 const dataStore = useDashboardDataStore()
 
@@ -25,9 +27,9 @@ const chartRef = ref<HTMLDivElement | null>(null)
 let myChart: echarts.ECharts | null = null
 
 // 签收数据
-const signingData = ref([
-  { name: '今日已签收', value: 0, color: '#00AEEF' },
-  { name: '今日待签收', value: 0, color: '#F5A623' },
+const signingData = computed(() => [
+  { name: t('dashboard.signingInformation.cards.todaySigned'), value: 0, color: '#00AEEF' },
+  { name: t('dashboard.signingInformation.cards.todayPending'), value: 0, color: '#F5A623' },
 ])
 
 // 加载状态
@@ -65,10 +67,10 @@ const modalProvinceSearch = ref('')
 const modalRdcSearch = ref('')
 
 // 运输方式选项
-const modeTypeOptions = [
-  { code: '区配', name: '区配' },
-  { code: '直送', name: '直送' },
-]
+const modeTypeOptions = computed(() => [
+  { code: '区配', name: t('dashboard.signingInformation.modeTypeOptions.zoneDelivery') },
+  { code: '直送', name: t('dashboard.signingInformation.modeTypeOptions.directDelivery') },
+])
 
 // 筛选选项数据
 const warehouseOptions = ref<{ code: string; name: string }[]>([])
@@ -93,32 +95,32 @@ const loadFilterOptions = async () => {
       rdcOptions.value = Array.isArray(rdcRes.data) ? rdcRes.data : []
     }
   } catch (error) {
-    console.error('加载筛选选项失败:', error)
+    console.error(t('dashboard.signingInformation.messages.fetchFilterOptionsFailed'), error)
   }
 }
 
 // 表格列配置
-const tableColumns = [
-  { title: '始发仓', dataIndex: 'fromWarehouse', key: 'fromWarehouse', width: 100 },
-  { title: '数据源', dataIndex: 'dataSource', key: 'dataSource', width: 60 },
-  { title: '承运商', dataIndex: 'carrierName', key: 'carrierName', width: 80 },
-  { title: '配送商', dataIndex: 'deliveryName', key: 'deliveryName', width: 80 },
-  { title: '运输单号', dataIndex: 'transNo', key: 'transNo', width: 160 },
-  { title: '发货单号', dataIndex: 'invoiceNo', key: 'invoiceNo', width: 160 },
-  { title: '订单状态', dataIndex: 'orderStatus', key: 'orderStatus', width: 60 },
-  { title: '运输方式', dataIndex: 'transType', key: 'transType', width: 70 },
-  { title: '配送模式', dataIndex: 'modeType', key: 'modeType', width: 60 },
-  { title: '目的仓', dataIndex: 'toWarehouse', key: 'toWarehouse', width: 80 },
-  { title: '目的省', dataIndex: 'toProvince', key: 'toProvince', width: 60 },
-  { title: '目的市', dataIndex: 'toCity', key: 'toCity', width: 70 },
-  { title: '目的区', dataIndex: 'toCounty', key: 'toCounty', width: 70 },
-  { title: '收货方', dataIndex: 'deliveryParty', key: 'deliveryParty', width: 120 },
-  { title: '发货时间', dataIndex: 'deliverTime', key: 'deliverTime', width: 140 },
-  { title: '到达RDC时间', dataIndex: 'arrivalRdcTime', key: 'arrivalRdcTime', width: 140 },
-  { title: '预计到达时间', dataIndex: 'predictArrivalCustomerTime', key: 'predictArrivalCustomerTime', width: 140 },
-  { title: '件数', dataIndex: 'goodsNum', key: 'goodsNum', width: 50 },
-  { title: '体积', dataIndex: 'volume', key: 'volume', width: 60 },
-]
+const tableColumns = computed(() => [
+  { title: t('dashboard.signingInformation.tableColumns.fromWarehouse'), dataIndex: 'fromWarehouse', key: 'fromWarehouse', width: 100 },
+  { title: t('dashboard.signingInformation.tableColumns.dataSource'), dataIndex: 'dataSource', key: 'dataSource', width: 60 },
+  { title: t('dashboard.signingInformation.tableColumns.carrierName'), dataIndex: 'carrierName', key: 'carrierName', width: 80 },
+  { title: t('dashboard.signingInformation.tableColumns.deliveryName'), dataIndex: 'deliveryName', key: 'deliveryName', width: 80 },
+  { title: t('dashboard.signingInformation.tableColumns.transNo'), dataIndex: 'transNo', key: 'transNo', width: 160 },
+  { title: t('dashboard.signingInformation.tableColumns.invoiceNo'), dataIndex: 'invoiceNo', key: 'invoiceNo', width: 160 },
+  { title: t('dashboard.signingInformation.tableColumns.orderStatus'), dataIndex: 'orderStatus', key: 'orderStatus', width: 60 },
+  { title: t('dashboard.signingInformation.tableColumns.transType'), dataIndex: 'transType', key: 'transType', width: 70 },
+  { title: t('dashboard.signingInformation.tableColumns.modeType'), dataIndex: 'modeType', key: 'modeType', width: 60 },
+  { title: t('dashboard.signingInformation.tableColumns.toWarehouse'), dataIndex: 'toWarehouse', key: 'toWarehouse', width: 80 },
+  { title: t('dashboard.signingInformation.tableColumns.toProvince'), dataIndex: 'toProvince', key: 'toProvince', width: 60 },
+  { title: t('dashboard.signingInformation.tableColumns.toCity'), dataIndex: 'toCity', key: 'toCity', width: 70 },
+  { title: t('dashboard.signingInformation.tableColumns.toCounty'), dataIndex: 'toCounty', key: 'toCounty', width: 70 },
+  { title: t('dashboard.signingInformation.tableColumns.deliveryParty'), dataIndex: 'deliveryParty', key: 'deliveryParty', width: 120 },
+  { title: t('dashboard.signingInformation.tableColumns.deliverTime'), dataIndex: 'deliverTime', key: 'deliverTime', width: 140 },
+  { title: t('dashboard.signingInformation.tableColumns.arrivalRdcTime'), dataIndex: 'arrivalRdcTime', key: 'arrivalRdcTime', width: 140 },
+  { title: t('dashboard.signingInformation.tableColumns.predictArrivalCustomerTime'), dataIndex: 'predictArrivalCustomerTime', key: 'predictArrivalCustomerTime', width: 140 },
+  { title: t('dashboard.signingInformation.tableColumns.goodsNum'), dataIndex: 'goodsNum', key: 'goodsNum', width: 50 },
+  { title: t('dashboard.signingInformation.tableColumns.volume'), dataIndex: 'volume', key: 'volume', width: 60 },
+])
 
 // 获取签收数据（使用全局筛选条件）
 const fetchSigningData = async () => {
@@ -143,7 +145,7 @@ const fetchSigningData = async () => {
     // 同步到数据 Store（UI 实时镜像）
     syncToDataStore()
   } catch (error) {
-    console.error('获取签收数据失败:', error)
+    console.error(t('dashboard.signingInformation.messages.fetchSigningDataFailed'), error)
     signingData.value[0].value = 0
     signingData.value[1].value = 0
     syncToDataStore()
@@ -177,7 +179,7 @@ const syncToDataStore = () => {
 const donutOptions = computed(() => ({
   tooltip: {
     trigger: 'item',
-    formatter: '{b}: {c}单',
+    formatter: (params: any) => `${params.name}: ${params.value}${t('dashboard.signingInformation.chart.unit')}`,
     backgroundColor: 'rgba(0, 0, 0, 0.8)',
     borderColor: '#4A90E2',
     borderWidth: 1,
@@ -194,14 +196,14 @@ const donutOptions = computed(() => ({
   },
   series: [
     {
-      name: '签收信息',
+      name: t('dashboard.signingInformation.chart.seriesName'),
       type: 'pie',
       radius: ['40%', '60%'],
       center: ['50%', '40%'],
       label: {
         show: true,
         position: 'outside',
-        formatter: '{c}单',
+        formatter: (params: any) => `${params.value}${t('dashboard.signingInformation.chart.unit')}`,
         fontSize: 12,
         fontWeight: 'bold',
         color: '#FFFFFF',
@@ -234,7 +236,7 @@ const donutOptions = computed(() => ({
 
 // 处理图表点击
 const handleChartClick = (params: any) => {
-  if (params?.name === '今日待签收') {
+  if (params?.name === t('dashboard.signingInformation.cards.todayPending')) {
     modalVisible.value = true
     // 继承全局筛选值（参考 refer 逻辑）
     modalSelectedWarehouse.value = props.fromWarehouse?.[0] || ''
@@ -267,7 +269,7 @@ const fetchModalData = async (page: number = currentPage.value) => {
     // 同步到数据 Store
     syncToDataStore()
   } catch (error) {
-    console.error('获取未签收明细失败:', error)
+    console.error(t('dashboard.signingInformation.messages.fetchModalDataFailed'), error)
     modalData.value = []
     total.value = 0
     syncToDataStore()
@@ -338,15 +340,15 @@ const handleExport = async () => {
       if (url) {
         const link = document.createElement('a')
         link.href = url
-        link.download = `未签收明细_${new Date().toISOString().slice(0, 10)}.xlsx`
+        link.download = `${t('dashboard.signingInformation.modal.detailTitle')}_${new Date().toISOString().slice(0, 10)}.xlsx`
         document.body.appendChild(link)
         link.click()
         document.body.removeChild(link)
-        message.success('导出成功')
+        message.success(t('dashboard.signingInformation.messages.exportSuccess'))
       }
     }
   } catch (error) {
-    message.error('导出失败')
+    message.error(t('dashboard.signingInformation.messages.exportFailedMsg'))
   } finally {
     exportLoading.value = false
   }
@@ -562,7 +564,7 @@ onUnmounted(() => {
 <template>
   <div class="signing-information-wrapper">
     <div class="header-bar">
-      <h2 class="header-title">签收信息</h2>
+      <h2 class="header-title">{{ t('dashboard.signingInformation.title') }}</h2>
     </div>
     <div class="signing-information">
       <!-- single 布局：左右分栏 -->
@@ -578,26 +580,26 @@ onUnmounted(() => {
             <div class="inline-filters">
               <div class="filter-group">
                 <select v-model="modalSelectedWarehouse" class="filter-select filter-select-sm">
-                  <option value="">始发仓</option>
+                  <option value="">{{ t('dashboard.signingInformation.filters.fromWarehouse') }}</option>
                   <option v-for="opt in warehouseOptions" :key="opt.code" :value="opt.code">{{ opt.name }}</option>
                 </select>
                 <select v-model="modalSelectedProvince" class="filter-select">
-                  <option value="">目的省</option>
+                  <option value="">{{ t('dashboard.signingInformation.filters.toProvince') }}</option>
                   <option v-for="opt in provinceOptions" :key="opt.code" :value="opt.code">{{ opt.name }}</option>
                 </select>
                 <select v-model="modalSelectedRdc" class="filter-select filter-select-sm">
-                  <option value="">目的RDC</option>
+                  <option value="">{{ t('dashboard.signingInformation.filters.toRdc') }}</option>
                   <option v-for="opt in rdcOptions" :key="opt.code" :value="opt.code">{{ opt.name }}</option>
                 </select>
                 <select v-model="modalSelectedModeType" class="filter-select">
-                  <option value="">配送模式</option>
+                  <option value="">{{ t('dashboard.signingInformation.filters.modeType') }}</option>
                   <option v-for="opt in modeTypeOptions" :key="opt.code" :value="opt.code">{{ opt.name }}</option>
                 </select>
               </div>
               <div class="filter-buttons">
-                <a-button size="small" @click="handleSearch">搜索</a-button>
-                <a-button size="small" @click="handleReset">重置</a-button>
-                <a-button size="small" type="primary" :loading="exportLoading" @click="handleExport">导出</a-button>
+                <a-button size="small" @click="handleSearch">{{ t('dashboard.signingInformation.buttons.search') }}</a-button>
+                <a-button size="small" @click="handleReset">{{ t('dashboard.signingInformation.buttons.reset') }}</a-button>
+                <a-button size="small" type="primary" :loading="exportLoading" @click="handleExport">{{ t('dashboard.signingInformation.buttons.export') }}</a-button>
               </div>
             </div>
             <!-- 表格 -->
@@ -622,7 +624,7 @@ onUnmounted(() => {
                 :total="total"
                 show-size-changer
                 show-quick-jumper
-                :show-total="(total: number) => `共 ${total} 条`"
+                :show-total="(total: number) => t('dashboard.signingInformation.pagination.showTotal', { total })"
                 :page-size-options="['10', '20', '50', '100']"
                 @change="handlePageChange"
                 @showSizeChange="handlePageSizeChange"
@@ -646,7 +648,7 @@ onUnmounted(() => {
             <div class="modal-container">
               <!-- 弹窗头部 -->
               <div class="modal-header">
-                <h3 class="modal-title">未签收明细</h3>
+                <h3 class="modal-title">{{ t('dashboard.signingInformation.modal.detailTitle') }}</h3>
                 <button class="close-btn" @click="handleModalClose">×</button>
               </div>
 
@@ -654,26 +656,26 @@ onUnmounted(() => {
               <div class="modal-filters">
                 <div class="filter-group">
                   <select v-model="modalSelectedWarehouse" class="filter-select filter-select-sm">
-                    <option value="">始发仓</option>
+                    <option value="">{{ t('dashboard.signingInformation.filters.fromWarehouse') }}</option>
                     <option v-for="opt in warehouseOptions" :key="opt.code" :value="opt.code">{{ opt.name }}</option>
                   </select>
                   <select v-model="modalSelectedProvince" class="filter-select">
-                    <option value="">目的省</option>
+                    <option value="">{{ t('dashboard.signingInformation.filters.toProvince') }}</option>
                     <option v-for="opt in provinceOptions" :key="opt.code" :value="opt.code">{{ opt.name }}</option>
                   </select>
                   <select v-model="modalSelectedRdc" class="filter-select filter-select-sm">
-                    <option value="">目的RDC</option>
+                    <option value="">{{ t('dashboard.signingInformation.filters.toRdc') }}</option>
                     <option v-for="opt in rdcOptions" :key="opt.code" :value="opt.code">{{ opt.name }}</option>
                   </select>
                   <select v-model="modalSelectedModeType" class="filter-select">
-                    <option value="">配送模式</option>
+                    <option value="">{{ t('dashboard.signingInformation.filters.modeType') }}</option>
                     <option v-for="opt in modeTypeOptions" :key="opt.code" :value="opt.code">{{ opt.name }}</option>
                   </select>
                 </div>
                 <div class="filter-buttons">
-                  <a-button size="small" @click="handleSearch">搜索</a-button>
-                  <a-button size="small" @click="handleReset">重置</a-button>
-                  <a-button size="small" type="primary" :loading="exportLoading" @click="handleExport">导出</a-button>
+                  <a-button size="small" @click="handleSearch">{{ t('dashboard.signingInformation.buttons.search') }}</a-button>
+                  <a-button size="small" @click="handleReset">{{ t('dashboard.signingInformation.buttons.reset') }}</a-button>
+                  <a-button size="small" type="primary" :loading="exportLoading" @click="handleExport">{{ t('dashboard.signingInformation.buttons.export') }}</a-button>
                 </div>
               </div>
 
@@ -700,7 +702,7 @@ onUnmounted(() => {
                     :total="total"
                     show-size-changer
                     show-quick-jumper
-                    :show-total="(total: number) => `共 ${total} 条`"
+                    :show-total="(total: number) => t('dashboard.signingInformation.pagination.showTotal', { total })"
                     :page-size-options="['10', '20', '50', '100']"
                     @change="handlePageChange"
                     @showSizeChange="handlePageSizeChange"

@@ -1,0 +1,28 @@
+{
+  "buttons": {
+    "search": "搜索",
+    "reset": "重置",
+    "export": "导出",
+    "confirm": "确定",
+    "cancel": "取消",
+    "close": "关闭",
+    "save": "保存",
+    "refresh": "刷新"
+  },
+  "placeholders": {
+    "search": "请输入搜索内容...",
+    "select": "请选择"
+  },
+  "messages": {
+    "noData": "暂无数据",
+    "loading": "加载中...",
+    "success": "操作成功",
+    "failed": "操作失败",
+    "confirmDelete": "确认删除吗？"
+  },
+  "table": {
+    "columns": "列",
+    "actions": "操作",
+    "total": "共 {total} 条"
+  }
+}

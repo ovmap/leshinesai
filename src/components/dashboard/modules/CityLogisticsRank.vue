@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch, nextTick, Teleport } from 'vue';
+import { useI18n } from 'vue-i18n';
 import dayjs, { type Dayjs } from 'dayjs';
 import { message } from 'ant-design-vue';
 import { useSelectOptionsStore } from '../../../stores/selectOptionsStore';
 import { useDashboardDataStore } from '../../../stores/dashboardDataStore';
 import { queryDeliveryKpiRank, queryDeliveryKpiRankDetail, queryDeliveryLogisticPunishInfo, exportDeliveryLogisticKpiRank, exportDeliveryLogisticKpiRankScoreDetail, exportDeliveryLogisticKpiRankPunishDetail } from '../../../services/transportApi';
+
+const { t } = useI18n();
 
 // 定义zoom属性
 const props = defineProps({
@@ -56,13 +59,13 @@ const filteredLogisticProviderOptions = computed(() => {
   }
   
   // 在列表开头添加重置选项
-  return [{ code: '__reset__', name: '重置' }, ...filtered];
+  return [{ code: '__reset__', name: t('dashboard.cityLogisticsRank.reset') }, ...filtered];
 });
 
 // 过滤后的CDC仓库选项（包含重置选项）
 const filteredCdcWarehouseOptions = computed(() => {
   let filtered: { code: string; name: string }[] = [];
-  
+
   if (!cdcWarehouseSearch.value.trim()) {
     filtered = cdcWarehouseOptions.value;
   } else {
@@ -71,9 +74,9 @@ const filteredCdcWarehouseOptions = computed(() => {
       option.name.toLowerCase().includes(searchLower)
     );
   }
-  
+
   // 在列表开头添加重置选项
-  return [{ code: '__reset__', name: '重置' }, ...filtered];
+  return [{ code: '__reset__', name: t('dashboard.cityLogisticsRank.reset') }, ...filtered];
 });
 
 // 下拉框开关状态
@@ -86,7 +89,7 @@ const loading = ref(false);
 
 // 弹窗相关状态
 const modalVisible = ref(false);
-const modalTitle = ref('城配物流商KPI排名详情');
+const modalTitle = computed(() => t('dashboard.cityLogisticsRank.modalTitle'));
 const activeTab = ref<'score' | 'reward'>('score');
 const modalLoading = ref(false);
 const exportLoading = ref(false);
@@ -118,7 +121,7 @@ const modalTableScrollY = ref<number | undefined>(200);
 
 // 显示文本（多选）
 const selectedLogisticProviderText = computed(() => {
-  if (selectedLogisticProvider.value.length === 0) return '物流商';
+  if (selectedLogisticProvider.value.length === 0) return t('dashboard.cityLogisticsRank.logisticProvider');
   const names = selectedLogisticProvider.value.map(code => {
     const option = logisticProviderOptions.value.find(item => item.code === code);
     return option ? option.name : code;
@@ -127,7 +130,7 @@ const selectedLogisticProviderText = computed(() => {
 });
 
 const selectedCdcWarehouseText = computed(() => {
-  if (selectedCdcWarehouse.value.length === 0) return 'CDC仓库';
+  if (selectedCdcWarehouse.value.length === 0) return t('dashboard.cityLogisticsRank.cdcWarehouse');
   const names = selectedCdcWarehouse.value.map(code => {
     const option = cdcWarehouseOptions.value.find(item => item.code === code);
     return option ? option.name : code;
@@ -206,14 +209,14 @@ const tableColumns = computed(() => {
   // 基础列：物流商、仓库（这两个列会跨两行）
   const baseColumns = [
     {
-      title: '物流商',
+      title: t('dashboard.cityLogisticsRank.logisticProvider'),
       key: 'logistic',
       dataIndex: 'logistic',
       width: 120,
       align: 'center' as const,
     },
     {
-      title: '仓库',
+      title: t('dashboard.cityLogisticsRank.warehouse'),
       key: 'warehouse',
       dataIndex: 'warehouse',
       width: 120,
@@ -222,36 +225,36 @@ const tableColumns = computed(() => {
   ];
 
   const monthColumns: any[] = [];
-  
+
   // 对月份进行排序（从新到旧）
   const sortedMonths = [...monthList.value].sort((a, b) => {
     return dayjs(b).valueOf() - dayjs(a).valueOf();
   });
-  
+
   // 第一组：所有月份的排名和总成绩（按月份顺序）
   sortedMonths.forEach((month) => {
     // 处理无效日期 "0000-00"
     let monthLabel: string;
     if (month === '0000-00' || !month || month.startsWith('0000')) {
-      monthLabel = '0000年00月';
+      monthLabel = t('dashboard.cityLogisticsRank.monthFormat00');
     } else {
-      monthLabel = dayjs(month).format('YYYY年M月');
+      monthLabel = dayjs(month).format(t('dashboard.cityLogisticsRank.monthFormat'));
     }
-    
+
     monthColumns.push({
       title: monthLabel,
       key: `month_${month}_performance`,
       align: 'center' as const,
       children: [
         {
-          title: '排名',
+          title: t('dashboard.cityLogisticsRank.rank'),
           key: `${month}_rank`,
           dataIndex: `${month}_rank`,
           width: 80,
           align: 'center' as const,
         },
         {
-          title: '总成绩',
+          title: t('dashboard.cityLogisticsRank.totalScore'),
           key: `${month}_totalScore`,
           dataIndex: `${month}_totalScore`,
           width: 100,
@@ -260,43 +263,43 @@ const tableColumns = computed(() => {
       ],
     });
   });
-  
+
   // 第二组：所有月份的是否进行奖励和红线/重大/严重（按月份顺序）
   sortedMonths.forEach((month) => {
     // 处理无效日期 "0000-00"
     let monthLabel: string;
     if (month === '0000-00' || !month || month.startsWith('0000')) {
-      monthLabel = '0000年00月';
+      monthLabel = t('dashboard.cityLogisticsRank.monthFormat00');
     } else {
-      monthLabel = dayjs(month).format('YYYY年M月');
+      monthLabel = dayjs(month).format(t('dashboard.cityLogisticsRank.monthFormat'));
     }
-    
+
     monthColumns.push({
       title: monthLabel,
       key: `month_${month}_reward`,
       align: 'center' as const,
       children: [
         {
-          title: '是否进行奖励',
+          title: t('dashboard.cityLogisticsRank.hasReward'),
           key: `${month}_hasReward`,
           dataIndex: `${month}_hasReward`,
           width: 120,
           align: 'center' as const,
           customRender: ({ text }: { text: boolean | null }) => {
-            if (text === true) return '是';
-            if (text === false) return '否';
+            if (text === true) return t('dashboard.cityLogisticsRank.yes');
+            if (text === false) return t('dashboard.cityLogisticsRank.no');
             return '-';
           },
         },
         {
-          title: '红线/重大/严重问题',
+          title: t('dashboard.cityLogisticsRank.redLineMajorSerious'),
           key: `${month}_hasPunish`,
           dataIndex: `${month}_hasPunish`,
           width: 150,
           align: 'center' as const,
           customRender: ({ text }: { text: boolean | null }) => {
-            if (text === true) return '是';
-            if (text === false) return '否';
+            if (text === true) return t('dashboard.cityLogisticsRank.yes');
+            if (text === false) return t('dashboard.cityLogisticsRank.no');
             return '-';
           },
         },
@@ -391,13 +394,13 @@ const fetchRankData = async () => {
         monthList.value = [];
       }
     } else {
-      message.error(result?.msg || '获取数据失败');
+      message.error(result?.msg || t('dashboard.cityLogisticsRank.fetchDataFailed'));
       tableData.value = [];
       monthList.value = [];
     }
   } catch (error) {
     console.error('获取排名数据失败:', error);
-    message.error('获取数据失败');
+    message.error(t('dashboard.cityLogisticsRank.fetchDataFailed'));
     tableData.value = [];
   } finally {
     loading.value = false;
@@ -609,7 +612,7 @@ const fetchDetailData = async () => {
           detailTableData.value = [];
         }
       } else {
-        message.error(result?.msg || '获取得分详情数据失败');
+        message.error(result?.msg || t('dashboard.cityLogisticsRank.fetchScoreDetailFailed'));
         scoreTableData.value = [];
         detailTableData.value = [];
       }
@@ -651,7 +654,7 @@ const fetchDetailData = async () => {
               // 违约相关
               standardBreachAmount: item.standardBreachAmount !== undefined ? item.standardBreachAmount : null, // 标准违约金(元)
               breachCoefficient: item.breachCoefficient || '-', // 违约系数
-              hasReward: item.hasReward !== undefined ? (item.hasReward ? '是' : '否') : '-', // 考核结果是否奖励
+              hasReward: item.hasReward !== undefined ? (item.hasReward ? t('dashboard.cityLogisticsRank.yes') : t('dashboard.cityLogisticsRank.no')) : '-', // 考核结果是否奖励
             });
           });
           
@@ -662,7 +665,7 @@ const fetchDetailData = async () => {
           detailTableData.value = [];
         }
       } else {
-        message.error(result?.msg || '获取奖惩详情数据失败');
+        message.error(result?.msg || t('dashboard.cityLogisticsRank.fetchRewardDetailFailed'));
         rewardTableData.value = [];
         detailTableData.value = [];
       }
@@ -670,7 +673,7 @@ const fetchDetailData = async () => {
   } catch (error) {
     if (isStale()) return;
     console.error('获取详情数据失败:', error);
-    message.error('获取详情数据失败');
+    message.error(t('dashboard.cityLogisticsRank.fetchDetailFailed'));
     scoreTableData.value = [];
     rewardTableData.value = [];
     detailTableData.value = [];
@@ -694,13 +697,13 @@ const modalFilteredLogisticProviderOptions = computed(() => {
     );
   }
   
-  return [{ code: '__reset__', name: '重置' }, ...filtered];
+  return [{ code: '__reset__', name: t('dashboard.cityLogisticsRank.reset') }, ...filtered];
 });
 
 // 弹窗内过滤后的CDC仓库选项
 const modalFilteredCdcWarehouseOptions = computed(() => {
   let filtered: { code: string; name: string }[] = [];
-  
+
   if (!modalCdcWarehouseSearch.value.trim()) {
     filtered = cdcWarehouseOptions.value;
   } else {
@@ -709,13 +712,13 @@ const modalFilteredCdcWarehouseOptions = computed(() => {
       option.name.toLowerCase().includes(searchLower)
     );
   }
-  
-  return [{ code: '__reset__', name: '重置' }, ...filtered];
+
+  return [{ code: '__reset__', name: t('dashboard.cityLogisticsRank.reset') }, ...filtered];
 });
 
 // 弹窗内显示文本
 const modalSelectedLogisticProviderText = computed(() => {
-  if (modalSelectedLogisticProvider.value.length === 0) return '物流商';
+  if (modalSelectedLogisticProvider.value.length === 0) return t('dashboard.cityLogisticsRank.logisticProvider');
   const names = modalSelectedLogisticProvider.value.map(code => {
     const option = logisticProviderOptions.value.find(item => item.code === code);
     return option ? option.name : code;
@@ -724,7 +727,7 @@ const modalSelectedLogisticProviderText = computed(() => {
 });
 
 const modalSelectedCdcWarehouseText = computed(() => {
-  if (modalSelectedCdcWarehouse.value.length === 0) return 'CDC仓库';
+  if (modalSelectedCdcWarehouse.value.length === 0) return t('dashboard.cityLogisticsRank.cdcWarehouse');
   const names = modalSelectedCdcWarehouse.value.map(code => {
     const option = cdcWarehouseOptions.value.find(item => item.code === code);
     return option ? option.name : code;
@@ -865,17 +868,17 @@ const handleExport = async () => {
     if (modalVisible.value) {
       // 弹窗内导出：根据当前标签页调用不同的导出接口
       if (!modalDateRange.value || !modalDateRange.value[0] || !modalDateRange.value[1]) {
-        message.warning('请先选择日期范围');
+        message.warning(t('dashboard.cityLogisticsRank.selectDateRangeFirst'));
         return;
       }
-      
+
       const baseParams = {
         startDate: modalDateRange.value[0].format('YYYY-MM'),
         endDate: modalDateRange.value[1].format('YYYY-MM'),
         logisticName: modalSelectedLogisticProvider.value.length > 0 ? modalSelectedLogisticProvider.value : selectedLogisticProvider.value || [],
         cdcWarehouse: modalSelectedCdcWarehouse.value.length > 0 ? modalSelectedCdcWarehouse.value : selectedCdcWarehouse.value || [],
       };
-      
+
       let result;
       if (activeTab.value === 'score') {
         // 得分详情导出
@@ -892,7 +895,7 @@ const handleExport = async () => {
         };
         result = await exportDeliveryLogisticKpiRankPunishDetail(params);
       }
-      
+
       // 处理导出结果
       if (result && result.code === 200 && result.data) {
         const url = result.data;
@@ -903,17 +906,17 @@ const handleExport = async () => {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        message.success('导出成功');
+        message.success(t('dashboard.cityLogisticsRank.exportSuccess'));
       } else {
-        message.error(result?.msg || '导出失败');
+        message.error(result?.msg || t('dashboard.cityLogisticsRank.exportFailed'));
       }
     } else {
       // 主页面导出：导出排名数据
       if (!dateRange.value || !dateRange.value[0] || !dateRange.value[1]) {
-        message.warning('请先选择日期范围');
+        message.warning(t('dashboard.cityLogisticsRank.selectDateRangeFirst'));
         return;
       }
-      
+
       const params = {
         startDate: dateRange.value[0].format('YYYY-MM'),
         endDate: dateRange.value[1].format('YYYY-MM'),
@@ -921,9 +924,9 @@ const handleExport = async () => {
         cdcWarehouse: selectedCdcWarehouse.value || [],
         customer: [] as string[],
       };
-      
+
       const result = await exportDeliveryLogisticKpiRank(params);
-      
+
       // 处理导出结果
       if (result && result.code === 200 && result.data) {
         const url = result.data;
@@ -934,14 +937,14 @@ const handleExport = async () => {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        message.success('导出成功');
+        message.success(t('dashboard.cityLogisticsRank.exportSuccess'));
       } else {
-        message.error(result?.msg || '导出失败');
+        message.error(result?.msg || t('dashboard.cityLogisticsRank.exportFailed'));
       }
     }
   } catch (error: any) {
     console.error('导出失败:', error);
-    message.error(error?.msg || '导出失败');
+    message.error(error?.msg || t('dashboard.cityLogisticsRank.exportFailed'));
   } finally {
     exportLoading.value = false;
   }
@@ -950,42 +953,42 @@ const handleExport = async () => {
 // 得分详情表格列
 const scoreTableColumns = computed(() => [
   {
-    title: '年月',
+    title: t('dashboard.cityLogisticsRank.yearMonth'),
     key: 'yearMonth',
     dataIndex: 'yearMonth',
     width: 100,
     align: 'center' as const,
     customRender: ({ text }: { text: string }) => {
       if (!text) return '-';
-      if (text === '汇总') return '汇总';
+      if (text === t('dashboard.cityLogisticsRank.summary')) return t('dashboard.cityLogisticsRank.summary');
       // 处理无效日期 "0000-00"
       if (text === '0000-00' || text.startsWith('0000')) {
-        return '0000年00月';
+        return t('dashboard.cityLogisticsRank.monthFormat00');
       }
       // 格式化年月：2025-11 -> 2025年11月
       const parts = text.split('-');
       if (parts.length === 2 && parts[0] && parts[1]) {
-        return `${parts[0]}年${parseInt(parts[1])}月`;
+        return dayjs(text).format(t('dashboard.cityLogisticsRank.monthFormat'));
       }
       return text;
     },
   },
   {
-    title: '物流商',
+    title: t('dashboard.cityLogisticsRank.logisticProvider'),
     key: 'logistic',
     dataIndex: 'logistic',
     width: 120,
     align: 'center' as const,
   },
   {
-    title: '仓库',
+    title: t('dashboard.cityLogisticsRank.warehouse'),
     key: 'warehouse',
     dataIndex: 'warehouse',
     width: 120,
     align: 'center' as const,
   },
   {
-    title: '总成绩',
+    title: t('dashboard.cityLogisticsRank.totalScore'),
     key: 'totalScore',
     dataIndex: 'totalScore',
     width: 100,
@@ -995,7 +998,7 @@ const scoreTableColumns = computed(() => [
     },
   },
   {
-    title: 'SEC入库周期达标率(满分: 15)',
+    title: t('dashboard.cityLogisticsRank.score.secInboundCycleScore'),
     key: 'secInboundCycleScore',
     dataIndex: 'secInboundCycleScore',
     width: 220,
@@ -1005,7 +1008,7 @@ const scoreTableColumns = computed(() => [
     },
   },
   {
-    title: '发货及时率(满分: 5)',
+    title: t('dashboard.cityLogisticsRank.score.deliveryOnTimeScore'),
     key: 'deliveryOnTimeScore',
     dataIndex: 'deliveryOnTimeScore',
     width: 160,
@@ -1015,7 +1018,7 @@ const scoreTableColumns = computed(() => [
     },
   },
   {
-    title: '库存准确率(满分: 5)',
+    title: t('dashboard.cityLogisticsRank.score.inventoryAccuracyScore'),
     key: 'inventoryAccuracyScore',
     dataIndex: 'inventoryAccuracyScore',
     width: 160,
@@ -1025,7 +1028,7 @@ const scoreTableColumns = computed(() => [
     },
   },
   {
-    title: '准时交货率(满分: 30)',
+    title: t('dashboard.cityLogisticsRank.score.onTimeDeliveryScore'),
     key: 'onTimeDeliveryScore',
     dataIndex: 'onTimeDeliveryScore',
     width: 170,
@@ -1035,7 +1038,7 @@ const scoreTableColumns = computed(() => [
     },
   },
   {
-    title: '货损率(满分: 5)',
+    title: t('dashboard.cityLogisticsRank.score.cargoDamageScore'),
     key: 'cargoDamageScore',
     dataIndex: 'cargoDamageScore',
     width: 140,
@@ -1045,7 +1048,7 @@ const scoreTableColumns = computed(() => [
     },
   },
   {
-    title: '异常解决及时率(满分: 5)',
+    title: t('dashboard.cityLogisticsRank.score.abnormalResolutionScore'),
     key: 'abnormalResolutionScore',
     dataIndex: 'abnormalResolutionScore',
     width: 200,
@@ -1055,7 +1058,7 @@ const scoreTableColumns = computed(() => [
     },
   },
   {
-    title: 'TMS&SEC APP签收率(满分: 5)',
+    title: t('dashboard.cityLogisticsRank.score.tmsSecAppScore'),
     key: 'tmsSecAppScore',
     dataIndex: 'tmsSecAppScore',
     width: 210,
@@ -1065,7 +1068,7 @@ const scoreTableColumns = computed(() => [
     },
   },
   {
-    title: 'TMS信息签收及时性(满分: 10)',
+    title: t('dashboard.cityLogisticsRank.score.tmsInfoSignScore'),
     key: 'tmsInfoSignScore',
     dataIndex: 'tmsInfoSignScore',
     width: 230,
@@ -1075,7 +1078,7 @@ const scoreTableColumns = computed(() => [
     },
   },
   {
-    title: '返单及时率得分(满分: 10)',
+    title: t('dashboard.cityLogisticsRank.score.returnOrderScore'),
     key: 'returnOrderScore',
     dataIndex: 'returnOrderScore',
     width: 180,
@@ -1085,7 +1088,7 @@ const scoreTableColumns = computed(() => [
     },
   },
   {
-    title: '运作准确率得分(满分: 5)',
+    title: t('dashboard.cityLogisticsRank.score.operationAccuracyScore'),
     key: 'operationAccuracyScore',
     dataIndex: 'operationAccuracyScore',
     width: 190,
@@ -1095,7 +1098,7 @@ const scoreTableColumns = computed(() => [
     },
   },
   {
-    title: '客户满意度得分(满分: 5)',
+    title: t('dashboard.cityLogisticsRank.score.customerSatisfactionScore'),
     key: 'customerSatisfactionScore',
     dataIndex: 'customerSatisfactionScore',
     width: 190,
@@ -1105,7 +1108,7 @@ const scoreTableColumns = computed(() => [
     },
   },
   {
-    title: '得分汇总',
+    title: t('dashboard.cityLogisticsRank.score.kpiScore'),
     key: 'kpiScore',
     dataIndex: 'kpiScore',
     width: 120,
@@ -1115,7 +1118,7 @@ const scoreTableColumns = computed(() => [
     },
   },
   {
-    title: '红线问题',
+    title: t('dashboard.cityLogisticsRank.score.redLineIssue'),
     key: 'redLineIssue',
     dataIndex: 'redLineIssue',
     width: 100,
@@ -1125,7 +1128,7 @@ const scoreTableColumns = computed(() => [
     },
   },
   {
-    title: '重大问题',
+    title: t('dashboard.cityLogisticsRank.score.majorIssue'),
     key: 'majorIssue',
     dataIndex: 'majorIssue',
     width: 100,
@@ -1135,7 +1138,7 @@ const scoreTableColumns = computed(() => [
     },
   },
   {
-    title: '严重问题',
+    title: t('dashboard.cityLogisticsRank.score.seriousIssue'),
     key: 'seriousIssue',
     dataIndex: 'seriousIssue',
     width: 100,
@@ -1145,7 +1148,7 @@ const scoreTableColumns = computed(() => [
     },
   },
   {
-    title: '一般问题',
+    title: t('dashboard.cityLogisticsRank.score.minorIssue'),
     key: 'minorIssue',
     dataIndex: 'minorIssue',
     width: 100,
@@ -1155,7 +1158,7 @@ const scoreTableColumns = computed(() => [
     },
   },
   {
-    title: '问题描述',
+    title: t('dashboard.cityLogisticsRank.score.issueDescription'),
     key: 'issueDescription',
     dataIndex: 'issueDescription',
     width: 240,
@@ -1164,7 +1167,7 @@ const scoreTableColumns = computed(() => [
     customHeaderCell: () => ({ class: 'table-cell-wrap' }),
   },
   {
-    title: '加分/扣分合计',
+    title: t('dashboard.cityLogisticsRank.score.bonusDeductionTotal'),
     key: 'bonusDeductionTotal',
     dataIndex: 'bonusDeductionTotal',
     width: 140,
@@ -1180,42 +1183,42 @@ const scoreTableColumns = computed(() => [
 // 奖惩详情表格列
 const rewardTableColumns = computed(() => [
   {
-    title: '年月',
+    title: t('dashboard.cityLogisticsRank.yearMonth'),
     key: 'yearMonth',
     dataIndex: 'yearMonth',
     width: 100,
     align: 'center' as const,
     customRender: ({ text }: { text: string }) => {
       if (!text) return '-';
-      if (text === '汇总') return '汇总';
+      if (text === t('dashboard.cityLogisticsRank.summary')) return t('dashboard.cityLogisticsRank.summary');
       // 处理无效日期 "0000-00"
       if (text === '0000-00' || text.startsWith('0000')) {
-        return '0000年00月';
+        return t('dashboard.cityLogisticsRank.monthFormat00');
       }
       // 格式化年月：2025-11 -> 2025年11月
       const parts = text.split('-');
       if (parts.length === 2 && parts[0] && parts[1]) {
-        return `${parts[0]}年${parseInt(parts[1])}月`;
+        return dayjs(text).format(t('dashboard.cityLogisticsRank.monthFormat'));
       }
       return text;
     },
   },
   {
-    title: '物流商',
+    title: t('dashboard.cityLogisticsRank.logisticProvider'),
     key: 'logistic',
     dataIndex: 'logistic',
     width: 120,
     align: 'center' as const,
   },
   {
-    title: '仓库',
+    title: t('dashboard.cityLogisticsRank.warehouse'),
     key: 'warehouse',
     dataIndex: 'warehouse',
     width: 120,
     align: 'center' as const,
   },
   {
-    title: '红线问题(元)',
+    title: t('dashboard.cityLogisticsRank.reward.redLineIssue'),
     key: 'redLineIssue',
     dataIndex: 'redLineIssue',
     width: 140,
@@ -1225,7 +1228,7 @@ const rewardTableColumns = computed(() => [
     },
   },
   {
-    title: '重大问题(元)',
+    title: t('dashboard.cityLogisticsRank.reward.majorIssue'),
     key: 'majorIssue',
     dataIndex: 'majorIssue',
     width: 140,
@@ -1235,7 +1238,7 @@ const rewardTableColumns = computed(() => [
     },
   },
   {
-    title: '严重问题(元)',
+    title: t('dashboard.cityLogisticsRank.reward.seriousIssue'),
     key: 'seriousIssue',
     dataIndex: 'seriousIssue',
     width: 140,
@@ -1245,7 +1248,7 @@ const rewardTableColumns = computed(() => [
     },
   },
   {
-    title: '一般问题(元)',
+    title: t('dashboard.cityLogisticsRank.reward.minorIssue'),
     key: 'minorIssue',
     dataIndex: 'minorIssue',
     width: 140,
@@ -1255,7 +1258,7 @@ const rewardTableColumns = computed(() => [
     },
   },
   {
-    title: '违约处理(元)',
+    title: t('dashboard.cityLogisticsRank.reward.breachHandling'),
     key: 'breachHandling',
     dataIndex: 'breachHandling',
     width: 140,
@@ -1265,7 +1268,7 @@ const rewardTableColumns = computed(() => [
     },
   },
   {
-    title: '总罚款金额(元)',
+    title: t('dashboard.cityLogisticsRank.reward.totalPenalty'),
     key: 'totalPenalty',
     dataIndex: 'totalPenalty',
     width: 160,
@@ -1275,7 +1278,7 @@ const rewardTableColumns = computed(() => [
     },
   },
   {
-    title: '奖励金额(元)',
+    title: t('dashboard.cityLogisticsRank.reward.rewardAmount'),
     key: 'rewardAmount',
     dataIndex: 'rewardAmount',
     width: 140,
@@ -1285,7 +1288,7 @@ const rewardTableColumns = computed(() => [
     },
   },
   {
-    title: '备注原因',
+    title: t('dashboard.cityLogisticsRank.reward.remarkReason'),
     key: 'remarkReason',
     dataIndex: 'remarkReason',
     width: 240,
@@ -1294,7 +1297,7 @@ const rewardTableColumns = computed(() => [
     customHeaderCell: () => ({ class: 'table-cell-wrap' }),
   },
   {
-    title: '总成绩',
+    title: t('dashboard.cityLogisticsRank.totalScore'),
     key: 'totalScore',
     dataIndex: 'totalScore',
     width: 100,
@@ -1304,7 +1307,7 @@ const rewardTableColumns = computed(() => [
     },
   },
   {
-    title: '月均发货体积(单位:m³)',
+    title: t('dashboard.cityLogisticsRank.reward.avgMonthlyShipVolume'),
     key: 'avgMonthlyShipVolume',
     dataIndex: 'avgMonthlyShipVolume',
     width: 180,
@@ -1314,7 +1317,7 @@ const rewardTableColumns = computed(() => [
     },
   },
   {
-    title: '标准违约金(元)',
+    title: t('dashboard.cityLogisticsRank.reward.standardBreachAmount'),
     key: 'standardBreachAmount',
     dataIndex: 'standardBreachAmount',
     width: 160,
@@ -1324,14 +1327,14 @@ const rewardTableColumns = computed(() => [
     },
   },
   {
-    title: '违约系数',
+    title: t('dashboard.cityLogisticsRank.reward.breachCoefficient'),
     key: 'breachCoefficient',
     dataIndex: 'breachCoefficient',
     width: 120,
     align: 'center' as const,
   },
   {
-    title: '考核结果是否奖励',
+    title: t('dashboard.cityLogisticsRank.reward.hasReward'),
     key: 'hasReward',
     dataIndex: 'hasReward',
     width: 160,
@@ -1377,7 +1380,7 @@ onUnmounted(() => {
 <template>
   <div class="rank-container">
     <div class="header-bar">
-      <h2 class="header-title">城配物流商KPI排名</h2>
+      <h2 class="header-title">{{ t('dashboard.cityLogisticsRank.title') }}</h2>
     </div>
     <!-- 控制面板 -->
     <div class="control-panel">
@@ -1388,12 +1391,12 @@ onUnmounted(() => {
             v-model:value="dateRange"
             picker="month"
             format="YYYY-MM"
-            separator="至"
-            :placeholder="['开始月份', '结束月份']"
+            :separator="t('dashboard.cityLogisticsRank.separator')"
+            :placeholder="[t('dashboard.cityLogisticsRank.startMonth'), t('dashboard.cityLogisticsRank.endMonth')]"
             class="date-range-picker"
           />
         </div>
-        
+
         <!-- 物流商下拉框 -->
         <div class="dropdown-item" @click.stop="toggleLogisticProviderDropdown">
           <span class="dropdown-text">{{ selectedLogisticProviderText }}</span>
@@ -1402,30 +1405,30 @@ onUnmounted(() => {
           </svg>
           <div class="dropdown-content" v-show="isLogisticProviderOpen" @click.stop>
             <div class="search-box">
-              <input 
-                v-model="logisticProviderSearch" 
-                type="text" 
-                placeholder="搜索物流商..." 
+              <input
+                v-model="logisticProviderSearch"
+                type="text"
+                :placeholder="t('dashboard.cityLogisticsRank.searchLogisticProvider')"
                 class="search-input"
-                @click.stop 
+                @click.stop
               />
             </div>
             <div class="options-list">
-              <div 
-                v-for="option in filteredLogisticProviderOptions" 
-                :key="option.code" 
+              <div
+                v-for="option in filteredLogisticProviderOptions"
+                :key="option.code"
                 class="dropdown-option"
-                :class="{ 
+                :class="{
                   'selected': option.code !== '__reset__' && selectedLogisticProvider.includes(option.code),
                   'reset-option': option.code === '__reset__'
-                }" 
+                }"
                 @click.stop="selectLogisticProvider(option.code)"
               >
                 <span class="checkmark" v-if="option.code !== '__reset__' && selectedLogisticProvider.includes(option.code)">✓</span>
                 {{ option.name }}
               </div>
               <div v-if="filteredLogisticProviderOptions.length === 1 && logisticProviderSearch" class="no-results">
-                暂无搜索结果
+                {{ t('dashboard.cityLogisticsRank.noSearchResults') }}
               </div>
             </div>
           </div>
@@ -1439,30 +1442,30 @@ onUnmounted(() => {
           </svg>
           <div class="dropdown-content" v-show="isCdcWarehouseOpen" @click.stop>
             <div class="search-box">
-              <input 
-                v-model="cdcWarehouseSearch" 
-                type="text" 
-                placeholder="搜索CDC仓库..." 
+              <input
+                v-model="cdcWarehouseSearch"
+                type="text"
+                :placeholder="t('dashboard.cityLogisticsRank.searchCdcWarehouse')"
                 class="search-input"
-                @click.stop 
+                @click.stop
               />
             </div>
             <div class="options-list">
-              <div 
-                v-for="option in filteredCdcWarehouseOptions" 
-                :key="option.code" 
+              <div
+                v-for="option in filteredCdcWarehouseOptions"
+                :key="option.code"
                 class="dropdown-option"
-                :class="{ 
+                :class="{
                   'selected': option.code !== '__reset__' && selectedCdcWarehouse.includes(option.code),
                   'reset-option': option.code === '__reset__'
-                }" 
+                }"
                 @click.stop="selectCdcWarehouse(option.code)"
               >
                 <span class="checkmark" v-if="option.code !== '__reset__' && selectedCdcWarehouse.includes(option.code)">✓</span>
                 {{ option.name }}
               </div>
               <div v-if="filteredCdcWarehouseOptions.length === 1 && cdcWarehouseSearch" class="no-results">
-                暂无搜索结果
+                {{ t('dashboard.cityLogisticsRank.noSearchResults') }}
               </div>
             </div>
           </div>
@@ -1473,10 +1476,10 @@ onUnmounted(() => {
       <!-- 操作按钮组 -->
       <div class="action-buttons">
         <a-button type="primary" @click="showDetailModal" class="action-btn">
-          查看详情
+          {{ t('dashboard.cityLogisticsRank.viewDetails') }}
         </a-button>
         <a-button @click="handleExport" class="action-btn" :loading="exportLoading">
-          导出
+          {{ t('dashboard.cityLogisticsRank.export') }}
         </a-button>
       </div>
     </div>
@@ -1484,11 +1487,11 @@ onUnmounted(() => {
     <!-- 表格区域 -->
     <div class="table-section" ref="tableSectionRef">
       <a-spin :spinning="loading">
-        <a-table 
-          :columns="tableColumns" 
-          :data-source="tableData" 
+        <a-table
+          :columns="tableColumns"
+          :data-source="tableData"
           :pagination="false"
-          size="small" 
+          size="small"
           class="custom-table"
           :scroll="{ x: 'max-content', y: tableScrollY }"
         />
@@ -1510,19 +1513,19 @@ onUnmounted(() => {
           <div class="modal-body" @click="handleModalBodyClick">
             <!-- 标签页 -->
             <div class="tabs-container">
-              <div 
-                class="tab-item" 
+              <div
+                class="tab-item"
                 :class="{ active: activeTab === 'score' }"
                 @click="handleTabChange('score')"
               >
-                得分详情
+                {{ t('dashboard.cityLogisticsRank.scoreDetail') }}
               </div>
-              <div 
-                class="tab-item" 
+              <div
+                class="tab-item"
                 :class="{ active: activeTab === 'reward' }"
                 @click="handleTabChange('reward')"
               >
-                奖惩详情
+                {{ t('dashboard.cityLogisticsRank.rewardDetail') }}
               </div>
             </div>
 
@@ -1536,14 +1539,14 @@ onUnmounted(() => {
                       v-model:value="modalDateRange"
                       picker="month"
                       format="YYYY-MM"
-                      separator="至"
-                      :placeholder="['开始月份', '结束月份']"
+                      :separator="t('dashboard.cityLogisticsRank.separator')"
+                      :placeholder="[t('dashboard.cityLogisticsRank.startMonth'), t('dashboard.cityLogisticsRank.endMonth')]"
                       class="date-range-picker"
                       @click.stop
                     />
                   </div>
                 </div>
-                
+
                 <!-- 物流商下拉框 -->
                 <div class="search-item">
                   <div class="dropdown-group">
@@ -1554,20 +1557,20 @@ onUnmounted(() => {
                       </svg>
                       <div class="dropdown-content" v-show="modalIsLogisticProviderOpen" @click.stop>
                         <div class="search-box">
-                          <input 
-                            v-model="modalLogisticProviderSearch" 
-                            type="text" 
-                            placeholder="搜索物流商..." 
+                          <input
+                            v-model="modalLogisticProviderSearch"
+                            type="text"
+                            :placeholder="t('dashboard.cityLogisticsRank.searchLogisticProvider')"
                             class="search-input"
-                            @click.stop 
+                            @click.stop
                           />
                         </div>
                         <div class="options-list">
-                          <div 
-                            v-for="option in modalFilteredLogisticProviderOptions" 
-                            :key="option.code" 
+                          <div
+                            v-for="option in modalFilteredLogisticProviderOptions"
+                            :key="option.code"
                             class="dropdown-option"
-                            :class="{ 
+                            :class="{
                               'selected': option.code !== '__reset__' && modalSelectedLogisticProvider.includes(option.code),
                               'reset-option': option.code === '__reset__'
                             }" 
@@ -1592,23 +1595,23 @@ onUnmounted(() => {
                       </svg>
                       <div class="dropdown-content" v-show="modalIsCdcWarehouseOpen" @click.stop>
                         <div class="search-box">
-                          <input 
-                            v-model="modalCdcWarehouseSearch" 
-                            type="text" 
-                            placeholder="搜索CDC仓库..." 
+                          <input
+                            v-model="modalCdcWarehouseSearch"
+                            type="text"
+                            :placeholder="t('dashboard.cityLogisticsRank.searchCdcWarehouse')"
                             class="search-input"
-                            @click.stop 
+                            @click.stop
                           />
                         </div>
                         <div class="options-list">
-                          <div 
-                            v-for="option in modalFilteredCdcWarehouseOptions" 
-                            :key="option.code" 
+                          <div
+                            v-for="option in modalFilteredCdcWarehouseOptions"
+                            :key="option.code"
                             class="dropdown-option"
-                            :class="{ 
+                            :class="{
                               'selected': option.code !== '__reset__' && modalSelectedCdcWarehouse.includes(option.code),
                               'reset-option': option.code === '__reset__'
-                            }" 
+                            }"
                             @click.stop="modalSelectCdcWarehouse(option.code)"
                           >
                             <span class="checkmark" v-if="option.code !== '__reset__' && modalSelectedCdcWarehouse.includes(option.code)">✓</span>
@@ -1622,9 +1625,9 @@ onUnmounted(() => {
 
                 <!-- 操作按钮 -->
                 <div class="search-buttons">
-                  <a-button @click="handleModalReset" class="reset-btn">重置</a-button>
-                  <a-button @click="fetchDetailData" class="searchinfo-btn">查询</a-button>
-                  <a-button @click="handleExport" class="searchinfo-btn" :loading="exportLoading">导出</a-button>
+                  <a-button @click="handleModalReset" class="reset-btn">{{ t('dashboard.cityLogisticsRank.reset') }}</a-button>
+                  <a-button @click="fetchDetailData" class="searchinfo-btn">{{ t('dashboard.cityLogisticsRank.query') }}</a-button>
+                  <a-button @click="handleExport" class="searchinfo-btn" :loading="exportLoading">{{ t('dashboard.cityLogisticsRank.export') }}</a-button>
                 </div>
               </div>
             </div>
@@ -1632,11 +1635,11 @@ onUnmounted(() => {
             <!-- 表格区域 -->
             <div class="table-section" ref="modalTableSectionRef" :class="{ 'score-tab': activeTab === 'score', 'reward-tab': activeTab === 'reward' }">
               <a-spin :spinning="modalLoading">
-                <a-table 
-                  :columns="activeTab === 'score' ? scoreTableColumns : rewardTableColumns" 
-                  :data-source="detailTableData" 
+                <a-table
+                  :columns="activeTab === 'score' ? scoreTableColumns : rewardTableColumns"
+                  :data-source="detailTableData"
                   :pagination="false"
-                  size="small" 
+                  size="small"
                   class="custom-table"
                   :scroll="{ x: activeTab === 'score' ? 2000 : 2400, y: modalTableScrollY }"
                 />

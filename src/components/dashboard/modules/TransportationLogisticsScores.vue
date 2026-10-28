@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch, h, nextTick } from 'vue';
+import { useI18n } from 'vue-i18n';
 import dayjs, { type Dayjs } from 'dayjs';
 import { message } from 'ant-design-vue';
 import { useSelectOptionsStore } from '../../../stores/selectOptionsStore';
 import { useDashboardDataStore } from '../../../stores/dashboardDataStore';
 import { queryTransKpiSummary, queryTransTypeList, exportTransLogisticKpiScoreSummary, exportTransLogisticKpiScoreDetail } from '../../../services/transportApi';
+
+const { t } = useI18n();
 
 const props = defineProps<{
   fromWarehouse?: string[]
@@ -47,7 +50,7 @@ const filteredLogisticProviderOptions = computed(() => {
       option.name.toLowerCase().includes(searchLower)
     );
   }
-  return [{ code: '__reset__', name: '重置' }, ...filtered];
+  return [{ code: '__reset__', name: t('dashboard.transportationLogistics.reset') }, ...filtered];
 });
 
 const filteredCdcWarehouseOptions = computed(() => {
@@ -60,7 +63,7 @@ const filteredCdcWarehouseOptions = computed(() => {
       option.name.toLowerCase().includes(searchLower)
     );
   }
-  return [{ code: '__reset__', name: '重置' }, ...filtered];
+  return [{ code: '__reset__', name: t('dashboard.transportationLogistics.reset') }, ...filtered];
 });
 
 const filteredTransTypeOptions = computed(() => {
@@ -73,7 +76,7 @@ const filteredTransTypeOptions = computed(() => {
       option.name.toLowerCase().includes(searchLower)
     );
   }
-  return [{ code: '__reset__', name: '重置' }, ...filtered];
+  return [{ code: '__reset__', name: t('dashboard.transportationLogistics.reset') }, ...filtered];
 });
 
 const isLogisticProviderOpen = ref(false);
@@ -170,7 +173,7 @@ const createKpiDetailColumn = (
       title: child.title,
       key: child.key,
       dataIndex: child.key,
-      width: child.title.includes('得分') ? 140 : (child.title.length > 12 ? 180 : 160),
+      width: child.key.endsWith('_score') ? 140 : (child.title.length > 12 ? 180 : 160),
       align: 'center' as const,
       customRender: ({ record }: { record: any }) => {
         const kpi = record.kpiData?.find((k: any) => k.kpiType === kpiType);
@@ -199,7 +202,7 @@ const createKpiDetailColumn = (
 const tableColumns = computed(() => {
   const baseColumns = [
     {
-      title: '年月',
+      title: t('dashboard.transportationLogistics.yearMonth'),
       key: 'yearMonth',
       dataIndex: 'yearMonth',
       width: 100,
@@ -209,27 +212,27 @@ const tableColumns = computed(() => {
         const textStr = text || '';
         const parts = textStr.split('-');
         if (parts.length === 2 && parts[0] && parts[1]) {
-          return `${parts[0]}年${parseInt(parts[1])}月`;
+          return `${parts[0]}${t('dashboard.transportationLogistics.year')}${parseInt(parts[1])}${t('dashboard.transportationLogistics.month')}`;
         }
         return text || '-';
       },
     },
     {
-      title: '运输方式',
+      title: t('dashboard.transportationLogistics.transType'),
       key: 'transType',
       dataIndex: 'transType',
       width: 120,
       align: 'center' as const,
     },
     {
-      title: '物流商',
+      title: t('dashboard.transportationLogistics.logisticProvider'),
       key: 'logistic',
       dataIndex: 'logistic',
       width: 120,
       align: 'center' as const,
     },
     {
-      title: 'CDC仓库',
+      title: t('dashboard.transportationLogistics.cdcWarehouse'),
       key: 'cdcWarehouse',
       dataIndex: 'cdcWarehouse',
       width: 120,
@@ -239,7 +242,7 @@ const tableColumns = computed(() => {
 
   if (showDetails.value) {
     baseColumns.push({
-      title: '得分合计',
+      title: t('dashboard.transportationLogistics.totalScore'),
       key: 'totalScore',
       dataIndex: 'totalScore',
       width: 100,
@@ -252,52 +255,52 @@ const tableColumns = computed(() => {
 
   if (showDetails.value) {
     const kpiColumns = [
-      createKpiDetailColumn('干线准时交货率', 6, [
-        { title: '交货单数量', key: 'trunk_numerator', dataKey: 'numerator' },
-        { title: '总交货单数量', key: 'trunk_denominator', dataKey: 'denominator' },
-        { title: '干线准时交货率', key: 'trunk_rate', dataKey: 'rate' },
-        { title: '得分(满分50分)', key: 'trunk_score', dataKey: 'score', maxScore: 50 },
+      createKpiDetailColumn(t('dashboard.transportationLogistics.trunkOnTimeDeliveryRate'), 6, [
+        { title: t('dashboard.transportationLogistics.deliveryOrderCount'), key: 'trunk_numerator', dataKey: 'numerator' },
+        { title: t('dashboard.transportationLogistics.totalDeliveryOrderCount'), key: 'trunk_denominator', dataKey: 'denominator' },
+        { title: t('dashboard.transportationLogistics.trunkOnTimeDeliveryRate'), key: 'trunk_rate', dataKey: 'rate' },
+        { title: t('dashboard.transportationLogistics.scoreFull50'), key: 'trunk_score', dataKey: 'score', maxScore: 50 },
       ]),
-      createKpiDetailColumn('提货及时率', 7, [
-        { title: '准时发货单数量', key: 'pickup_numerator', dataKey: 'numerator' },
-        { title: '总发货单数量', key: 'pickup_denominator', dataKey: 'denominator' },
-        { title: '提货及时率', key: 'pickup_rate', dataKey: 'rate' },
-        { title: '得分(满分10分)', key: 'pickup_score', dataKey: 'score', maxScore: 10 },
+      createKpiDetailColumn(t('dashboard.transportationLogistics.pickupTimelinessRate'), 7, [
+        { title: t('dashboard.transportationLogistics.onTimeShipmentCount'), key: 'pickup_numerator', dataKey: 'numerator' },
+        { title: t('dashboard.transportationLogistics.totalShipmentCount'), key: 'pickup_denominator', dataKey: 'denominator' },
+        { title: t('dashboard.transportationLogistics.pickupTimelinessRate'), key: 'pickup_rate', dataKey: 'rate' },
+        { title: t('dashboard.transportationLogistics.scoreFull10'), key: 'pickup_score', dataKey: 'score', maxScore: 10 },
       ]),
-      createKpiDetailColumn('干线破损率', 8, [
-        { title: '发生货损货丢的发货单数量', key: 'damage_numerator', dataKey: 'numerator' },
-        { title: '总发货单数量', key: 'damage_denominator', dataKey: 'denominator' },
-        { title: '干线破损率', key: 'damage_rate', dataKey: 'rate', decimalPlaces: 3 },
-        { title: '得分(满分10分)', key: 'damage_score', dataKey: 'score', maxScore: 10 },
+      createKpiDetailColumn(t('dashboard.transportationLogistics.trunkDamageRate'), 8, [
+        { title: t('dashboard.transportationLogistics.damagedShipmentCount'), key: 'damage_numerator', dataKey: 'numerator' },
+        { title: t('dashboard.transportationLogistics.totalShipmentCount'), key: 'damage_denominator', dataKey: 'denominator' },
+        { title: t('dashboard.transportationLogistics.trunkDamageRate'), key: 'damage_rate', dataKey: 'rate', decimalPlaces: 3 },
+        { title: t('dashboard.transportationLogistics.scoreFull10'), key: 'damage_score', dataKey: 'score', maxScore: 10 },
       ]),
-      createKpiDetailColumn('7天异常订单处理及时率', 9, [
-        { title: '异常周期内解决的订单数', key: 'abnormal_numerator', dataKey: 'numerator' },
-        { title: '总异常单数量', key: 'abnormal_denominator', dataKey: 'denominator' },
-        { title: '7天异常订单处理及时率', key: 'abnormal_rate', dataKey: 'rate' },
-        { title: '得分(满分5分)', key: 'abnormal_score', dataKey: 'score', maxScore: 10 },
+      createKpiDetailColumn(t('dashboard.transportationLogistics.abnormal7dRate'), 9, [
+        { title: t('dashboard.transportationLogistics.resolvedOrderCount'), key: 'abnormal_numerator', dataKey: 'numerator' },
+        { title: t('dashboard.transportationLogistics.totalAbnormalCount'), key: 'abnormal_denominator', dataKey: 'denominator' },
+        { title: t('dashboard.transportationLogistics.abnormal7dRate'), key: 'abnormal_rate', dataKey: 'rate' },
+        { title: t('dashboard.transportationLogistics.scoreFull5'), key: 'abnormal_score', dataKey: 'score', maxScore: 10 },
       ]),
-      createKpiDetailColumn('信息反馈及时率', 10, [
-        { title: '及时反馈发货单数量', key: 'feedback_numerator', dataKey: 'numerator' },
-        { title: '总发货单数量', key: 'feedback_denominator', dataKey: 'denominator' },
-        { title: '信息反馈及时率', key: 'feedback_rate', dataKey: 'rate' },
-        { title: '得分(满分10分)', key: 'feedback_score', dataKey: 'score', maxScore: 5 },
+      createKpiDetailColumn(t('dashboard.transportationLogistics.infoFeedbackRate'), 10, [
+        { title: t('dashboard.transportationLogistics.timelyFeedbackCount'), key: 'feedback_numerator', dataKey: 'numerator' },
+        { title: t('dashboard.transportationLogistics.totalShipmentCount'), key: 'feedback_denominator', dataKey: 'denominator' },
+        { title: t('dashboard.transportationLogistics.infoFeedbackRate'), key: 'feedback_rate', dataKey: 'rate' },
+        { title: t('dashboard.transportationLogistics.scoreFull10'), key: 'feedback_score', dataKey: 'score', maxScore: 5 },
       ]),
-      createKpiDetailColumn('返单及时率', 11, [
-        { title: '及时返单数量', key: 'return_numerator', dataKey: 'numerator' },
-        { title: '总发货单数量', key: 'return_denominator', dataKey: 'denominator' },
-        { title: '返单及时率', key: 'return_rate', dataKey: 'rate' },
-        { title: '得分(满分10分)', key: 'return_score', dataKey: 'score', maxScore: 10 },
+      createKpiDetailColumn(t('dashboard.transportationLogistics.returnOrderTimelinessRate'), 11, [
+        { title: t('dashboard.transportationLogistics.timelyReturnCount'), key: 'return_numerator', dataKey: 'numerator' },
+        { title: t('dashboard.transportationLogistics.totalShipmentCount'), key: 'return_denominator', dataKey: 'denominator' },
+        { title: t('dashboard.transportationLogistics.returnOrderTimelinessRate'), key: 'return_rate', dataKey: 'rate' },
+        { title: t('dashboard.transportationLogistics.scoreFull10'), key: 'return_score', dataKey: 'score', maxScore: 10 },
       ]),
-      createKpiDetailColumn('运作准确率', 5, [
-        { title: '运作准确率', key: 'operation_rate', dataKey: 'rate' },
-        { title: '得分(满分5分)', key: 'operation_score', dataKey: 'score', maxScore: 5 },
+      createKpiDetailColumn(t('dashboard.transportationLogistics.operationAccuracyRate'), 5, [
+        { title: t('dashboard.transportationLogistics.operationAccuracyRate'), key: 'operation_rate', dataKey: 'rate' },
+        { title: t('dashboard.transportationLogistics.scoreFull5'), key: 'operation_score', dataKey: 'score', maxScore: 5 },
       ]),
     ];
     return [...baseColumns, ...kpiColumns];
   } else {
     const kpiColumns = [
       {
-        title: '干线准时交货率',
+        title: t('dashboard.transportationLogistics.trunkOnTimeDeliveryRate'),
         key: 'trunkLineOnTimeRate',
         dataIndex: 'trunkLineOnTimeRate',
         width: 150,
@@ -310,7 +313,7 @@ const tableColumns = computed(() => {
         },
       },
       {
-        title: '提货及时率',
+        title: t('dashboard.transportationLogistics.pickupTimelinessRate'),
         key: 'pickupTimelinessRate',
         dataIndex: 'pickupTimelinessRate',
         width: 150,
@@ -323,7 +326,7 @@ const tableColumns = computed(() => {
         },
       },
       {
-        title: '干线破损率',
+        title: t('dashboard.transportationLogistics.trunkDamageRate'),
         key: 'trunkLineDamageRate',
         dataIndex: 'trunkLineDamageRate',
         width: 150,
@@ -336,7 +339,7 @@ const tableColumns = computed(() => {
         },
       },
       {
-        title: '7天异常订单处理及时率',
+        title: t('dashboard.transportationLogistics.abnormal7dRate'),
         key: 'abnormalOrderProcessingRate',
         dataIndex: 'abnormalOrderProcessingRate',
         width: 200,
@@ -349,7 +352,7 @@ const tableColumns = computed(() => {
         },
       },
       {
-        title: '信息反馈及时率',
+        title: t('dashboard.transportationLogistics.infoFeedbackRate'),
         key: 'infoFeedbackTimelinessRate',
         dataIndex: 'infoFeedbackTimelinessRate',
         width: 150,
@@ -362,7 +365,7 @@ const tableColumns = computed(() => {
         },
       },
       {
-        title: '返单及时率',
+        title: t('dashboard.transportationLogistics.returnOrderTimelinessRate'),
         key: 'returnOrderTimelinessRate',
         dataIndex: 'returnOrderTimelinessRate',
         width: 150,
@@ -375,7 +378,7 @@ const tableColumns = computed(() => {
         },
       },
       {
-        title: '运作准确率',
+        title: t('dashboard.transportationLogistics.operationAccuracyRate'),
         key: 'operationAccuracyRate',
         dataIndex: 'operationAccuracyRate',
         width: 150,
@@ -393,7 +396,7 @@ const tableColumns = computed(() => {
 });
 
 const selectedLogisticProviderText = computed(() => {
-  if (selectedLogisticProvider.value.length === 0) return '物流商';
+  if (selectedLogisticProvider.value.length === 0) return t('dashboard.transportationLogistics.logisticProvider');
   const names = selectedLogisticProvider.value.map(code => {
     const option = logisticProviderOptions.value.find(item => item.code === code);
     return option ? option.name : code;
@@ -402,7 +405,7 @@ const selectedLogisticProviderText = computed(() => {
 });
 
 const selectedCdcWarehouseText = computed(() => {
-  if (selectedCdcWarehouse.value.length === 0) return 'CDC仓库';
+  if (selectedCdcWarehouse.value.length === 0) return t('dashboard.transportationLogistics.cdcWarehouse');
   const names = selectedCdcWarehouse.value.map(code => {
     const option = cdcWarehouseOptions.value.find(item => item.code === code);
     return option ? option.name : code;
@@ -411,7 +414,7 @@ const selectedCdcWarehouseText = computed(() => {
 });
 
 const selectedTransTypeText = computed(() => {
-  if (selectedTransType.value.length === 0) return '运输方式';
+  if (selectedTransType.value.length === 0) return t('dashboard.transportationLogistics.transType');
   const names = selectedTransType.value.map(code => {
     const option = transTypeOptions.value.find(item => item.code === code);
     return option ? option.name : code;
@@ -556,12 +559,12 @@ const fetchData = async () => {
         tableData.value = [];
       }
     } else {
-      message.error(result?.msg || '获取数据失败');
+      message.error(result?.msg || t('dashboard.transportationLogistics.fetchDataFailed'));
       tableData.value = [];
     }
   } catch (error) {
-    console.error('获取数据失败:', error);
-    message.error('获取数据失败');
+    console.error('Fetch transportation logistics data failed:', error);
+    message.error(t('dashboard.transportationLogistics.fetchDataFailed'));
     tableData.value = [];
   } finally {
     loading.value = false;
@@ -624,8 +627,8 @@ const fetchTransTypeList = async () => {
         .filter((option: { code: string; name: string }) => option.code && option.name);
     }
   } catch (error) {
-    console.error('获取运输方式列表失败:', error);
-    message.error('获取运输方式列表失败');
+    console.error('Fetch transport type list failed:', error);
+    message.error(t('dashboard.transportationLogistics.fetchTransTypeFailed'));
   }
 };
 
@@ -649,11 +652,11 @@ onMounted(async () => {
 
 const handleExportSummary = async () => {
   if (!dateRange.value || !dateRange.value[0] || !dateRange.value[1]) {
-    message.warning('请选择日期范围');
+    message.warning(t('dashboard.transportationLogistics.selectDateRange'));
     return;
   }
   if (!tableData.value || tableData.value.length === 0) {
-    message.warning('没有数据可以导出');
+    message.warning(t('dashboard.transportationLogistics.noDataToExport'));
     return;
   }
   try {
@@ -672,23 +675,23 @@ const handleExportSummary = async () => {
         const link = document.createElement('a');
         link.href = result.data;
         const xlsxMatch = result.data.match(/([^/]+\.xlsx)$/);
-        const downloadFilename = xlsxMatch ? xlsxMatch[1] : `运输物流商KPI评分汇总_${dateRange.value[0].format('YYYY-MM')}_${dateRange.value[1].format('YYYY-MM')}.xlsx`;
+        const downloadFilename = xlsxMatch ? xlsxMatch[1] : `${t('dashboard.transportationLogistics.exportSummaryFilename')}_${dateRange.value[0].format('YYYY-MM')}_${dateRange.value[1].format('YYYY-MM')}.xlsx`;
         link.download = downloadFilename;
         link.target = '_blank';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        message.success('导出汇总成功');
+        message.success(t('dashboard.transportationLogistics.exportSummarySuccess'));
       }
     } else {
-      message.error(result?.message || '导出汇总失败');
+      message.error(result?.message || t('dashboard.transportationLogistics.exportSummaryFailed'));
     }
   } catch (error: any) {
     const errCode = error?.code || error?.response?.status;
     if (errCode === 409 || errCode === 504 || errCode === 505) {
-      message.error(error.msg || '导出数据量过大，请缩小查询范围');
+      message.error(error.msg || t('dashboard.transportationLogistics.exportDataTooLarge'));
     } else {
-      message.error(error.msg || '导出汇总失败');
+      message.error(error.msg || t('dashboard.transportationLogistics.exportSummaryFailed'));
     }
   } finally {
     exportSummaryLoading.value = false;
@@ -697,11 +700,11 @@ const handleExportSummary = async () => {
 
 const handleExportDetail = async () => {
   if (!dateRange.value || !dateRange.value[0] || !dateRange.value[1]) {
-    message.warning('请选择日期范围');
+    message.warning(t('dashboard.transportationLogistics.selectDateRange'));
     return;
   }
   if (!tableData.value || tableData.value.length === 0) {
-    message.warning('没有数据可以导出');
+    message.warning(t('dashboard.transportationLogistics.noDataToExport'));
     return;
   }
   try {
@@ -720,23 +723,23 @@ const handleExportDetail = async () => {
         const link = document.createElement('a');
         link.href = result.data;
         const xlsxMatch = result.data.match(/([^/]+\.xlsx)$/);
-        const downloadFilename = xlsxMatch ? xlsxMatch[1] : `运输物流商KPI评分明细_${dateRange.value[0].format('YYYY-MM')}_${dateRange.value[1].format('YYYY-MM')}.xlsx`;
+        const downloadFilename = xlsxMatch ? xlsxMatch[1] : `${t('dashboard.transportationLogistics.exportDetailFilename')}_${dateRange.value[0].format('YYYY-MM')}_${dateRange.value[1].format('YYYY-MM')}.xlsx`;
         link.download = downloadFilename;
         link.target = '_blank';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        message.success('导出明细成功');
+        message.success(t('dashboard.transportationLogistics.exportDetailSuccess'));
       }
     } else {
-      message.error(result?.message || '导出明细失败');
+      message.error(result?.message || t('dashboard.transportationLogistics.exportDetailFailed'));
     }
   } catch (error: any) {
     const errCode = error?.code || error?.response?.status;
     if (errCode === 409 || errCode === 504 || errCode === 505) {
-      message.error(error.msg || '导出数据量过大，请缩小查询范围');
+      message.error(error.msg || t('dashboard.transportationLogistics.exportDataTooLarge'));
     } else {
-      message.error(error.msg || '导出明细失败');
+      message.error(error.msg || t('dashboard.transportationLogistics.exportDetailFailed'));
     }
   } finally {
     exportDetailLoading.value = false;
@@ -755,7 +758,7 @@ onUnmounted(() => {
 <template>
   <div class="rank-container">
     <div class="header-bar">
-      <h2 class="header-title">运输物流商KPI评分</h2>
+      <h2 class="header-title">{{ t('dashboard.transportationLogistics.title') }}</h2>
     </div>
     <div class="control-panel">
       <div class="filter-group">
@@ -764,8 +767,8 @@ onUnmounted(() => {
             v-model:value="dateRange"
             picker="month"
             format="YYYY-MM"
-            separator="至"
-            :placeholder="['开始月份', '结束月份']"
+            :separator="t('dashboard.transportationLogistics.dateSeparator')"
+            :placeholder="[t('dashboard.transportationLogistics.startMonth'), t('dashboard.transportationLogistics.endMonth')]"
             class="date-range-picker"
           />
         </div>
@@ -780,7 +783,7 @@ onUnmounted(() => {
               <input 
                 v-model="logisticProviderSearch" 
                 type="text" 
-                placeholder="搜索物流商..." 
+                :placeholder="t('dashboard.transportationLogistics.searchLogisticProvider')" 
                 class="search-input"
                 @click.stop 
               />
@@ -800,7 +803,7 @@ onUnmounted(() => {
                 {{ option.name }}
               </div>
               <div v-if="filteredLogisticProviderOptions.length === 1 && logisticProviderSearch" class="no-results">
-                暂无搜索结果
+                {{ t('dashboard.transportationLogistics.noSearchResults') }}
               </div>
             </div>
           </div>
@@ -816,7 +819,7 @@ onUnmounted(() => {
               <input 
                 v-model="cdcWarehouseSearch" 
                 type="text" 
-                placeholder="搜索CDC仓库..." 
+                :placeholder="t('dashboard.transportationLogistics.searchCdcWarehouse')" 
                 class="search-input"
                 @click.stop 
               />
@@ -836,7 +839,7 @@ onUnmounted(() => {
                 {{ option.name }}
               </div>
               <div v-if="filteredCdcWarehouseOptions.length === 1 && cdcWarehouseSearch" class="no-results">
-                暂无搜索结果
+                {{ t('dashboard.transportationLogistics.noSearchResults') }}
               </div>
             </div>
           </div>
@@ -852,7 +855,7 @@ onUnmounted(() => {
               <input 
                 v-model="transTypeSearch" 
                 type="text" 
-                placeholder="搜索运输方式..." 
+                :placeholder="t('dashboard.transportationLogistics.searchTransType')" 
                 class="search-input"
                 @click.stop 
               />
@@ -872,14 +875,14 @@ onUnmounted(() => {
                 {{ option.name }}
               </div>
               <div v-if="filteredTransTypeOptions.length === 1 && transTypeSearch" class="no-results">
-                暂无搜索结果
+                {{ t('dashboard.transportationLogistics.noSearchResults') }}
               </div>
             </div>
           </div>
         </div>
 
         <div class="switch-item">
-          <span class="switch-label">显示详情</span>
+          <span class="switch-label">{{ t('dashboard.transportationLogistics.showDetails') }}</span>
           <a-switch v-model:checked="showDetails" />
         </div>
 
@@ -887,10 +890,10 @@ onUnmounted(() => {
       
       <div class="action-buttons">
         <a-button @click="handleExportSummary" class="action-btn" :loading="exportSummaryLoading">
-          导出汇总
+          {{ t('dashboard.transportationLogistics.exportSummary') }}
         </a-button>
         <a-button @click="handleExportDetail" class="action-btn" :loading="exportDetailLoading">
-          导出明细
+          {{ t('dashboard.transportationLogistics.exportDetail') }}
         </a-button>
       </div>
     </div>

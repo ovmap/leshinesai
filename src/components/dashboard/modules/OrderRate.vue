@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import dayjs from 'dayjs'
 import { message } from 'ant-design-vue'
 import { queryConfirmInTimeRate, exportConfirmInTimeRate, queryLogisticList } from '../../../services/transportApi'
 import { useGlobalFilterStore } from '../../../stores/globalFilterStore'
 import { useDashboardDataStore } from '../../../stores/dashboardDataStore'
 
+const { t } = useI18n()
 const globalFilterStore = useGlobalFilterStore()
 const dataStore = useDashboardDataStore()
 
@@ -50,12 +52,12 @@ const filteredLogisticOptions = computed(() => {
     option.label.toLowerCase().includes(logisticSearch.value.toLowerCase()),
   )
   // 在列表开头添加重置选项
-  return [{ value: '__reset__', label: '重置' }, ...filtered]
+  return [{ value: '__reset__', label: t('dashboard.orderRate.buttons.reset') }, ...filtered]
 })
 
 // 显示文本
 const selectedLogisticText = computed(() => {
-  if (!selectedLogistic.value || selectedLogistic.value.length === 0) return '物流商'
+  if (!selectedLogistic.value || selectedLogistic.value.length === 0) return t('dashboard.orderRate.filters.logisticName')
 
   const selectedLabels = selectedLogistic.value
     .map(value => {
@@ -64,9 +66,9 @@ const selectedLogisticText = computed(() => {
     })
     .filter(label => label)
 
-  if (selectedLabels.length === 0) return '物流商'
+  if (selectedLabels.length === 0) return t('dashboard.orderRate.filters.logisticName')
   if (selectedLabels.length === 1) return selectedLabels[0]
-  return `已选择${selectedLabels.length}个`
+  return t('dashboard.orderRate.filters.selectedCount', { count: selectedLabels.length })
 })
 
 // 下拉框开关方法
@@ -117,7 +119,7 @@ const fetchLogisticList = async () => {
         }))
     }
   } catch (error) {
-    console.error('加载物流商列表失败:', error)
+    console.error('Failed to fetch logistic list:', error)
   }
 }
 
@@ -172,7 +174,7 @@ const loadData = async () => {
       tableData.value = []
     }
   } catch (error) {
-    console.error('加载返单及时率数据失败:', error)
+    console.error('Failed to fetch order rate data:', error)
     tableData.value = []
   } finally {
     loading.value = false
@@ -199,7 +201,7 @@ watch(
 // 导出数据
 const handleExport = async () => {
   if (!dateRange.value || !dateRange.value[0] || !dateRange.value[1]) {
-    message.warning('请选择日期范围')
+    message.warning(t('dashboard.orderRate.messages.selectDateRange'))
     return
   }
 
@@ -241,28 +243,28 @@ const handleExport = async () => {
         const link = document.createElement('a')
         link.href = result.data
         const xlsxMatch = result.data.match(/([^/]+\.xlsx)$/)
-        const downloadFilename = xlsxMatch ? xlsxMatch[1] : `返单及时率导出汇总_${dateRange.value[0].format('YYYY-MM')}_${dateRange.value[1].format('YYYY-MM')}.xlsx`
+        const downloadFilename = xlsxMatch ? xlsxMatch[1] : t('dashboard.orderRate.messages.exportFileName', { start: dateRange.value[0].format('YYYY-MM'), end: dateRange.value[1].format('YYYY-MM') })
 
         link.download = downloadFilename
         link.target = '_blank'
         document.body.appendChild(link)
         link.click()
         document.body.removeChild(link)
-        message.success('导出汇总成功')
+        message.success(t('dashboard.orderRate.messages.exportSuccess'))
       }
     } else {
-      console.error('导出汇总失败:', result?.message || '未知错误')
-      message.error(result?.message || '导出汇总失败')
+      console.error('Export summary failed:', result?.message || 'Unknown error')
+      message.error(result?.message || t('dashboard.orderRate.messages.exportFailed'))
     }
   } catch (error: any) {
-    console.error('导出汇总失败:', error)
+    console.error('Export summary failed:', error)
 
     // 检查是否是409或504状态码
     const errCode = error?.code || error?.response?.status
     if (errCode === 409 || errCode === 504 || errCode === 505) {
-      message.error(error.msg || '导出数据量过大，请缩小查询范围')
+      message.error(error.msg || t('dashboard.orderRate.messages.exportDataTooLarge'))
     } else {
-      message.error(error.msg || '导出汇总失败')
+      message.error(error.msg || t('dashboard.orderRate.messages.exportFailed'))
     }
   } finally {
     exportLoading.value = false
@@ -292,7 +294,7 @@ onUnmounted(() => {
   <div class="order-rate-container">
     <!-- 标题栏 -->
     <div class="header-bar">
-      <h2 class="header-title">返单及时率</h2>
+      <h2 class="header-title">{{ t('dashboard.orderRate.title') }}</h2>
     </div>
 
     <!-- 筛选器和操作按钮 -->
@@ -303,7 +305,7 @@ onUnmounted(() => {
           <a-range-picker
             v-model:value="dateRange"
             format="YYYY-MM-DD"
-            separator="至"
+            :separator="t('dashboard.orderRate.dateRange.separator')"
             class="date-range-picker"
             :show-time="false"
           />
@@ -318,7 +320,7 @@ onUnmounted(() => {
             </svg>
             <div class="dropdown-content" v-show="isLogisticOpen && logisticOptions?.length" @click.stop>
               <div class="search-box">
-                <input v-model="logisticSearch" type="text" placeholder="搜索物流商..." class="search-input"
+                <input v-model="logisticSearch" type="text" :placeholder="t('dashboard.orderRate.placeholders.searchLogistic')" class="search-input"
                   @click.stop />
               </div>
               <div class="options-list">
@@ -328,7 +330,7 @@ onUnmounted(() => {
                   {{ option.label }}
                 </div>
                 <div v-if="filteredLogisticOptions.length === 1 && logisticSearch" class="no-results">
-                  无搜索结果
+                  {{ t('dashboard.orderRate.messages.noSearchResults') }}
                 </div>
               </div>
             </div>
@@ -339,10 +341,10 @@ onUnmounted(() => {
       <!-- 操作按钮 -->
       <div class="action-buttons">
         <button class="action-btn search-btn" @click="loadData" :disabled="loading">
-          {{ loading ? '搜索中...' : '搜索' }}
+          {{ loading ? t('dashboard.orderRate.buttons.searching') : t('dashboard.orderRate.buttons.search') }}
         </button>
         <button class="action-btn" @click="handleExport" :disabled="exportLoading">
-          {{ exportLoading ? '导出中...' : '导出' }}
+          {{ exportLoading ? t('dashboard.orderRate.buttons.exporting') : t('dashboard.orderRate.buttons.export') }}
         </button>
       </div>
     </div>
@@ -358,13 +360,13 @@ onUnmounted(() => {
         <table v-if="tableData.length > 0" class="data-table">
           <thead>
             <tr>
-              <th>仓库</th>
-              <th>物流商</th>
-              <th>年份</th>
-              <th>月份</th>
-              <th>返单总数</th>
-              <th>不及时订单数</th>
-              <th>返单及时率</th>
+              <th>{{ t('dashboard.orderRate.tableColumns.warehouse') }}</th>
+              <th>{{ t('dashboard.orderRate.tableColumns.logisticName') }}</th>
+              <th>{{ t('dashboard.orderRate.tableColumns.year') }}</th>
+              <th>{{ t('dashboard.orderRate.tableColumns.month') }}</th>
+              <th>{{ t('dashboard.orderRate.tableColumns.confirmTotal') }}</th>
+              <th>{{ t('dashboard.orderRate.tableColumns.nonCompliantOrderCount') }}</th>
+              <th>{{ t('dashboard.orderRate.tableColumns.confirmInTimeRate') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -381,8 +383,8 @@ onUnmounted(() => {
         </table>
 
         <div v-else class="no-data-container">
-          <div class="no-data-text">暂无数据</div>
-          <div class="no-data-desc">请调整筛选条件后重试</div>
+          <div class="no-data-text">{{ t('dashboard.orderRate.messages.noData') }}</div>
+          <div class="no-data-desc">{{ t('dashboard.orderRate.messages.noDataDesc') }}</div>
         </div>
       </div>
     </div>

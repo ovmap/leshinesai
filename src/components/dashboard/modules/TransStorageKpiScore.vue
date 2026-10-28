@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue';
+import { useI18n } from 'vue-i18n';
 import dayjs, { type Dayjs } from 'dayjs';
 import { message } from 'ant-design-vue';
 import { useDashboardDataStore } from '../../../stores/dashboardDataStore';
 import { queryTransStorageKpiScore, exportTransStorageKpiScore, queryAssessmentUnit } from '../../../services/transportApi';
+
+const { t } = useI18n();
 
 const props = defineProps<{
   fromWarehouse?: string[]
@@ -23,9 +26,9 @@ const selectedAssessUnit = ref<string[]>([]);
 const selectedCustomer = ref<string[]>([]);
 
 // 下拉框选项
-const customerOptions = ref<Array<{ code: string; name: string }>>([
-  { code: 'storage', name: '仓储运输多业务-仓储' },
-  { code: 'transport', name: '仓储运输多业务-运输' },
+const customerOptions = computed<Array<{ code: string; name: string }>>(() => [
+  { code: 'storage', name: t('dashboard.transStorageKpi.customerOptionStorage') },
+  { code: 'transport', name: t('dashboard.transStorageKpi.customerOptionTransport') },
 ]);
 const assessUnitOptions = ref<Array<{ code: string; name: string }>>([]);
 
@@ -46,7 +49,7 @@ const filteredAssessUnitOptions = computed(() => {
     );
   }
   
-  return [{ code: '__reset__', name: '重置' }, ...filtered];
+  return [{ code: '__reset__', name: t('dashboard.transStorageKpi.reset') }, ...filtered];
 });
 
 // 过滤后的业务分类选项（包含重置选项）
@@ -62,7 +65,7 @@ const filteredCustomerOptions = computed(() => {
     );
   }
   
-  return [{ code: '__reset__', name: '重置' }, ...filtered];
+  return [{ code: '__reset__', name: t('dashboard.transStorageKpi.reset') }, ...filtered];
 });
 
 // 下拉框开关状态
@@ -107,7 +110,7 @@ const truncateText = (items: string[], maxLength: number) => {
 
 // 显示文本
 const selectedAssessUnitText = computed(() => {
-  if (selectedAssessUnit.value.length === 0) return '考核单元';
+  if (selectedAssessUnit.value.length === 0) return t('dashboard.transStorageKpi.assessUnit');
   const selectedLabels = selectedAssessUnit.value.map(code => {
     const option = assessUnitOptions.value.find(item => item.code === code);
     return option ? option.name : code;
@@ -123,11 +126,11 @@ const fullAssessUnitText = computed(() =>
           return option ? option.name : code;
         })
         .join(', ')
-    : '考核单元',
+    : t('dashboard.transStorageKpi.assessUnit'),
 );
 
 const selectedCustomerText = computed(() => {
-  if (selectedCustomer.value.length === 0) return '业务分类';
+  if (selectedCustomer.value.length === 0) return t('dashboard.transStorageKpi.bizType');
   const selectedLabels = selectedCustomer.value.map(code => {
     const option = customerOptions.value.find(item => item.code === code);
     return option ? option.name : code;
@@ -143,7 +146,7 @@ const fullCustomerText = computed(() =>
           return option ? option.name : code;
         })
         .join(', ')
-    : '业务分类',
+    : t('dashboard.transStorageKpi.bizType'),
 );
 
 // 下拉框切换
@@ -212,7 +215,7 @@ const selectCustomer = (code: string) => {
 // 表格列定义
 const tableColumns = computed(() => [
   {
-    title: '年月',
+    title: t('dashboard.transStorageKpi.colMonth'),
     key: 'month',
     dataIndex: 'month',
     width: 100,
@@ -222,46 +225,46 @@ const tableColumns = computed(() => [
       if (text.length === 6) {
         const year = text.substring(0, 4);
         const month = parseInt(text.substring(4, 6));
-        return `${year}年${month}月`;
+        return t('dashboard.transStorageKpi.yearMonthFormat', [year, month]);
       } else if (text.includes('-')) {
         const parts = text.split('-');
         if (parts.length === 2 && parts[0] && parts[1]) {
-          return `${parts[0]}年${parseInt(parts[1])}月`;
+          return t('dashboard.transStorageKpi.yearMonthFormat', [parts[0], parseInt(parts[1])]);
         }
       }
       return text;
     },
   },
   {
-    title: '业务分类',
+    title: t('dashboard.transStorageKpi.bizType'),
     key: 'bizType',
     dataIndex: 'bizType',
     width: 120,
     align: 'center' as const,
   },
   {
-    title: '考核单元',
+    title: t('dashboard.transStorageKpi.assessUnit'),
     key: 'assessUnit',
     dataIndex: 'assessUnit',
     width: 120,
     align: 'center' as const,
   },
   {
-    title: '物流商',
+    title: t('dashboard.transStorageKpi.logistic'),
     key: 'logistic',
     dataIndex: 'logistic',
     width: 120,
     align: 'center' as const,
   },
   {
-    title: '考核项目',
+    title: t('dashboard.transStorageKpi.assessProject'),
     key: 'assessProject',
     dataIndex: 'assessProject',
     width: 150,
     align: 'center' as const,
   },
   {
-    title: '权重',
+    title: t('dashboard.transStorageKpi.weight'),
     key: 'weight',
     dataIndex: 'weight',
     width: 100,
@@ -271,7 +274,7 @@ const tableColumns = computed(() => [
     },
   },
   {
-    title: '项目得分',
+    title: t('dashboard.transStorageKpi.projectScore'),
     key: 'projectScore',
     dataIndex: 'projectScore',
     width: 120,
@@ -282,7 +285,7 @@ const tableColumns = computed(() => [
     },
   },
   {
-    title: '最终得分',
+    title: t('dashboard.transStorageKpi.finalScore'),
     key: 'finalScore',
     dataIndex: 'finalScore',
     width: 120,
@@ -363,12 +366,12 @@ const fetchData = async () => {
         tableData.value = [];
       }
     } else {
-      message.error(result?.msg || '获取数据失败');
+      message.error(result?.msg || t('dashboard.transStorageKpi.fetchDataFailed'));
       tableData.value = [];
     }
   } catch (error) {
-    console.error('获取数据失败:', error);
-    message.error('获取数据失败');
+    console.error(t('dashboard.transStorageKpi.fetchDataFailed') + ':', error);
+    message.error(t('dashboard.transStorageKpi.fetchDataFailed'));
     tableData.value = [];
   } finally {
     loading.value = false;
@@ -411,12 +414,12 @@ const handleClickOutside = (event: Event) => {
 // 导出数据
 const handleExport = async () => {
   if (!selectedMonth.value) {
-    message.warning('请先选择月份');
+    message.warning(t('dashboard.transStorageKpi.selectMonthFirst'));
     return;
   }
 
   if (!tableData.value || tableData.value.length === 0) {
-    message.warning('没有数据可以导出');
+    message.warning(t('dashboard.transStorageKpi.noDataToExport'));
     return;
   }
 
@@ -454,13 +457,13 @@ const handleExport = async () => {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      message.success('导出成功');
+      message.success(t('dashboard.transStorageKpi.exportSuccess'));
     } else {
-      message.error(result?.msg || '导出失败');
+      message.error(result?.msg || t('dashboard.transStorageKpi.exportFailed'));
     }
   } catch (error: any) {
-    console.error('导出失败:', error);
-    message.error(error?.msg || '导出失败');
+    console.error(t('dashboard.transStorageKpi.exportFailed') + ':', error);
+    message.error(error?.msg || t('dashboard.transStorageKpi.exportFailed'));
   } finally {
     exportLoading.value = false;
   }
@@ -479,7 +482,7 @@ const fetchAssessUnitOptions = async () => {
       }
     }
   } catch (error) {
-    console.error('获取考核单元列表失败:', error);
+    console.error(t('dashboard.transStorageKpi.fetchAssessUnitFailed') + ':', error);
     assessUnitOptions.value = [];
   }
 };
@@ -518,7 +521,7 @@ onUnmounted(() => {
 <template>
   <div class="kpi-score-container">
     <div class="header-bar">
-      <h2 class="header-title">运输仓储多业务KPI评分</h2>
+      <h2 class="header-title">{{ t('dashboard.transStorageKpi.title') }}</h2>
     </div>
     <!-- 控制面板 -->
     <div class="control-panel">
@@ -529,7 +532,7 @@ onUnmounted(() => {
             v-model:value="selectedMonth"
             picker="month"
             format="YYYY-MM"
-            placeholder="请选择月份"
+            :placeholder="t('dashboard.transStorageKpi.selectMonth')"
             class="month-picker"
           />
         </div>
@@ -545,7 +548,7 @@ onUnmounted(() => {
               <input 
                 v-model="customerSearch" 
                 type="text" 
-                placeholder="搜索业务分类..." 
+                :placeholder="t('dashboard.transStorageKpi.searchBizType')" 
                 class="search-input"
                 @click.stop 
               />
@@ -565,7 +568,7 @@ onUnmounted(() => {
                 {{ option.name }}
               </div>
               <div v-if="filteredCustomerOptions.length === 1 && customerSearch" class="no-results">
-                暂无搜索结果
+                {{ t('dashboard.transStorageKpi.noSearchResults') }}
               </div>
             </div>
           </div>
@@ -582,7 +585,7 @@ onUnmounted(() => {
               <input 
                 v-model="assessUnitSearch" 
                 type="text" 
-                placeholder="搜索考核单元..." 
+                :placeholder="t('dashboard.transStorageKpi.searchAssessUnit')" 
                 class="search-input"
                 @click.stop 
               />
@@ -602,7 +605,7 @@ onUnmounted(() => {
                 {{ option.name }}
               </div>
               <div v-if="filteredAssessUnitOptions.length === 1 && assessUnitSearch" class="no-results">
-                暂无搜索结果
+                {{ t('dashboard.transStorageKpi.noSearchResults') }}
               </div>
             </div>
           </div>
@@ -612,7 +615,7 @@ onUnmounted(() => {
       <!-- 操作按钮组 -->
       <div class="action-buttons">
         <a-button @click="handleExport" class="action-btn" :loading="exportLoading">
-          导出
+          {{ t('dashboard.transStorageKpi.export') }}
         </a-button>
       </div>
     </div>

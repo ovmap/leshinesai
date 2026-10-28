@@ -1,9 +1,13 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { queryOnTimeRateCard } from '../../../services/transportApi'
 import { useDashboardDataStore } from '../../../stores/dashboardDataStore'
 
+const { t } = useI18n()
 const dataStore = useDashboardDataStore()
+
+const title = computed(() => t('dashboard.endToEnd.title'))
 
 const props = defineProps<{
   fromWarehouse?: string[]
@@ -63,7 +67,7 @@ const fetchData = async () => {
       rateValue.value = '0%'
     }
   } catch (error) {
-    console.error('获取端对端准时交付率失败:', error)
+    console.error(t('dashboard.endToEnd.messages.fetchDataFailed'), error)
     rateValue.value = '0%'
   } finally {
     loading.value = false
@@ -87,7 +91,7 @@ onMounted(() => {
   <div class="cargo-volume-container">
     <div class="static-card">
       <div class="card-content-carouselCard">
-        <div class="card-title">准时交付率</div>
+        <div class="card-title">{{ title }}</div>
         <div class="card-main-content">
           <div class="card-value-unit">
             <span class="card-value green">{{ loading ? '...' : rateValue }}</span>

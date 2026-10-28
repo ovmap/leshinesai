@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch, nextTick, Teleport } from 'vue';
+import { useI18n } from 'vue-i18n';
 import dayjs, { type Dayjs } from 'dayjs';
 import { message } from 'ant-design-vue';
 import { useSelectOptionsStore } from '../../../stores/selectOptionsStore';
@@ -12,6 +13,8 @@ import {
   exportToBLogisticKpiRankScoreDetail,
   exportToBLogisticKpiRankPunishDetail
 } from '../../../services/transportApi';
+
+const { t } = useI18n();
 
 const props = defineProps<{
   fromWarehouse?: string[]
@@ -51,7 +54,7 @@ const filteredLogisticProviderOptions = computed(() => {
       option.name.toLowerCase().includes(searchLower)
     );
   }
-  return [{ code: '__reset__', name: '重置' }, ...filtered];
+  return [{ code: '__reset__', name: t('dashboard.tobWarehousingRank.filters.reset') }, ...filtered];
 });
 
 const filteredCdcWarehouseOptions = computed(() => {
@@ -64,7 +67,7 @@ const filteredCdcWarehouseOptions = computed(() => {
       option.name.toLowerCase().includes(searchLower)
     );
   }
-  return [{ code: '__reset__', name: '重置' }, ...filtered];
+  return [{ code: '__reset__', name: t('dashboard.tobWarehousingRank.filters.reset') }, ...filtered];
 });
 
 const isLogisticProviderOpen = ref(false);
@@ -74,7 +77,7 @@ const tableData = ref<any[]>([]);
 const loading = ref(false);
 
 const modalVisible = ref(false);
-const modalTitle = ref('PFP-仓库-ToB物流商KPI排名详情');
+const modalTitle = computed(() => t('dashboard.tobWarehousingRank.modalTitles.detail'));
 const activeTab = ref<'score' | 'reward'>('score');
 const modalLoading = ref(false);
 const exportLoading = ref(false);
@@ -100,7 +103,7 @@ const modalTableSectionRef = ref<HTMLElement | null>(null);
 const modalTableScrollY = ref<number | undefined>(200);
 
 const selectedLogisticProviderText = computed(() => {
-  if (selectedLogisticProvider.value.length === 0) return '物流商';
+  if (selectedLogisticProvider.value.length === 0) return t('dashboard.tobWarehousingRank.filters.logisticProvider');
   const names = selectedLogisticProvider.value.map(code => {
     const option = logisticProviderOptions.value.find(item => item.code === code);
     return option ? option.name : code;
@@ -109,7 +112,7 @@ const selectedLogisticProviderText = computed(() => {
 });
 
 const selectedCdcWarehouseText = computed(() => {
-  if (selectedCdcWarehouse.value.length === 0) return 'CDC仓库';
+  if (selectedCdcWarehouse.value.length === 0) return t('dashboard.tobWarehousingRank.filters.cdcWarehouse');
   const names = selectedCdcWarehouse.value.map(code => {
     const option = cdcWarehouseOptions.value.find(item => item.code === code);
     return option ? option.name : code;
@@ -180,8 +183,8 @@ const monthList = ref<string[]>([]);
 
 const tableColumns = computed(() => {
   const baseColumns = [
-    { title: '物流商', key: 'logistic', dataIndex: 'logistic', width: 120, align: 'center' as const },
-    { title: '仓库', key: 'warehouse', dataIndex: 'warehouse', width: 120, align: 'center' as const },
+    { title: t('dashboard.tobWarehousingRank.tableColumns.logistic'), key: 'logistic', dataIndex: 'logistic', width: 120, align: 'center' as const },
+    { title: t('dashboard.tobWarehousingRank.tableColumns.warehouse'), key: 'warehouse', dataIndex: 'warehouse', width: 120, align: 'center' as const },
   ];
 
   const monthColumns: any[] = [];
@@ -190,9 +193,10 @@ const tableColumns = computed(() => {
   sortedMonths.forEach((month) => {
     let monthLabel: string;
     if (month === '0000-00' || !month || month.startsWith('0000')) {
-      monthLabel = '0000年00月';
+      monthLabel = t('dashboard.tobWarehousingRank.dateRange.invalidMonth');
     } else {
-      monthLabel = dayjs(month).format('YYYY年M月');
+      const d = dayjs(month);
+      monthLabel = t('dashboard.tobWarehousingRank.dateRange.yearMonth', { year: d.format('YYYY'), month: d.format('M') });
     }
 
     monthColumns.push({
@@ -200,8 +204,8 @@ const tableColumns = computed(() => {
       key: `month_${month}_performance`,
       align: 'center' as const,
       children: [
-        { title: '排名', key: `${month}_rank`, dataIndex: `${month}_rank`, width: 80, align: 'center' as const },
-        { title: '总成绩', key: `${month}_totalScore`, dataIndex: `${month}_totalScore`, width: 100, align: 'center' as const },
+        { title: t('dashboard.tobWarehousingRank.tableColumns.rank'), key: `${month}_rank`, dataIndex: `${month}_rank`, width: 80, align: 'center' as const },
+        { title: t('dashboard.tobWarehousingRank.tableColumns.totalScore'), key: `${month}_totalScore`, dataIndex: `${month}_totalScore`, width: 100, align: 'center' as const },
       ],
     });
   });
@@ -209,9 +213,10 @@ const tableColumns = computed(() => {
   sortedMonths.forEach((month) => {
     let monthLabel: string;
     if (month === '0000-00' || !month || month.startsWith('0000')) {
-      monthLabel = '0000年00月';
+      monthLabel = t('dashboard.tobWarehousingRank.dateRange.invalidMonth');
     } else {
-      monthLabel = dayjs(month).format('YYYY年M月');
+      const d = dayjs(month);
+      monthLabel = t('dashboard.tobWarehousingRank.dateRange.yearMonth', { year: d.format('YYYY'), month: d.format('M') });
     }
 
     monthColumns.push({
@@ -220,26 +225,26 @@ const tableColumns = computed(() => {
       align: 'center' as const,
       children: [
         {
-          title: '是否进行奖励',
+          title: t('dashboard.tobWarehousingRank.tableColumns.hasReward'),
           key: `${month}_hasReward`,
           dataIndex: `${month}_hasReward`,
           width: 120,
           align: 'center' as const,
           customRender: ({ text }: { text: boolean | null }) => {
-            if (text === true) return '是';
-            if (text === false) return '否';
+            if (text === true) return t('dashboard.tobWarehousingRank.common.yes');
+            if (text === false) return t('dashboard.tobWarehousingRank.common.no');
             return '-';
           },
         },
         {
-          title: '红线/重大/严重问题',
+          title: t('dashboard.tobWarehousingRank.tableColumns.redLineMajorSerious'),
           key: `${month}_hasPunish`,
           dataIndex: `${month}_hasPunish`,
           width: 150,
           align: 'center' as const,
           customRender: ({ text }: { text: boolean | null }) => {
-            if (text === true) return '是';
-            if (text === false) return '否';
+            if (text === true) return t('dashboard.tobWarehousingRank.common.yes');
+            if (text === false) return t('dashboard.tobWarehousingRank.common.no');
             return '-';
           },
         },
@@ -308,13 +313,13 @@ const fetchRankData = async () => {
         monthList.value = [];
       }
     } else {
-      message.error(result?.msg || '获取数据失败');
+      message.error(result?.msg || t('dashboard.tobWarehousingRank.messages.fetchDataFailed'));
       tableData.value = [];
       monthList.value = [];
     }
   } catch (error) {
-    console.error('获取排名数据失败:', error);
-    message.error('获取数据失败');
+    console.error('tobWarehousingRank fetchRankData:', error);
+    message.error(t('dashboard.tobWarehousingRank.messages.fetchDataFailed'));
     tableData.value = [];
   } finally {
     loading.value = false;
@@ -467,7 +472,7 @@ const fetchDetailData = async () => {
           detailTableData.value = [];
         }
       } else {
-        message.error(result?.msg || '获取得分详情数据失败');
+        message.error(result?.msg || t('dashboard.tobWarehousingRank.messages.fetchScoreDetailFailed'));
         scoreTableData.value = [];
         detailTableData.value = [];
       }
@@ -497,7 +502,7 @@ const fetchDetailData = async () => {
               avgMonthlyShipVolume: item.avgMonthlyShipVolume !== undefined ? item.avgMonthlyShipVolume : null,
               standardBreachAmount: item.standardBreachAmount !== undefined ? item.standardBreachAmount : null,
               breachCoefficient: item.breachCoefficient || '-',
-              hasReward: item.hasReward !== undefined ? (item.hasReward ? '是' : '否') : '-',
+              hasReward: item.hasReward !== undefined ? (item.hasReward ? t('dashboard.tobWarehousingRank.common.yes') : t('dashboard.tobWarehousingRank.common.no')) : '-',
             });
           });
           rewardTableData.value = rewardData;
@@ -507,15 +512,15 @@ const fetchDetailData = async () => {
           detailTableData.value = [];
         }
       } else {
-        message.error(result?.msg || '获取奖惩详情数据失败');
+        message.error(result?.msg || t('dashboard.tobWarehousingRank.messages.fetchRewardDetailFailed'));
         rewardTableData.value = [];
         detailTableData.value = [];
       }
     }
   } catch (error) {
     if (isStale()) return;
-    console.error('获取详情数据失败:', error);
-    message.error('获取详情数据失败');
+    console.error('tobWarehousingRank fetchDetailData:', error);
+    message.error(t('dashboard.tobWarehousingRank.messages.fetchDetailFailed'));
     scoreTableData.value = [];
     rewardTableData.value = [];
     detailTableData.value = [];
@@ -536,7 +541,7 @@ const modalFilteredLogisticProviderOptions = computed(() => {
       option.name.toLowerCase().includes(searchLower)
     );
   }
-  return [{ code: '__reset__', name: '重置' }, ...filtered];
+  return [{ code: '__reset__', name: t('dashboard.tobWarehousingRank.filters.reset') }, ...filtered];
 });
 
 const modalFilteredCdcWarehouseOptions = computed(() => {
@@ -549,11 +554,11 @@ const modalFilteredCdcWarehouseOptions = computed(() => {
       option.name.toLowerCase().includes(searchLower)
     );
   }
-  return [{ code: '__reset__', name: '重置' }, ...filtered];
+  return [{ code: '__reset__', name: t('dashboard.tobWarehousingRank.filters.reset') }, ...filtered];
 });
 
 const modalSelectedLogisticProviderText = computed(() => {
-  if (modalSelectedLogisticProvider.value.length === 0) return '物流商';
+  if (modalSelectedLogisticProvider.value.length === 0) return t('dashboard.tobWarehousingRank.filters.logisticProvider');
   const names = modalSelectedLogisticProvider.value.map(code => {
     const option = logisticProviderOptions.value.find(item => item.code === code);
     return option ? option.name : code;
@@ -562,7 +567,7 @@ const modalSelectedLogisticProviderText = computed(() => {
 });
 
 const modalSelectedCdcWarehouseText = computed(() => {
-  if (modalSelectedCdcWarehouse.value.length === 0) return 'CDC仓库';
+  if (modalSelectedCdcWarehouse.value.length === 0) return t('dashboard.tobWarehousingRank.filters.cdcWarehouse');
   const names = modalSelectedCdcWarehouse.value.map(code => {
     const option = cdcWarehouseOptions.value.find(item => item.code === code);
     return option ? option.name : code;
@@ -657,7 +662,7 @@ const handleTabChange = (key: string) => {
 
 const handleExport = async () => {
   if (!dateRange.value || !dateRange.value[0] || !dateRange.value[1]) {
-    message.warning('请选择日期范围');
+    message.warning(t('dashboard.tobWarehousingRank.messages.selectDateRange'));
     return;
   }
   try {
@@ -676,23 +681,23 @@ const handleExport = async () => {
         const link = document.createElement('a');
         link.href = result.data;
         const xlsxMatch = result.data.match(/([^/]+\.xlsx)$/);
-        const downloadFilename = xlsxMatch ? xlsxMatch[1] : `ToB物流商KPI排名_${dateRange.value[0].format('YYYY-MM')}_${dateRange.value[1].format('YYYY-MM')}.xlsx`;
+        const downloadFilename = xlsxMatch ? xlsxMatch[1] : `${t('dashboard.tobWarehousingRank.messages.exportFileName')}_${dateRange.value[0].format('YYYY-MM')}_${dateRange.value[1].format('YYYY-MM')}.xlsx`;
         link.download = downloadFilename;
         link.target = '_blank';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        message.success('导出成功');
+        message.success(t('dashboard.tobWarehousingRank.messages.exportSuccess'));
       }
     } else {
-      message.error(result?.message || '导出失败');
+      message.error(result?.message || t('dashboard.tobWarehousingRank.messages.exportFailed'));
     }
   } catch (error: any) {
     const errCode = error?.code || error?.response?.status;
     if (errCode === 409 || errCode === 504 || errCode === 505) {
-      message.error(error.msg || '导出数据量过大，请缩小查询范围');
+      message.error(error.msg || t('dashboard.tobWarehousingRank.messages.exportDataTooLarge'));
     } else {
-      message.error(error.msg || '导出失败');
+      message.error(error.msg || t('dashboard.tobWarehousingRank.messages.exportFailed'));
     }
   } finally {
     exportLoading.value = false;
@@ -701,7 +706,7 @@ const handleExport = async () => {
 
 const handleModalExport = async () => {
   if (!modalDateRange.value || !modalDateRange.value[0] || !modalDateRange.value[1]) {
-    message.warning('请选择日期范围');
+    message.warning(t('dashboard.tobWarehousingRank.messages.selectDateRange'));
     return;
   }
   try {
@@ -718,10 +723,10 @@ const handleModalExport = async () => {
     let defaultFilename = '';
     if (activeTab.value === 'score') {
       result = await exportToBLogisticKpiRankScoreDetail(params);
-      defaultFilename = `ToB物流商KPI排名得分详情_${modalDateRange.value[0].format('YYYY-MM')}_${modalDateRange.value[1].format('YYYY-MM')}.xlsx`;
+      defaultFilename = `${t('dashboard.tobWarehousingRank.messages.exportScoreDetailFileName')}_${modalDateRange.value[0].format('YYYY-MM')}_${modalDateRange.value[1].format('YYYY-MM')}.xlsx`;
     } else {
       result = await exportToBLogisticKpiRankPunishDetail(params);
-      defaultFilename = `ToB物流商KPI排名奖惩详情_${modalDateRange.value[0].format('YYYY-MM')}_${modalDateRange.value[1].format('YYYY-MM')}.xlsx`;
+      defaultFilename = `${t('dashboard.tobWarehousingRank.messages.exportRewardDetailFileName')}_${modalDateRange.value[0].format('YYYY-MM')}_${modalDateRange.value[1].format('YYYY-MM')}.xlsx`;
     }
     if (result && result.code === 200) {
       if (result.data) {
@@ -734,17 +739,17 @@ const handleModalExport = async () => {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        message.success('导出成功');
+        message.success(t('dashboard.tobWarehousingRank.messages.exportSuccess'));
       }
     } else {
-      message.error(result?.message || '导出失败');
+      message.error(result?.message || t('dashboard.tobWarehousingRank.messages.exportFailed'));
     }
   } catch (error: any) {
     const errCode = error?.code || error?.response?.status;
     if (errCode === 409 || errCode === 504 || errCode === 505) {
-      message.error(error.msg || '导出数据量过大，请缩小查询范围');
+      message.error(error.msg || t('dashboard.tobWarehousingRank.messages.exportDataTooLarge'));
     } else {
-      message.error(error.msg || '导出失败');
+      message.error(error.msg || t('dashboard.tobWarehousingRank.messages.exportFailed'));
     }
   } finally {
     exportLoading.value = false;
@@ -753,51 +758,51 @@ const handleModalExport = async () => {
 
 const formatYearMonth = (text: string) => {
   if (!text) return '-';
-  if (text === '汇总') return '汇总';
-  if (text === '0000-00' || text.startsWith('0000')) return '0000年00月';
+  if (text === t('dashboard.tobWarehousingRank.dateRange.summary')) return t('dashboard.tobWarehousingRank.dateRange.summary');
+  if (text === '0000-00' || text.startsWith('0000')) return t('dashboard.tobWarehousingRank.dateRange.invalidMonth');
   const parts = text.split('-');
   if (parts.length === 2 && parts[0] && parts[1]) {
-    return `${parts[0]}年${parseInt(parts[1])}月`;
+    return t('dashboard.tobWarehousingRank.dateRange.yearMonth', { year: parts[0], month: parseInt(parts[1]) });
   }
   return text;
 };
 
-const scoreTableColumns = [
-  { title: '年月', key: 'yearMonth', dataIndex: 'yearMonth', width: 100, align: 'center' as const, customRender: ({ text }: { text: string }) => formatYearMonth(text) },
-  { title: '物流商', key: 'logistic', dataIndex: 'logistic', width: 120, align: 'center' as const },
-  { title: '仓库', key: 'warehouse', dataIndex: 'warehouse', width: 120, align: 'center' as const },
-  { title: '总成绩', key: 'totalScore', dataIndex: 'totalScore', width: 100, align: 'center' as const, customRender: ({ text }: { text: number | null }) => text !== null && text !== undefined ? String(text) : '-' },
-  { title: '发货及时率得分(满分: 50)', key: 'deliveryOnTimeScore', dataIndex: 'deliveryOnTimeScore', width: 190, align: 'center' as const, customRender: ({ text }: { text: number | null }) => text !== null && text !== undefined ? String(text) : '-' },
-  { title: '入库及时率得分(满分: 20)', key: 'inboundOnTimeScore', dataIndex: 'inboundOnTimeScore', width: 180, align: 'center' as const, customRender: ({ text }: { text: number | null }) => text !== null && text !== undefined ? String(text) : '-' },
-  { title: '仓储STD达标率得分(满分: 10)', key: 'stdComplianceScore', dataIndex: 'stdComplianceScore', width: 200, align: 'center' as const, customRender: ({ text }: { text: number | null }) => text !== null && text !== undefined ? String(text) : '-' },
-  { title: '库存准确率得分(满分: 10)', key: 'inventoryAccuracyScore', dataIndex: 'inventoryAccuracyScore', width: 180, align: 'center' as const, customRender: ({ text }: { text: number | null }) => text !== null && text !== undefined ? String(text) : '-' },
-  { title: '运作准确率得分(满分: 10)', key: 'operationAccuracyScore', dataIndex: 'operationAccuracyScore', width: 190, align: 'center' as const, customRender: ({ text }: { text: number | null }) => text !== null && text !== undefined ? String(text) : '-' },
-  { title: '得分汇总', key: 'kpiScore', dataIndex: 'kpiScore', width: 120, align: 'center' as const, customRender: ({ text }: { text: number | null }) => text !== null && text !== undefined ? String(text) : '-' },
-  { title: '红线问题', key: 'redLineIssue', dataIndex: 'redLineIssue', width: 100, align: 'center' as const, customRender: ({ text }: { text: number | null }) => text !== null && text !== undefined ? String(text) : '-' },
-  { title: '重大问题', key: 'majorIssue', dataIndex: 'majorIssue', width: 100, align: 'center' as const, customRender: ({ text }: { text: number | null }) => text !== null && text !== undefined ? String(text) : '-' },
-  { title: '严重问题', key: 'seriousIssue', dataIndex: 'seriousIssue', width: 100, align: 'center' as const, customRender: ({ text }: { text: number | null }) => text !== null && text !== undefined ? String(text) : '-' },
-  { title: '一般问题', key: 'minorIssue', dataIndex: 'minorIssue', width: 100, align: 'center' as const, customRender: ({ text }: { text: number | null }) => text !== null && text !== undefined ? String(text) : '-' },
-  { title: '问题描述', key: 'issueDescription', dataIndex: 'issueDescription', width: 240, align: 'center' as const },
-  { title: '加分/扣分合计', key: 'bonusDeductionTotal', dataIndex: 'bonusDeductionTotal', width: 140, align: 'center' as const, customRender: ({ text }: { text: number | null }) => text !== null && text !== undefined ? String(text) : '-' },
-];
+const scoreTableColumns = computed(() => [
+  { title: t('dashboard.tobWarehousingRank.tableColumns.yearMonth'), key: 'yearMonth', dataIndex: 'yearMonth', width: 100, align: 'center' as const, customRender: ({ text }: { text: string }) => formatYearMonth(text) },
+  { title: t('dashboard.tobWarehousingRank.tableColumns.logistic'), key: 'logistic', dataIndex: 'logistic', width: 120, align: 'center' as const },
+  { title: t('dashboard.tobWarehousingRank.tableColumns.warehouse'), key: 'warehouse', dataIndex: 'warehouse', width: 120, align: 'center' as const },
+  { title: t('dashboard.tobWarehousingRank.tableColumns.totalScore'), key: 'totalScore', dataIndex: 'totalScore', width: 100, align: 'center' as const, customRender: ({ text }: { text: number | null }) => text !== null && text !== undefined ? String(text) : '-' },
+  { title: t('dashboard.tobWarehousingRank.scoreTableColumns.deliveryOnTimeScore'), key: 'deliveryOnTimeScore', dataIndex: 'deliveryOnTimeScore', width: 190, align: 'center' as const, customRender: ({ text }: { text: number | null }) => text !== null && text !== undefined ? String(text) : '-' },
+  { title: t('dashboard.tobWarehousingRank.scoreTableColumns.inboundOnTimeScore'), key: 'inboundOnTimeScore', dataIndex: 'inboundOnTimeScore', width: 180, align: 'center' as const, customRender: ({ text }: { text: number | null }) => text !== null && text !== undefined ? String(text) : '-' },
+  { title: t('dashboard.tobWarehousingRank.scoreTableColumns.stdComplianceScore'), key: 'stdComplianceScore', dataIndex: 'stdComplianceScore', width: 200, align: 'center' as const, customRender: ({ text }: { text: number | null }) => text !== null && text !== undefined ? String(text) : '-' },
+  { title: t('dashboard.tobWarehousingRank.scoreTableColumns.inventoryAccuracyScore'), key: 'inventoryAccuracyScore', dataIndex: 'inventoryAccuracyScore', width: 180, align: 'center' as const, customRender: ({ text }: { text: number | null }) => text !== null && text !== undefined ? String(text) : '-' },
+  { title: t('dashboard.tobWarehousingRank.scoreTableColumns.operationAccuracyScore'), key: 'operationAccuracyScore', dataIndex: 'operationAccuracyScore', width: 190, align: 'center' as const, customRender: ({ text }: { text: number | null }) => text !== null && text !== undefined ? String(text) : '-' },
+  { title: t('dashboard.tobWarehousingRank.scoreTableColumns.scoreSummary'), key: 'kpiScore', dataIndex: 'kpiScore', width: 120, align: 'center' as const, customRender: ({ text }: { text: number | null }) => text !== null && text !== undefined ? String(text) : '-' },
+  { title: t('dashboard.tobWarehousingRank.scoreTableColumns.redLineIssue'), key: 'redLineIssue', dataIndex: 'redLineIssue', width: 100, align: 'center' as const, customRender: ({ text }: { text: number | null }) => text !== null && text !== undefined ? String(text) : '-' },
+  { title: t('dashboard.tobWarehousingRank.scoreTableColumns.majorIssue'), key: 'majorIssue', dataIndex: 'majorIssue', width: 100, align: 'center' as const, customRender: ({ text }: { text: number | null }) => text !== null && text !== undefined ? String(text) : '-' },
+  { title: t('dashboard.tobWarehousingRank.scoreTableColumns.seriousIssue'), key: 'seriousIssue', dataIndex: 'seriousIssue', width: 100, align: 'center' as const, customRender: ({ text }: { text: number | null }) => text !== null && text !== undefined ? String(text) : '-' },
+  { title: t('dashboard.tobWarehousingRank.scoreTableColumns.minorIssue'), key: 'minorIssue', dataIndex: 'minorIssue', width: 100, align: 'center' as const, customRender: ({ text }: { text: number | null }) => text !== null && text !== undefined ? String(text) : '-' },
+  { title: t('dashboard.tobWarehousingRank.scoreTableColumns.issueDescription'), key: 'issueDescription', dataIndex: 'issueDescription', width: 240, align: 'center' as const },
+  { title: t('dashboard.tobWarehousingRank.scoreTableColumns.bonusDeductionTotal'), key: 'bonusDeductionTotal', dataIndex: 'bonusDeductionTotal', width: 140, align: 'center' as const, customRender: ({ text }: { text: number | null }) => text !== null && text !== undefined ? String(text) : '-' },
+]);
 
 const rewardTableColumns = computed(() => [
-  { title: '年月', key: 'yearMonth', dataIndex: 'yearMonth', width: 100, align: 'center' as const, customRender: ({ text }: { text: string }) => formatYearMonth(text) },
-  { title: '物流商', key: 'logistic', dataIndex: 'logistic', width: 120, align: 'center' as const },
-  { title: '仓库', key: 'warehouse', dataIndex: 'warehouse', width: 120, align: 'center' as const },
-  { title: '红线问题(元)', key: 'redLineIssue', dataIndex: 'redLineIssue', width: 140, align: 'center' as const, customRender: ({ text }: { text: number | null }) => text !== null && text !== undefined ? String(text) : '-' },
-  { title: '重大问题(元)', key: 'majorIssue', dataIndex: 'majorIssue', width: 140, align: 'center' as const, customRender: ({ text }: { text: number | null }) => text !== null && text !== undefined ? String(text) : '-' },
-  { title: '严重问题(元)', key: 'seriousIssue', dataIndex: 'seriousIssue', width: 140, align: 'center' as const, customRender: ({ text }: { text: number | null }) => text !== null && text !== undefined ? String(text) : '-' },
-  { title: '一般问题(元)', key: 'minorIssue', dataIndex: 'minorIssue', width: 140, align: 'center' as const, customRender: ({ text }: { text: number | null }) => text !== null && text !== undefined ? String(text) : '-' },
-  { title: '违约处理(元)', key: 'breachHandling', dataIndex: 'breachHandling', width: 140, align: 'center' as const, customRender: ({ text }: { text: number | null }) => text !== null && text !== undefined ? String(text) : '-' },
-  { title: '总罚款金额(元)', key: 'totalPenalty', dataIndex: 'totalPenalty', width: 160, align: 'center' as const, customRender: ({ text }: { text: number | null }) => text !== null && text !== undefined ? String(text) : '-' },
-  { title: '奖励金额(元)', key: 'rewardAmount', dataIndex: 'rewardAmount', width: 140, align: 'center' as const, customRender: ({ text }: { text: number | null }) => text !== null && text !== undefined ? String(text) : '-' },
-  { title: '备注原因', key: 'remarkReason', dataIndex: 'remarkReason', width: 240, align: 'center' as const },
-  { title: '总成绩', key: 'totalScore', dataIndex: 'totalScore', width: 100, align: 'center' as const, customRender: ({ text }: { text: number | null }) => text !== null && text !== undefined ? String(text) : '-' },
-  { title: '月均发货体积(单位:m³)', key: 'avgMonthlyShipVolume', dataIndex: 'avgMonthlyShipVolume', width: 180, align: 'center' as const, customRender: ({ text }: { text: number | null }) => text !== null && text !== undefined ? String(text) : '-' },
-  { title: '标准违约金(元)', key: 'standardBreachAmount', dataIndex: 'standardBreachAmount', width: 160, align: 'center' as const, customRender: ({ text }: { text: number | null }) => text !== null && text !== undefined ? String(text) : '-' },
-  { title: '违约系数', key: 'breachCoefficient', dataIndex: 'breachCoefficient', width: 120, align: 'center' as const },
-  { title: '考核结果是否奖励', key: 'hasReward', dataIndex: 'hasReward', width: 160, align: 'center' as const },
+  { title: t('dashboard.tobWarehousingRank.tableColumns.yearMonth'), key: 'yearMonth', dataIndex: 'yearMonth', width: 100, align: 'center' as const, customRender: ({ text }: { text: string }) => formatYearMonth(text) },
+  { title: t('dashboard.tobWarehousingRank.tableColumns.logistic'), key: 'logistic', dataIndex: 'logistic', width: 120, align: 'center' as const },
+  { title: t('dashboard.tobWarehousingRank.tableColumns.warehouse'), key: 'warehouse', dataIndex: 'warehouse', width: 120, align: 'center' as const },
+  { title: t('dashboard.tobWarehousingRank.rewardTableColumns.redLineIssue'), key: 'redLineIssue', dataIndex: 'redLineIssue', width: 140, align: 'center' as const, customRender: ({ text }: { text: number | null }) => text !== null && text !== undefined ? String(text) : '-' },
+  { title: t('dashboard.tobWarehousingRank.rewardTableColumns.majorIssue'), key: 'majorIssue', dataIndex: 'majorIssue', width: 140, align: 'center' as const, customRender: ({ text }: { text: number | null }) => text !== null && text !== undefined ? String(text) : '-' },
+  { title: t('dashboard.tobWarehousingRank.rewardTableColumns.seriousIssue'), key: 'seriousIssue', dataIndex: 'seriousIssue', width: 140, align: 'center' as const, customRender: ({ text }: { text: number | null }) => text !== null && text !== undefined ? String(text) : '-' },
+  { title: t('dashboard.tobWarehousingRank.rewardTableColumns.minorIssue'), key: 'minorIssue', dataIndex: 'minorIssue', width: 140, align: 'center' as const, customRender: ({ text }: { text: number | null }) => text !== null && text !== undefined ? String(text) : '-' },
+  { title: t('dashboard.tobWarehousingRank.rewardTableColumns.breachHandling'), key: 'breachHandling', dataIndex: 'breachHandling', width: 140, align: 'center' as const, customRender: ({ text }: { text: number | null }) => text !== null && text !== undefined ? String(text) : '-' },
+  { title: t('dashboard.tobWarehousingRank.rewardTableColumns.totalPenalty'), key: 'totalPenalty', dataIndex: 'totalPenalty', width: 160, align: 'center' as const, customRender: ({ text }: { text: number | null }) => text !== null && text !== undefined ? String(text) : '-' },
+  { title: t('dashboard.tobWarehousingRank.rewardTableColumns.rewardAmount'), key: 'rewardAmount', dataIndex: 'rewardAmount', width: 140, align: 'center' as const, customRender: ({ text }: { text: number | null }) => text !== null && text !== undefined ? String(text) : '-' },
+  { title: t('dashboard.tobWarehousingRank.rewardTableColumns.remarkReason'), key: 'remarkReason', dataIndex: 'remarkReason', width: 240, align: 'center' as const },
+  { title: t('dashboard.tobWarehousingRank.tableColumns.totalScore'), key: 'totalScore', dataIndex: 'totalScore', width: 100, align: 'center' as const, customRender: ({ text }: { text: number | null }) => text !== null && text !== undefined ? String(text) : '-' },
+  { title: t('dashboard.tobWarehousingRank.rewardTableColumns.avgMonthlyShipVolume'), key: 'avgMonthlyShipVolume', dataIndex: 'avgMonthlyShipVolume', width: 180, align: 'center' as const, customRender: ({ text }: { text: number | null }) => text !== null && text !== undefined ? String(text) : '-' },
+  { title: t('dashboard.tobWarehousingRank.rewardTableColumns.standardBreachAmount'), key: 'standardBreachAmount', dataIndex: 'standardBreachAmount', width: 160, align: 'center' as const, customRender: ({ text }: { text: number | null }) => text !== null && text !== undefined ? String(text) : '-' },
+  { title: t('dashboard.tobWarehousingRank.rewardTableColumns.breachCoefficient'), key: 'breachCoefficient', dataIndex: 'breachCoefficient', width: 120, align: 'center' as const },
+  { title: t('dashboard.tobWarehousingRank.rewardTableColumns.hasReward'), key: 'hasReward', dataIndex: 'hasReward', width: 160, align: 'center' as const },
 ]);
 
 const handleModalBodyClick = (event: Event) => {
@@ -831,7 +836,7 @@ onUnmounted(() => {
 <template>
   <div class="rank-container">
     <div class="header-bar">
-      <h2 class="header-title">ToB物流商KPI排名</h2>
+      <h2 class="header-title">{{ t('dashboard.tobWarehousingRank.title') }}</h2>
     </div>
     <!-- 控制面板 -->
     <div class="control-panel">
@@ -841,8 +846,8 @@ onUnmounted(() => {
             v-model:value="dateRange"
             picker="month"
             format="YYYY-MM"
-            separator="至"
-            :placeholder="['开始月份', '结束月份']"
+            :separator="t('dashboard.tobWarehousingRank.dateRange.separator')"
+            :placeholder="[t('dashboard.tobWarehousingRank.dateRange.startMonth'), t('dashboard.tobWarehousingRank.dateRange.endMonth')]"
             class="date-range-picker"
           />
         </div>
@@ -853,7 +858,7 @@ onUnmounted(() => {
           </svg>
           <div class="dropdown-content" v-show="isLogisticProviderOpen" @click.stop>
             <div class="search-box">
-              <input v-model="logisticProviderSearch" type="text" placeholder="搜索物流商..." class="search-input" @click.stop />
+              <input v-model="logisticProviderSearch" type="text" :placeholder="t('dashboard.tobWarehousingRank.placeholders.searchLogistic')" class="search-input" @click.stop />
             </div>
             <div class="options-list">
               <div
@@ -866,7 +871,7 @@ onUnmounted(() => {
                 <span class="checkmark" v-if="option.code !== '__reset__' && selectedLogisticProvider.includes(option.code)">✓</span>
                 {{ option.name }}
               </div>
-              <div v-if="filteredLogisticProviderOptions.length === 1 && logisticProviderSearch" class="no-results">暂无搜索结果</div>
+              <div v-if="filteredLogisticProviderOptions.length === 1 && logisticProviderSearch" class="no-results">{{ t('dashboard.tobWarehousingRank.messages.noSearchResults') }}</div>
             </div>
           </div>
         </div>
@@ -877,7 +882,7 @@ onUnmounted(() => {
           </svg>
           <div class="dropdown-content" v-show="isCdcWarehouseOpen" @click.stop>
             <div class="search-box">
-              <input v-model="cdcWarehouseSearch" type="text" placeholder="搜索CDC仓库..." class="search-input" @click.stop />
+              <input v-model="cdcWarehouseSearch" type="text" :placeholder="t('dashboard.tobWarehousingRank.placeholders.searchCdcWarehouse')" class="search-input" @click.stop />
             </div>
             <div class="options-list">
               <div
@@ -890,14 +895,14 @@ onUnmounted(() => {
                 <span class="checkmark" v-if="option.code !== '__reset__' && selectedCdcWarehouse.includes(option.code)">✓</span>
                 {{ option.name }}
               </div>
-              <div v-if="filteredCdcWarehouseOptions.length === 1 && cdcWarehouseSearch" class="no-results">暂无搜索结果</div>
+              <div v-if="filteredCdcWarehouseOptions.length === 1 && cdcWarehouseSearch" class="no-results">{{ t('dashboard.tobWarehousingRank.messages.noSearchResults') }}</div>
             </div>
           </div>
         </div>
       </div>
       <div class="action-buttons">
-        <a-button type="primary" @click="showDetailModal" class="action-btn">查看详情</a-button>
-        <a-button @click="handleExport" class="action-btn" :loading="exportLoading">导出</a-button>
+        <a-button type="primary" @click="showDetailModal" class="action-btn">{{ t('dashboard.tobWarehousingRank.buttons.viewDetail') }}</a-button>
+        <a-button @click="handleExport" class="action-btn" :loading="exportLoading">{{ t('dashboard.tobWarehousingRank.buttons.export') }}</a-button>
       </div>
     </div>
 
@@ -926,8 +931,8 @@ onUnmounted(() => {
           </div>
           <div class="modal-body" @click="handleModalBodyClick">
             <div class="tabs-container">
-              <div class="tab-item" :class="{ active: activeTab === 'score' }" @click="handleTabChange('score')">得分详情</div>
-              <div class="tab-item" :class="{ active: activeTab === 'reward' }" @click="handleTabChange('reward')">奖惩详情</div>
+              <div class="tab-item" :class="{ active: activeTab === 'score' }" @click="handleTabChange('score')">{{ t('dashboard.tobWarehousingRank.tabs.scoreDetail') }}</div>
+              <div class="tab-item" :class="{ active: activeTab === 'reward' }" @click="handleTabChange('reward')">{{ t('dashboard.tobWarehousingRank.tabs.rewardDetail') }}</div>
             </div>
             <div class="search-section">
               <div class="search-row">
@@ -937,8 +942,8 @@ onUnmounted(() => {
                       v-model:value="modalDateRange"
                       picker="month"
                       format="YYYY-MM"
-                      separator="至"
-                      :placeholder="['开始月份', '结束月份']"
+                      :separator="t('dashboard.tobWarehousingRank.dateRange.separator')"
+                      :placeholder="[t('dashboard.tobWarehousingRank.dateRange.startMonth'), t('dashboard.tobWarehousingRank.dateRange.endMonth')]"
                       class="date-range-picker"
                       @click.stop
                     />
@@ -953,7 +958,7 @@ onUnmounted(() => {
                       </svg>
                       <div class="dropdown-content" v-show="modalIsLogisticProviderOpen" @click.stop>
                         <div class="search-box">
-                          <input v-model="modalLogisticProviderSearch" type="text" placeholder="搜索物流商..." class="search-input" @click.stop />
+                          <input v-model="modalLogisticProviderSearch" type="text" :placeholder="t('dashboard.tobWarehousingRank.placeholders.searchLogistic')" class="search-input" @click.stop />
                         </div>
                         <div class="options-list">
                           <div
@@ -980,7 +985,7 @@ onUnmounted(() => {
                       </svg>
                       <div class="dropdown-content" v-show="modalIsCdcWarehouseOpen" @click.stop>
                         <div class="search-box">
-                          <input v-model="modalCdcWarehouseSearch" type="text" placeholder="搜索CDC仓库..." class="search-input" @click.stop />
+                          <input v-model="modalCdcWarehouseSearch" type="text" :placeholder="t('dashboard.tobWarehousingRank.placeholders.searchCdcWarehouse')" class="search-input" @click.stop />
                         </div>
                         <div class="options-list">
                           <div
@@ -999,9 +1004,9 @@ onUnmounted(() => {
                   </div>
                 </div>
                 <div class="search-buttons">
-                  <a-button @click="handleModalReset" class="reset-btn">重置</a-button>
-                  <a-button @click="fetchDetailData" class="searchinfo-btn">查询</a-button>
-                  <a-button @click="handleModalExport" class="searchinfo-btn" :loading="exportLoading">导出</a-button>
+                  <a-button @click="handleModalReset" class="reset-btn">{{ t('dashboard.tobWarehousingRank.buttons.reset') }}</a-button>
+                  <a-button @click="fetchDetailData" class="searchinfo-btn">{{ t('dashboard.tobWarehousingRank.buttons.query') }}</a-button>
+                  <a-button @click="handleModalExport" class="searchinfo-btn" :loading="exportLoading">{{ t('dashboard.tobWarehousingRank.buttons.export') }}</a-button>
                 </div>
               </div>
             </div>

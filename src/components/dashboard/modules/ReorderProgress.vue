@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, nextTick, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import * as echarts from 'echarts'
 import dayjs from 'dayjs'
 import { message, Modal } from 'ant-design-vue'
@@ -11,6 +12,7 @@ import {
 } from '../../../services/transportApi'
 import { useDashboardDataStore } from '../../../stores/dashboardDataStore'
 
+const { t } = useI18n()
 const dataStore = useDashboardDataStore()
 
 const props = defineProps<{
@@ -93,7 +95,7 @@ const truncateText = (items: string[], maxLength: number) => {
 }
 
 const displayCustomer = computed(() => {
-  if (selectedCustomer.value.length === 0) return '客户'
+  if (selectedCustomer.value.length === 0) return t('dashboard.reorderProgress.filters.customer')
   const selectedLabels = selectedCustomer.value.map((value) => {
     const option = customerOptions.value.find((opt) => opt.value === value)
     return option ? option.label : value
@@ -102,7 +104,7 @@ const displayCustomer = computed(() => {
 })
 
 const fullCustomerText = computed(() => {
-  if (selectedCustomer.value.length === 0) return '客户'
+  if (selectedCustomer.value.length === 0) return t('dashboard.reorderProgress.filters.customer')
   const selectedLabels = selectedCustomer.value.map((value) => {
     const option = customerOptions.value.find((opt) => opt.value === value)
     return option ? option.label : value
@@ -114,16 +116,16 @@ const filteredCustomerOptions = computed(() => {
   const filtered = customerOptions.value.filter((option) =>
     option.label.toLowerCase().includes(customerSearch.value.toLowerCase()),
   )
-  return [{ value: '__reset__', label: '重置' }, ...filtered]
+  return [{ value: '__reset__', label: t('dashboard.reorderProgress.buttons.reset') }, ...filtered]
 })
 
 // 图例数据
 const legendData = computed(() => [
-  { name: '已返', icon: 'rect', itemStyle: { color: '#2563EB' } },
-  { name: '未返', icon: 'rect', itemStyle: { color: '#00AEEF' } },
-  { name: '30天内', icon: 'rect', itemStyle: { color: '#FFD700' } },
-  { name: '30-60天', icon: 'rect', itemStyle: { color: '#F5A623' } },
-  { name: '60天以上', icon: 'rect', itemStyle: { color: '#FF4500' } },
+  { name: t('dashboard.reorderProgress.legend.confirmed'), icon: 'rect', itemStyle: { color: '#2563EB' } },
+  { name: t('dashboard.reorderProgress.legend.notConfirmed'), icon: 'rect', itemStyle: { color: '#00AEEF' } },
+  { name: t('dashboard.reorderProgress.legend.within30d'), icon: 'rect', itemStyle: { color: '#FFD700' } },
+  { name: t('dashboard.reorderProgress.legend.30to60d'), icon: 'rect', itemStyle: { color: '#F5A623' } },
+  { name: t('dashboard.reorderProgress.legend.over60d'), icon: 'rect', itemStyle: { color: '#FF4500' } },
 ])
 
 const currentPageLegends = computed(() => {
@@ -145,7 +147,7 @@ const loadCustomerOptions = async () => {
       }))
     }
   } catch (error) {
-    console.error('加载客户选项失败:', error)
+    console.error(t('dashboard.reorderProgress.messages.loadCustomerOptionsFailed'), error)
   }
 }
 
@@ -231,7 +233,7 @@ const fetchReturnData = async () => {
   } catch (error: any) {
     const errCode = error?.response?.data?.code
     if (errCode === 500) {
-      message.error('服务器错误')
+      message.error(t('dashboard.reorderProgress.messages.serverError'))
     }
     returnData.value = {
       confirmed: 0,
@@ -299,18 +301,18 @@ const pollExportProgress = async () => {
         if (exportData) {
           downloadFile(exportData, exportRedisKey.value)
           stopExportProgress(true)
-          message.success('导出成功')
+          message.success(t('dashboard.reorderProgress.messages.exportSuccess'))
         } else {
           stopExportProgress(false)
-          message.error(error?.msg || '导出失败')
+          message.error(error?.msg || t('dashboard.reorderProgress.messages.exportFailed'))
         }
       } else if (success === false && flag === false) {
         stopExportProgress(false)
-        message.error(error?.msg || '导出失败')
+        message.error(error?.msg || t('dashboard.reorderProgress.messages.exportFailed'))
       }
     }
   } catch (error) {
-    console.error('查询导出进度失败:', error)
+    console.error(t('dashboard.reorderProgress.messages.queryExportProgressFailed'), error)
   }
 }
 
@@ -376,21 +378,21 @@ const handleExport = async (notConfirmType: number | null = null) => {
     if (result && result.code === 200 && result.data) {
       startExportProgress(result.data)
     } else {
-      message.error(result.message || '导出失败')
+      message.error(result.message || t('dashboard.reorderProgress.messages.exportFailed'))
     }
   } catch (error: any) {
-    console.error('导出失败:', error)
+    console.error(t('dashboard.reorderProgress.messages.exportFailed'), error)
     stopExportProgress(false)
     const errCode = error?.code || error?.response?.data?.code || error?.response?.status
     if (errCode === 500) {
-      message.error('服务器错误，请重试')
+      message.error(t('dashboard.reorderProgress.messages.serverErrorRetry'))
     } else if (errCode === 409 || errCode === 504 || errCode === 505) {
       const errorMsg = error?.msg || error?.response?.data?.msg || error?.message
       message.error(errorMsg)
     } else if (errCode === 'ECONNABORTED' || error?.message?.includes('timeout')) {
-      message.error('导出超时')
+      message.error(t('dashboard.reorderProgress.messages.exportTimeout'))
     } else {
-      message.error('导出失败，请重试')
+      message.error(t('dashboard.reorderProgress.messages.exportFailedRetry'))
     }
   } finally {
     exportLoading.value = false
@@ -405,34 +407,34 @@ const handleChartClick = (params: any) => {
       let notConfirmType: number | null = null
       let confirmTitle = ''
 
-      if (params.seriesName === '返单进度') {
-        if (params.name === '未返') {
+      if (params.seriesName === t('dashboard.reorderProgress.chart.seriesName')) {
+        if (params.name === t('dashboard.reorderProgress.legend.notConfirmed')) {
           notConfirmType = null
-          confirmTitle = '未返'
+          confirmTitle = t('dashboard.reorderProgress.legend.notConfirmed')
         }
-      } else if (params.seriesName === '内圈时间分布') {
+      } else if (params.seriesName === t('dashboard.reorderProgress.chart.innerSeriesName')) {
         switch (params.name) {
-          case '30天内':
+          case t('dashboard.reorderProgress.legend.within30d'):
             notConfirmType = 1
-            confirmTitle = '30天内'
+            confirmTitle = t('dashboard.reorderProgress.legend.within30d')
             break
-          case '30-60天':
+          case t('dashboard.reorderProgress.legend.30to60d'):
             notConfirmType = 2
-            confirmTitle = '30-60天'
+            confirmTitle = t('dashboard.reorderProgress.legend.30to60d')
             break
-          case '60天以上':
+          case t('dashboard.reorderProgress.legend.over60d'):
             notConfirmType = 3
-            confirmTitle = '60天以上'
+            confirmTitle = t('dashboard.reorderProgress.legend.over60d')
             break
         }
       }
 
       if (confirmTitle) {
         Modal.confirm({
-          title: '确认导出',
-          content: `确定要导出「${confirmTitle}」的数据吗？`,
-          okText: '确定',
-          cancelText: '取消',
+          title: t('dashboard.reorderProgress.modal.confirmExport'),
+          content: t('dashboard.reorderProgress.modal.confirmExportContent', { title: confirmTitle }),
+          okText: t('dashboard.reorderProgress.buttons.confirm'),
+          cancelText: t('dashboard.reorderProgress.buttons.cancel'),
           onOk: () => {
             handleExport(notConfirmType)
           },
@@ -466,7 +468,7 @@ const donutOptions = computed(() => {
       trigger: 'item',
       formatter: function (params: any) {
         if (!params.name || params.name === '') return ''
-        return `${params.name}: ${params.value}单`
+        return `${params.name}: ${params.value}${t('dashboard.reorderProgress.tooltip.unit')}`
       },
       backgroundColor: 'rgba(0, 0, 0, 0.8)',
       borderColor: '#2563EB',
@@ -477,7 +479,7 @@ const donutOptions = computed(() => {
     legend: { show: false },
     series: [
       {
-        name: '返单进度',
+        name: t('dashboard.reorderProgress.chart.seriesName'),
         type: 'pie',
         radius: ['40%', '60%'],
         center: ['50%', '50%'],
@@ -505,8 +507,8 @@ const donutOptions = computed(() => {
           lineStyle: { width: 1 },
         },
         data: [
-          { value: confirmed, name: '已返', itemStyle: { color: '#2563EB' } },
-          { value: notConfirm, name: '未返', itemStyle: { color: '#00AEEF' } },
+          { value: confirmed, name: t('dashboard.reorderProgress.legend.confirmed'), itemStyle: { color: '#2563EB' } },
+          { value: notConfirm, name: t('dashboard.reorderProgress.legend.notConfirmed'), itemStyle: { color: '#00AEEF' } },
         ].filter((item) => item.value > 0),
         emphasis: {
           itemStyle: {
@@ -519,7 +521,7 @@ const donutOptions = computed(() => {
       ...(isDataComplete.value
         ? [
             {
-              name: '内圈时间分布',
+              name: t('dashboard.reorderProgress.chart.innerSeriesName'),
               type: 'pie',
               radius: ['20%', '40%'],
               center: ['50%', '50%'],
@@ -537,9 +539,9 @@ const donutOptions = computed(() => {
                     tooltip: { show: false },
                   },
                 },
-                { value: notConfirmWithin30d, name: '30天内', itemStyle: { color: '#FFD700' } },
-                { value: notConfirm30dTo60d, name: '30-60天', itemStyle: { color: '#F5A623' } },
-                { value: notConfirmOver60d, name: '60天以上', itemStyle: { color: '#FF4500' } },
+                { value: notConfirmWithin30d, name: t('dashboard.reorderProgress.legend.within30d'), itemStyle: { color: '#FFD700' } },
+                { value: notConfirm30dTo60d, name: t('dashboard.reorderProgress.legend.30to60d'), itemStyle: { color: '#F5A623' } },
+                { value: notConfirmOver60d, name: t('dashboard.reorderProgress.legend.over60d'), itemStyle: { color: '#FF4500' } },
               ].filter((item) => item.value > 0 || item.name === ''),
               emphasis: {
                 itemStyle: {
@@ -620,7 +622,7 @@ const getElapsedTime = computed(() => elapsedTimeSeconds.value)
 <template>
   <div class="reorder-progress-wrapper">
     <div class="header-bar">
-      <h2 class="header-title">返单进展</h2>
+      <h2 class="header-title">{{ t('dashboard.reorderProgress.title') }}</h2>
     </div>
     <div class="reorder-progress-container">
       <!-- 控制面板 -->
@@ -650,7 +652,7 @@ const getElapsedTime = computed(() => elapsedTimeSeconds.value)
                   <input
                     v-model="customerSearch"
                     type="text"
-                    placeholder="搜索客户..."
+                    :placeholder="t('dashboard.reorderProgress.placeholders.searchCustomer')"
                     class="search-input"
                     @click.stop
                   />
@@ -666,7 +668,7 @@ const getElapsedTime = computed(() => elapsedTimeSeconds.value)
                     <span class="checkmark" v-if="selectedCustomer.includes(option.value) && option.value !== '__reset__'">✓</span>
                     {{ option.label }}
                   </div>
-                  <div v-if="filteredCustomerOptions.length === 0" class="no-results">无搜索结果</div>
+                  <div v-if="filteredCustomerOptions.length === 0" class="no-results">{{ t('dashboard.reorderProgress.messages.noSearchResults') }}</div>
                 </div>
               </div>
             </div>
@@ -711,7 +713,7 @@ const getElapsedTime = computed(() => elapsedTimeSeconds.value)
     <!-- 导出进度Modal -->
     <a-modal
       v-model:open="exportProgressVisible"
-      title="导出中"
+      :title="t('dashboard.reorderProgress.modal.exporting')"
       :footer="null"
       :closable="false"
       :maskClosable="false"
@@ -722,8 +724,8 @@ const getElapsedTime = computed(() => elapsedTimeSeconds.value)
       <div class="export-progress-content">
         <div class="progress-info">
           <a-spin size="large" />
-          <p class="progress-text">正在导出数据...</p>
-          <p class="progress-time">已等待 {{ getElapsedTime }} 秒</p>
+          <p class="progress-text">{{ t('dashboard.reorderProgress.modal.exportingData') }}</p>
+          <p class="progress-time">{{ t('dashboard.reorderProgress.modal.elapsedTime', { seconds: getElapsedTime }) }}</p>
         </div>
         <a-progress
           :percent="exportProgressPercent"

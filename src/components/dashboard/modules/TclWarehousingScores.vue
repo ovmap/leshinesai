@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch, h, nextTick } from 'vue';
+import { useI18n } from 'vue-i18n';
 import dayjs, { type Dayjs } from 'dayjs';
 import { message } from 'ant-design-vue';
 import { useSelectOptionsStore } from '../../../stores/selectOptionsStore';
@@ -14,6 +15,7 @@ const props = defineProps<{
 
 const selectOptionsStore = useSelectOptionsStore();
 const dataStore = useDashboardDataStore();
+const { t } = useI18n();
 
 const getInitialDateRange = (): [Dayjs, Dayjs] => {
   const now = dayjs();
@@ -45,7 +47,7 @@ const filteredLogisticProviderOptions = computed(() => {
       option.name.toLowerCase().includes(searchLower)
     );
   }
-  return [{ code: '__reset__', name: '重置' }, ...filtered];
+  return [{ code: '__reset__', name: t('dashboard.tclWarehousing.reset') }, ...filtered];
 });
 
 const filteredCdcWarehouseOptions = computed(() => {
@@ -58,7 +60,7 @@ const filteredCdcWarehouseOptions = computed(() => {
       option.name.toLowerCase().includes(searchLower)
     );
   }
-  return [{ code: '__reset__', name: '重置' }, ...filtered];
+  return [{ code: '__reset__', name: t('dashboard.tclWarehousing.reset') }, ...filtered];
 });
 
 const isLogisticProviderOpen = ref(false);
@@ -75,61 +77,61 @@ const tableScrollY = ref<number | undefined>(200);
 // 表格列定义
 const tableColumns = computed(() => {
   const baseColumns = [
-    { title: '年月', key: 'month', dataIndex: 'month', width: 120, align: 'center' as const },
-    { title: '物流商', key: 'logisticProvider', dataIndex: 'logisticProvider', width: 120, align: 'center' as const },
-    { title: '运输方式', key: 'transType', dataIndex: 'transType', width: 120, align: 'center' as const },
-    { title: '发货平台', key: 'cdcWarehouse', dataIndex: 'cdcWarehouse', width: 120, align: 'center' as const },
+    { title: t('dashboard.tclWarehousing.tableColumns.month'), key: 'month', dataIndex: 'month', width: 120, align: 'center' as const },
+    { title: t('dashboard.tclWarehousing.tableColumns.logisticProvider'), key: 'logisticProvider', dataIndex: 'logisticProvider', width: 120, align: 'center' as const },
+    { title: t('dashboard.tclWarehousing.tableColumns.transType'), key: 'transType', dataIndex: 'transType', width: 120, align: 'center' as const },
+    { title: t('dashboard.tclWarehousing.tableColumns.cdcWarehouse'), key: 'cdcWarehouse', dataIndex: 'cdcWarehouse', width: 120, align: 'center' as const },
   ];
 
   if (showDetails.value) {
     // 显示详情时的表头（带子列）
     const kpiColumns = [
       // 提货及时率 (kpiType: 34)
-      createKpiDetailColumn('提货及时率', 34, [
-        { title: '达标数量', key: 'doa_ontime_numerator', dataKey: 'numerator' },
-        { title: '总数量', key: 'doa_ontime_denominator', dataKey: 'denominator' },
-        { title: '达标率', key: 'doa_ontime_rate', dataKey: 'rate' },
-        { title: '得分(满分10分)', key: 'doa_ontime_score', dataKey: 'score', maxScore: 10 },
+      createKpiDetailColumn(t('dashboard.tclWarehousing.kpiColumns.pickupTimelinessRate'), 34, [
+        { title: t('dashboard.tclWarehousing.kpiColumns.numerator'), key: 'doa_ontime_numerator', dataKey: 'numerator' },
+        { title: t('dashboard.tclWarehousing.kpiColumns.denominator'), key: 'doa_ontime_denominator', dataKey: 'denominator' },
+        { title: t('dashboard.tclWarehousing.kpiColumns.rate'), key: 'doa_ontime_rate', dataKey: 'rate' },
+        { title: t('dashboard.tclWarehousing.kpiColumns.scoreFull10'), key: 'doa_ontime_score', dataKey: 'score', maxScore: 10 },
       ]),
       // 送货及时率 (kpiType: 35)
-      createKpiDetailColumn('送货及时率', 35, [
-        { title: '达标数量', key: 'doa_delivery_numerator', dataKey: 'numerator' },
-        { title: '总数量', key: 'doa_delivery_denominator', dataKey: 'denominator' },
-        { title: '达标率', key: 'doa_delivery_rate', dataKey: 'rate' },
-        { title: '得分(满分20分)', key: 'doa_delivery_score', dataKey: 'score', maxScore: 20 },
+      createKpiDetailColumn(t('dashboard.tclWarehousing.kpiColumns.deliveryTimelinessRate'), 35, [
+        { title: t('dashboard.tclWarehousing.kpiColumns.numerator'), key: 'doa_delivery_numerator', dataKey: 'numerator' },
+        { title: t('dashboard.tclWarehousing.kpiColumns.denominator'), key: 'doa_delivery_denominator', dataKey: 'denominator' },
+        { title: t('dashboard.tclWarehousing.kpiColumns.rate'), key: 'doa_delivery_rate', dataKey: 'rate' },
+        { title: t('dashboard.tclWarehousing.kpiColumns.scoreFull20'), key: 'doa_delivery_score', dataKey: 'score', maxScore: 20 },
       ]),
       // 返单及时率 (kpiType: 36)
-      createKpiDetailColumn('返单及时率', 36, [
-        { title: '达标数量', key: 'doa_return_numerator', dataKey: 'numerator' },
-        { title: '总数量', key: 'doa_return_denominator', dataKey: 'denominator' },
-        { title: '达标率', key: 'doa_return_rate', dataKey: 'rate' },
-        { title: '得分(满分10分)', key: 'doa_return_score', dataKey: 'score', maxScore: 10 },
+      createKpiDetailColumn(t('dashboard.tclWarehousing.kpiColumns.returnTimelinessRate'), 36, [
+        { title: t('dashboard.tclWarehousing.kpiColumns.numerator'), key: 'doa_return_numerator', dataKey: 'numerator' },
+        { title: t('dashboard.tclWarehousing.kpiColumns.denominator'), key: 'doa_return_denominator', dataKey: 'denominator' },
+        { title: t('dashboard.tclWarehousing.kpiColumns.rate'), key: 'doa_return_rate', dataKey: 'rate' },
+        { title: t('dashboard.tclWarehousing.kpiColumns.scoreFull10'), key: 'doa_return_score', dataKey: 'score', maxScore: 10 },
       ]),
     ];
     return [
       ...baseColumns,
-      { title: '总成绩', key: 'totalScore', dataIndex: 'totalScore', width: 120, align: 'center' as const },
+      { title: t('dashboard.tclWarehousing.tableColumns.totalScore'), key: 'totalScore', dataIndex: 'totalScore', width: 120, align: 'center' as const },
       ...kpiColumns,
-      { title: '得分汇总', key: 'scoreSummary', dataIndex: 'scoreSummary', width: 150, align: 'center' as const },
+      { title: t('dashboard.tclWarehousing.tableColumns.scoreSummary'), key: 'scoreSummary', dataIndex: 'scoreSummary', width: 150, align: 'center' as const },
       {
-        title: '扣分项', key: 'deductionitem',
+        title: t('dashboard.tclWarehousing.deductionColumns.title'), key: 'deductionitem',
         children: [
-          { title: '质量（默认满分30）', key: 'qualityDeduction', dataIndex: 'qualityDeduction', width: 150, align: 'center' as const },
-          { title: '服务（默认满分15）', key: 'serviceDeduction', dataIndex: 'serviceDeduction', width: 150, align: 'center' as const },
-          { title: '安全（默认满分15）', key: 'safetyDeduction', dataIndex: 'safetyDeduction', width: 150, align: 'center' as const },
-          { title: '其他扣分项', key: 'otherDeduction', dataIndex: 'otherDeduction', width: 150, align: 'center' as const },
-          { title: '扣分说明', key: 'deductionDesc', dataIndex: 'deductionDesc', width: 150, align: 'center' as const },
+          { title: t('dashboard.tclWarehousing.deductionColumns.quality'), key: 'qualityDeduction', dataIndex: 'qualityDeduction', width: 150, align: 'center' as const },
+          { title: t('dashboard.tclWarehousing.deductionColumns.service'), key: 'serviceDeduction', dataIndex: 'serviceDeduction', width: 150, align: 'center' as const },
+          { title: t('dashboard.tclWarehousing.deductionColumns.safety'), key: 'safetyDeduction', dataIndex: 'safetyDeduction', width: 150, align: 'center' as const },
+          { title: t('dashboard.tclWarehousing.deductionColumns.other'), key: 'otherDeduction', dataIndex: 'otherDeduction', width: 150, align: 'center' as const },
+          { title: t('dashboard.tclWarehousing.deductionColumns.description'), key: 'deductionDesc', dataIndex: 'deductionDesc', width: 150, align: 'center' as const },
         ]
       },
       {
-        title: '加分项', key: 'bonusitem',
+        title: t('dashboard.tclWarehousing.bonusColumns.title'), key: 'bonusitem',
         children: [
-          { title: '其他加分项', key: 'otherBonus', dataIndex: 'otherBonus', width: 150, align: 'center' as const,
+          { title: t('dashboard.tclWarehousing.bonusColumns.other'), key: 'otherBonus', dataIndex: 'otherBonus', width: 150, align: 'center' as const,
             customRender: ({ text, record }: { text: number; record: any }) => {
               return renderNumberCell(text, record.otherBonusTrend);
             }
           },
-          { title: '加分说明', key: 'bonusDescription', dataIndex: 'bonusDescription', width: 150, align: 'center' as const },
+          { title: t('dashboard.tclWarehousing.bonusColumns.description'), key: 'bonusDescription', dataIndex: 'bonusDescription', width: 150, align: 'center' as const },
         ]
       }
     ];
@@ -138,7 +140,7 @@ const tableColumns = computed(() => {
     return [
       ...baseColumns,
       {
-        title: '提货及时率', key: 'pickupTimelinessRate', dataIndex: 'pickupTimelinessRate', width: 150, align: 'center' as const,
+        title: t('dashboard.tclWarehousing.kpiColumns.pickupTimelinessRate'), key: 'pickupTimelinessRate', dataIndex: 'pickupTimelinessRate', width: 150, align: 'center' as const,
         customRender: ({ record }: { record: any }) => {
           const kpi = record.kpiData?.find((k: any) => k.kpiType === 34);
           if (!kpi) return '-';
@@ -147,7 +149,7 @@ const tableColumns = computed(() => {
         },
       },
       {
-        title: '送货及时率', key: 'deliveryOnTimeRate', dataIndex: 'deliveryOnTimeRate', width: 150, align: 'center' as const,
+        title: t('dashboard.tclWarehousing.kpiColumns.deliveryTimelinessRate'), key: 'deliveryOnTimeRate', dataIndex: 'deliveryOnTimeRate', width: 150, align: 'center' as const,
         customRender: ({ record }: { record: any }) => {
           const kpi = record.kpiData?.find((k: any) => k.kpiType === 35);
           if (!kpi) return '-';
@@ -156,7 +158,7 @@ const tableColumns = computed(() => {
         },
       },
       {
-        title: '返单及时率', key: 'onTimeReturnRate', dataIndex: 'onTimeReturnRate', width: 200, align: 'center' as const,
+        title: t('dashboard.tclWarehousing.kpiColumns.returnTimelinessRate'), key: 'onTimeReturnRate', dataIndex: 'onTimeReturnRate', width: 200, align: 'center' as const,
         customRender: ({ record }: { record: any }) => {
           const kpi = record.kpiData?.find((k: any) => k.kpiType === 36);
           if (!kpi) return '-';
@@ -244,7 +246,7 @@ const createKpiDetailColumn = (
 
 // 显示文本
 const selectedLogisticProviderText = computed(() => {
-  if (selectedLogisticProvider.value.length === 0) return '物流商';
+  if (selectedLogisticProvider.value.length === 0) return t('dashboard.tclWarehousing.tableColumns.logisticProvider');
   const names = selectedLogisticProvider.value.map(code => {
     const option = logisticProviderOptions.value.find(item => item.code === code);
     return option ? option.name : code;
@@ -253,7 +255,7 @@ const selectedLogisticProviderText = computed(() => {
 });
 
 const selectedCdcWarehouseText = computed(() => {
-  if (selectedCdcWarehouse.value.length === 0) return '发货平台';
+  if (selectedCdcWarehouse.value.length === 0) return t('dashboard.tclWarehousing.tableColumns.cdcWarehouse');
   const names = selectedCdcWarehouse.value.map(code => {
     const option = cdcWarehouseOptions.value.find(item => item.code === code);
     return option ? option.name : code;
@@ -364,12 +366,12 @@ const fetchTableData = async () => {
         tableData.value = [];
       }
     } else {
-      message.error(result?.msg || '获取数据失败');
+      message.error(result?.msg || t('dashboard.tclWarehousing.messages.fetchDataFailed'));
       tableData.value = [];
     }
   } catch (error) {
-    console.error('获取表格数据失败:', error);
-    message.error('获取数据失败');
+    console.error(t('dashboard.tclWarehousing.messages.fetchTableDataFailed'), error);
+    message.error(t('dashboard.tclWarehousing.messages.fetchDataFailed'));
     tableData.value = [];
   } finally {
     loading.value = false;
@@ -379,11 +381,11 @@ const fetchTableData = async () => {
 // 导出汇总
 const handleExportSummary = async () => {
   if (!dateRange.value || !dateRange.value[0] || !dateRange.value[1]) {
-    message.warning('请选择日期范围');
+    message.warning(t('dashboard.tclWarehousing.messages.selectDateRange'));
     return;
   }
   if (!tableData.value || tableData.value.length === 0) {
-    message.warning('没有数据可以导出');
+    message.warning(t('dashboard.tclWarehousing.messages.noDataToExport'));
     return;
   }
   try {
@@ -403,23 +405,23 @@ const handleExportSummary = async () => {
         const link = document.createElement('a');
         link.href = result.data;
         const xlsxMatch = result.data.match(/([^/]+\.xlsx)$/);
-        const downloadFilename = xlsxMatch ? xlsxMatch[1] : `华星物流商KPI评分汇总_${dateRange.value[0].format('YYYY-MM')}_${dateRange.value[1].format('YYYY-MM')}.xlsx`;
+        const downloadFilename = xlsxMatch ? xlsxMatch[1] : t('dashboard.tclWarehousing.messages.exportSummaryFileName', [dateRange.value[0].format('YYYY-MM'), dateRange.value[1].format('YYYY-MM')]);
         link.download = downloadFilename;
         link.target = '_blank';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        message.success('导出汇总成功');
+        message.success(t('dashboard.tclWarehousing.messages.exportSummarySuccess'));
       }
     } else {
-      message.error(result?.message || '导出汇总失败');
+      message.error(result?.message || t('dashboard.tclWarehousing.messages.exportSummaryFailed'));
     }
   } catch (error: any) {
     const errCode = error?.code || error?.response?.status;
     if (errCode === 409 || errCode === 504 || errCode === 505) {
-      message.error(error.msg || '导出数据量过大，请缩小查询范围');
+      message.error(error.msg || t('dashboard.tclWarehousing.messages.exportDataTooLarge'));
     } else {
-      message.error(error.msg || '导出汇总失败');
+      message.error(error.msg || t('dashboard.tclWarehousing.messages.exportSummaryFailed'));
     }
   } finally {
     exportSummaryLoading.value = false;
@@ -429,11 +431,11 @@ const handleExportSummary = async () => {
 // 导出明细
 const handleExportDetail = async () => {
   if (!dateRange.value || !dateRange.value[0] || !dateRange.value[1]) {
-    message.warning('请选择日期范围');
+    message.warning(t('dashboard.tclWarehousing.messages.selectDateRange'));
     return;
   }
   if (!tableData.value || tableData.value.length === 0) {
-    message.warning('没有数据可以导出');
+    message.warning(t('dashboard.tclWarehousing.messages.noDataToExport'));
     return;
   }
   try {
@@ -453,23 +455,23 @@ const handleExportDetail = async () => {
         const link = document.createElement('a');
         link.href = result.data;
         const xlsxMatch = result.data.match(/([^/]+\.xlsx)$/);
-        const downloadFilename = xlsxMatch ? xlsxMatch[1] : `华星物流商KPI评分明细_${dateRange.value[0].format('YYYY-MM')}_${dateRange.value[1].format('YYYY-MM')}.xlsx`;
+        const downloadFilename = xlsxMatch ? xlsxMatch[1] : t('dashboard.tclWarehousing.messages.exportDetailFileName', [dateRange.value[0].format('YYYY-MM'), dateRange.value[1].format('YYYY-MM')]);
         link.download = downloadFilename;
         link.target = '_blank';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        message.success('导出明细成功');
+        message.success(t('dashboard.tclWarehousing.messages.exportDetailSuccess'));
       }
     } else {
-      message.error(result?.message || '导出明细失败');
+      message.error(result?.message || t('dashboard.tclWarehousing.messages.exportDetailFailed'));
     }
   } catch (error: any) {
     const errCode = error?.code || error?.response?.status;
     if (errCode === 409 || errCode === 504 || errCode === 505) {
-      message.error(error.msg || '导出数据量过大，请缩小查询范围');
+      message.error(error.msg || t('dashboard.tclWarehousing.messages.exportDataTooLarge'));
     } else {
-      message.error(error.msg || '导出明细失败');
+      message.error(error.msg || t('dashboard.tclWarehousing.messages.exportDetailFailed'));
     }
   } finally {
     exportDetailLoading.value = false;
@@ -537,7 +539,7 @@ onUnmounted(() => {
 <template>
   <div class="tcl-card-container">
     <div class="header-bar">
-      <h2 class="header-title">华星物流商KPI评分</h2>
+      <h2 class="header-title">{{ t('dashboard.tclWarehousing.title') }}</h2>
     </div>
     <!-- 控制面板 -->
     <div class="control-panel">
@@ -548,8 +550,8 @@ onUnmounted(() => {
             v-model:value="dateRange"
             picker="month"
             format="YYYY-MM"
-            separator="至"
-            :placeholder="['开始月份', '结束月份']"
+            :separator="t('dashboard.tclWarehousing.dateRange.separator')"
+            :placeholder="[t('dashboard.tclWarehousing.dateRange.startMonth'), t('dashboard.tclWarehousing.dateRange.endMonth')]"
             class="date-range-picker"
           />
         </div>
@@ -561,7 +563,7 @@ onUnmounted(() => {
           </svg>
           <div class="dropdown-content" v-show="isLogisticProviderOpen" @click.stop>
             <div class="search-box">
-              <input v-model="logisticProviderSearch" type="text" placeholder="搜索物流商..." class="search-input" @click.stop />
+              <input v-model="logisticProviderSearch" type="text" :placeholder="t('dashboard.tclWarehousing.placeholders.searchLogisticProvider')" class="search-input" @click.stop />
             </div>
             <div class="options-list">
               <div
@@ -575,7 +577,7 @@ onUnmounted(() => {
                 {{ option.name }}
               </div>
               <div v-if="filteredLogisticProviderOptions.length === 1 && logisticProviderSearch" class="no-results">
-                暂无搜索结果
+                {{ t('dashboard.tclWarehousing.noSearchResults') }}
               </div>
             </div>
           </div>
@@ -588,7 +590,7 @@ onUnmounted(() => {
           </svg>
           <div class="dropdown-content" v-show="isCdcWarehouseOpen" @click.stop>
             <div class="search-box">
-              <input v-model="cdcWarehouseSearch" type="text" placeholder="搜索发货平台..." class="search-input" @click.stop />
+              <input v-model="cdcWarehouseSearch" type="text" :placeholder="t('dashboard.tclWarehousing.placeholders.searchCdcWarehouse')" class="search-input" @click.stop />
             </div>
             <div class="options-list">
               <div
@@ -602,21 +604,21 @@ onUnmounted(() => {
                 {{ option.name }}
               </div>
               <div v-if="filteredCdcWarehouseOptions.length === 1 && cdcWarehouseSearch" class="no-results">
-                暂无搜索结果
+                {{ t('dashboard.tclWarehousing.noSearchResults') }}
               </div>
             </div>
           </div>
         </div>
         <!-- 显示详情开关 -->
         <div class="switch-item">
-          <span class="switch-label">显示详情</span>
+          <span class="switch-label">{{ t('dashboard.tclWarehousing.showDetails') }}</span>
           <a-switch v-model:checked="showDetails" />
         </div>
       </div>
       <!-- 导出按钮组 -->
       <div class="export-group">
-        <a-button type="primary" :loading="exportSummaryLoading" @click="handleExportSummary" class="export-btn">导出汇总</a-button>
-        <a-button type="primary" :loading="exportDetailLoading" @click="handleExportDetail" class="export-btn">导出明细</a-button>
+        <a-button type="primary" :loading="exportSummaryLoading" @click="handleExportSummary" class="export-btn">{{ t('dashboard.tclWarehousing.buttons.exportSummary') }}</a-button>
+        <a-button type="primary" :loading="exportDetailLoading" @click="handleExportDetail" class="export-btn">{{ t('dashboard.tclWarehousing.buttons.exportDetail') }}</a-button>
       </div>
     </div>
     <!-- 表格区域 -->
