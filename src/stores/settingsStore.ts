@@ -1248,16 +1248,19 @@ export const useSettingsStore = defineStore('settings', () => {
       settings.value.ttsProvider = 'local'
       settings.value.embeddingProvider = 'local'
     } else {
-      // For dashscope AI provider without OpenAI key, use dashscope for TTS/Embeddings
-      const defaultProvider =
+      // For dashscope AI provider without OpenAI key, force dashscope for TTS/Embeddings
+      // (matches the computed display logic in VoiceModelsStep)
+      const shouldUseDashscope =
         onboardingData.aiProvider === 'dashscope' && !hasOpenAIKey
-          ? 'dashscope'
-          : 'openai'
 
-      // Respect the user's choice from the wizard if available, otherwise use default
-      settings.value.ttsProvider = onboardingData.ttsProvider || defaultProvider
-      settings.value.embeddingProvider =
-        onboardingData.embeddingProvider || defaultProvider
+      if (shouldUseDashscope) {
+        settings.value.ttsProvider = 'dashscope'
+        settings.value.embeddingProvider = 'dashscope'
+      } else {
+        settings.value.ttsProvider = onboardingData.ttsProvider || 'openai'
+        settings.value.embeddingProvider =
+          onboardingData.embeddingProvider || 'openai'
+      }
     }
 
     if (onboardingData.ollamaBaseUrl) {

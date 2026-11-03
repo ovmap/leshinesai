@@ -1092,10 +1092,13 @@ export const createContextAnalysisResponse = async (
 ): Promise<string | null> => {
   const settings = useSettingsStore().config
   // 分析用户情绪，仅在明显负面情绪时输出，否则返回空
-const analysisSystemPrompt = `Analyze the user's emotional state in the conversation. Only output a brief description if the user shows clear negative emotions (anxiety, anger, frustration). Return empty string if the user is neutral or positive. Do not analyze neutral or positive emotions.`
+const analysisSystemPrompt = `Analyze the user's emotional state in the conversation. Only output a brief description (1-3 words) if the user shows clear negative emotions (anxiety, anger, frustration). Return empty string if the user is neutral or positive. Do not analyze neutral or positive emotions.`
   const combinedText = messagesToAnalyze
     .map(msg => `${msg.role}: ${msg.content}`)
     .join('\n\n')
+
+  // 情感分析结果应该很简短，超过这个长度说明模型理解错误
+  const MAX_EMOTIONAL_CONTEXT_LENGTH = 20
 
   if (settings.aiProvider === 'codex') {
     const content = await createCodexTextResponse(
@@ -1103,7 +1106,9 @@ const analysisSystemPrompt = `Analyze the user's emotional state in the conversa
       analysisModel,
       analysisSystemPrompt
     )
-    return content ? content.replace(/"/g, '') : null
+    const result = content ? content.replace(/"/g, '').trim() : null
+    // 如果输出太长，当作无效
+    return result && result.length <= MAX_EMOTIONAL_CONTEXT_LENGTH ? result : null
   }
 
   const client = getAIClient()
@@ -1133,9 +1138,11 @@ const analysisSystemPrompt = `Analyze the user's emotional state in the conversa
     )
 
     const content = response.choices[0]?.message?.content?.trim()
-    return content
-      ? stripReasoningFromMiniMaxContent(content).replace(/"/g, '')
+    const result = content
+      ? stripReasoningFromMiniMaxContent(content).replace(/"/g, '').trim()
       : null
+    // 如果输出太长，当作无效
+    return result && result.length <= MAX_EMOTIONAL_CONTEXT_LENGTH ? result : null
   } else {
     const response = await client.responses.create({
       model: analysisModel,
@@ -1160,7 +1167,9 @@ const analysisSystemPrompt = `Analyze the user's emotional state in the conversa
     const outputItem = response.output?.[0] as any
     const textPart = outputItem?.content?.[0]
     if (textPart?.type === 'output_text') {
-      return textPart.text.trim().replace(/"/g, '')
+      const result = textPart.text.trim().replace(/"/g, '')
+      // 如果输出太长，当作无效
+      return result.length <= MAX_EMOTIONAL_CONTEXT_LENGTH ? result : null
     }
     return null
   }

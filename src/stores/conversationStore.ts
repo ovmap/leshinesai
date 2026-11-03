@@ -490,6 +490,7 @@ export const useConversationStore = defineStore('conversation', () => {
       queueAudioForPlayback: response => queueAudioForPlayback(response),
       getAudioState: () => audioState.value as AudioState,
       setAudioState: state => setAudioState(state),
+      isTTSEnabled: () => generalStore.isTTSEnabled,
       logError: (...args: any[]) => console.error(...args),
     }
   }

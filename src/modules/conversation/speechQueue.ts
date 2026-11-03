@@ -7,6 +7,7 @@ export interface SpeechQueueDependencies {
   queueAudioForPlayback(response: Response): boolean
   getAudioState(): AudioState
   setAudioState(state: AudioState): void
+  isTTSEnabled(): boolean
   logError(...args: any[]): void
 }
 
@@ -20,6 +21,9 @@ export function createSpeechQueueManager(
   return {
     async enqueueSpeech(text: string): Promise<void> {
       if (!text.trim()) return
+
+      // Skip TTS request entirely if TTS is disabled
+      if (!dependencies.isTTSEnabled()) return
 
       const abortController = dependencies.createAbortController()
       dependencies.setTtsAbortController(abortController)

@@ -269,77 +269,118 @@ function initializeDashScopeClient(): void {
 export function reinitializeClients(): void {
   console.log('Reinitializing API clients with updated settings...')
 
-  try {
-    initializeOpenAIClient()
-    console.log('OpenAI client reinitialized successfully')
-  } catch (error) {
-    console.error('Failed to reinitialize OpenAI client:', error)
-    openaiClient = null
+  const settings = useSettingsStore().config
+
+  // Reset all clients first
+  openaiClient = null
+  openrouterClient = null
+  groqClient = null
+  ollamaClient = null
+  lmStudioClient = null
+  zaiClient = null
+  minimaxClient = null
+  deepseekClient = null
+  dashscopeClient = null
+
+  // Determine which providers are actually needed
+  const neededProviders = new Set<string>()
+  neededProviders.add(settings.aiProvider)
+  neededProviders.add(settings.sttProvider)
+  neededProviders.add(settings.ttsProvider)
+  neededProviders.add(settings.embeddingProvider)
+
+  // Initialize only the clients that are actually needed
+  if (neededProviders.has('openai')) {
+    try {
+      initializeOpenAIClient()
+      console.log('OpenAI client reinitialized successfully')
+    } catch (error) {
+      console.warn('OpenAI client not initialized:', (error as Error).message)
+      openaiClient = null
+    }
   }
 
-  try {
-    initializeOpenRouterClient()
-    console.log('OpenRouter client reinitialized successfully')
-  } catch (error) {
-    console.error('Failed to reinitialize OpenRouter client:', error)
-    openrouterClient = null
+  if (neededProviders.has('openrouter')) {
+    try {
+      initializeOpenRouterClient()
+      console.log('OpenRouter client reinitialized successfully')
+    } catch (error) {
+      console.warn('OpenRouter client not initialized:', (error as Error).message)
+      openrouterClient = null
+    }
   }
 
-  try {
-    initializeGroqClient()
-    console.log('Groq client reinitialized successfully')
-  } catch (error) {
-    console.error('Failed to reinitialize Groq client:', error)
-    groqClient = null
+  if (neededProviders.has('groq')) {
+    try {
+      initializeGroqClient()
+      console.log('Groq client reinitialized successfully')
+    } catch (error) {
+      console.warn('Groq client not initialized:', (error as Error).message)
+      groqClient = null
+    }
   }
 
-  try {
-    initializeOllamaClient()
-    console.log('Ollama client reinitialized successfully')
-  } catch (error) {
-    console.error('Failed to reinitialize Ollama client:', error)
-    ollamaClient = null
+  if (neededProviders.has('ollama')) {
+    try {
+      initializeOllamaClient()
+      console.log('Ollama client reinitialized successfully')
+    } catch (error) {
+      console.warn('Ollama client not initialized:', (error as Error).message)
+      ollamaClient = null
+    }
   }
 
-  try {
-    initializeLMStudioClient()
-    console.log('LM Studio client reinitialized successfully')
-  } catch (error) {
-    console.error('Failed to reinitialize LM Studio client:', error)
-    lmStudioClient = null
+  if (neededProviders.has('lm-studio')) {
+    try {
+      initializeLMStudioClient()
+      console.log('LM Studio client reinitialized successfully')
+    } catch (error) {
+      console.warn('LM Studio client not initialized:', (error as Error).message)
+      lmStudioClient = null
+    }
   }
 
-  try {
-    initializeZAIClient()
-    console.log('Z.ai client reinitialized successfully')
-  } catch (error) {
-    console.error('Failed to reinitialize Z.ai client:', error)
-    zaiClient = null
+  if (neededProviders.has('zai')) {
+    try {
+      initializeZAIClient()
+      console.log('Z.ai client reinitialized successfully')
+    } catch (error) {
+      console.warn('Z.ai client not initialized:', (error as Error).message)
+      zaiClient = null
+    }
   }
 
-  try {
-    initializeMiniMaxClient()
-    console.log('MiniMax client reinitialized successfully')
-  } catch (error) {
-    console.error('Failed to reinitialize MiniMax client:', error)
-    minimaxClient = null
+  if (neededProviders.has('minimax')) {
+    try {
+      initializeMiniMaxClient()
+      console.log('MiniMax client reinitialized successfully')
+    } catch (error) {
+      console.warn('MiniMax client not initialized:', (error as Error).message)
+      minimaxClient = null
+    }
   }
 
-  try {
-    initializeDeepSeekClient()
-    console.log('DeepSeek client reinitialized successfully')
-  } catch (error) {
-    console.error('Failed to reinitialize DeepSeek client:', error)
-    deepseekClient = null
+  if (neededProviders.has('deepseek')) {
+    try {
+      initializeDeepSeekClient()
+      console.log('DeepSeek client reinitialized successfully')
+    } catch (error) {
+      console.warn('DeepSeek client not initialized:', (error as Error).message)
+      deepseekClient = null
+    }
   }
 
-  try {
-    initializeDashScopeClient()
-    console.log('DashScope (通义千问) client reinitialized successfully')
-  } catch (error) {
-    console.error('Failed to reinitialize DashScope client:', error)
-    dashscopeClient = null
+  if (neededProviders.has('dashscope')) {
+    try {
+      initializeDashScopeClient()
+      console.log('DashScope (通义千问) client reinitialized successfully')
+    } catch (error) {
+      console.warn('DashScope client not initialized:', (error as Error).message)
+      dashscopeClient = null
+    }
   }
+
+  console.log('API clients reinitialization complete')
 }
 
 export async function initializeClients(): Promise<void> {
