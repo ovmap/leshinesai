@@ -31,6 +31,12 @@ export const useDashboardDataStore = defineStore('dashboardData', () => {
   // 最后更新时间
   const lastUpdated = ref<number>(0)
 
+  // AI 大脑当前聚焦的报告类型（cddWeeklyReport / pfpAssessment / isgAlert / signingAlert）
+  const focusedAIReport = ref<string | null>(null)
+
+  // AI 大脑模块名列表
+  const AI_BRAIN_MODULES = ['cddWeeklyReport', 'pfpAssessment', 'isgAlert', 'signingAlert']
+
   // 控制 Store 引用
   const controlStore = useDashboardControlStore()
   
@@ -61,14 +67,14 @@ export const useDashboardDataStore = defineStore('dashboardData', () => {
     module: string,
     scope: 'summary' | 'detail' | 'full' = 'summary'
   ): string {
-    // 特殊处理：cddWeeklyReport 和 pfpAssessment 从 cargoBanner 数据中提取
-    if (module === 'cddWeeklyReport' || module === 'pfpAssessment') {
+    // 特殊处理：虚拟模块从 cargoBanner 数据中提取
+    if (['cddWeeklyReport', 'pfpAssessment', 'isgAlert', 'signingAlert'].includes(module)) {
       const cargoBannerData = moduleData.value['cargoBanner']
       const subData = cargoBannerData?.[module]
       
       if (!subData) {
-        const title = module === 'cddWeeklyReport' ? 'CDD 周报' : 'PFP 考核'
-        return `## ${title}\n暂无数据\n\n> 提示: 请先使用 page({ page: "cargoBanner" }) 打开智能体中心页面`
+        const titleMap: Record<string, string> = { cddWeeklyReport: 'CDD 周报', pfpAssessment: 'PFP 考核', isgAlert: 'ISG 订单预警', signingAlert: '签收异常预警' }
+        return `## ${titleMap[module] || module}\n暂无数据\n\n> 提示: 请先使用 page({ page: "cargoBanner" }) 打开智能体中心页面`
       }
       
       const formatter = formatters[module]
@@ -475,15 +481,16 @@ export const useDashboardDataStore = defineStore('dashboardData', () => {
         return getPageOverview()
       }
 
-      // 特殊虚拟模块（cddWeeklyReport, pfpAssessment）跳过页面检查
-      const isVirtualModule = module === 'cddWeeklyReport' || module === 'pfpAssessment'
+      // AI 大脑模块：设置聚焦报告，跳过页面检查
+      if (AI_BRAIN_MODULES.includes(module)) {
+        focusedAIReport.value = module
+        return getModuleFormattedData(module, scope)
+      }
       
       // 指定了模块 → 直接返回数据（不限制当前页面）
-      if (!isVirtualModule) {
-        const targetPage = findModulePage(module)
-        if (!targetPage) {
-          return `模块 [${module}] 不在任何页面中。`
-        }
+      const targetPage = findModulePage(module)
+      if (!targetPage) {
+        return `模块 [${module}] 不在任何页面中。`
       }
 
       // 返回模块数据
@@ -502,9 +509,12 @@ export const useDashboardDataStore = defineStore('dashboardData', () => {
     // ========== grid/cards 布局 ==========
     if (layout === 'grid' || layout === 'cards') {
       if (module) {
-        // 虚拟模块直接返回数据
-        const isVirtualModule = module === 'cddWeeklyReport' || module === 'pfpAssessment'
-        if (!isVirtualModule && !controlStore.activeModules.includes(module)) {
+        // AI 大脑模块：设置聚焦报告，直接返回数据
+        if (AI_BRAIN_MODULES.includes(module)) {
+          focusedAIReport.value = module
+          return getModuleFormattedData(module, 'detail')
+        }
+        if (!controlStore.activeModules.includes(module)) {
           const titleMap = getModuleTitleMap()
           const currentNames = controlStore.activeModules.map(m => titleMap[m] || m).join('、')
           const moduleTitle = titleMap[module] || module
@@ -520,9 +530,12 @@ export const useDashboardDataStore = defineStore('dashboardData', () => {
     // ========== single 布局 ==========
     if (layout === 'single') {
       if (module) {
-        // 虚拟模块直接返回数据
-        const isVirtualModule = module === 'cddWeeklyReport' || module === 'pfpAssessment'
-        if (!isVirtualModule && !controlStore.activeModules.includes(module)) {
+        // AI 大脑模块：设置聚焦报告，直接返回数据
+        if (AI_BRAIN_MODULES.includes(module)) {
+          focusedAIReport.value = module
+          return getModuleFormattedData(module, 'detail')
+        }
+        if (!controlStore.activeModules.includes(module)) {
           const titleMap = getModuleTitleMap()
           const currentModule = controlStore.activeModules[0]
           const currentTitle = titleMap[currentModule] || currentModule
@@ -544,6 +557,7 @@ export const useDashboardDataStore = defineStore('dashboardData', () => {
     moduleData,
     uiState,
     lastUpdated,
+    focusedAIReport,
     updateModuleData,
     updateUIState,
     removeModuleData,

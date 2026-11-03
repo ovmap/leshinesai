@@ -226,6 +226,14 @@ export const pageRegistry: PageMeta[] = [
  */
 export const moduleRegistry: ModuleMeta[] = [
   {
+    name: 'aiBrainReport',
+    title: 'AI 大脑报告',
+    icon: 'alert',
+    component: defineAsyncComponent(() => import('./modules/AIBrainReport.vue')),
+    defaultSpan: 24,
+    order: -1,
+  },
+  {
     name: 'cargoBanner',
     title: '智能体中心',
     icon: 'alert',
@@ -636,6 +644,7 @@ export function getPages(): PageMeta[] {
 
 /** 大模块（支持 single/grid 布局） */
 export const LARGE_MODULES = [
+  'aiBrainReport',
   'energyPrices',
   'abnormalTransportation',
   'capacityPool',

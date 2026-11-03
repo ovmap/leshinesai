@@ -585,7 +585,9 @@ const fetchRiskOrderStats = async () => {
     dataStore.updateModuleData('cargoBanner', {
       cards: dataCards.value,
       cddWeeklyReport: finalCddWeeklyReport,
-      pfpAssessment: finalPfpAssessment
+      pfpAssessment: finalPfpAssessment,
+      isgAlert: finalIsgContent,
+      signingAlert: finalCddContent,
     })
   } catch (error) {
     console.error('fetchRiskOrderStats error:', error)

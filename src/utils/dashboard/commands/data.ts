@@ -8,7 +8,7 @@ import type { CommandHandler } from '../types'
 const AVAILABLE_MODULES = getModuleNames()
 
 // 特殊虚拟模块（从 cargoBanner 数据中提取，不在 moduleRegistry 中注册）
-const VIRTUAL_MODULES = ['cddWeeklyReport', 'pfpAssessment']
+const VIRTUAL_MODULES = ['cddWeeklyReport', 'pfpAssessment', 'isgAlert', 'signingAlert']
 
 export const handleData: CommandHandler = async (args) => {
   const module = args?.module

@@ -98,6 +98,30 @@ await window.ipcRenderer.invoke('dashboard:data', { module: 'cargoTrend' })
 await window.ipcRenderer.invoke('dashboard:data', { module: 'signingInformation' })
 ```
 
+#### AI 大脑核心产出（重要数据）
+
+打开智能体中心页面后，以下数据会自动获取，可直接通过 `data` 命令获取：
+
+```js
+// CDD 周报 — 运输准时交付率，含指标定义、达成情况、各维度分析
+await window.ipcRenderer.invoke('dashboard:data', { module: 'cddWeeklyReport' })
+
+// PFP 考核 — 物流商考核成绩、排名、评级、奖惩
+await window.ipcRenderer.invoke('dashboard:data', { module: 'pfpAssessment' })
+
+// ISG 订单预警 — 延误(delay)、在途(inTransit)、交付(delivery) 三类预警
+await window.ipcRenderer.invoke('dashboard:data', { module: 'isgAlert' })
+
+// 签收异常预警 — 签收异常和超期情况
+await window.ipcRenderer.invoke('dashboard:data', { module: 'signingAlert' })
+```
+
+> 前提：先打开智能体中心页面，让数据自动加载：
+> ```js
+> await window.ipcRenderer.invoke('dashboard:show', {})
+> await window.ipcRenderer.invoke('dashboard:page', { page: 'cargoBanner' })
+> ```
+
 #### 状态感知行为
 
 | 布局 | 不指定 module | 指定 module |

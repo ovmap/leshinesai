@@ -523,7 +523,7 @@
   {
     "type": "function",
     "name": "dashboard_command",
-    "description": "控制运输智能体看板的 CLI 工具。可用命令：show/filter/data/status/action/layout/page/help/close。**不确定参数时，先调用 help 查询用法。**",
+    "description": "控制数字空间(Dashboard)的 CLI 工具。支持打开看板、获取数据、筛选、操作模块、切换页面/布局等。不确定参数时先调用 help 查询。",
     "strict": false,
     "parameters": {
       "type": "object",
@@ -539,7 +539,7 @@
           "properties": {
             "module": {
               "type": "string",
-              "description": "目标模块 (data/action/help 命令)"
+              "description": "目标模块 (data/action/help 命令)。AI大脑模块: cddWeeklyReport, pfpAssessment, isgAlert, signingAlert。其他模块: cargoTrend, signingInformation 等"
             },
             "page": {
               "type": "string",
@@ -556,12 +556,12 @@
             },
             "params": {
               "type": "object",
-              "description": "操作参数 (action 命令)。用 help 查询参数要求"
+              "description": "操作参数 (action 命令)"
             },
             "layout": {
               "type": "string",
               "enum": ["single"],
-              "description": "布局模式 (layout 命令)。用于放大展示、单独显示某个模块查看数据。可用模块名通过 help({ queryCommand: 'layout' }) 查询。不涉及 scroll 布局"
+              "description": "布局模式 (layout 命令)。放大展示单个模块"
             },
             "queryCommand": {
               "type": "string",
