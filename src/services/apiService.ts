@@ -1085,7 +1085,8 @@ export const createContextAnalysisResponse = async (
   analysisModel: string
 ): Promise<string | null> => {
   const settings = useSettingsStore().config
-  const analysisSystemPrompt = `You are an expert in emotional intelligence. Analyze the tone and emotional state of the 'user' in the following conversation transcript. Provide a single, concise sentence describing their likely emotional state. Do not add any extra commentary.`
+  // 分析用户情绪，仅在明显负面情绪时输出，否则返回空
+const analysisSystemPrompt = `Analyze the user's emotional state in the conversation. Only output a brief description if the user shows clear negative emotions (anxiety, anger, frustration). Return empty string if the user is neutral or positive. Do not analyze neutral or positive emotions.`
   const combinedText = messagesToAnalyze
     .map(msg => `${msg.role}: ${msg.content}`)
     .join('\n\n')
