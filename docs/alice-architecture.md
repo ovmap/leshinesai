@@ -233,7 +233,7 @@ sentence describing their likely emotional state. Do not add any extra commentar
 
 ### 6.1 工具定义
 
-- Schema 定义：`docs/functions.json` — 包含 20 个预定义工具的 JSON Schema
+- Schema 定义：`resources/functions.json` — 包含 20 个预定义工具的 JSON Schema
 - 工具注册：`src/utils/assistantTools.ts` — 从 `functions.json` 加载 schema
 
 ### 6.2 内置工具列表

@@ -51,6 +51,9 @@ export const useGeneralStore = defineStore('general', () => {
   const audioQueue = ref<Response[]>([])
   const sideBarView = ref<string>('chat')
   const attachedFile = ref<File | null>(null)
+  const activeWidgetHtml = ref<string | null>(null)
+  const showWidget = (html: string) => { activeWidgetHtml.value = html }
+  const closeWidget = () => { activeWidgetHtml.value = null }
   const awaitingWakeWord = ref<boolean>(false)
   const wakeWordDetected = ref<boolean>(false)
 
@@ -234,6 +237,9 @@ export const useGeneralStore = defineStore('general', () => {
     audioQueue,
     sideBarView,
     attachedFile,
+    activeWidgetHtml,
+    showWidget,
+    closeWidget,
     awaitingWakeWord,
     wakeWordDetected,
     setAudioState,

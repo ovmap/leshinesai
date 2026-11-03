@@ -190,6 +190,35 @@ export function minimizeMainWindow(minimize: boolean): void {
   }
 }
 
+// 保存原始窗口大小和位置，用于恢复
+let originalWindowBounds: { x: number; y: number; width: number; height: number } | null = null
+
+export function maximizeMainWindow(): boolean {
+  if (!win) return false
+
+  // 保存当前窗口状态
+  if (!originalWindowBounds) {
+    const bounds = win.getBounds()
+    originalWindowBounds = bounds
+  }
+
+  // 最大化窗口
+  const { width, height } = screen.getPrimaryDisplay().workAreaSize
+  win.setBounds({ x: 0, y: 0, width, height })
+  return true
+}
+
+export function unmaximizeMainWindow(): boolean {
+  if (!win) return false
+
+  // 恢复原始窗口大小
+  if (originalWindowBounds) {
+    win.setBounds(originalWindowBounds)
+    originalWindowBounds = null
+  }
+  return true
+}
+
 export function focusMainWindow(): boolean {
   if (win && !win.isDestroyed()) {
     win.show()

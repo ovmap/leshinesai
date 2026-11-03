@@ -1,119 +1,155 @@
 <template>
   <div
-    class="sidebar-wrapper h-[480px] ml-[380px] bg-gray-900/90 flex flex-col absolute z-10 rounded-r-lg"
-    :class="{ open: openSidebar }"
+    class="sidebar-wrapper bg-gray-900/90 flex flex-col absolute z-10 rounded-r-lg"
+    :class="{
+      'widget-mode': activeWidgetHtml,
+      'h-[480px] ml-[380px]': !activeWidgetHtml,
+      open: openSidebar
+    }"
   >
-    <div
-      class="sidebar-content w-full flex-1 overflow-y-auto flex flex-col relative"
-      ref="sidebarContentElement"
-      @scroll="handleScroll"
-    >
-      <Chat
-        @processRequest="$emit('processRequest')"
-        v-if="sideBarView === 'chat'"
-      />
-      <MemoryManagerComponent v-if="sideBarView === 'memories'" />
-
-      <div
-        v-if="
-          sideBarView === 'chat' &&
-          !isConversationReady &&
-          !settingsStore.isLoading
-        "
-        class="absolute inset-0 flex items-center justify-center text-center p-4 z-10"
-      >
-        <div class="text-white">
-          <p class="text-lg font-semibold mb-2">
-            {{
-              generalStore.statusMessage.includes('Error:')
-                ? 'Initialization Failed'
-                : 'Initializing Leshine'
-            }}
-          </p>
-          <p
-            v-if="generalStore.statusMessage.includes('Error:')"
-            class="text-sm text-red-400"
+    <!-- Widget 模式：左右布局 -->
+    <template v-if="activeWidgetHtml">
+      <div class="flex h-full">
+        <!-- 左侧 1/3：对话区域 -->
+        <div class="w-1/3 flex flex-col border-r border-gray-700">
+          <div
+            class="sidebar-content flex-1 overflow-y-auto flex flex-col relative"
+            ref="sidebarContentElement"
+            @scroll="handleScroll"
           >
-            {{ generalStore.statusMessage }}
-          </p>
-          <p v-else class="text-sm">Please wait...</p>
-
-          <button
-            v-if="generalStore.statusMessage.includes('Error:')"
-            @click="retryInitialization"
-            class="mt-4 btn btn-sm btn-warning"
-          >
-            Retry Init
-          </button>
-          <button
-            v-if="generalStore.statusMessage.includes('Error:')"
-            @click="openSettingsWindow"
-            class="mt-4 ml-2 btn btn-sm btn-info"
-          >
-            Check Settings
-          </button>
+            <Chat @processRequest="$emit('processRequest')" v-if="sideBarView === 'chat'" />
+          </div>
+          <!-- 输入框 -->
+          <div class="p-4" v-if="sideBarView === 'chat' && isConversationReady">
+            <div class="gradient-border-wrapper">
+              <div class="flex items-center gap-1 bg-gray-800 rounded-lg pl-2">
+                <img
+                  :src="pdfIcon"
+                  alt="PDF Icon"
+                  class="w-5 h-5 mr-2 cursor-pointer hover:opacity-60"
+                  title="Attach PDF"
+                  @click="triggerFileUpload"
+                />
+                <input
+                  ref="fileInput"
+                  type="file"
+                  @change="handleFileSelect"
+                  class="hidden"
+                  accept=".pdf"
+                />
+                <input
+                  v-model="chatInput"
+                  @keyup.enter="chatInputHandle"
+                  class="input w-full bg-transparent border-0 shadow-none text-white p-2 text-sm disabled:cursor-not-allowed focus:outline-none"
+                  placeholder="输入消息..."
+                  :disabled="!isConversationReady"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- 右侧 2/3：Widget 区域 -->
+        <div class="w-2/3 p-8 overflow-auto">
+          <iframe
+            :srcdoc="widgetSrcdoc"
+            class="widget-iframe"
+            frameborder="0"
+          ></iframe>
         </div>
       </div>
-    </div>
+    </template>
 
-    <div
-      class="w-full pt-4 pr-4"
-      v-if="sideBarView === 'chat' && isConversationReady"
-    >
+    <!-- 默认模式：原有布局 -->
+    <template v-else>
       <div
-        class="gradient-border-wrapper"
-        :class="{ 'opacity-50': !isConversationReady }"
+        class="sidebar-content w-full flex-1 overflow-y-auto flex flex-col relative"
+        ref="sidebarContentElement"
+        @scroll="handleScroll"
       >
-        <div class="flex items-center gap-1 bg-gray-800 rounded-lg pl-2">
-          <img
-            :src="pdfIcon"
-            alt="PDF Icon"
-            class="w-6 h-6 mr-2 cursor-pointer hover:opacity-60"
-            title="Attach PDF"
-            @click="triggerFileUpload"
-          />
-          <input
-            ref="fileInput"
-            type="file"
-            @change="handleFileSelect"
-            class="hidden"
-            accept=".pdf"
-          />
-          <input
-            v-model="chatInput"
-            @keyup.enter="chatInputHandle"
-            class="input w-full bg-transparent border-0 shadow-none text-white p-3 relative z-10 disabled:cursor-not-allowed focus:outline-none focus:shadow-none"
-            placeholder="Type your message here..."
-            :disabled="!isConversationReady"
-          />
+        <Chat @processRequest="$emit('processRequest')" v-if="sideBarView === 'chat'" />
+        <MemoryManagerComponent v-if="sideBarView === 'memories'" />
+
+        <div
+          v-if="
+            sideBarView === 'chat' &&
+            !isConversationReady &&
+            !settingsStore.isLoading
+          "
+          class="absolute inset-0 flex items-center justify-center text-center p-4 z-10"
+        >
+          <div class="text-white">
+            <p class="text-lg font-semibold mb-2">
+              {{
+                generalStore.statusMessage.includes('Error:')
+                  ? 'Initialization Failed'
+                  : 'Initializing Leshine'
+              }}
+            </p>
+            <p v-if="generalStore.statusMessage.includes('Error:')" class="text-sm text-red-400">
+              {{ generalStore.statusMessage }}
+            </p>
+            <p v-else class="text-sm">Please wait...</p>
+
+            <button
+              v-if="generalStore.statusMessage.includes('Error:')"
+              @click="retryInitialization"
+              class="mt-4 btn btn-sm btn-warning"
+            >
+              Retry Init
+            </button>
+            <button
+              v-if="generalStore.statusMessage.includes('Error:')"
+              @click="openSettingsWindow"
+              class="mt-4 ml-2 btn btn-sm btn-info"
+            >
+              Check Settings
+            </button>
+          </div>
         </div>
       </div>
-      <div
-        v-if="attachedFile"
-        class="text-xs text-gray-400 p-1 pl-3 flex justify-between items-center"
-      >
-        <span class="truncate" :title="attachedFile.name"
-          >Attached: {{ attachedFile.name }}</span
+
+      <div class="w-full pt-4 pr-4" v-if="sideBarView === 'chat' && isConversationReady">
+        <div class="gradient-border-wrapper" :class="{ 'opacity-50': !isConversationReady }">
+          <div class="flex items-center gap-1 bg-gray-800 rounded-lg pl-2">
+            <img
+              :src="pdfIcon"
+              alt="PDF Icon"
+              class="w-6 h-6 mr-2 cursor-pointer hover:opacity-60"
+              title="Attach PDF"
+              @click="triggerFileUpload"
+            />
+            <input
+              ref="fileInput"
+              type="file"
+              @change="handleFileSelect"
+              class="hidden"
+              accept=".pdf"
+            />
+            <input
+              v-model="chatInput"
+              @keyup.enter="chatInputHandle"
+              class="input w-full bg-transparent border-0 shadow-none text-white p-3 relative z-10 disabled:cursor-not-allowed focus:outline-none focus:shadow-none"
+              placeholder="Type your message here..."
+              :disabled="!isConversationReady"
+            />
+          </div>
+        </div>
+        <div v-if="attachedFile" class="text-xs text-gray-400 p-1 pl-3 flex justify-between items-center">
+          <span class="truncate" :title="attachedFile.name">Attached: {{ attachedFile.name }}</span>
+          <button @click="clearAttachedFile" class="btn btn-xs btn-ghost" title="Remove file">✕</button>
+        </div>
+        <div
+          class="w-full px-4 pt-1 pb-2 text-center text-xs text-gray-500"
+          v-if="!isConversationReady && !attachedFile"
         >
-        <button
-          @click="clearAttachedFile"
-          class="btn btn-xs btn-ghost"
-          title="Remove file"
-        >
-          ✕
-        </button>
+          {{
+            generalStore.statusMessage.includes('Error:')
+              ? 'AI Services unavailable. Check settings or retry.'
+              : 'Initializing AI services...'
+          }}
+        </div>
       </div>
-      <div
-        class="w-full px-4 pt-1 pb-2 text-center text-xs text-gray-500"
-        v-if="!isConversationReady && !attachedFile"
-      >
-        {{
-          generalStore.statusMessage.includes('Error:')
-            ? 'AI Services unavailable. Check settings or retry.'
-            : 'Initializing AI services...'
-        }}
-      </div>
-    </div>
+    </template>
   </div>
 </template>
 
@@ -138,7 +174,7 @@ const emit = defineEmits(['processRequest'])
 const shouldAutoScroll = ref(true)
 const scrollThreshold = 100 // pixels from bottom to consider "at bottom"
 
-const { openSidebar, chatInput, sideBarView, attachedFile } =
+const { openSidebar, chatInput, sideBarView, attachedFile, activeWidgetHtml } =
   storeToRefs(generalStore)
 const { chatHistory } = storeToRefs(generalStore)
 const { isInitialized: conversationIsInitialized } =
@@ -146,6 +182,11 @@ const { isInitialized: conversationIsInitialized } =
 
 const isConversationReady = computed(() => conversationIsInitialized.value)
 const fileInput = ref<HTMLInputElement | null>(null)
+
+const widgetSrcdoc = computed(() => {
+  if (!activeWidgetHtml.value) return ''
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{margin:0;padding:0;background:transparent;}</style></head><body>${activeWidgetHtml.value}</body></html>`
+})
 
 const triggerFileUpload = () => {
   if (!isConversationReady.value) return
@@ -338,6 +379,38 @@ watch(
 </script>
 
 <style scoped>
+.sidebar-wrapper {
+  transform-origin: left center;
+  transition: transform 0.4s ease-out, opacity 0.3s ease-out;
+}
+
+.sidebar-wrapper:not(.open):not(.widget-mode) {
+  transform: scaleX(0) scaleY(0);
+  opacity: 0;
+}
+
+.sidebar-wrapper.open,
+.sidebar-wrapper.widget-mode {
+  transform: scaleX(1) scaleY(1);
+  opacity: 1;
+}
+
+.sidebar-wrapper.widget-mode {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  border-radius: 0;
+  z-index: 100;
+  max-width: 100vw !important;
+  overflow: visible !important;
+  padding: 0 !important;
+}
+
 .sidebar-content {
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
@@ -359,5 +432,12 @@ watch(
 
 .sidebar-content::-webkit-scrollbar-thumb:hover {
   background-color: rgba(255, 255, 255, 0.3);
+}
+
+.widget-iframe {
+  width: 100%;
+  height: 100%;
+  min-height: 500px;
+  border: none;
 }
 </style>

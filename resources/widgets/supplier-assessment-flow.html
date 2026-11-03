@@ -1,0 +1,334 @@
+<style>
+  :root {
+    --surface: transparent;
+    --surface-muted: rgba(255, 255, 255, 0.06);
+    --text: #e5e5e5;
+    --text-muted: #a1a1aa;
+    --border: rgba(255, 255, 255, 0.1);
+    --brand: #32F08C;
+    --brand-soft: rgba(50, 240, 140, 0.1);
+    --brand-text: #d4ffe8;
+    --accent: #27D2BF;
+    --accent-soft: rgba(39, 210, 191, 0.1);
+    --accent-text: #b8f0e8;
+    --radius: 8px;
+    --radius-card: 12px;
+    --spacer-4: 4px;
+    --spacer-8: 8px;
+    --spacer-12: 12px;
+    --spacer-16: 16px;
+    --spacer-20: 20px;
+    --spacer-24: 24px;
+    --font-sans: "SF Pro Text", "PingFang SC", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    --weight-regular: 400;
+    --weight-medium: 500;
+    --weight-strong: 600;
+    --text-caption: 12px/18px;
+    --text-body: 14px/20px;
+    --text-title: 16px/24px;
+  }
+
+  .widget {
+    color: var(--text);
+    background: transparent;
+    font: var(--weight-regular) var(--text-body) var(--font-sans);
+    max-width: 680px;
+    margin: 0 auto;
+    display: block !important;
+    flex-direction: column !important;
+  }
+
+  .widget-title {
+    font: var(--weight-strong) var(--text-title) var(--font-sans);
+    color: var(--text);
+    margin-bottom: var(--spacer-16);
+    text-align: center;
+    animation: fadeInUp 0.8s ease-out both;
+  }
+
+  .agent-card {
+    background: var(--brand-soft);
+    border: 1px solid var(--brand);
+    border-radius: var(--radius-card);
+    padding: var(--spacer-16);
+    margin-bottom: var(--spacer-20);
+    animation: fadeInUp 0.8s ease-out 1s both;
+  }
+
+  .agent-role {
+    font: var(--weight-medium) var(--text-body) var(--font-sans);
+    color: var(--brand-text);
+    margin-bottom: var(--spacer-4);
+  }
+
+  .agent-desc {
+    font: var(--weight-regular) var(--text-caption) var(--font-sans);
+    color: var(--brand-text);
+    opacity: 0.85;
+  }
+
+  .timeline {
+    position: relative;
+    padding-left: 32px;
+    margin-bottom: var(--spacer-24);
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 11px;
+    top: 8px;
+    bottom: 8px;
+    width: 2px;
+    background: var(--border);
+    transform-origin: top;
+    animation: growDown 10s ease-out 2s both;
+  }
+
+  .timeline-item {
+    position: relative;
+    margin-bottom: var(--spacer-16);
+    animation: fadeInUp 0.8s ease-out both;
+  }
+
+  .timeline-item:nth-child(1) { animation-delay: 2s; }
+  .timeline-item:nth-child(2) { animation-delay: 4.5s; }
+  .timeline-item:nth-child(3) { animation-delay: 7s; }
+
+  .timeline-marker {
+    position: absolute;
+    left: -32px;
+    top: 4px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 2px solid var(--brand);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font: var(--weight-strong) var(--text-caption) var(--font-sans);
+    color: var(--brand-text);
+  }
+
+  .timeline-content {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: var(--spacer-12) var(--spacer-16);
+  }
+
+  .timeline-date {
+    font: var(--weight-medium) var(--text-caption) var(--font-sans);
+    color: var(--brand-text);
+    background: var(--brand-soft);
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: var(--radius);
+    margin-bottom: var(--spacer-4);
+  }
+
+  .timeline-title {
+    font: var(--weight-medium) var(--text-body) var(--font-sans);
+    color: var(--text);
+    margin-bottom: var(--spacer-4);
+  }
+
+  .timeline-desc {
+    font: var(--weight-regular) var(--text-caption) var(--font-sans);
+    color: var(--text-muted);
+  }
+
+  .skills-section {
+    margin-bottom: var(--spacer-20);
+    animation: fadeInUp 0.8s ease-out 9.5s both;
+  }
+
+  .skills-title {
+    font: var(--weight-medium) var(--text-caption) var(--font-sans);
+    color: var(--text-muted);
+    margin-bottom: var(--spacer-12);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacer-12);
+  }
+
+  .skill-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: var(--spacer-12);
+  }
+
+  .skill-icon {
+    font-size: 20px;
+    margin-bottom: var(--spacer-8);
+  }
+
+  .skill-name {
+    font: var(--weight-medium) var(--text-caption) var(--font-sans);
+    color: var(--text);
+    margin-bottom: var(--spacer-4);
+  }
+
+  .skill-items {
+    font: var(--weight-regular) var(--text-caption) var(--font-sans);
+    color: var(--text-muted);
+  }
+
+  .skill-tag {
+    display: inline-block;
+    background: var(--surface-muted);
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin: 2px;
+    font-size: 11px;
+    font-family: var(--font-mono);
+  }
+
+  .infra-section {
+    animation: fadeInUp 0.8s ease-out 12s both;
+  }
+
+  .infra-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacer-12);
+  }
+
+  .infra-card {
+    background: var(--accent-soft);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius);
+    padding: var(--spacer-12);
+    text-align: center;
+  }
+
+  .infra-name {
+    font: var(--weight-medium) var(--text-caption) var(--font-sans);
+    color: var(--accent-text);
+  }
+
+  .infra-desc {
+    font: var(--weight-regular) 11px/16px var(--font-sans);
+    color: var(--accent-text);
+    opacity: 0.8;
+    margin-top: var(--spacer-4);
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes growDown {
+    from {
+      transform: scaleY(0);
+    }
+    to {
+      transform: scaleY(1);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+</style>
+
+<div class="widget">
+  <div class="widget-title">供应商考核全流程管理</div>
+
+  <div class="agent-card">
+    <div class="agent-role">🤖 AI Agent · 供应商绩效考核主管</div>
+    <div class="agent-desc">AI 大脑，执行节奏控制，严格把控每月 10→15→18 号核心时间节点，驱动全流程流转</div>
+  </div>
+
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-marker">1</div>
+      <div class="timeline-content">
+        <div class="timeline-date">每月 10 号 · 初版</div>
+        <div class="timeline-title">系统生成考核结果，邮件通知接口人</div>
+        <div class="timeline-desc">生成各物流商、各业务、各单元的考核结果，邮件通知每个接口人。接口人收到初版结果后会对结果提出申诉</div>
+      </div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-marker">2</div>
+      <div class="timeline-content">
+        <div class="timeline-date">每月 15 号 · 确认版</div>
+        <div class="timeline-title">Agent 接收申诉 → 复核修正 → 输出调整结果</div>
+        <div class="timeline-desc">Agent 接收申诉后对结果复核修正，输出调整后的考核结果。接口人收到结果后需在 3 天内完成结果确认</div>
+      </div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-marker">3</div>
+      <div class="timeline-content">
+        <div class="timeline-date">每月 18 号 · 终版</div>
+        <div class="timeline-title">终版输出 → 审批 → 分析报告 → 调账 → 通知</div>
+        <div class="timeline-desc">系统输出终版考核结果，触发系统审批。审批结束后触发月度考核分析报告，同时调用调账 Agent 完成奖惩调账，最后分别通知每一个供应商月度考核结果</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="skills-section">
+    <div class="skills-title">Skill 技能单元</div>
+    <div class="skills-grid">
+      <div class="skill-card">
+        <div class="skill-icon">⚙️</div>
+        <div class="skill-name">数据与计算</div>
+        <div class="skill-items">
+          <span class="skill-tag">cfc_plp</span>
+          <span class="skill-tag">route</span>
+          <span class="skill-tag">plpstat</span>
+          <span class="skill-tag">reward</span>
+        </div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon">📊</div>
+        <div class="skill-name">分析与报告</div>
+        <div class="skill-items">
+          <span class="skill-tag">gen_final_result</span>
+          <span class="skill-tag">gen_plp_report</span>
+        </div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon">🔔</div>
+        <div class="skill-name">协同与通知</div>
+        <div class="skill-items">
+          <span class="skill-tag">gen_plp_notice</span>
+          <span class="skill-tag">collect_feedback</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="infra-section">
+    <div class="infra-grid">
+      <div class="infra-card">
+        <div class="infra-name">MCP 标准化接口</div>
+        <div class="infra-desc">权限管控 · 精准调度 · 日志留存</div>
+      </div>
+      <div class="infra-card">
+        <div class="infra-name">LangChain 运行平台</div>
+        <div class="infra-desc">数仓对接 · 数据脱敏 · 异常重试</div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -39,7 +39,6 @@ CLAUDE.md
 /resources/python/_internal
 resources/python/leshine-ai-backend.exe
 /python/__pycache__
-/resources
 /backend/bin
 /backend/lib
 /backend/models

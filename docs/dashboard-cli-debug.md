@@ -11,6 +11,7 @@
 ```js
 // 打开看板窗口，默认 scroll 布局
 await window.ipcRenderer.invoke('dashboard:open', { layout: 'scroll' })
+await window.ipcRenderer.invoke('dashboard:open')
 ```
 
 > 提示: 放大展示单个模块请使用 `layout` 命令

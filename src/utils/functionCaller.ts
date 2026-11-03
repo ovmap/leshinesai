@@ -17,6 +17,9 @@ import {
 } from './functions/calendar'
 import { search_torrents, add_torrent_to_qb } from './functions/torrent'
 import axios from 'axios'
+import { useGeneralStore } from '../stores/generalStore'
+
+const widgetModules = import.meta.glob('../../resources/widgets/*.html', { query: '?raw', import: 'default', eager: true }) as Record<string, string>
 
 interface FunctionResult {
   success: boolean
@@ -754,6 +757,23 @@ async function dashboard_command(
   }
 }
 
+async function show_visual(args: any): Promise<FunctionResult> {
+  const { widget_id } = args
+  const generalStore = useGeneralStore()
+
+  const modulePath = Object.keys(widgetModules).find(key =>
+    key.includes(`/${widget_id}.html`)
+  )
+
+  if (!modulePath) {
+    return { success: false, error: `Widget not found: ${widget_id}` }
+  }
+
+  const html = widgetModules[modulePath]
+  generalStore.showWidget(html)
+  return { success: true, data: `Widget displayed: ${widget_id}` }
+}
+
 const functionRegistry: {
   [key: string]: (args: any, settings?: any) => Promise<FunctionResult>
 } = {
@@ -780,6 +800,7 @@ const functionRegistry: {
   perform_web_search: perform_web_search,
   searxng_web_search: searxng_web_search,
   dashboard_command: dashboard_command,
+  show_visual: show_visual,
 }
 
 const functionSchemas = {
@@ -808,6 +829,7 @@ const functionSchemas = {
   perform_web_search: { required: ['query'] },
   searxng_web_search: { required: ['query'] },
   dashboard_command: { required: ['command'] },
+  show_visual: { required: ['widget_id'] },
 }
 
 /**

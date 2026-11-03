@@ -1,4 +1,4 @@
-import rawFunctionSchemasFromFile from '../../docs/functions.json'
+import rawFunctionSchemasFromFile from '../../resources/functions.json'
 
 export interface ApiRequestBodyFunctionTool {
   type: 'function'

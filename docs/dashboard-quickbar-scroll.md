@@ -671,7 +671,7 @@ async function handleLayout(args?: Record<string, any>): Promise<string> {
 | **修改** | `src/components/DashboardView.vue` | scroll 布局分支 + 集成 QuickBar |
 | **修改** | `src/components/dashboard/ModulesRender.vue` | 改用 `moduleRegistry` 获取组件映射 |
 | **修改** | `src/utils/dashboardCLI.ts` | 改用 `moduleRegistry`、`validLayouts` 加 `'scroll'` |
-| **修改** | `docs/functions.json` | layout enum 加 `'scroll'` |
+| **修改** | `resources/functions.json` | layout enum 加 `'scroll'` |
 
 ---
 

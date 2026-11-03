@@ -50,7 +50,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref as vueRef } from 'vue'
+import { computed, onMounted, onUnmounted, ref as vueRef, watch } from 'vue'
 import type { CSSProperties } from 'vue'
 import { storeToRefs } from 'pinia'
 import Actions from './Actions.vue'
@@ -102,6 +102,18 @@ const audioPlayerElement = vueRef<HTMLAudioElement | null>(null)
 const aiVideoElement = vueRef<HTMLVideoElement | null>(null)
 
 let isProcessingRequest = false
+
+// Widget 激活时最大化窗口，关闭时恢复
+watch(() => generalStore.activeWidgetHtml, (newVal, oldVal) => {
+  if (!isElectron) return
+  if (newVal && !oldVal) {
+    // Widget 激活 - 最大化窗口
+    window.ipcRenderer.invoke('window:maximize').catch(console.error)
+  } else if (!newVal && oldVal) {
+    // Widget 关闭 - 恢复窗口大小
+    window.ipcRenderer.invoke('window:unmaximize').catch(console.error)
+  }
+})
 
 const avatarRingStyle = computed<CSSProperties>(() => {
   const style: CSSProperties = {
@@ -220,6 +232,8 @@ const processRequest = async (
     return
   }
   isProcessingRequest = true
+
+  generalStore.closeWidget()
 
   setAudioState('WAITING_FOR_RESPONSE')
 

@@ -574,5 +574,22 @@
       "required": ["command"],
       "additionalProperties": false
     }
+  },
+  {
+    "type": "function",
+    "name": "show_visual",
+    "description": "在聊天界面弹出一张预制的可视化卡片，配合语音讲解使用。用户下次输入时卡片自动关闭。当用户询问或提及供应商考核全流程管理时，调用此工具展示 supplier-assessment-flow 卡片，然后按以下顺序讲解：1)Agent角色：AI大脑/供应商绩效考核主管，负责执行节奏控制，严格把控每月10号初版、15号确认版、18号终版的核心时间节点，驱动全流程流转；2)10号初版：系统生成各物流商各业务各单元的考核结果，邮件通知每个接口人，接口人收到初版结果后会提出申诉；3)15号确认版：Agent接收申诉后对结果复核修正，输出调整后的考核结果，接口人需在三天内完成结果确认；4)18号终版：系统输出终版考核结果，触发系统审批，审批结束后触发月度考核分析报告，同时调用调账Agent完成奖惩调账，最后分别通知每一个供应商月度考核结果。",
+    "strict": true,
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "widget_id": {
+          "type": "string",
+          "description": "要展示的 widget 模板 ID。可用值: supplier-assessment-flow"
+        }
+      },
+      "required": ["widget_id"],
+      "additionalProperties": false
+    }
   }
 ]

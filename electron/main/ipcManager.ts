@@ -76,6 +76,8 @@ import {
   getMainWindow,
   resizeMainWindow,
   minimizeMainWindow,
+  maximizeMainWindow,
+  unmaximizeMainWindow,
   showOverlay,
   hideOverlay,
   focusMainWindow,
@@ -569,6 +571,15 @@ export function registerIPCHandlers(): void {
 
   ipcMain.handle('focus-main-window', () => {
     return focusMainWindow()
+  })
+
+  // Window maximize/unmaximize for widget mode
+  ipcMain.handle('window:maximize', () => {
+    return maximizeMainWindow()
+  })
+
+  ipcMain.handle('window:unmaximize', () => {
+    return unmaximizeMainWindow()
   })
 
   // Settings window management

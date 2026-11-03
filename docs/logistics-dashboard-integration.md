@@ -66,7 +66,7 @@
 
 ### 3.1 新增工具定义
 
-**文件**: `docs/functions.json`
+**文件**: `resources/functions.json`
 
 在现有工具数组中新增：
 

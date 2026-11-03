@@ -7,6 +7,11 @@
 .sidebar-wrapper.open {
   @apply w-full max-w-[960px] py-4 pl-[300px] opacity-100 border-blue-500/50 shadow-md;
 }
+.sidebar-wrapper.widget-mode {
+  max-width: 100vw !important;
+  overflow: visible !important;
+  padding: 0 !important;
+}
 .gradient-border-wrapper {
   position: relative;
   border-radius: 0.5rem;

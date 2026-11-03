@@ -441,7 +441,7 @@ interface ModuleDataSchema {
 | `src/stores/dashboardControlStore.ts` | 看板窗口内的控制状态（看板窗口侧） |
 | `src/stores/dashboardDataStore.ts` | 看板窗口内的数据缓存（看板窗口侧） |
 | `src/utils/functionCaller.ts` | 注册 `dashboard_command` 工具 |
-| `docs/functions.json` | 工具定义 |
+| `resources/functions.json` | 工具定义 |
 | `electron/main/ipcManager.ts` | `dashboard:control` 和 `dashboard:data` IPC |
 | `electron/main/windowManager.ts` | 转发控制指令到看板窗口 |
 
