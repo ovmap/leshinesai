@@ -97,9 +97,6 @@
         <IntegrationsTab
           v-if="activeTab === 'integrations'"
           :current-settings="currentSettings"
-          :google-auth-status="googleAuthStatus"
-          @connect-google-services="connectGoogleServices"
-          @disconnect-google-services="disconnectGoogleServices"
         />
 
         <SecurityTab
@@ -215,7 +212,6 @@ import { heartIcon } from '../utils/assetsImport'
 import { PREDEFINED_OPENAI_TOOLS } from '../utils/assistantTools'
 import { DEFAULT_ASSISTANT_PERSONA_PROMPT } from '../stores/settingsStore'
 import { useHotkeyRecording } from '../composables/useHotkeyRecording'
-import { useGoogleAuth } from '../composables/useGoogleAuth'
 import {
   getStaticModelsForProvider,
   type ProviderModelDefinition,
@@ -256,9 +252,6 @@ const {
   clearHotkey: clearHotkeyComposable,
 } = useHotkeyRecording()
 
-const { googleAuthStatus, connectGoogleServices, disconnectGoogleServices } =
-  useGoogleAuth()
-
 const availableToolsForSelect = computed(() => {
   return PREDEFINED_OPENAI_TOOLS.map(tool => {
     const functionDef = (tool as any).function || tool
@@ -292,16 +285,7 @@ const availableModelsForSelect = computed(() => {
 })
 
 const toolDependencies: Record<string, string[]> = {
-  search_torrents: ['VITE_JACKETT_API_KEY', 'VITE_JACKETT_URL'],
-  add_torrent_to_qb: ['VITE_QB_URL', 'VITE_QB_USERNAME', 'VITE_QB_PASSWORD'],
   perform_web_search: ['VITE_METASO_API_KEY'],
-  get_calendar_events: ['GOOGLE_AUTH'],
-  create_calendar_event: ['GOOGLE_AUTH'],
-  update_calendar_event: ['GOOGLE_AUTH'],
-  delete_calendar_event: ['GOOGLE_AUTH'],
-  get_unread_emails: ['GOOGLE_AUTH'],
-  search_emails: ['GOOGLE_AUTH'],
-  get_email_content: ['GOOGLE_AUTH'],
 }
 const refreshModels = async () => {
   if (isRefreshingModels.value) return
@@ -327,17 +311,7 @@ function getToolInfo(name: string): {
     save_memory: 'Save Memory',
     delete_memory: 'Delete Memory',
     recall_memories: 'Recall Memories',
-    get_calendar_events: 'Get Calendar Events',
-    create_calendar_event: 'Create Calendar Event',
-    update_calendar_event: 'Update Calendar Event',
-    delete_calendar_event: 'Delete Calendar Event',
-    get_unread_emails: 'Get Unread Emails',
-    search_emails: 'Search Emails',
-    get_email_content: 'Get Email Content',
-    search_torrents: 'Torrent Search',
-    add_torrent_to_qb: 'Add Torrent to QB',
-    perform_web_search: 'Web Search (Tavily)',
-    searxng_web_search: 'Web Search (SearXNG)',
+    perform_web_search: 'Web Search (Metaso)',
   }
 
   const descriptionMap: Record<string, string> = {
@@ -353,25 +327,9 @@ function getToolInfo(name: string): {
     execute_command: "Leshine can execute shell commands on the user's computer",
     schedule_task: 'Leshine can schedule tasks to run on a recurring basis',
     manage_scheduled_tasks: 'Leshine can manage scheduled tasks',
-    get_calendar_events: 'Google Calendar integration to get calendar events',
-    create_calendar_event:
-      'Google Calendar integration to create calendar events',
-    update_calendar_event:
-      'Google Calendar integration to update calendar events',
-    delete_calendar_event:
-      'Google Calendar integration to delete calendar events',
-    get_unread_emails: 'Google Gmail integration to get unread emails',
-    search_emails: 'Google Gmail integration to search emails',
-    get_email_content: 'Google Gmail integration to get email content',
-    search_torrents:
-      'Leshine can search for torrents on the internet (requires Jackett)',
-    add_torrent_to_qb:
-      'Leshine can add a torrent to qBittorrent (requires qBittorrent)',
     browser_context:
       'Leshine can get information about the current webpage in users browser (requires browser extension)',
-    perform_web_search: 'For models that lack web search capabilities (Tavily)',
-    searxng_web_search:
-      'For models that lack web search capabilities (SearXNG)',
+    perform_web_search: '国内可用的网页搜索 (秘塔 Metaso)',
   }
 
   return {
@@ -407,9 +365,6 @@ function isToolConfigured(toolName: string): boolean {
   if (!deps) return true
 
   return deps.every(depKey => {
-    if (depKey === 'GOOGLE_AUTH') {
-      return googleAuthStatus.isAuthenticated
-    }
     const value = currentLocalSettings[depKey as keyof LeshineSettings]
     if (typeof value === 'string') {
       return !!value.trim()

@@ -36,7 +36,7 @@
                     class="btn btn-error btn-xs"
                     title="Remove command"
                   >
-                    �?
+                    ☒
                   </button>
                 </td>
               </tr>
