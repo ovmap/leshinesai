@@ -1039,6 +1039,12 @@ export const createSummarizationResponse = async (
       ],
       stream: false,
     } as any
+
+    // 为阿里模型关闭思考模式，避免响应过慢导致超时
+    if (settings.aiProvider === 'dashscope') {
+      params.enable_thinking = false
+    }
+
     // 使用独立的 AbortController，避免受主 LLM 请求影响
     const summarizationController = new AbortController()
     const response = await createChatCompletionForProvider(
@@ -1111,6 +1117,12 @@ const analysisSystemPrompt = `Analyze the user's emotional state in the conversa
       ],
       stream: false,
     } as any
+
+    // 为阿里模型关闭思考模式，避免响应过慢导致超时
+    if (settings.aiProvider === 'dashscope') {
+      params.enable_thinking = false
+    }
+
     // 使用独立的 AbortController，避免受主 LLM 请求影响
     const analysisController = new AbortController()
     const response = await createChatCompletionForProvider(

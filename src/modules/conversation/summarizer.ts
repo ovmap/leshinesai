@@ -27,6 +27,7 @@ export interface SummarizerDependencies {
   setEphemeralEmotionalContext(value: string | null): void
   getSummarizationConfig(): {
     messageCount: number
+    frequency: number
     model: string
     systemPrompt: string
   }
@@ -40,22 +41,33 @@ export interface Summarizer {
 export function createSummarizer(
   dependencies: SummarizerDependencies
 ): Summarizer {
+  // 追踪上次总结时的消息数量，用于频率控制
+  let lastSummarizedMessageCount = 0
+
   return {
     async triggerSummarization(): Promise<void> {
       if (dependencies.isSummarizing()) return
 
+      const config = dependencies.getSummarizationConfig()
+      const messagesResult = await dependencies.fetchRecentMessages(
+        config.messageCount
+      )
+
+      if (!messagesResult.success || !messagesResult.data?.length) {
+        return
+      }
+
+      const currentMessageCount = messagesResult.data.length
+
+      // 频率控制：只有当新消息数量达到阈值时才触发总结
+      const newMessagesSinceLastSummary = currentMessageCount - lastSummarizedMessageCount
+      if (lastSummarizedMessageCount > 0 && newMessagesSinceLastSummary < config.frequency) {
+        return
+      }
+
       dependencies.setSummarizing(true)
 
       try {
-        const config = dependencies.getSummarizationConfig()
-        const messagesResult = await dependencies.fetchRecentMessages(
-          config.messageCount
-        )
-
-        if (!messagesResult.success || !messagesResult.data?.length) {
-          return
-        }
-
         const rawMessages = messagesResult.data
         const formattedMessages = rawMessages.map(m => ({
           role: m.role,
@@ -81,6 +93,9 @@ export function createSummarizer(
             summarizedMessagesCount: rawMessages.length,
           })
         }
+
+        // 更新上次总结的消息数量
+        lastSummarizedMessageCount = currentMessageCount
       } catch (error) {
         dependencies.logError('[Summarizer] Error during summarization:', error)
       } finally {

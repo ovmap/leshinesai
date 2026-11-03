@@ -68,6 +68,7 @@ export interface LeshineSettings {
   MAX_HISTORY_MESSAGES_FOR_API: number
   MAX_MESSAGE_LENGTH_FOR_API: number
   SUMMARIZATION_MESSAGE_COUNT: number
+  SUMMARIZATION_FREQUENCY: number
   SUMMARIZATION_MODEL: string
   SUMMARIZATION_SYSTEM_PROMPT: string
   ttsProvider: 'openai' | 'google' | 'local' | 'dashscope'
@@ -181,6 +182,7 @@ const defaultSettings: LeshineSettings = {
   MAX_HISTORY_MESSAGES_FOR_API: 10,
   MAX_MESSAGE_LENGTH_FOR_API: 3000,
   SUMMARIZATION_MESSAGE_COUNT: 20,
+  SUMMARIZATION_FREQUENCY: 10,
   SUMMARIZATION_MODEL: 'gpt-4.1-nano',
   SUMMARIZATION_SYSTEM_PROMPT: DEFAULT_SUMMARIZATION_SYSTEM_PROMPT,
   ttsProvider: 'openai',
@@ -254,6 +256,7 @@ const settingKeyToLabelMap: Record<keyof LeshineSettings, string> = {
   MAX_HISTORY_MESSAGES_FOR_API: 'Max History Messages for API',
   MAX_MESSAGE_LENGTH_FOR_API: 'Max Message Length for API',
   SUMMARIZATION_MESSAGE_COUNT: 'Summarization Message Count',
+  SUMMARIZATION_FREQUENCY: 'Summarization Frequency (messages between summaries)',
   SUMMARIZATION_MODEL: 'Summarization Model',
   SUMMARIZATION_SYSTEM_PROMPT: 'Summarization System Prompt',
   ttsProvider: 'Text-to-Speech Provider',
@@ -565,6 +568,7 @@ export const useSettingsStore = defineStore('settings', () => {
             key === 'MAX_HISTORY_MESSAGES_FOR_API' ||
             key === 'MAX_MESSAGE_LENGTH_FOR_API' ||
             key === 'SUMMARIZATION_MESSAGE_COUNT' ||
+            key === 'SUMMARIZATION_FREQUENCY' ||
             key === 'SUMMARIZATION_MODEL' ||
             key === 'SUMMARIZATION_SYSTEM_PROMPT' ||
             key === 'sttProvider' ||
@@ -576,6 +580,7 @@ export const useSettingsStore = defineStore('settings', () => {
             key === 'MAX_HISTORY_MESSAGES_FOR_API' ||
             key === 'MAX_MESSAGE_LENGTH_FOR_API' ||
             key === 'SUMMARIZATION_MESSAGE_COUNT' ||
+            key === 'SUMMARIZATION_FREQUENCY' ||
             key === 'assistantTemperature' ||
             key === 'assistantTopP' ||
             key === 'ragTopK' ||
@@ -676,7 +681,8 @@ export const useSettingsStore = defineStore('settings', () => {
               key === 'assistantTopP' ||
               key === 'MAX_HISTORY_MESSAGES_FOR_API' ||
               key === 'MAX_MESSAGE_LENGTH_FOR_API' ||
-              key === 'SUMMARIZATION_MESSAGE_COUNT'
+              key === 'SUMMARIZATION_MESSAGE_COUNT' ||
+              key === 'SUMMARIZATION_FREQUENCY'
             ) {
               ;(devCombinedSettings as any)[key] = parseFloat(
                 envValue as string
@@ -764,6 +770,7 @@ export const useSettingsStore = defineStore('settings', () => {
       key === 'MAX_HISTORY_MESSAGES_FOR_API' ||
       key === 'MAX_MESSAGE_LENGTH_FOR_API' ||
       key === 'SUMMARIZATION_MESSAGE_COUNT' ||
+      key === 'SUMMARIZATION_FREQUENCY' ||
       key === 'websocketPort' ||
       key === 'ragTopK' ||
       key === 'ragMaxContextChars'
@@ -795,8 +802,8 @@ export const useSettingsStore = defineStore('settings', () => {
           PROVIDER_CONFIGS.deepseek.defaultModel
       } else if (settings.value.aiProvider === 'dashscope') {
         settings.value.assistantModel = PROVIDER_CONFIGS.dashscope.defaultModel
-        settings.value.SUMMARIZATION_MODEL =
-          PROVIDER_CONFIGS.dashscope.defaultModel
+        // 总结模型使用便宜的 qwen3.7-flash，降低成本
+        settings.value.SUMMARIZATION_MODEL = 'qwen3.7-flash'
       } else if (settings.value.aiProvider === 'codex') {
         settings.value.assistantModel = PROVIDER_CONFIGS.codex.defaultModel
         settings.value.SUMMARIZATION_MODEL =
@@ -920,6 +927,7 @@ export const useSettingsStore = defineStore('settings', () => {
         MAX_MESSAGE_LENGTH_FOR_API:
           settings.value.MAX_MESSAGE_LENGTH_FOR_API,
         SUMMARIZATION_MESSAGE_COUNT: settings.value.SUMMARIZATION_MESSAGE_COUNT,
+        SUMMARIZATION_FREQUENCY: settings.value.SUMMARIZATION_FREQUENCY,
         SUMMARIZATION_MODEL: settings.value.SUMMARIZATION_MODEL,
         SUMMARIZATION_SYSTEM_PROMPT: settings.value.SUMMARIZATION_SYSTEM_PROMPT,
         ttsProvider: settings.value.ttsProvider,

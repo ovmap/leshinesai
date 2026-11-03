@@ -472,6 +472,7 @@ export const useConversationStore = defineStore('conversation', () => {
       },
       getSummarizationConfig: () => ({
         messageCount: settingsStore.config.SUMMARIZATION_MESSAGE_COUNT,
+        frequency: settingsStore.config.SUMMARIZATION_FREQUENCY,
         model: settingsStore.config.SUMMARIZATION_MODEL,
         systemPrompt: settingsStore.config.SUMMARIZATION_SYSTEM_PROMPT,
       }),

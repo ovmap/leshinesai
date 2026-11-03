@@ -43,6 +43,7 @@ export const DEEPSEEK_TEXT_MODELS: ProviderModelDefinition[] = [
 export const DASHSCOPE_TEXT_MODELS: ProviderModelDefinition[] = [
   { id: 'qwen3.7-plus', displayName: 'Qwen 3.7 Plus' },
   { id: 'qwen3.6-plus', displayName: 'Qwen 3.6 Plus' },
+  { id: 'qwen3.7-flash', displayName: 'Qwen 3.7 Flash (Cheap & Fast)' },
   { id: 'glm-5', displayName: 'GLM-5' },
 ]
 
