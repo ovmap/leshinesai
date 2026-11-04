@@ -2,6 +2,7 @@ import { createDualEmbeddings, createEmbedding } from '../services/apiService'
 import { useCustomToolsStore } from '../stores/customToolsStore'
 import { manage_clipboard } from './functions/clipboard'
 import { executeDashboardCommand } from './dashboard'
+import presetWorkflowsRaw from '../../resources/presetWorkflows.json'
 import {
   open_path,
   list_directory,
@@ -757,6 +758,53 @@ async function dashboard_command(
   }
 }
 
+/**
+ * 预设分析流程模板
+ *
+ * 每个模板定义：
+ * - trigger: 触发场景描述（给 LLM 参考）
+ * - steps: 按顺序执行的 dashboard_command 步骤
+ * - analysis: 分析维度与判断规则
+ * - outputTemplate: 输出格式模板
+ *
+ * 数据定义在 resources/presetWorkflows.json
+ */
+interface PresetWorkflow {
+  name: string
+  trigger: string
+  steps: { command: string; args?: Record<string, any>; purpose: string }[]
+  analysis: { dimension: string; metric: string; threshold: string; action: string }[]
+  outputTemplate: string
+}
+
+const PRESET_WORKFLOWS: Record<string, PresetWorkflow> = presetWorkflowsRaw as Record<string, PresetWorkflow>
+
+async function get_preset_workflow(args: { scenario: string }): Promise<FunctionResult> {
+  const { scenario } = args
+  const workflow = PRESET_WORKFLOWS[scenario]
+
+  if (!workflow) {
+    const available = Object.entries(PRESET_WORKFLOWS)
+      .map(([key, val]) => `${key}=${val.name}`)
+      .join(', ')
+    return {
+      success: false,
+      error: `未知场景 "${scenario}"。可用场景: ${available}`,
+    }
+  }
+
+  return {
+    success: true,
+    data: {
+      name: workflow.name,
+      trigger: workflow.trigger,
+      steps: workflow.steps,
+      analysis: workflow.analysis,
+      outputTemplate: workflow.outputTemplate,
+    },
+  }
+}
+
 async function show_visual(args: any): Promise<FunctionResult> {
   const { widget_id } = args
   const generalStore = useGeneralStore()
@@ -800,6 +848,7 @@ const functionRegistry: {
   perform_web_search: perform_web_search,
   searxng_web_search: searxng_web_search,
   dashboard_command: dashboard_command,
+  get_preset_workflow: get_preset_workflow,
   show_visual: show_visual,
 }
 
@@ -829,6 +878,7 @@ const functionSchemas = {
   perform_web_search: { required: ['query'] },
   searxng_web_search: { required: ['query'] },
   dashboard_command: { required: ['command'] },
+  get_preset_workflow: { required: ['scenario'] },
   show_visual: { required: ['widget_id'] },
 }
 

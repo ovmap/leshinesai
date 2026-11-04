@@ -99,16 +99,39 @@ export function getHelpInfo(
 4. 不确定当前状态？用 \`status\`
 5. 不确定参数？用 \`help\`
 
-### 重要数据（AI大脑核心产出）
-打开智能体中心页面后，以下数据会自动获取，可单独精准获取：
-- **CDD 周报**：运输准时交付率，含指标定义、达成情况、各维度分析
-  - 获取：\`data({ module: "cddWeeklyReport" })\`
-- **PFP 考核**：物流商考核成绩、排名、评级、奖惩
-  - 获取：\`data({ module: "pfpAssessment" })\`
-- **ISG 订单预警**：延误、在途、交付三类预警
-  - 获取：\`data({ module: "isgAlert" })\`
-- **签收异常预警**：签收异常和超期情况
-  - 获取：\`data({ module: "signingAlert" })\`
+### 页面一览（共12个）
+
+**综合看板**
+| 页面标识 | 标题 | 包含模块 |
+|----------|------|----------|
+| cargoBanner | 智能体中心 | 累计货量、提货及时率、准时交付率、能源价格、干单价、配单价、货量趋势、签收信息、返单进展、智能体中心、能源价格趋势、运输异常、运力池、加急&重点客户风险、重大活动&极端天气影响 |
+| mapPage | 地图 | 地图 |
+| reorderDashboard | 返单看板 | 应签未签、应签未签明细、返单及时率、未返单明细 |
+| cargoDashboard | 货量看板 | 货量趋势、货量占比、货量(表格占比)、运输异常 |
+
+**准时交付率（CDD）相关**
+| 页面标识 | 标题 | 包含模块 |
+|----------|------|----------|
+| onTimeDelivery | 准时交付率（整体） | 准时交付率(仓+物流)、准时交付率(时间维度) |
+| onTimeDeliveryCustomer | 准时交付率（联想客户） | 准时交付率(联想客户)、准时交付率(非联想客户) |
+
+**PFP 供应商考核相关**（按业务维度拆分，查看各维度评分明细和排名）
+| 页面标识 | 标题 | 适用场景 |
+|----------|------|----------|
+| pfpKpiWarehouse | ToB物流商KPI评分 | 仓库维度的物流商评分与排名 |
+| pfpKpiTransport | 运输物流商KPI评分 | 运输维度的物流商评分与排名 |
+| pfpKpiCityDelivery | 城配物流商KPI评分 | 区配/城配/配送维度的评分与排名 |
+| pfpKpiCustomer | PFP KPI-客户 | 按客户维度的评分与排名 |
+| pfpKpiToC | PFP KPI-ToC | 面向个人消费者(ToC)业务的评分与排名 |
+| pfpKpiExpress | PFP KPI-运输快递业务 | 快递业务维度的评分与排名 |
+
+> **智能体中心页面(cargoBanner)** 包含4个AI大脑核心产出（最终报告）：
+> - **CDD周报**：运输准时交付率最终报告，含指标定义、达成情况、各维度分析 → \`data({ report: "cddWeeklyReport" })\`
+> - **PFP考核**：物流商考核最终报告，含成绩、排名、评级、奖惩 → \`data({ report: "pfpAssessment" })\`
+> - **ISG订单预警**：延误、在途、交付三类预警汇总 → \`data({ report: "isgAlert" })\`
+> - **签收异常预警**：签收异常和超期情况汇总 → \`data({ report: "signingAlert" })\`
+> 
+> 只有用户明确要看"报告/总结/周报/考核结果"时才输出这些，想看明细图表请用对应明细页面。
 
 ### 深入查询
 - \`help({ queryCommand: "filter" })\` 查看筛选参数详情
@@ -245,29 +268,33 @@ filter({ filters: { fromWarehouse: [] } })  // 清空始发仓（空数组）
       result += `### 参数
 | 参数 | 类型 | 说明 |
 |------|------|------|
-| module | string | 目标模块（不指定则返回当前页面概览） |
+| module | string | 目标模块名（获取页面模块数据，不指定则返回当前页面概览） |
+| report | string | AI大脑报告名（获取最终报告：cddWeeklyReport/pfpAssessment/isgAlert/signingAlert） |
 
 ### 智能行为
-- 不指定 module → 返回当前页面概览
+- 不指定参数 → 返回当前页面概览
+- 指定 module → 返回该模块的数据
+- 指定 report → 返回AI大脑生成的最终报告
 - 根据当前布局自动返回合适的数据格式
 
-### 重要数据（AI大脑核心产出）
-以下数据会自动获取，可单独精准获取：
-- **CDD 周报**：运输准时交付率，含指标定义、达成情况、各维度分析
-  - 获取：\`data({ module: "cddWeeklyReport" })\`
-- **PFP 考核**：物流商考核成绩、排名、评级、奖惩
-  - 获取：\`data({ module: "pfpAssessment" })\`
-- **ISG 订单预警**：延误、在途、交付三类预警
-  - 获取：\`data({ module: "isgAlert" })\`
-- **签收异常预警**：签收异常和超期情况
-  - 获取：\`data({ module: "signingAlert" })\`
+### 重要数据（最终报告/总结）vs 明细数据
+
+**获取报告** — 用户想看"最终报告/总结/结论"时使用 \`report\` 参数：
+- **CDD 周报**（最终分析报告）：\`data({ report: "cddWeeklyReport" })\`
+- **PFP 考核**（最终考核报告）：\`data({ report: "pfpAssessment" })\`
+- **ISG 订单预警**（预警汇总）：\`data({ report: "isgAlert" })\`
+- **签收异常预警**（异常汇总）：\`data({ report: "signingAlert" })\`
+
+**获取模块数据** — 用户想看"具体图表/趋势/排名细节"时使用 \`module\` 参数：
+- 准时交付率趋势图表 → \`data({ module: "warehousingLogistics" })\` 等（先切换到 onTimeDelivery 页面）
+- 物流商评分排名明细 → \`data({ module: "tobWarehousingCard" })\` 等（先切换到对应 pfpKpi* 页面）
 
 ### 示例
 \`\`\`
 data()                                    // 当前页面概览
-data({ module: "cargoTrend" })            // 货量趋势数据
-data({ module: "cddWeeklyReport" })       // CDD 周报（运输准时交付率）
-data({ module: "pfpAssessment" })         // PFP 考核（物流商考核）
+data({ module: "cargoTrend" })            // 货量趋势数据（模块明细）
+data({ report: "cddWeeklyReport" })       // CDD 周报（AI大脑报告）
+data({ report: "pfpAssessment" })         // PFP 考核（AI大脑报告）
 \`\`\``
       
       return result
@@ -416,12 +443,21 @@ layout({ modules: ["cargoTrend"] })  // 全屏显示货量趋势
 page 命令用于在 scroll 布局下切换页面。每个页面是一个独立的全屏视图，包含多个模块。
 
 ### 可用页面
-| 页面标识 | 标题 |
-|----------|------|
+| 页面标识 | 标题 | 适用场景 |
+|----------|------|----------|
 `
       for (const p of pages) {
         const isCurrent = (layout === 'scroll' && p.name === currentPage) ? ' ← 当前' : ''
-        result += `| ${p.name} | ${p.title}${isCurrent} |\n`
+        let desc = ''
+        if (p.name === 'pfpKpiWarehouse') desc = '仓库维度的物流商评分与排名'
+        else if (p.name === 'pfpKpiTransport') desc = '运输维度的物流商评分与排名'
+        else if (p.name === 'pfpKpiCityDelivery') desc = '区配/城配/配送维度的评分与排名'
+        else if (p.name === 'pfpKpiCustomer') desc = '按客户维度的评分与排名'
+        else if (p.name === 'pfpKpiToC') desc = '面向个人消费者(ToC)业务的评分与排名'
+        else if (p.name === 'pfpKpiExpress') desc = '快递业务维度的评分与排名'
+        else if (p.name === 'onTimeDelivery') desc = '准时交付率（整体）'
+        else if (p.name === 'onTimeDeliveryCustomer') desc = '准时交付率（联想客户 vs 非联想客户）'
+        result += `| ${p.name} | ${p.title}${isCurrent} | ${desc} |\n`
       }
       
       result += `\n### 示例

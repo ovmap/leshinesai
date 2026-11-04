@@ -1091,8 +1091,19 @@ export const createContextAnalysisResponse = async (
   analysisModel: string
 ): Promise<string | null> => {
   const settings = useSettingsStore().config
-  // 分析用户情绪，仅在明显负面情绪时输出，否则返回空
-const analysisSystemPrompt = `Analyze the user's emotional state in the conversation. Only output a brief description (1-3 words) if the user shows clear negative emotions (anxiety, anger, frustration). Return empty string if the user is neutral or positive. Do not analyze neutral or positive emotions.`
+  // 分析用户反馈，用于验证数据查询和操作流程是否正确
+  const analysisSystemPrompt = `Analyze user feedback in logistics data context. Output format:
+- If user confirms data/workflow is correct: "confirmed"
+- If user says data/workflow is wrong: "incorrect"
+- If user shows frustration with system: "frustrated"
+- If neutral or general chat: ""
+
+Examples:
+- "对了，就是这样" → "confirmed"
+- "不对，数据有问题" → "incorrect"
+- "怎么又查错了" → "incorrect"
+- "好的，谢谢" → "confirmed"
+- "今天天气怎么样" → ""`
   const combinedText = messagesToAnalyze
     .map(msg => `${msg.role}: ${msg.content}`)
     .join('\n\n')

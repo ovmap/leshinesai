@@ -225,17 +225,26 @@ onMounted(() => {
 
   // dashboard:request-data — 数据请求响应（使用布局感知的 getSmartData）
   window.ipcRenderer?.on('dashboard:request-data', (_event: any, params: any) => {
-    const { requestId, module } = params
+    const { requestId, module, report } = params
 
-    // AI 大脑模块：切换到 single 布局显示 aiBrainReport
-    const AI_BRAIN_MODULES = ['cddWeeklyReport', 'pfpAssessment', 'isgAlert', 'signingAlert']
-    if (module && AI_BRAIN_MODULES.includes(module)) {
+    // AI 大脑报告：切换到 single 布局显示 aiBrainReport
+    if (report) {
       controlStore.setModules(['aiBrainReport'])
       controlStore.setLayout('single')
+      const data = dataStore.getSmartData(report)
+      window.ipcRenderer?.send(`dashboard:data-response-${requestId}`, data)
+      return
     }
 
-    const data = dataStore.getSmartData(module)
-    // 直接发送给主进程（主进程 ipcMain.once 直接捕获，无需通过主窗口转发）
+    // 普通模块数据
+    if (module) {
+      const data = dataStore.getSmartData(module)
+      window.ipcRenderer?.send(`dashboard:data-response-${requestId}`, data)
+      return
+    }
+
+    // 都没传，返回当前页面概览
+    const data = dataStore.getSmartData()
     window.ipcRenderer?.send(`dashboard:data-response-${requestId}`, data)
   })
 

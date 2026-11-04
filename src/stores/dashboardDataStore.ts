@@ -266,29 +266,80 @@ export const useDashboardDataStore = defineStore('dashboardData', () => {
       case 'dryPrice':
         return `${title}: ${parseFloat(data?.deliveryPrice || '0').toFixed(2)} 元`
       case 'energyPrices': {
-        const items = data.items || []
-        if (items.length > 0) {
-          const latest = items[items.length - 1]
-          const gas = parseFloat(latest.gasoline || '0').toFixed(2)
-          return `${title}: 最新汽油 ${gas} 元/吨`
-        }
-        return `${title}: 暂无数据`
+        // 数据在 domestic/international 下，优先取国内
+        const current = data.domestic || data.international || data
+        // 当前价格（顶层字段）
+        const gas = current.gasoline ? parseFloat(current.gasoline).toLocaleString() : '-'
+        const diesel = current.diesel ? parseFloat(current.diesel).toLocaleString() : '-'
+        const aircraft = current.aircraftFuel ? parseFloat(current.aircraftFuel).toLocaleString() : '-'
+        // 涨跌标志
+        const gasTrend = current.gasolinePriceIsUp ? '↑' : '↓'
+        const dieselTrend = current.dieselPriceIsUp ? '↑' : '↓'
+        const aircraftTrend = current.aircraftFuelPriceIsUp ? '↑' : '↓'
+        // 最新事件
+        const event = current.event || ''
+        return `${title}: 汽油${gas}元/吨${gasTrend} | 柴油${diesel}元/吨${dieselTrend} | 航煤${aircraft}元/吨${aircraftTrend}${event ? '（' + event + '）' : ''}`
       }
       case 'abnormalTransportation': {
-        const count = data.totalCount || data.list?.length || 0
-        return `${title}: ${count} 条异常`
+        // 数据格式：rawData 是 { code, msg, data: [{abnormalType, abnormalTypeName, abnormalInfoList}] }
+        const rawData = data.rawData?.data || data.rawData || data
+        const list = Array.isArray(rawData) ? rawData : []
+        
+        if (list.length === 0) return `${title}: 0 条异常`
+        
+        const totalCount = list.reduce((sum: number, item: any) => {
+          const infoList = item.abnormalInfoList || []
+          return sum + infoList.reduce((s: number, i: any) => s + (i.abnormalNum || 0), 0)
+        }, 0)
+        
+        if (totalCount === 0) return `${title}: 0 条异常`
+        
+        // 按异常类型输出明细，包含天数分布
+        const details = list.map((item: any) => {
+          const typeName = item.abnormalTypeName || '未知'
+          const infoList = item.abnormalInfoList || []
+          const typeTotal = infoList.reduce((s: number, i: any) => s + (i.abnormalNum || 0), 0)
+          const breakdown = infoList
+            .filter((i: any) => i.abnormalNum > 0)
+            .map((i: any) => `${i.abnormalDays}${i.abnormalNum}单`)
+            .join('、')
+          return `${typeName}${typeTotal}单（${breakdown}）`
+        }).filter(Boolean)
+        
+        return `${title}: 共${totalCount}单异常\n${details.join('\n')}`
       }
       case 'capacityPool': {
         const total = data.total || data.list?.length || 0
-        return `${title}: ${total} 台可用`
+        const status = total > 10 ? '运力充足' : '运力紧张'
+        return `${title}: ${total} 台可用（${status}）`
       }
       case 'urgentCustomer': {
         const count = data.total || data.list?.length || 0
-        return `${title}: ${count} 条风险`
+        if (count === 0) return `${title}: 0 条风险`
+        // 输出高风险条目明细（最多5条）
+        const list = data.list || []
+        const preview = list.slice(0, 5).map((item: any) => {
+          const invoice = item.invoiceNo || ''
+          const route = item.toProvince ? `→${item.toProvince}` : ''
+          const risk = item.riskType || (item.hasRisk ? '有风险' : '')
+          return `${invoice}${route}${risk ? '(' + risk + ')' : ''}`
+        }).join('; ')
+        const more = count > 5 ? ` ...等${count}条` : ''
+        return `${title}: ${count} 条风险 | ${preview}${more}`
       }
       case 'majorEvents': {
         const count = data.total || data.list?.length || 0
-        return `${title}: ${count} 条影响`
+        if (count === 0) return `${title}: 0 条影响`
+        // 输出条目明细（最多5条）
+        const list = data.list || []
+        const preview = list.slice(0, 5).map((item: any) => {
+          const section = item.roadSection || ''
+          const impact = item.impact || ''
+          const orders = item.affectedOrders ? `影响${item.affectedOrders}单` : ''
+          return `${section}: ${impact}${orders ? '(' + orders + ')' : ''}`
+        }).join('; ')
+        const more = count > 5 ? ` ...等${count}条` : ''
+        return `${title}: ${count} 条影响 | ${preview}${more}`
       }
       case 'cargoTrend': {
         const timeSeries = data.timeSeries || []
@@ -296,7 +347,7 @@ export const useDashboardDataStore = defineStore('dashboardData', () => {
           const latest = timeSeries[timeSeries.length - 1]
           const total = latest.totalValue || 0
           const yoy = latest.totalYoy || '-'
-          return `${title}: 最新 ${total.toLocaleString()} 单, 同比 ${yoy}`
+          return `${title}: 最新 ${total.toLocaleString()} m³, 同比 ${yoy}`
         }
         return `${title}: 暂无数据`
       }
@@ -305,27 +356,28 @@ export const useDashboardDataStore = defineStore('dashboardData', () => {
         const u = data.unsigned ?? 0
         const t = s + u
         const r = t > 0 ? ((s / t) * 100).toFixed(1) : '0'
-        return `${title}: 签收率 ${r}%`
+        return `${title}: 签收率 ${r}%（已签 ${s.toLocaleString()} / 未签 ${u.toLocaleString()}）`
       }
       case 'reorderProgress': {
         const confirmed = data.confirmedCount || 0
         const total = data.totalCount || 0
         const pct = total > 0 ? ((confirmed / total) * 100).toFixed(1) : '0'
-        return `${title}: 确认率 ${pct}%`
+        return `${title}: 确认率 ${pct}%（${confirmed.toLocaleString()} / ${total.toLocaleString()}）`
       }
       case 'mapPage':
         return `${title}: 地图页面`
       case 'cargoBanner': {
         const cards = data.cards || []
-        const parts: string[] = []
-        if (cards.length > 0) {
-          const summary = cards.map((c: any, i: number) => `${i}:${c.title || '未知'}(${c.content?.length || 0}条)`).join(', ')
-          parts.push(`[${summary}]`)
-        }
-        if (data.cddWeeklyReport) parts.push('CDD周报✓')
-        if (data.pfpAssessment) parts.push('PFP考核✓')
-        if (parts.length === 0) return `${title}: 暂无数据`
-        return `${title}: ${parts.join(', ')}`
+        if (cards.length === 0) return `${title}: 暂无数据`
+        // 输出每个卡片的条目明细（最多5条），过滤掉分类标题（如"重点关注"、"一般关注"）
+        const CATEGORY_HEADERS = ['重点关注', '一般关注', '高优先级', '普通优先级']
+        const cardSummaries = cards.map((c: any, i: number) => {
+          const items = (c.content || []).filter((item: string) => !CATEGORY_HEADERS.includes(item.trim()))
+          const preview = items.slice(0, 5).map((item: string) => item.substring(0, 40)).join('; ')
+          const more = items.length > 5 ? ` ...等${items.length}条` : ''
+          return `[${i}]${c.title || '未知'}(${items.length}条): ${preview}${more}`
+        })
+        return `${title}:\n${cardSummaries.join('\n')}`
       }
       // 准时交付率系列
       case 'warehousingLogistics': {
@@ -363,7 +415,14 @@ export const useDashboardDataStore = defineStore('dashboardData', () => {
       case 'transportationExpressScores': {
         const list = Array.isArray(data) ? data : (data?.list || data?.items || [])
         if (list.length > 0) {
-          return `${title}: ${list.length} 条记录`
+          const preview = list.slice(0, 3).map((row: any) => {
+            const logistic = row.logistic || '-'
+            const score = row.totalScore ?? '-'
+            const month = row.month || ''
+            return `${month}${logistic}(${score}分)`
+          }).join('、')
+          const more = list.length > 3 ? ` ...等${list.length}条` : ''
+          return `${title}: ${preview}${more}`
         }
         const score = data?.kpiScore || data?.score
         return score ? `${title}: ${score}` : `${title}: 暂无数据`
