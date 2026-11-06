@@ -22,10 +22,16 @@ jobs:
           fetch-depth: 0
           lfs: true
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
+          cache: 'pnpm'
 
       - name: Set up Python (for native modules)
         uses: actions/setup-python@v5
@@ -38,11 +44,8 @@ jobs:
           python -m pip install --upgrade pip setuptools wheel
           python -c "import distutils; print('distutils available')"
 
-      - name: Clean install dependencies
-        run: |
-          rm -rf node_modules
-          npm cache clean --force
-          npm install
+      - name: Install dependencies
+        run: pnpm install
         env:
           PYTHON: ${{ steps.setup_python.outputs.python-path }}
           npm_config_python: ${{ steps.setup_python.outputs.python-path }}
@@ -59,7 +62,7 @@ jobs:
           printf "}\n" >> app-config.json
 
       - name: Build macOS Release
-        run: npm run build:mac
+        run: pnpm run build:mac
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
