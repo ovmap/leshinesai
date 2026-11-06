@@ -1,0 +1,86 @@
+name: Build macOS
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-mac:
+    name: Build for macOS
+    runs-on: macos-latest
+    environment: Prod
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          lfs: true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      - name: Set up Python (for native modules)
+        uses: actions/setup-python@v5
+        id: setup_python
+        with:
+          python-version: '3.11'
+
+      - name: Install Python build tools
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          python -c "import distutils; print('distutils available')"
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+          cache-dependency-path: backend/go.sum
+
+      - name: Cache Go modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: macos-go-${{ hashFiles('backend/go.sum') }}
+          restore-keys: |
+            macos-go-
+
+      - name: Install Node Dependencies
+        run: npm install
+        env:
+          PYTHON: ${{ steps.setup_python.outputs.python-path }}
+          npm_config_python: ${{ steps.setup_python.outputs.python-path }}
+
+      - name: Get app version from package.json
+        id: get_version
+        run: echo "APP_VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
+
+      - name: Create app-config.json
+        run: |
+          printf "{\n" > app-config.json
+          printf "  \"VITE_GOOGLE_CLIENT_ID\": \"%s\",\n" "${{ secrets.VITE_GOOGLE_CLIENT_ID }}" >> app-config.json
+          printf "  \"VITE_GOOGLE_CLIENT_SECRET\": \"%s\"\n" "${{ secrets.VITE_GOOGLE_CLIENT_SECRET }}" >> app-config.json
+          printf "}\n" >> app-config.json
+
+      - name: Create resources directory
+        run: mkdir -p resources/backend
+
+      - name: Build Go Backend and Download Models
+        run: npm run build:go
+
+      - name: Build macOS Release
+        run: npm run build:web && npx electron-builder --mac --publish never
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload macOS Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-build-${{ env.APP_VERSION }}
+          path: release/${{ env.APP_VERSION }}
+          if-no-files-found: error
+          retention-days: 5
