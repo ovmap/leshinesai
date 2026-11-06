@@ -26,7 +26,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18
-          cache: 'npm'
 
       - name: Set up Python (for native modules)
         uses: actions/setup-python@v5
@@ -39,24 +38,10 @@ jobs:
           python -m pip install --upgrade pip setuptools wheel
           python -c "import distutils; print('distutils available')"
 
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: '1.23'
-          cache-dependency-path: backend/go.sum
-
-      - name: Cache Go modules
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg/mod
-          key: macos-go-${{ hashFiles('backend/go.sum') }}
-          restore-keys: |
-            macos-go-
-
-      - name: Install Node Dependencies
-        run: npm install
+      - name: Clean install dependencies
+        run: |
+          rm -rf node_modules package-lock.json
+          npm install
         env:
           PYTHON: ${{ steps.setup_python.outputs.python-path }}
           npm_config_python: ${{ steps.setup_python.outputs.python-path }}
@@ -72,14 +57,8 @@ jobs:
           printf "  \"VITE_GOOGLE_CLIENT_SECRET\": \"%s\"\n" "${{ secrets.VITE_GOOGLE_CLIENT_SECRET }}" >> app-config.json
           printf "}\n" >> app-config.json
 
-      - name: Create resources directory
-        run: mkdir -p resources/backend
-
-      - name: Build Go Backend and Download Models
-        run: npm run build:go
-
       - name: Build macOS Release
-        run: npm run build:web && npx electron-builder --mac --publish never
+        run: npm run build:mac
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
