@@ -63,7 +63,7 @@
   "dependencies": {
     "@ant-design/icons-vue": "^7.0.1",
     "@electron/node-gyp": "^10.2.0-electron.2",
-    "@ricky0123/vad-web": "^0.0.24",
+    "@ricky0123/vad-web": "^0.0.31",
     "@tailwindcss/vite": "^4.3.2",
     "@types/node-cron": "^3.0.11",
     "ant-design-vue": "^4.2.6",
